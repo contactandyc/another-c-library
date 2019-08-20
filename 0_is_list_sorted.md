@@ -215,6 +215,7 @@ int *is_list_not_sorted(int *arr, size_t N) {
   // only 0.0025% of unsorted cases should arrive here.
   return is_list_not_sorted_iteration(p, lp);
 }
+```
 
 If the list is unsorted, the odds of it reaching comparison 6 are 1/120.  The odds of it needing to do iteration to determine that the list is unsorted is 1/40230!  Furthermore, if you do reach iteration, you can know how many items were sorted at the front.  I don't believe that anything fancy is needed based upon the number of items in the list.  If our data has any probability of being sorted (which most sets do), then it is extremely unlikely to randomly meet even a 7 point test.
 
