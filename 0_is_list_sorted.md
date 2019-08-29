@@ -13,11 +13,16 @@ To determine if ABCDE is sorted, you might
 5.  list is sorted
 ```
 
-For a list of 1 million items, it would take at most 999,999 comparison to determine if the list is sorted.  In the example above, BCDEA would be the worst case as it would fail on the last comparison.  <b>In the case of a million items, we could confirm that every 100,000th item is in order before doing the 999,999 comparisons.  The odds of every 100,000th item being in order are 1 in 362,880.  By doing 10 comparisons, 999,999 comparisons can be avoided in determining if a set is sorted in the worst case.</b>
+For a list of 1 million items, it would take at most 999,999 comparison to determine if the list is sorted.  In the example above, BCDEA would be the worst case as it would fail on the last comparison.  <b>In the case of a million items, we could confirm that every 100,000th item is in order before doing the 999,999 comparisons.  The odds of every 100,000th item being in order are 1 in 362,880.  By doing 10 comparisons, 999,999 comparisons can be avoided in determining if a set is sorted in the worst case.</b>  Choosing random or points distributed through the set is likely better than choosing sequential items as the sequential items only give you probability of the given space and not the whole set.   
 
-qsort is a standard C function which typically uses a combination of the quicksort algorithm and insertion sort.  The partitioning that is used within qsort is based upon Robert Sedgewick's idea of choosing a median pivot point of the first, middle, and last point.  To find the median, comparisons are made and if they are out of order, swapping occurs.  It is possible to know without any extra comparisons that the first, middle, and last point are in order and didn't need swapping.  Given that this only occurs 1/6th of the time on random sets, it makes sense to continue to see if the full set was fully sorted (or reversed) prior to engaging the quicksort's generally recursive algoithm.  By doing this, the quicksort's worst case scenarios become the best case scenarios!  If the iteration does occur and determines that the list is not sorted, the items in the list up that point are known to be sorted and can be compared against the median to reduce comparisons on the left side.
+qsort is a standard C function which typically uses a combination of the quicksort algorithm and insertion sort.  The partitioning that is used within qsort is based upon Robert Sedgewick's idea of choosing a median pivot point of the first, middle, and last point.  In the process of finding the median, one can know if the first, middle, and last points were originally sorted.  Given that this only occurs 1/6th of the time on random sets, it makes sense to continue to see if the full set was fully sorted (or reversed) prior to engaging the quicksort's generally recursive algorithm.  By doing this, the quicksort's worst case scenarios become the best case scenarios!  If the iteration does occur and determines that the list is not sorted, the items in the list up that point are known to be sorted and can be compared against the median to reduce comparisons on the left side.
 
-I have no idea if this is new or not, but the qsort method in the standard gcc library doesn't apply this optimization.  
+I have no idea if this is new or not, but the qsort method in the standard gcc library and in FreeBSD's implementation do not apply this optimization.
+
+I've created another repo https://github.com/contactandyc/quicksort/ to show differences in the linux version of qsort.
+
+https://opensource.apple.com/source/Libc/Libc-1272.200.26/stdlib/FreeBSD/qsort.c.auto.html
+https://code.woboq.org/userspace/glibc/stdlib/qsort.c.html
 
 # Detailed explanation with C code.
 
@@ -133,7 +138,7 @@ int *is_list_not_sorted(int *arr, size_t N) {
 
 To make this clearer, we will break it into two functions.
 ```c
-int is_list_not_sorted_iteration(int *p, int *lp) {
+int *is_list_not_sorted_iteration(int *p, int *lp) {
   p++; // advance to second item
   while(p <= lp) {
     if(p[-1] > *p)
@@ -189,29 +194,13 @@ int *is_list_not_sorted(int *arr, size_t N) {
   int *lp = arr+N-1;
   size_t block_size = (N>>3);
   int *np = arr+block_size;
-  if(*p > *np)  // test 1
-    return p;
-  int *np2 = np+block_size;
-  if(*np > *np2) // test 2
-    return p;
-  np = np2+block_size;
-  if(*np2 > *np) // test 3
-    return p;
-  np2 = np+block_size;
-  if(*np2 > *np) // test 4
-    return p;
-  np = np2+block_size;
-  if(*np2 > *np) // test 5
-    return p;
-  np2 = np+block_size;
-  if(*np2 > *np) // test 6
-    return p;
-  np = np2+block_size;
-  if(*np2 > *np) // test 7
-    return p;
-  if(*np > *lp) // test 8
-    return p;
-
+  int *np2 = arr;
+  while(np < lp) {
+    if(*np > *np2)
+      return p;
+    np2 = np;
+    np += block_size;
+  }
   // only 0.0025% of unsorted cases should arrive here.
   return is_list_not_sorted_iteration(p, lp);
 }
