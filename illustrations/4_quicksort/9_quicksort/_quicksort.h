@@ -390,10 +390,19 @@ median_of_5s:;
   goto *return_label;
 
 fast_sort:;
-fast_sort_post_median:;
   mid = base + (num_elements>>1);
   high = base + (num_elements-1);
-  quicksort_swap(mid, high); // if data is sorted forward or reverse, then mid is best split, if random or equal, it can't hurt
+  if(quicksort_less(*mid, *base, arg)) {
+    quicksort_swap(base, mid);
+  }
+  if(quicksort_less(*high, *mid, arg)) {
+    if(quicksort_less(*high, *base, arg)) {
+      quicksort_swap(base,high);
+    }
+  }
+  else {
+    quicksort_swap(mid, high);
+  }
   a = b = base;
   while(a < high) {
     if(quicksort_less(*a, *high, arg)) {
