@@ -1,7 +1,7 @@
 all: test_quicksort examples
 
-test_quicksort: test_quicksort.c _quicksort.h
-	gcc test_quicksort.c -o test_quicksort -O3
+test_quicksort: test_quicksort.c timer.c timer.h _quicksort.h
+	gcc test_quicksort.c timer.c -o test_quicksort -O3
 
 examples:
 	./test_quicksort A 100000
