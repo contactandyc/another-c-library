@@ -55,7 +55,6 @@ void quicksort_test(const char *function, int line, quicksort_type *base, ssize_
   }
 }
 
-
 #define quicksort_swap(a, b) \
   tmp = *(a); \
   *(a) = *(b); \
