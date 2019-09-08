@@ -467,7 +467,7 @@ else {
 
 The curly braces are not needed if there is exactly one statement.
 
-else if works in connection with if.  else if only happens if the if (or else if statements) have not reached a true condition.  Finally, else doesn't expect a condition and essentially becomes the default block to run if all other conditions were evaluated to be false.  It's also important to realize the difference between = and ==.  A single equal statement is used for assignment.  A double equal statement indicates an equality test.
+else if works in connection with if.  else if only happens if the if (or else if statements abpve it) have not been evaluated to equal a true condition.  Finally, else doesn't expect a condition and essentially becomes the default block to run if all other conditions were evaluated to be false.  It's also important to realize the difference between = and ==.  A single equal statement is used for assignment.  A double equal statement indicates an equality test.
 
 In code below, p was of type void *.  It must be converted before it can be dereferenced (to get the value of what p is pointing at).
 ```c
