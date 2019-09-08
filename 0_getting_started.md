@@ -463,7 +463,7 @@ gcc test_timer.c -o test_timer
 
 The examples block will run everytime because it doesn't have any dependencies and examples isn't a file that exists.  If you were to create a file called examples, then the examples block would cease to run.  By running <b>make</b>, you will effectively build test_timer if it needs built and run the examples block.  Running <b>make clean</b> will clean up the binary.  You can run any block by specifying it.  <b>make all</b> is equivalent to running <b>make</b>.  If you just want to run the examples block, you can by running <b>make examples</b>.  
 
-# Defining the first interface
+# Defining the timer interface
 
 ```c
 #ifndef _timer_H
