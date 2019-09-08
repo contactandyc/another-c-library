@@ -11,6 +11,16 @@ In the project, there is an illustrations folder which contains most of the code
 At various points in this project, we will be timing code in an attempt to optimize it.  Our first object is going to be simple, but will illustrate how I plan to maintain separation between interfaces and their respective implementation.
 
 The following code is found in <i>illustrations/0_getting_started/1_timer</i>
+```bash
+$ make
+gcc test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 49.0980ns
+Reverse => esreveR
+time_spent: 23.1360ns
+overall time_spent: 72.2340ns
+```
 
 test_timer.c
 ```c
@@ -305,7 +315,8 @@ for( int j=0; j<repeat_test; j++ ) {
   reverse_string(s);
 }
 long test_t2 = get_time();
-overall_time += (test_t2-test_t1);
+long time_spent = test_t2-test_t1;
+overall_time += time_spent;
 ```
 
 After timing the reverse_string call, printf is used to print the string before it was reversed and the new form of the string (s).  Printf allows for format specifiers to match arguments after the first parameter (also known as the format string).  %s indicates that there must be a string for the given argument.  %0.4f expects a floating point number and prints 4 decimal places.  test_t2 and test_t1 are both measured in microseconds.  Multiplying the difference by 1000 will change the unit type to nanoseconds.  Since the test was repeated 1 million times, the overall time needs divided by 1 million.  By multiplying or dividing a number by a decimal, it converts the type to a decimal.
@@ -463,19 +474,220 @@ gcc test_timer.c -o test_timer
 
 The examples block will run everytime because it doesn't have any dependencies and examples isn't a file that exists.  If you were to create a file called examples, then the examples block would cease to run.  By running <b>make</b>, you will effectively build test_timer if it needs built and run the examples block.  Running <b>make clean</b> will clean up the binary.  You can run any block by specifying it.  <b>make all</b> is equivalent to running <b>make</b>.  If you just want to run the examples block, you can by running <b>make examples</b>.  
 
+# Doing a better job of timing
 
+In the last section, we explored how to time the reverse_string function.  In this section, we will explore how to better time the function.  One thing you may have noticed is that there is a million calls to both reverse_string and strcpy.  There is also the overhead of the loop.  To do the timing properly, we should have timed the strcpy and the loop and subtracted that from the loop which has the reverse_string function called.
+
+The timing for the work in <i>illustrations/0_getting_started/2_timer</i> was...
+```bash
+$ make
+gcc test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 46.4650ns
+Reverse => esreveR
+time_spent: 20.5820ns
+overall time_spent: 67.0470ns
+```
+
+This section's code is found in <i>illustrations/0_getting_started/2_timer</i>
+
+```bash
+$ make
+gcc test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 35.8950ns
+Reverse => esreveR
+time_spent: 13.7250ns
+overall time_spent: 49.6200ns
+```
+
+Running make yields a 17.5 nanosecond improvement.  The difference between 1_timer and 2_timer can be found by running...
+
+```bash
+$ diff test_timer.c ../1_timer/test_timer.c
+30,35d29
+<     long copy_t1 = get_time();
+<     for( int j=0; j<repeat_test; j++ ) {
+<       strcpy(s, argv[i]);
+<     }
+<     long copy_t2 = get_time();
+<
+42c36
+<     long time_spent = (test_t2-test_t1) - (copy_t2-copy_t1);
+---
+>     long time_spent = test_t2-test_t1;
+```
+
+The less than symbols mean that the change is in the file in the first parameter (test_timer.c).  The greater than symbol indicates that the change is in the file in the second parameter (../1_timer/test_timer.c).  You should also notice three dashes (---) between the two lines indicating time_spent.  The 30,35d29 means that the lines were added after line 29 as lines 30-35.  The 42c36 means that line 42 in test_timer.c was compared with line 36 in ../1_timer/test_timer.c.
+
+As you can see from above, there are two changes.  The first times everything but the reverse_string.
+```c
+  long copy_t1 = get_time();
+  for( int j=0; j<repeat_test; j++ ) {
+     strcpy(s, argv[i]);
+  }
+  long copy_t2 = get_time();
+```
+
+The second change subtracts the time spent doing everything but the reverse string from the reverse string loop.
+```c
+long time_spent = (test_t2-test_t1) - (copy_t2-copy_t1);
+```
+
+# Doing a better job of timing continued
+
+In the last section, we eliminated the cost of the strcpy and loop from the timing.  Another thing to do is to reconsider our reverse_string function.  The reverse_string calls strlen to get the length of the string s.  We could try and just pass the length of s into the call.  We can get the length of the argument outside of the repeated and timed test.  For completeness, we will compare the timing of 2_timer with 3_timer.
+
+The timing for the work in <i>illustrations/0_getting_started/2_timer</i> was...
+```bash
+$ make
+gcc test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 37.4880ns
+Reverse => esreveR
+time_spent: 12.5070ns
+overall time_spent: 49.9950ns
+```
+
+This section's code is found in <i>illustrations/0_getting_started/3_timer</i>
+```bash
+$ make
+gcc test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 28.8140ns
+Reverse => esreveR
+time_spent: 6.5320ns
+overall time_spent: 35.3460ns
+```
+
+Running make yields a 14.5 nanosecond improvement.  The difference between 2_timer and 3_timer can be found by running...
+```bash
+$ diff test_timer.c ../2_timer/test_timer.c
+7c7,8
+< void reverse_string( char *s, size_t len ) {
+---
+> void reverse_string( char *s ) {
+>   size_t len = strlen(s);
+28,30c29
+<     size_t len = strlen(argv[i]);
+<     char *s = (char *)malloc(len+1);
+<
+---
+>     char *s = (char *)malloc(strlen(argv[i])+1);
+40c39
+<       reverse_string(s, len);
+---
+>       reverse_string(s);
+```
+
+Line 7 replaces lines 7-8 in the previous test_timer.c.  Lines 28-30 replace line 29.  Line 40 replaces line 39.
+
+Lines 7-8
+```c
+void reverse_string( char *s ) {
+  size_t len = strlen(s);
+```
+
+are replaced with this line at line 7
+```c
+void reverse_string( char *s, size_t len ) {
+```
+
+Instead of getting the string length of s in every call, reverse_string now expects the length of the string to be passed into it.
+
+Line 29
+```c
+char *s = (char *)malloc(strlen(argv[i])+1);
+```
+
+is replaced with lines 28-30
+```c
+size_t len = strlen(argv[i]);
+char *s = (char *)malloc(len+1);
+
+```
+
+We get the length of the ith argument one time before calling malloc and use that length in the malloc call.
+
+Line 39
+```c
+reverse_string(s);
+```
+
+is replaced by line 40
+```c
+reverse_string(s, len);
+```
+
+The length is passed into the reverse_string call so that reverse_string doesn't have to calculate it.  This optimization yielded another 14.5 nanoseconds.
+
+# Compiler optimizations
+
+It's important to not forget that the compiler can optimize the code further.  You can pass a flag called -O3 to gcc and sometimes see an improvement.
+
+The timing for the work in <i>illustrations/0_getting_started/3_timer</i> was...
+```bash
+$ make
+gcc test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 28.8140ns
+Reverse => esreveR
+time_spent: 6.5320ns
+overall time_spent: 35.3460ns
+```
+
+This section's code is found in <i>illustrations/0_getting_started/3_timer</i>
+```bash
+$ make
+gcc -O3 test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 9.7730ns
+Reverse => esreveR
+time_spent: 2.5150ns
+overall time_spent: 12.2880ns
+```
+
+Running make yields a 23 nanosecond improvement!  The only difference is in the Makefile.
+```bash
+$ diff . ../3_timer/
+diff ./Makefile ../3_timer/Makefile
+4c4
+< 	gcc -O3 test_timer.c -o test_timer
+---
+> 	gcc test_timer.c -o test_timer
+```
+
+The -O3 optimization (full optimization) was turned on in gcc.  It is good to actually compare time with optimizations turned on because sometimes the fastest code is slower once optimizations are turned on.
 
 # Defining the timer interface
 
-The following code is found in <i>illustrations/0_getting_started/2_timer</i>
+The following code is found in <i>illustrations/0_getting_started/5_timer</i>
 
 The Makefile has one minor difference.  This project will have a separate timer object.  The gcc command will run if test_timer.c, timer.c, or timer.h are changed.
 ```Makefile
 test_timer: test_timer.c timer.c timer.h
-	gcc timer.c test_timer.c -o test_timer
+	gcc -O3 timer.c test_timer.c -o test_timer
 ```
 
-Run <b>make</b> to build this project and run examples.
+Build the project...
+```bash
+$ make
+gcc -O3 timer.c test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 9.7730ns
+Reverse => esreveR
+time_spent: 2.5150ns
+overall time_spent: 12.2880ns
+```
+
+The timing is the same as 4_timer.  This section will be about 
 
 timer.h
 ```c
