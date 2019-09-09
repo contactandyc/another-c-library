@@ -1396,3 +1396,50 @@ void timer_destroy(timer_t *t) {
 ```
 
 timer_destroy simply needs to free the memory that was allocated by either of the init methods.
+
+```c
+void timer_subtract(timer_t *t, timer_t *sub);
+void timer_add(timer_t *t, timer_t *add);
+```
+
+becomes
+```c
+void timer_subtract(timer_t *t, timer_t *sub) {
+  t->base -= (sub->time_spent+sub->base);
+}
+
+void timer_add(timer_t *t, timer_t *add) {
+  t->base += (add->time_spent+add->base);
+}
+```
+
+These methods may also have been initialized from another timer, so the base is added to the time_spent.  
+
+```c
+void timer_start(timer_t *t);
+void timer_stop(timer_t *t);
+```
+
+becomes
+```c
+void timer_start(timer_t *t) {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  t->start_time = (tv.tv_sec * 1000000) + tv.tv_usec;
+}
+
+void timer_stop(timer_t *t) {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  long v = (tv.tv_sec * 1000000) + tv.tv_usec;
+  v -= t->start_time;
+  t->time_spent += v;
+}
+```
+
+timer_start is basically the same as get_time() defined earlier.  The difference is that it sets the start_time member of the struct timer_t t.
+
+double timer_ns(timer_t *t);
+double timer_us(timer_t *t);
+double timer_ms(timer_t *t);
+double timer_sec(timer_t *t);
