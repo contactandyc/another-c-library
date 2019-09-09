@@ -129,6 +129,87 @@ typedef unsigned int number_t;
 number_t a = 100;
 ```
 
+Every data type in C has a size.  The size of a pointer is always the same (it is the same as the size_t type).  You can determine the size of a type or variable by using the sizeof() operator.  sizeof(number_t) would find the size of the number_t type (and return 4 since unsigned int is 4 bytes).  sizeof(void) is not allowed as that doesn't make sense.
+
+In C, you can group multiple data types as variables together to define a larger structure.  A classic example is to create a point structure.  Typically, they would be defined as follows...
+```c
+#include <stdio.h>
+
+struct point {
+  int x;
+  int y;
+};
+
+int main( int argc, char *argv[]) {
+  struct point p;
+  p.x = 1;
+  p.y = 100;
+  printf( "(%d, %d)\n", p.x, p.y );
+  return 0;
+}
+```
+
+You can use typedef to reduce the need for typing the keyword struct over and over...
+```c
+#include <stdio.h>
+
+typedef struct point_s {
+  int x;
+  int y;
+} point;
+
+int main( int argc, char *argv[] ) {
+  point p; // or struct point_s p;
+  p.x = 1;
+  p.y = 100;
+  printf( "(%d, %d)\n", p.x, p.y );
+  return 0;
+}
+```
+
+You can also define that a struct will exist and then define it later.
+```c
+#include <stdio.h>
+
+struct point_s;
+typedef struct point_s point;
+
+struct point_s {
+  int x;
+  int y;
+};
+
+int main( int argc, char *argv[] ) {
+  point p; // or struct point_s p;
+  p.x = 1;
+  p.y = 100;
+  printf( "(%d, %d)\n", p.x, p.y );
+  return 0;
+}
+```
+
+To access members of a struct value, you use the dot notation.  If you have a pointer to the structure, then you access members using the -> syntax.
+```c
+#include <stdio.h>
+
+struct point_s;
+typedef struct point_s point;
+
+struct point_s {
+  int x;
+  int y;
+};
+
+int main( int argc, char *argv[] ) {
+  point p; // or struct point_s p;
+  point *ptr = &p; // &p gets the address of p (or returns a pointer to p).
+  ptr->x = 1;
+  ptr->y = 100;
+  printf( "(%d, %d)\n", ptr->x, ptr->y );
+  return 0;
+}
+```
+
 A variable can be cast from one type to another either implicitly or explicitly.  Imagine you want to convert an int to a double or vice versa.
 
 ```c
@@ -1095,6 +1176,14 @@ overall time_spent: 12.2880ns
 
 The timing is the same as 4_timer.  This section will be about
 
+In test_timer.c the following lines of code exists.
+```c
+#include "timer.h"
+#include "timer.h" // to show the importance of compiler directives
+```
+
+In order to make our project reusable, we need to break it up into objects (or interfaces and implementations).  In the above example, we are including timer.h (which we will make next).  
+
 timer.h
 ```c
 #ifndef _timer_H
@@ -1140,4 +1229,37 @@ double timer_ms(timer_t *t);
 double timer_sec(timer_t *t);
 
 #endif
+```
+
+Compiler directives always begin with a #.  We've briefly talked about #include.  #include allows filenames to be wrapped in double quotes or angle brackets.  Typically, one would use double quotes to include things that you have written and angle brackets for system or third party packages.  This is just a convention.  Most of the time, you will want header files to only be read once even if they are included multiple times (usually by different files).  Most header files will be wrapped in a #ifndef, #define, #endif block.  #ifndef checks to see if _timer_H is defined.  If it is not defined, then the next statement defines it.  The #endif statement is the end of the #ifndef block.  #define has many more uses as we will see later.
+
+```c
+#ifndef _timer_H
+#define _timer_H
+
+...
+
+#endif
+```
+
+Earlier you learned that the struct keyword allows you to group zero or more types together to form a new type.  In general, I like to name struct types with a _s suffix and then typedef them to have a _t suffix.  In the timer.h above, the timer_s struct was declared, but never actually defined.  The details of what is in the structure is part of the implementation and isn't meant to be known externally.  C allows you to define types in this way and use them as long as you only reference them as pointers.  All pointers have the same size (the number of bits that the cpu supports or the sizeof(size_t)).  For now, just recognize that there is a new type named timer_t and that timer_s will be defined in timer.c.
+
+```c
+struct timer_s;
+typedef struct timer_s timer_t;
+```
+
+I follow a pattern where every function is prefixed by the object name (in this case timer).  The primary type (if there is one) is usually the object name followed by _t.  Objects will typically have an init and a destroy method.  The job of the header file is to create an interface for applications to use.  It should hide implementation details as much as possible.  I usually will define an interface before defining an implementation.
+
+For the timer object, the number of times 
+```c
+/*
+   Initialize the timer.  repeat is necessary to indicate how many times the
+   test was repeated so that the final result represents that.  If a thing is
+   only being timed with a single repetition, then use a value of 1.
+*/
+timer_t *timer_init(int repeat);
+
+/* destroy the timer */
+void timer_destroy(timer_t *t);
 ```
