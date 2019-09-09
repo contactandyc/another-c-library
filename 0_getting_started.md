@@ -1128,7 +1128,7 @@ time_spent: 6.5320ns
 overall time_spent: 35.3460ns
 ```
 
-This section's code is found in <i>illustrations/0_getting_started/3_timer</i>
+This section's code is found in <i>illustrations/0_getting_started/4_timer</i>
 ```bash
 $ make
 gcc -O3 test_timer.c -o test_timer
@@ -1151,6 +1151,415 @@ diff ./Makefile ../3_timer/Makefile
 ```
 
 The -O3 optimization (full optimization) was turned on in gcc.  It is good to actually compare time with optimizations turned on because sometimes the fastest code is slower once optimizations are turned on.
+
+# Splitting up your code into multiple files
+
+This section's code is found in <i>illustrations/0_getting_started/5_timer</i>
+
+If you run diff -q . ../4_timer/, a brief summary of what changed will be displayed.
+```bash
+$ diff -q . ../4_timer/
+Files ./Makefile and ../4_timer/Makefile differ
+Only in .: file2.c
+Files ./test_timer.c and ../4_timer/test_timer.c differ
+```
+
+In the test_timer.c, there were two functions besides the main function.  To illustrate how you can break your code up into multiple files, I moved those functions to file2.c
+
+file2.c:
+```c
+void reverse_string( char *s, size_t len ) {
+  char *e = s+len-1;
+  while(s < e) {
+    char tmp = *s;
+    *s = *e;
+    *e = tmp;
+    s++;
+    e--;
+  }
+}
+
+long get_time() {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return (tv.tv_sec * 1000000) + tv.tv_usec;
+}
+```
+
+The next change is to include file2.c in test_timer.c
+
+```c
+...
+#include <time.h>
+
+#include "file2.c"
+
+int main( int argc, char *argv[]) {
+...
+```
+
+The compiler basically inserts the contents of file2.c into test_timer.c.  At this point, if there was another source file that wanted to use these functions, all they would have to do is #include "file2.c".  For example...
+
+test_reverse.c
+```c
+#include "file2.c"
+
+#include <stdlib.h>
+#include <stdio.h>
+
+int main( int argc, char *argv[] ) {
+  for( int i=1; i<argc; i++ ) {
+    char *s = strdup(argv[i]); // string duplicate
+    reverse_string(s);
+    printf( "%s => %s\n", argv[i], s );
+    free(s);
+  }
+  return 0;
+}
+```
+
+```bash
+$ gcc test_reverse.c -o test_reverse
+In file included from test_reverse.c:1:
+./file2.c:1:31: error: unknown type name 'size_t'
+void reverse_string( char *s, size_t len ) {
+                              ^
+./file2.c:13:18: error: variable has incomplete type 'struct timeval'
+  struct timeval tv;
+                 ^
+./file2.c:13:10: note: forward declaration of 'struct timeval'
+  struct timeval tv;
+         ^
+./file2.c:14:3: warning: implicit declaration of function 'gettimeofday' is invalid in C99 [-Wimplicit-function-declaration]
+  gettimeofday(&tv, NULL);
+  ^
+./file2.c:14:21: error: use of undeclared identifier 'NULL'
+  gettimeofday(&tv, NULL);
+                    ^
+test_reverse.c:8:15: warning: implicitly declaring library function 'strdup' with type 'char *(const char *)' [-Wimplicit-function-declaration]
+    char *s = strdup(argv[i]); // string duplicate
+              ^
+test_reverse.c:8:15: note: include the header <string.h> or explicitly provide a declaration for 'strdup'
+2 warnings and 3 errors generated.
+```
+
+As you can see there are lots of errors.  It's generally best to work through errors starting from the first one and working down as the first error may cause other errors to occur.
+
+The first error is
+```
+In file included from test_reverse.c:1:
+./file2.c:1:31: error: unknown type name 'size_t'
+void reverse_string( char *s, size_t len ) {
+```
+
+The error indicates that the type size_t is not known.  Use your favorite search engine and query "error: unknown type name 'size_t'".  You should be able to find that it is defined in stdio.h, so the solution is to include stdio.h.  Notice that we actually do include stdio.h in test_reverse.c, but it is after we include file2.c.  Ideally, file2.c would be complete, so let's modify file2.c to include stdio.h and rerun gcc.  You will have to add the following line to the beginning of file2.c.
+
+```c
+#include <stdio.h>
+```
+
+and then run gcc again.
+```bash
+$ gcc test_reverse.c -o test_reverse
+In file included from test_reverse.c:1:
+./file2.c:15:18: error: variable has incomplete type 'struct timeval'
+  struct timeval tv;
+                 ^
+./file2.c:15:10: note: forward declaration of 'struct timeval'
+  struct timeval tv;
+         ^
+./file2.c:16:3: warning: implicit declaration of function 'gettimeofday' is invalid in C99 [-Wimplicit-function-declaration]
+  gettimeofday(&tv, NULL);
+  ^
+test_reverse.c:8:15: warning: implicitly declaring library function 'strdup' with type 'char *(const char *)' [-Wimplicit-function-declaration]
+    char *s = strdup(argv[i]); // string duplicate
+              ^
+test_reverse.c:8:15: note: include the header <string.h> or explicitly provide a declaration for 'strdup'
+test_reverse.c:9:21: error: too few arguments to function call, expected 2, have 1
+    reverse_string(s);
+    ~~~~~~~~~~~~~~  ^
+./file2.c:3:1: note: 'reverse_string' declared here
+void reverse_string( char *s, size_t len ) {
+^
+2 warnings and 2 errors generated.
+```
+
+The following two errors are missing now...
+```
+In file included from test_reverse.c:1:
+./file2.c:1:31: error: unknown type name 'size_t'
+void reverse_string( char *s, size_t len ) {
+
+./file2.c:14:21: error: use of undeclared identifier 'NULL'
+  gettimeofday(&tv, NULL);
+```
+
+NULL was also defined in stdio.h, so by fixing the first error, we actually fixed another error.  This is a big reason that I fix errors from the beginning to the end.  Often the fixes, fix other problems.
+
+The next error is
+```c
+In file included from test_reverse.c:1:
+./file2.c:15:18: error: variable has incomplete type 'struct timeval'
+  struct timeval tv;
+```
+
+Again, use your favorite search engine and query "error: variable has incomplete type 'struct timeval'".  I found the answer was to #include <sys/time.h> on stack overflow.  Again, let's add this to file2.c right after the #include <stdio.h> call.
+
+Add this right after #include <stdio.h> to file2.c
+```c
+#include <sys/time.h>
+```
+
+Again, run gcc to check for more errors
+```bash
+$ gcc test_reverse.c -o test_reverse
+test_reverse.c:8:15: warning: implicitly declaring library function 'strdup' with type 'char *(const char *)' [-Wimplicit-function-declaration]
+    char *s = strdup(argv[i]); // string duplicate
+              ^
+test_reverse.c:8:15: note: include the header <string.h> or explicitly provide a declaration for 'strdup'
+test_reverse.c:9:21: error: too few arguments to function call, expected 2, have 1
+    reverse_string(s);
+    ~~~~~~~~~~~~~~  ^
+./file2.c:4:1: note: 'reverse_string' declared here
+void reverse_string( char *s, size_t len ) {
+^
+1 warning and 1 error generated.
+```
+
+Again, by fixing the one error, we actually fixed more.  Let's continue with the next warning.
+```
+test_reverse.c:8:15: warning: implicitly declaring library function 'strdup' with type 'char *(const char *)' [-Wimplicit-function-declaration]
+    char *s = strdup(argv[i]); // string duplicate
+              ^
+test_reverse.c:8:15: note: include the header <string.h> or explicitly provide a declaration for 'strdup'
+```
+
+Notice that this time, gcc actually gives us a hint (include the header <string.h>).  Let's add this to test_reverse.c
+
+test_reverse.c:
+```c
+#include "file2.c"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+int main( int argc, char *argv[] ) {
+  for( int i=1; i<argc; i++ ) {
+    char *s = strdup(argv[i]); // string duplicate
+    reverse_string(s);
+    printf( "%s => %s\n", argv[i], s );
+    free(s);
+  }
+  return 0;
+}
+```
+
+We don't have to recompile everytime.  We can go ahead and look at the next error and try and fix more than one.
+```
+test_reverse.c:9:21: error: too few arguments to function call, expected 2, have 1
+    reverse_string(s);
+    ~~~~~~~~~~~~~~  ^
+./file2.c:4:1: note: 'reverse_string' declared here
+void reverse_string( char *s, size_t len ) {
+^
+```
+
+Again, gcc is helping us by pointing out that reverse_string requires two arguments and what they should be.  I forgot to pass the length of the string as the second argument.  We can do that with strlen.
+
+test_reverse.c:
+```c
+#include "file2.c"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+int main( int argc, char *argv[] ) {
+  for( int i=1; i<argc; i++ ) {
+    char *s = strdup(argv[i]); // string duplicate
+    reverse_string(s, strlen(s));
+    printf( "%s => %s\n", argv[i], s );
+    free(s);
+  }
+  return 0;
+}
+```
+
+Now if you run gcc...
+```bash
+$ gcc test_reverse.c -o test_reverse
+$
+```
+
+All of the errors and warnings are gone.  
+
+We can run test_reverse like...
+```bash
+$ ./test_reverse This is a test
+This => sihT
+is => si
+a => a
+test => tset
+```
+
+If you were following along and changing file2.c, you can run make again to see if the changes work in the original test_timer.
+
+```bash
+$ make
+gcc -O3 test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 11.9100ns
+Reverse => esreveR
+time_spent: 3.1390ns
+overall time_spent: 15.0490ns
+```
+
+The changes work.
+
+Before continuing, you should note that there was one important change in Makefile
+
+```
+test_timer: test_timer.c
+```
+
+changed to
+```
+test_timer: test_timer.c file2.c
+```
+
+This change is helpful because it says that the test_timer block should run if any of the files have changed.  Now that test_timer is made up of two files, we should list both files.  Internally, make simply looks at the time stamp of test_timer and of test_timer.c and file2.c.  If test_timer.c or file2.c has a time stamp that is greater than test_timer (or test_timer doesn't exist), then the block will be run again.
+
+# Splitting up your code into multiple files part 2
+
+This section's code is found in <i>illustrations/0_getting_started/6_timer</i>
+
+It is generally a good idea to make each file or group of files self-contained.  In the last section, we didn't notice errors when running make, but we did when trying to build test_reverse.  The errors didn't occur because prior to including file2.c we had already included stdio.h and sys/time.h.  In general, you want to include your custom code first as this will present the error earlier.  We should make the following change to test_timer.c
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/time.h>
+#include <time.h>
+
+#include "file2.c"
+```
+
+change to
+```c
+#include "file2.c"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/time.h>
+#include <time.h>
+```
+
+If you go back and change test_timer.c in <i>illustrations/0_getting_started/5_timer</i> and then run make, you will get some of the same errors that we had when building test_reverse.
+
+in illustrations/0_getting_started/5_timer after making above change
+```bash
+$ make
+gcc -O3 test_timer.c -o test_timer
+In file included from test_timer.c:1:
+./file2.c:1:31: error: unknown type name 'size_t'
+void reverse_string( char *s, size_t len ) {
+                              ^
+./file2.c:13:18: error: variable has incomplete type 'struct timeval'
+  struct timeval tv;
+                 ^
+./file2.c:13:10: note: forward declaration of 'struct timeval'
+  struct timeval tv;
+         ^
+./file2.c:14:3: warning: implicit declaration of function 'gettimeofday' is invalid in C99 [-Wimplicit-function-declaration]
+  gettimeofday(&tv, NULL);
+  ^
+./file2.c:14:21: error: use of undeclared identifier 'NULL'
+  gettimeofday(&tv, NULL);
+                    ^
+1 warning and 3 errors generated.
+make: *** [test_timer] Error 1
+```
+
+If we make the change in <i>illustrations/0_getting_started/6_timer</i> and run make
+```bash
+$ make
+gcc -O3 test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 7.6000ns
+Reverse => esreveR
+time_spent: 1.7670ns
+overall time_spent: 9.3670ns
+```
+
+It all works because we have fixed file2.c to have the right include statements.  Particularly if you are developing a new package, it is a good idea to include your own packages before outside or system packages.
+
+# Separating the implementation 
+
+# Defining an object
+
+A typical object looks something like this (where xxx is the object name):
+
+xxx.h
+```
+#ifndef _xxx_H
+#define _xxx_H
+
+struct xxx_s;
+typedef struct xxx_s xxx_t;
+
+xxx_t * xxx_init(int param1, int param2);
+void xxx_destroy( xxx_t *h );
+
+void xxx_do_something( xxx_t *h, const char *prefix );
+
+#endif
+```
+
+To use the above interface, you will include it and call it's methods.
+```
+#include "xxx.h"
+
+int main() {
+  xxx_t *handle = xxx_init(1, 2);
+  xxx_do_something(handle);
+  xxx_destroy(handle);
+  return 0;
+}
+```
+
+xxx.h is just an interface.  The implementation of those functions would be in a C file.
+
+xxx.c:
+```c
+#include "xxx.h"
+
+#include <stdio.h>
+
+struct xxx_s {
+  int x;
+  int y;
+};
+
+xxx_t * xxx_init(int param1, int param2) {
+  xxx_t *h = (xxx_t *)malloc(sizeof(xxx_t));
+  h->x = param1;
+  h->y = param2;
+  return h;
+}
+
+void xxx_destroy( xxx_t *h ) {
+  free(h);
+}
+
+void xxx_do_something( xxx_t *h, const char *prefix ) {
+  printf( "%s: (%d, %d)\n", prefix, h->x, h->y );
+}
+```
 
 # Defining the timer interface
 
@@ -1175,6 +1584,81 @@ overall time_spent: 12.2880ns
 ```
 
 The timing is the same as 4_timer.  This section will be about
+
+A typical object looks something like this (where xxx is the object name):
+
+xxx.h
+```
+#ifndef _xxx_H
+#define _xxx_H
+
+struct xxx_s;
+typedef struct xxx_s xxx_t;
+
+xxx_t * xxx_init(int param1, int param2);
+void xxx_destroy( xxx_t *h );
+
+void xxx_do_something( xxx_t *h, const char *prefix );
+
+#endif
+```
+
+To use the above interface, you will include it and call it's methods.
+```
+#include "xxx.h"
+
+int main() {
+  xxx_t *handle = xxx_init(1, 2);
+  xxx_do_something(handle);
+  xxx_destroy(handle);
+  return 0;
+}
+```
+
+xxx.h is just an interface.  The implementation of those functions would be in a C file.
+
+xxx.c:
+```c
+struct xxx_s {
+  int x;
+  int y;
+};
+
+xxx_t * xxx_init(int param1, int param2) {
+  xxx_t *h = (xxx_t *)malloc(sizeof(xxx_t));
+  h->x = param1;
+  h->y = param2;
+  return h;
+}
+
+void xxx_destroy( xxx_t *h ) {
+  free(h);
+}
+
+void xxx_do_something( xxx_t *h, const char *prefix ) {
+  printf( "%s: (%d, %d)\n", prefix, h->x, h->y );
+}
+```
+
+// these two lines of code make it possible for your C or C++ code to avoid having to type the word "struct" when
+// declaring variables.  So instead of "struct stdc_xxx_t variableName", you can type "stdc_xxx_t variableName"
+
+
+
+So to use this code, you would do something like this:
+```
+#include "stdc_xxx.h"
+
+int main() {
+  stdc_xxx_t *handle = stdc_xxx_init(...someParams);
+  stdc_xxx_do_something(handle, ...someParams);
+
+  // lots of code potentially in between because you might be reusing the handle to avoid memory allocations
+  stdc_xxx_destroy(handle)
+
+  return 0;
+}
+```
 
 In test_timer.c the following lines of code exists.
 ```c

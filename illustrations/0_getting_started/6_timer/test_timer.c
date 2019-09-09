@@ -1,51 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
+#include <time.h>
 
-#include "stla_timer.h"
-
-void reverse_string( char *s, size_t len ) {
-  char *e = s+len-1;
-  while(s < e) {
-    char tmp = *s;
-    *s = *e;
-    *e = tmp;
-    s++;
-    e--;
-  }
-}
+#include "file2.c"
 
 int main( int argc, char *argv[]) {
   int repeat_test = 1000000;
-  stla_timer_t *overall_timer = stla_timer_init(repeat_test);
+  long overall_time = 0;
   for( int i=1; i<argc; i++ ) {
     size_t len = strlen(argv[i]);
     char *s = (char *)malloc(len+1);
 
-    stla_timer_t *copy_timer = stla_timer_init(repeat_test);
-    stla_timer_start(copy_timer);
+    long copy_t1 = get_time();
     for( int j=0; j<repeat_test; j++ ) {
       strcpy(s, argv[i]);
     }
-    stla_timer_end(copy_timer);
+    long copy_t2 = get_time();
 
-    stla_timer_t *test_timer = stla_timer_timer_init(copy_timer);
-    stla_timer_start(test_timer);
+    long test_t1 = get_time();
     for( int j=0; j<repeat_test; j++ ) {
       strcpy(s, argv[i]);
       reverse_string(s, len);
     }
-    stla_timer_end(test_timer);
-    stla_timer_add(overall_timer, test_timer);
+    long test_t2 = get_time();
+    long time_spent = (test_t2-test_t1) - (copy_t2-copy_t1);
+    overall_time += time_spent;
 
     printf("%s => %s\n", argv[i], s);
-    printf( "time_spent: %0.4fns\n", stla_timer_ns(test_timer) );
+    printf( "time_spent: %0.4fns\n", (time_spent*1000.0)/(repeat_test*1.0));
 
-    stla_timer_destroy(test_timer);
-    stla_timer_destroy(copy_timer);
     free(s);
   }
-  printf( "overall time_spent: %0.4fns\n", stla_timer_ns(overall_timer) );
-  stla_timer_destroy(overall_timer);
+  printf( "overall time_spent: %0.4fns\n", (overall_time*1000.0)/(repeat_test*1.0));
   return 0;
 }
