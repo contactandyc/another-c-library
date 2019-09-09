@@ -1184,7 +1184,7 @@ In test_timer.c the following lines of code exists.
 
 In order to make our project reusable, we need to break it up into objects (or interfaces and implementations).  In the above example, we are including timer.h (which we will make next).  
 
-timer.h
+timer.h (comments removed)
 ```c
 #ifndef _timer_H
 #define _timer_H
@@ -1192,37 +1192,17 @@ timer.h
 struct timer_s;
 typedef struct timer_s timer_t;
 
-/*
-   Initialize the timer.  repeat is necessary to indicate how many times the
-   test was repeated so that the final result represents that.  If a thing is
-   only being timed with a single repetition, then use a value of 1.
-*/
 timer_t *timer_init(int repeat);
-
-/*
-   Initialize a timer from another timer.  This will subtract the time spent
-   from the other timer and set the repeat to match the other timer.
-*/
 timer_t *timer_timer_init(timer_t *t);
 
-/* destroy the timer */
 void timer_destroy(timer_t *t);
 
-/* Subtract the amount of time spent in sub from the current timer */
 void timer_subtract(timer_t *t, timer_t *sub);
-/* Add the amount of time spent in add to the current timer */
 void timer_add(timer_t *t, timer_t *add);
 
-/* start the timer */
 void timer_start(timer_t *t);
+void timer_stop(timer_t *t);
 
-/* end the timer */
-void timer_end(timer_t *t);
-
-/*
-  Returns time spent in nanoseconds (ns), microseconds (us), milliseconds (ms),
-  and seconds (sec).
-*/
 double timer_ns(timer_t *t);
 double timer_us(timer_t *t);
 double timer_ms(timer_t *t);
@@ -1251,15 +1231,168 @@ typedef struct timer_s timer_t;
 
 I follow a pattern where every function is prefixed by the object name (in this case timer).  The primary type (if there is one) is usually the object name followed by _t.  Objects will typically have an init and a destroy method.  The job of the header file is to create an interface for applications to use.  It should hide implementation details as much as possible.  I usually will define an interface before defining an implementation.
 
-For the timer object, the number of times 
+Initialize the timer.  repeat is necessary to indicate how many times the test was repeated so that the final result represents that.  If a thing is only being timed with a single repetition, then use a value of 1.  This function will allocate the timer_t structure and fill its members appropriately.  To free up the resources associated with this call, you must call timer_destroy with the return value of this call.
 ```c
-/*
-   Initialize the timer.  repeat is necessary to indicate how many times the
-   test was repeated so that the final result represents that.  If a thing is
-   only being timed with a single repetition, then use a value of 1.
-*/
 timer_t *timer_init(int repeat);
+```
 
-/* destroy the timer */
+Initialize a timer from another timer.  This will subtract the time spent and set the repeat from the timer which is passed as a parameter to timer_timer_init.
+```c
+timer_t *timer_timer_init(timer_t *t);
+```
+This will destroy the timer.
+```c
 void timer_destroy(timer_t *t);
 ```
+
+Subtract the amount of time spent in sub from the current timer (t)
+```c
+void timer_subtract(timer_t *t, timer_t *sub);
+```
+
+Add the amount of time spent in add to the current timer (t)
+```c
+void timer_add(timer_t *t, timer_t *add);
+```
+
+Start the timer (t)
+```c
+void timer_start(timer_t *t);
+```
+
+Stop the timer (t)
+```c
+void timer_stop(timer_t *t);
+```
+
+Returns time spent in nanoseconds (ns), microseconds (us), milliseconds (ms), and seconds (sec).
+```c
+double timer_ns(timer_t *t);
+double timer_us(timer_t *t);
+double timer_ms(timer_t *t);
+double timer_sec(timer_t *t);
+```
+
+Notice that timer.h doesn't mention how it is going to be implemented in any way.  It simply names functions in a way that are useable and describes what they do.
+
+I usually copy the .h (header file) to a similarly named .c (implementation file) and then fill in the details.
+
+timer.c (incomplete)
+```c
+#ifndef _timer_H
+#define _timer_H
+
+struct timer_s;
+typedef struct timer_s timer_t;
+
+timer_t *timer_init(int repeat);
+timer_t *timer_timer_init(timer_t *t);
+
+void timer_destroy(timer_t *t);
+
+void timer_subtract(timer_t *t, timer_t *sub);
+void timer_add(timer_t *t, timer_t *add);
+
+void timer_start(timer_t *t);
+void timer_stop(timer_t *t);
+
+double timer_ns(timer_t *t);
+double timer_us(timer_t *t);
+double timer_ms(timer_t *t);
+double timer_sec(timer_t *t);
+
+#endif
+```
+
+The first thing to do is to remove the #ifndef/#define/#endif and replace it with an #include "timer.h".
+
+timer.c (incomplete)
+```c
+#include "timer.h"
+
+struct timer_s;
+typedef struct timer_s timer_t;
+
+timer_t *timer_init(int repeat);
+timer_t *timer_timer_init(timer_t *t);
+
+void timer_destroy(timer_t *t);
+
+void timer_subtract(timer_t *t, timer_t *sub);
+void timer_add(timer_t *t, timer_t *add);
+
+void timer_start(timer_t *t);
+void timer_stop(timer_t *t);
+
+double timer_ns(timer_t *t);
+double timer_us(timer_t *t);
+double timer_ms(timer_t *t);
+double timer_sec(timer_t *t);
+```
+
+The next thing to do is to fill in the the timer_s details and remove the typedef that follows.
+
+```c
+struct timer_s;
+typedef struct timer_s timer_t;
+```
+
+becomes
+```c
+struct timer_s {
+  long base;
+  int repeat;
+  long time_spent;
+  long start_time;
+};
+```
+
+repeat is the number of times that the test will be repeated.  time_spent is the total time that has been spent within this object so far.  start_time is recorded everytime timer_start is called.  base is used to track how much time should be added or subtracted from the final time spent based upon other timers.
+
+```c
+timer_t *timer_init(int repeat);
+```
+
+becomes
+```c
+#include <stdlib.h>
+
+timer_t *timer_init(int repeat) {
+  timer_t *t = (timer_t *)malloc(sizeof(timer_t));
+  t->repeat = repeat;
+  t->base = t->time_spent = t->start_time = 0;
+  return t;
+}
+```
+
+#include <stdlib.h> is added at the top of the file since it is needed for malloc.  All of the members are initialized to zero except repeat (which is set to the value passed into timer_init).
+
+```c
+timer_t *timer_timer_init(timer_t *t);
+```
+
+becomes
+```c
+timer_t *timer_timer_init(timer_t *t) {
+  timer_t *r = (timer_t *)malloc(sizeof(timer_t));
+  r->repeat = t->repeat;
+  r->base = -t->time_spent;
+  r->time_spent = r->start_time = 0;
+  return r;  
+}
+```
+
+The repeat and base are set using this init method.  Notice that the base is set to the time_spent * -1.  This is because the time needs to ultimately be subtracted from the time spent within the timer.
+
+```c
+void timer_destroy(timer_t *t);
+```
+
+becomes
+```c
+void timer_destroy(timer_t *t) {
+  free(t);
+}
+```
+
+timer_destroy simply needs to free the memory that was allocated by either of the init methods.

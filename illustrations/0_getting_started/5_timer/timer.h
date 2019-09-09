@@ -28,8 +28,8 @@ void timer_add(timer_t *t, timer_t *add);
 /* start the timer */
 void timer_start(timer_t *t);
 
-/* end the timer */
-void timer_end(timer_t *t);
+/* stop the timer */
+void timer_stop(timer_t *t);
 
 /*
   Returns time spent in nanoseconds (ns), microseconds (us), milliseconds (ms),

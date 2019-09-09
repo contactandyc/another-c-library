@@ -44,7 +44,7 @@ void timer_start(timer_t *t) {
   t->start_time = (tv.tv_sec * 1000000) + tv.tv_usec;
 }
 
-void timer_end(timer_t *t) {
+void timer_stop(timer_t *t) {
   struct timeval tv;
   gettimeofday(&tv, NULL);
   long v = (tv.tv_sec * 1000000) + tv.tv_usec;

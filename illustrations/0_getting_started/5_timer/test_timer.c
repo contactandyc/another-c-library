@@ -28,7 +28,7 @@ int main( int argc, char *argv[]) {
     for( int j=0; j<repeat_test; j++ ) {
       strcpy(s, argv[i]);
     }
-    timer_end(copy_timer);
+    timer_stop(copy_timer);
 
     timer_t *test_timer = timer_timer_init(copy_timer);
     timer_start(test_timer);
@@ -36,7 +36,7 @@ int main( int argc, char *argv[]) {
       strcpy(s, argv[i]);
       reverse_string(s, len);
     }
-    timer_end(test_timer);
+    timer_stop(test_timer);
     timer_add(overall_timer, test_timer);
 
     printf("%s => %s\n", argv[i], s);
