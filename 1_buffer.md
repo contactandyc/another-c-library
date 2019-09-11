@@ -775,3 +775,5 @@ void *buffer_append_alloc(buffer_t *h, size_t length) {
 ```
 
 If you followed everything in this, that is great.  Otherwise, it might make more sense as the buffer object is used throughout the project.  Next up is /2_linked_structures.md
+
+# Continue to [Linked Structures](2_linked_structures.md)!

@@ -1,8 +1,9 @@
-#include "file2.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+void reverse_string( char *s, size_t len );
+long get_time();
 
 int main( int argc, char *argv[]) {
   int repeat_test = 1000000;

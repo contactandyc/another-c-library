@@ -131,85 +131,6 @@ number_t a = 100;
 
 Every data type in C has a size.  The size of a pointer is always the same (it is the same as the size_t type).  You can determine the size of a type or variable by using the sizeof() operator.  sizeof(number_t) would find the size of the number_t type (and return 4 since unsigned int is 4 bytes).  sizeof(void) is not allowed as that doesn't make sense.
 
-In C, you can group multiple data types as variables together to define a larger structure.  A classic example is to create a point structure.  Typically, they would be defined as follows...
-```c
-#include <stdio.h>
-
-struct point {
-  int x;
-  int y;
-};
-
-int main( int argc, char *argv[]) {
-  struct point p;
-  p.x = 1;
-  p.y = 100;
-  printf( "(%d, %d)\n", p.x, p.y );
-  return 0;
-}
-```
-
-You can use typedef to reduce the need for typing the keyword struct over and over...
-```c
-#include <stdio.h>
-
-typedef struct point_s {
-  int x;
-  int y;
-} point;
-
-int main( int argc, char *argv[] ) {
-  point p; // or struct point_s p;
-  p.x = 1;
-  p.y = 100;
-  printf( "(%d, %d)\n", p.x, p.y );
-  return 0;
-}
-```
-
-You can also define that a struct will exist and then define it later.
-```c
-#include <stdio.h>
-
-struct point_s;
-typedef struct point_s point;
-
-struct point_s {
-  int x;
-  int y;
-};
-
-int main( int argc, char *argv[] ) {
-  point p; // or struct point_s p;
-  p.x = 1;
-  p.y = 100;
-  printf( "(%d, %d)\n", p.x, p.y );
-  return 0;
-}
-```
-
-To access members of a struct value, you use the dot notation.  If you have a pointer to the structure, then you access members using the -> syntax.
-```c
-#include <stdio.h>
-
-struct point_s;
-typedef struct point_s point;
-
-struct point_s {
-  int x;
-  int y;
-};
-
-int main( int argc, char *argv[] ) {
-  point p; // or struct point_s p;
-  point *ptr = &p; // &p gets the address of p (or returns a pointer to p).
-  ptr->x = 1;
-  ptr->y = 100;
-  printf( "(%d, %d)\n", ptr->x, ptr->y );
-  return 0;
-}
-```
-
 A variable can be cast from one type to another either implicitly or explicitly.  Imagine you want to convert an int to a double or vice versa.
 
 ```c
@@ -1496,13 +1417,148 @@ time_spent: 1.7670ns
 overall time_spent: 9.3670ns
 ```
 
+In this section, I also removed the following two lines from test_timer.c as test_timer.c doesn't directly call any time related functions.
+
+```c
+#include <sys/time.h>
+#include <time.h>
+```
+
 It all works because we have fixed file2.c to have the right include statements.  Particularly if you are developing a new package, it is a good idea to include your own packages before outside or system packages.
 
-# Separating the implementation 
+# Separating the implementation from the interface
+
+This section's code is found in <i>illustrations/0_getting_started/7_timer</i>
+
+The key to writing large software projects that work is to clearly define objects and make them highly reusable.  When defining objects, it is best to split the object into an interface and an implementation.  Ideally, the interface will only describe what the object does and not how it works.  This is much like an automobile and a transmission.  An automobile might require a transmission with certain specifications.  That automobile doesn't care how the transmission is made.  An interface is like the specifications to a transmission.  The implementation would include how the transmission actually works.  C allows you to declare that a thing exists prior to it being defined.  Typically, this is done in header files (files that end in a .h extension), but it can be done anywhere.  In this section, we will show how to declare that the functions in file2.c without including them.
+
+In test_timer.c
+```c
+#include "file2.c"
+```
+
+changes to
+```c
+void reverse_string( char *s, size_t len );
+long get_time();
+```
+
+Declaring the functions this way, lets the compiler know that the functions do exist.  The syntax is the same as writing the function, except you replace the {} with a semicolon.
+
+If you run make...
+```bash
+$ make
+gcc -O3 test_timer.c -o test_timer
+Undefined symbols for architecture x86_64:
+  "_get_time", referenced from:
+      _main in test_timer-276d5b.o
+  "_reverse_string", referenced from:
+      _main in test_timer-276d5b.o
+ld: symbol(s) not found for architecture x86_64
+```
+
+This happens because we have defined the functions, but they ultimately don't make it into the binary.  To fix this, change the following line in Makefile.
+
+```Makefile
+gcc -O3 test_timer.c -o test_timer
+```
+
+to (add file2.c to the gcc line)
+```Makefile
+gcc -O3 file2.c test_timer.c -o test_timer
+```
+
+Save and run make again
+```bash
+$ make
+gcc -O3 file2.c test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 8.1540ns
+Reverse => esreveR
+time_spent: 2.4490ns
+overall time_spent: 10.6030ns
+```
+
+Everything works as expected.
+
+# Separating the implementation from the interface (part 2)
+
+This section's code is found in <i>illustrations/0_getting_started/8_timer</i>
+
+Ideally, file2.c should have a corresponding file2.h that describes what exists in file2.c.  We can put the definition of get_time and reverse_string into file2.h as follows...
+
+file2.h:
+```c
+#ifndef _file2_H
+#define _file2_H
+
+#include <stdlib.h>
+
+void reverse_string( char *s, size_t len );
+long get_time();
+
+#endif
+```
+
+The #ifndef, #define, #endif block basically prevents the compiler from including the same code over and over again.  It checks to see if _file2_H has been defined and if it hasn't, it defines it.  If it has been defined previously, the block is skipped by the compiler.
+
+size_t is used in reverse_string which is defined in stdlib.h, so we include stdlib.h.  One last change is to update file2.c to include file2.h so that we can be sure that file2.c and file2.h don't get out of sync.
+
+file2.c
+```c
+#include "file2.h"
+
+#include <stdlib.h>
+#include <sys/time.h>
+#include <time.h>
+...
+```
+
+Now we can include file2.h in test_timer.c instead of defining the functions in test_timer.c.
+
+test_timer.c changes from
+```c
+...
+
+void reverse_string( char *s, size_t len );
+long get_time();
+
+...
+```
+
+to
+```c
+#include "file2.h"
+```
+
+Again, since this is something that is our own, we should include it before system or third party includes.  The Makefile changed slightly
+
+Makefile changed from
+```Makefile
+test_timer: test_timer.c file2.c
+```
+
+to
+```Makefile
+test_timer: test_timer.c file2.h file2.c
+```
+
+So that test_timer will be built if file2.h is updated.
 
 # Defining an object
 
-A typical object looks something like this (where xxx is the object name):
+This section's code is found in <i>illustrations/0_getting_started/9_xxx</i>
+
+To build the code run...
+```bash
+$ make
+gcc -O3 xxx.c test_xxx.c -o test_xxx
+./test_xxx
+Hello: (1, 2)
+```
+
+The objects that will be created throughout the rest of this book will look something like this (where xxx is the object name):
 
 xxx.h
 ```
@@ -1520,13 +1576,15 @@ void xxx_do_something( xxx_t *h, const char *prefix );
 #endif
 ```
 
+The header file or interface simply provides what exists and doesn't offer details into how xxx might work.  The int param1, int param2 and const char *prefix above are just examples.  The init function often doesn't have any parameters.  The init function is used to create the structure so that it can be used by the other functions within the xxx object.  The destroy function destroys the xxx_t structure.  The xxx_t structure doesn't have members.  It is just declared (like the functions after it), so that the compiler knows that the structure is defined somewhere.  By defining the structure like this, applications using the xxx object cannot access members of the structure.  The implementation is free to put whatever members in the structure to make the function work.  The only thing applications which use this object are required to do is create (or init) the object and then pass it around to the various functions that use that type.  If there is a destroy method, then the application is expected to destroy the object to clean it up.
+
 To use the above interface, you will include it and call it's methods.
 ```
 #include "xxx.h"
 
 int main() {
   xxx_t *handle = xxx_init(1, 2);
-  xxx_do_something(handle);
+  xxx_do_something(handle, "Hello");
   xxx_destroy(handle);
   return 0;
 }
@@ -1560,6 +1618,128 @@ void xxx_do_something( xxx_t *h, const char *prefix ) {
   printf( "%s: (%d, %d)\n", prefix, h->x, h->y );
 }
 ```
+
+One thing that hasn't been talked about much is the struct keyword.
+
+In C, you can group multiple data types as variables together to define a larger structure.  A classic example is to create a point structure.  Typically, they would be defined as follows...
+```c
+#include <stdio.h>
+
+struct point {
+  int x;
+  int y;
+};
+
+int main( int argc, char *argv[]) {
+  struct point p;
+  p.x = 1;
+  p.y = 100;
+  printf( "(%d, %d)\n", p.x, p.y );
+  return 0;
+}
+```
+
+You can use typedef to reduce the need for typing the keyword struct over and over...
+```c
+#include <stdio.h>
+
+typedef struct point_s {
+  int x;
+  int y;
+} point;
+
+int main( int argc, char *argv[] ) {
+  point p; // or struct point_s p;
+  p.x = 1;
+  p.y = 100;
+  printf( "(%d, %d)\n", p.x, p.y );
+  return 0;
+}
+```
+
+You can also define that a struct will exist and then define it later.
+```c
+#include <stdio.h>
+
+struct point_s;
+typedef struct point_s point;
+
+struct point_s {
+  int x;
+  int y;
+};
+
+int main( int argc, char *argv[] ) {
+  point p; // or struct point_s p;
+  p.x = 1;
+  p.y = 100;
+  printf( "(%d, %d)\n", p.x, p.y );
+  return 0;
+}
+```
+
+To access members of a struct value, you use the dot notation.  If you have a pointer to the structure, then you access members using the -> syntax.
+```c
+#include <stdio.h>
+
+struct point_s;
+typedef struct point_s point;
+
+struct point_s {
+  int x;
+  int y;
+};
+
+int main( int argc, char *argv[] ) {
+  point p; // or struct point_s p;
+  point *ptr = &p; // &p gets the address of p (or returns a pointer to p).
+  ptr->x = 1;
+  ptr->y = 100;
+  printf( "(%d, %d)\n", ptr->x, ptr->y );
+  return 0;
+}
+```
+
+In the code above, the xxx_s is declared in xxx.h and then typedef'd to xxx_t.
+xxx.h:
+```c
+struct xxx_s;
+typedef struct xxx_s xxx_t;
+```
+
+The xxx_s struct is actually defined in xxx.c:
+```c
+struct xxx_s {
+  int x;
+  int y;
+};
+```
+
+The xxx_init function creates the xxx_t structure, sets the members, and then returns the newly allocated structure.
+```c
+xxx_t * xxx_init(int param1, int param2) {
+  xxx_t *h = (xxx_t *)malloc(sizeof(xxx_t));
+  h->x = param1;
+  h->y = param2;
+  return h;
+}
+```
+
+The xxx_destroy function frees the memory that was allocated in xxx_init.
+```c
+void xxx_destroy( xxx_t *h ) {
+  free(h);
+}
+```
+
+The xxx_do_something function prints x and y after printing the prefix which is passed into it.
+```c
+void xxx_do_something( xxx_t *h, const char *prefix ) {
+  printf( "%s: (%d, %d)\n", prefix, h->x, h->y );
+}
+```
+
+
 
 # Defining the timer interface
 
@@ -1927,3 +2107,5 @@ double timer_ns(timer_t *t);
 double timer_us(timer_t *t);
 double timer_ms(timer_t *t);
 double timer_sec(timer_t *t);
+
+# Continue to [hello buffer](1_buffer.md)!
