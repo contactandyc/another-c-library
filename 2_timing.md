@@ -7,6 +7,10 @@ At various points in this project, we will be timing code in an attempt to optim
 
 The following code is found in <i>illustrations/0_getting_started/1_timer</i>
 ```bash
+cd $stla/illustrations/0_getting_started/1_timer
+```
+
+```bash
 $ make
 gcc test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -66,7 +70,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-Every good c program that is capable of being executed has a main function.  The main function is typically implemented with the following two parameters to allow command line arguments to be passed to the program.  argc represents the number of arguments (the name of the program is the 1st argument).  argv represents the arguments.  argv[0] references the name of the program as called from the command line.  The main function returns an integer.  If the program executes successfully, it should return 0 which lets the command shell know that the program finished normally.  
+Every c program that is capable of being executed has a main function.  The main function is typically implemented with the following two parameters to allow command line arguments to be passed to the program.  argc represents the number of arguments (the name of the program is the 1st argument).  argv represents the arguments.  argv[0] references the name of the program as called from the command line.  The main function returns an integer.  If the program executes successfully, it should return 0 which lets the command shell know that the program finished normally.  
 
 ```c
 int main( int argc, char *argv[] ) {
