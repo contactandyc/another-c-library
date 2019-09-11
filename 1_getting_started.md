@@ -37,11 +37,11 @@ cd $stla
 
 To test whether you have make and gcc installed (what's needed for this project).  Change the directory to the first example and then run make
 ```bash
-cd $stla/illustrations/0_getting_started/0_test_setup
+cd $stla/illustrations/1_getting_started/1_test_setup
 make
 ```
 
-If your output matches the following,
+Output should be
 ```bash
 Success!  You are now ready to continue with the rest of the examples in the book.
 ```
@@ -50,7 +50,7 @@ If an error occurs, use your favorite search engine and copy and paste the error
 
 If you've changed directories, then you will need to rerun this.
 ```bash
-cd $stla/illustrations/0_getting_started/0_test_setup
+cd $stla/illustrations/1_getting_started/1_test_setup
 ```
 
 Run this command and if you get the message afterwards, you will be good to go.
