@@ -22,20 +22,21 @@ int main( int argc, char *argv[]) {
     size_t len = strlen(argv[i]);
     char *s = (char *)malloc(len+1);
 
-    timer_t *copy_timer = timer_init(repeat_test);
+    timer_t *copy_timer = timer_init(timer_get_repeat(overall_timer));
     timer_start(copy_timer);
     for( int j=0; j<repeat_test; j++ ) {
       strcpy(s, argv[i]);
     }
     timer_stop(copy_timer);
 
-    timer_t *test_timer = timer_timer_init(copy_timer);
+    timer_t *test_timer = timer_init(timer_get_repeat(overall_timer));
     timer_start(test_timer);
     for( int j=0; j<repeat_test; j++ ) {
       strcpy(s, argv[i]);
       reverse_string(s, len);
     }
     timer_stop(test_timer);
+    timer_subtract(test_timer, copy_timer);
     timer_add(overall_timer, test_timer);
 
     printf("%s => %s\n", argv[i], s);

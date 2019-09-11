@@ -1,5 +1,5 @@
 # Timing Code
-## The first project
+## The first project (an introduction to C)
 
 In the project, there is an illustrations folder which contains most of the code.  There is also a src directory where final code is placed.  Normally, one would start with a hello world project.  That actually exists later in a section called Hello Buffer.  If you find yourself lost, hopefully, it'll make more sense once you get to that section.  I'd recommend reading and working through the examples in this chapter anyways and then maybe coming back to it again after working through Hello Buffer.  The code for this chapter is located in <i>illustrations/2_timing</i>
 
@@ -1891,9 +1891,10 @@ struct timer_s;
 typedef struct timer_s timer_t;
 
 timer_t *timer_init(int repeat);
-timer_t *timer_timer_init(timer_t *t);
-
 void timer_destroy(timer_t *t);
+
+int timer_get_repeat(timer_t *t);
+void timer_set_repeat(timer_t *t, int repeat);
 
 void timer_subtract(timer_t *t, timer_t *sub);
 void timer_add(timer_t *t, timer_t *add);
@@ -1944,22 +1945,6 @@ timer_t *timer_init(int repeat) {
 
 #include <stdlib.h> is added at the top of the file since it is needed for malloc.  All of the members are initialized to zero except repeat (which is set to the value passed into timer_init).
 
-```c
-timer_t *timer_timer_init(timer_t *t);
-```
-
-becomes
-```c
-timer_t *timer_timer_init(timer_t *t) {
-  timer_t *r = (timer_t *)malloc(sizeof(timer_t));
-  r->repeat = t->repeat;
-  r->base = -t->time_spent;
-  r->time_spent = r->start_time = 0;
-  return r;  
-}
-```
-
-The repeat and base are set using this init method.  Notice that the base is set to the time_spent * -1.  This is because the time needs to ultimately be subtracted from the time spent within the timer.
 
 ```c
 void timer_destroy(timer_t *t);
@@ -1973,6 +1958,23 @@ void timer_destroy(timer_t *t) {
 ```
 
 timer_destroy simply needs to free the memory that was allocated by either of the init methods.
+
+```c
+int timer_get_repeat(timer_t *t);
+void timer_set_repeat(timer_t *t, int repeat);
+```
+
+becomes
+```c
+int timer_get_repeat(timer_t *t) {
+  return t->repeat;
+}
+
+void timer_set_repeat(timer_t *t, int repeat) {
+  t->repeat = repeat;
+}
+```
+Because the details of the timer_t structure are only known to timer.c, functions must be used to access members of the structure.  This encapsulation keeps a good separation from the interface and the implementation.
 
 ```c
 void timer_subtract(timer_t *t, timer_t *sub);
@@ -2053,6 +2055,91 @@ double timer_sec(timer_t *t) {
 
 The member time_spent and base are in microseconds.  Each function above does the appropriate conversions.
 
+
+timer.c (the finished product)
+```c
+#include "timer.h"
+
+#include <sys/time.h>
+#include <time.h>
+#include <stdlib.h>
+
+struct timer_s {
+  long base;
+  int repeat;
+  long time_spent;
+  long start_time;
+};
+
+timer_t *timer_init(int repeat) {
+  timer_t *t = (timer_t *)malloc(sizeof(timer_t));
+  t->repeat = repeat;
+  t->base = t->time_spent = t->start_time = 0;
+  return t;
+}
+
+void timer_destroy(timer_t *t) {
+  free(t);
+}
+
+/* get the number of times a task is meant to repeat */
+int timer_get_repeat(timer_t *t) {
+  return t->repeat;
+}
+
+/* set the number of times a task is meant to repeat */
+void timer_set_repeat(timer_t *t, int repeat) {
+  t->repeat = repeat;
+}
+
+
+void timer_subtract(timer_t *t, timer_t *sub) {
+  t->base -= (sub->time_spent+sub->base);
+}
+
+void timer_add(timer_t *t, timer_t *add) {
+  t->base += (add->time_spent+add->base);
+}
+
+void timer_start(timer_t *t) {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  t->start_time = (tv.tv_sec * 1000000) + tv.tv_usec;
+}
+
+void timer_stop(timer_t *t) {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  long v = (tv.tv_sec * 1000000) + tv.tv_usec;
+  v -= t->start_time;
+  t->time_spent += v;
+}
+
+double timer_ns(timer_t *t) {
+  double r = t->repeat * 1.0;
+  double ts = t->time_spent + t->base;
+  return (ts*1000.0) / r;
+}
+
+double timer_us(timer_t *t) {
+  double r = t->repeat * 1.0;
+  double ts = t->time_spent + t->base;
+  return ts / r;
+}
+
+double timer_ms(timer_t *t) {
+  double r = t->repeat * 1.0;
+  double ts = t->time_spent + t->base;
+  return ts / (r*1000.0);
+}
+
+double timer_sec(timer_t *t) {
+  double r = t->repeat * 1.0;
+  double ts = t->time_spent + t->base;
+  return ts / (r*1000000.0);
+}
+```
+
 Now that the timer interface has been defined, we can use it in our test_timer.c code.
 
 test_timer.c
@@ -2081,20 +2168,21 @@ int main( int argc, char *argv[]) {
     size_t len = strlen(argv[i]);
     char *s = (char *)malloc(len+1);
 
-    timer_t *copy_timer = timer_init(repeat_test);
+    timer_t *copy_timer = timer_init(timer_get_repeat(overall_timer));
     timer_start(copy_timer);
     for( int j=0; j<repeat_test; j++ ) {
       strcpy(s, argv[i]);
     }
     timer_stop(copy_timer);
 
-    timer_t *test_timer = timer_timer_init(copy_timer);
+    timer_t *test_timer = timer_init(timer_get_repeat(overall_timer));
     timer_start(test_timer);
     for( int j=0; j<repeat_test; j++ ) {
       strcpy(s, argv[i]);
       reverse_string(s, len);
     }
     timer_stop(test_timer);
+    timer_subtract(test_timer, copy_timer);
     timer_add(overall_timer, test_timer);
 
     printf("%s => %s\n", argv[i], s);
@@ -2134,7 +2222,301 @@ int main( int argc, char *argv[]) {
 
 We include the interface (or header file) we just created in the first line.  The rest of the code above has already been discussed.  
 
+To understand the rest of the code, it is helpful to consider what it looked like prior to using the timer object.
+
+Consider the following code from <i>illustrations/2_timing/8_timer</i>
+```c
+long overall_time = 0;
+for( int i=1; i<argc; i++ ) {
+  size_t len = strlen(argv[i]);
+  char *s = (char *)malloc(len+1);
+
+  long copy_t1 = get_time();
+  for( int j=0; j<repeat_test; j++ ) {
+    strcpy(s, argv[i]);
+  }
+  long copy_t2 = get_time();
+```
+
+vs
+```c
+timer_t *overall_timer = timer_init(repeat_test);
+for( int i=1; i<argc; i++ ) {
+  size_t len = strlen(argv[i]);
+  char *s = (char *)malloc(len+1);
+
+  timer_t *copy_timer = timer_init(timer_get_repeat(overall_timer));
+  timer_start(copy_timer);
+  for( int j=0; j<repeat_test; j++ ) {
+    strcpy(s, argv[i]);
+  }
+  timer_stop(copy_timer);
+```
+
+First, it is important to recognize that the new code is actually longer.  The number of lines of code isn't always a good measure to decide to create an object.  In the case of the timer object, the get_time() function is hidden in the timer object.  
+
+Instead of just having a counter for the overall time, I've replaced it with an timer object named overall_timer.
+```c
+long overall_time = 0;
+```
+
+becomes
+```c
+timer_t *overall_timer = timer_init(repeat_test);
+```
+
+In order to measure the time to copy, we will need a copy timer and start and stop it.
+```c
+long copy_t1 = get_time();
+for( int j=0; j<repeat_test; j++ ) {
+  strcpy(s, argv[i]);
+}
+long copy_t2 = get_time();
+```
+
+becomes
+```c
+timer_t *copy_timer = timer_init(timer_get_repeat(overall_timer));
+timer_start(copy_timer);
+for( int j=0; j<repeat_test; j++ ) {
+  strcpy(s, argv[i]);
+}
+timer_stop(copy_timer);
+```
+
+The timer_init call gets the repeat_test variable from the overall_timer since they should all be the same.  The timer_init call could have just been
+```c
+timer_t *copy_timer = timer_init(repeat_test);
+```
+
+but that would require that the repeat_test variable be separately.  This becomes important in more complex timings, but for now I'm primarily showing how timer_get_repeat can be useful.  In C, parameters to functions can be the result of other functions.  The timer_get_repeat call would be resolved prior to calling timer_init.
+
+To find the time spent in the first example, you need to subtract copy_t1 from copy_t2 and then divide that by the repeat factor.  This will return the number of microseconds that elapsed.  The timer_us(copy_timer) would yield the same result.  With the timer object, it is easy to get the time spent in microseconds, but also nanoseconds, milliseconds, and seconds.  In addition, the timer object automatically converts the time spent to a double (a decimal).
 
 
+The next section of code times the test (the reverse call) in the same way that the copy timer worked.
+```c
+timer_t *test_timer = timer_init(timer_get_repeat(overall_timer));
+timer_start(test_timer);
+for( int j=0; j<repeat_test; j++ ) {
+  strcpy(s, argv[i]);
+  reverse_string(s, len);
+}
+timer_stop(test_timer);
+```
 
-# Continue to [hello buffer](3_buffer.md)!
+The next two lines begin to show additional usefulness of the timer object.  The copy_timer is subtracted from the test_timer and then the test_timer is added to the overall_timer.  
+```c
+timer_subtract(test_timer, copy_timer);
+timer_add(overall_timer, test_timer);
+```
+
+I think this is easier to read than
+```c
+long time_spent = (test_t2-test_t1) - (copy_t2-copy_t1);
+overall_time += time_spent;
+```
+
+The timer objects also reduce the number of variables that are maintained in the code (each timer object replaces a t2 and t1 variable).
+
+Finally, the following line
+```c
+printf( "time_spent: %0.4fns\n", (time_spent*1000.0)/(repeat_test*1.0));
+```
+
+is replaced with
+```c
+printf( "time_spent: %0.4fns\n", timer_ns(test_timer) );
+```
+
+which again reduces complexity.  It is also easy to switch from nanoseconds to another measure if desired.
+
+# Making the timer object reusable
+
+The following code is found in <i>illustrations/2_timing/11_timer</i>
+
+This timer object is done and is ready to be reused.  In C, all of your functions share the same name space.  If another project has a function named timer_init, there will be a conflict.  To prevent this, projects typically adopt a package prefix in addition to the object prefix.  For this project, we will use stla (standard template library alternative).
+
+My rules for adding the prefix are...
+```
+1.  Comments should refer to the object name only.
+2.  All code references should be prefixed.
+3.  Functions should only use a prefix once even if multiple objects are
+    referenced in the name
+```
+
+The first thing to do is to copy timer.h to stla_timer.h and then apply the rules mentioned above.  The stla_timer header file exists in the current directory what follows is a partial diff.
+
+```
+$ diff timer.h stla_timer.h
+1,2c1,2
+< #ifndef _timer_H
+< #define _timer_H
+---
+> #ifndef _stla_timer_H
+> #define _stla_timer_H
+4,5c4,5
+< struct timer_s;
+< typedef struct timer_s timer_t;
+---
+> struct stla_timer_s;
+> typedef struct stla_timer_s stla_timer_t;
+12c12
+< timer_t *timer_init(int repeat);
+---
+> stla_timer_t *stla_timer_init(int repeat);
+...
+```
+
+The same thing is done for timer.c (copy to stla_timer.c and apply rules).
+```bash
+$ diff timer.c stla_timer.c
+1c1
+< #include "timer.h"
+---
+> #include "stla_timer.h"
+7c7
+< struct timer_s {
+---
+> struct stla_timer_s {
+14,15c14,15
+< timer_t *timer_init(int repeat) {
+<   timer_t *t = (timer_t *)malloc(sizeof(timer_t));
+---
+> stla_timer_t *stla_timer_init(int repeat) {
+>   stla_timer_t *t = (stla_timer_t *)malloc(sizeof(stla_timer_t));
+21c21
+...
+```
+
+Finally, the test_timer.c needs to change to use stla_timer instead of timer.
+
+```c
+#include "stla_timer.h"
+```
+
+becomes
+```c
+#include "timer.h"
+```
+
+```c
+timer_t *overall_timer = timer_init(repeat_test);
+```
+
+becomes
+```c
+stla_timer_t *overall_timer = stla_timer_init(repeat_test);
+```
+
+and so on.
+
+# Moving stla_timer to src (and variables in Makefile)
+## splitting up a project into multiple directories
+
+The following code is found in <i>illustrations/2_timing/12_timer</i>
+
+Once the object has the stla prefix, we can move it to the src directory.  This is done by executing the following command - this actually won't work as it already has been moved.
+
+This command will not work because it was done for you.
+```bash
+mv stla_timer.h stla_timer.c $stla/src
+```
+
+You can see that the files are there by running
+```bash
+cd $stla/src
+ls -l stla_timer.*
+```
+
+which will output
+```bash
+-rw-r--r--  1 ac  staff  1777 Sep 11 12:12 stla_timer.c
+-rw-r--r--  1 ac  staff  1314 Sep 11 12:12 stla_timer.h
+```
+
+You can change back to the previous directory (illustrations/2_timing/12_timer) by running
+```bash
+cd -
+```
+
+or
+```bash
+cd $stla/illustrations/2_timing/12_timer
+```
+
+cd - allows you to change to the directory that you were in previously and is useful.
+
+To make the program build properly, there are a few changes to Makefile that are needed.  The diff looks like the following.
+
+```bash
+$ diff Makefile ../11_timer/Makefile
+1,5d0
+< ROOT=../../..
+< OBJECTS=$(ROOT)/src/stla_timer.c
+< HEADER_FILES=$(ROOT)/src/stla_timer.h
+< FLAGS=-O3 -I$(ROOT)/src
+<
+8,9c3,4
+< test_timer: test_timer.c $(OBJECTS) $(HEADER_FILES)
+< 	gcc $(FLAGS) $(OBJECTS) test_timer.c -o test_timer
+---
+> test_timer: test_timer.c stla_timer.c stla_timer.h
+> 	gcc -O3 stla_timer.c test_timer.c -o test_timer
+```
+A new section of variables are added at the top and the test_timer target use those variables.
+
+The Makefile for this project.
+```Makefile
+ROOT=../../..
+OBJECTS=$(ROOT)/src/stla_timer.c
+HEADER_FILES=$(ROOT)/src/stla_timer.h
+FLAGS=-O3 -I$(ROOT)/src
+
+all: test_timer examples
+
+test_timer: test_timer.c $(OBJECTS) $(HEADER_FILES)
+	gcc $(FLAGS) $(OBJECTS) test_timer.c -o test_timer
+
+examples:
+	./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+
+clean:
+	rm -f test_timer *~
+```
+
+make allows you to create variables using the <name>=<value> syntax outside of sections.  You can then reference the value of those variables by enclosing the name in $(<name>).  One variable can reference another variable (see OBJECTS and ROOT above).  In order for gcc to find the stla_timer.h file, the src path needs to be added to gcc's include path.  That is done by using the -I<directory> option.  If you have multiple include paths, you can specify -I<directory> multiple times.  
+
+# Splitting up the Makefile
+
+The following code is found in <i>illustrations/2_timing/13_timer</i>
+
+Ideally, the objects in src could be defined by a Makefile in src and that Makefile could be included.  In src, there is a file named Makefile.include which defines the variables that were in the Makefile in the last section (as well as for other objects in src).
+
+Makefile.include in src
+```Makefile
+OBJECTS=$(ROOT)/src/stla_timer.c $(ROOT)/src/stla_buffer.c $(ROOT)/src/stla_pool.c
+HEADER_FILES=$(ROOT)/src/stla_timer.h $(ROOT)/src/stla_buffer.h $(ROOT)/src/stla_pool.h
+FLAGS=-O3 -I$(ROOT)/src
+```
+
+Makefile in illustrations/2_timing/13_timer
+```Makefile
+ROOT=../../..
+include $(ROOT)/src/Makefile.include
+
+all: test_timer examples
+
+test_timer: test_timer.c $(OBJECTS) $(HEADER_FILES)
+	gcc $(FLAGS) $(OBJECTS) test_timer.c -o test_timer
+
+examples:
+	./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+
+clean:
+	rm -f test_timer *~
+```
+
+The difference is that instead of the OBJECTS, HEADER_FILES, and FLAGS variables being specified in the Makefile, they are included by including $(ROOT)/src/Makefile.include.
+
+# Continue to create our second object [Buffer](3_buffer.md)!

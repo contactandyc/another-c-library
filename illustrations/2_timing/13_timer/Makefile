@@ -1,7 +1,5 @@
 ROOT=../../..
-OBJECTS=$(ROOT)/src/stla_timer.c
-HEADER_FILES=$(ROOT)/src/stla_timer.h
-FLAGS=-O3 -I$(ROOT)/src
+include $(ROOT)/src/Makefile.include
 
 all: test_timer examples
 
