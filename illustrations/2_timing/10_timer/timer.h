@@ -11,14 +11,14 @@ typedef struct timer_s timer_t;
 */
 timer_t *timer_init(int repeat);
 
-/*
-   Initialize a timer from another timer.  This will subtract the time spent
-   from the other timer and set the repeat to match the other timer.
-*/
-timer_t *timer_timer_init(timer_t *t);
-
 /* destroy the timer */
 void timer_destroy(timer_t *t);
+
+/* get the number of times a task is meant to repeat */
+int timer_get_repeat(timer_t *t);
+
+/* set the number of times a task is meant to repeat */
+void timer_set_repeat(time_t *t, int repeat);
 
 /* Subtract the amount of time spent in sub from the current timer */
 void timer_subtract(timer_t *t, timer_t *sub);

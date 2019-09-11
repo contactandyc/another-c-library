@@ -20,4 +20,4 @@ alt="C Programming for Beginners" width="480" height="360" border="10" /></a>
 ## Understanding the machine
 [Why software developers should care about CPU caches](https://medium.com/software-design/why-software-developers-should-care-about-cpu-caches-8da04355bb8a)<br/>
 
-# Let's [get started](0_getting_started.md)!
+# Let's [get started](1_getting_started.md)!

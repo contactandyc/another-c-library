@@ -5,9 +5,9 @@ In the project, there is an illustrations folder which contains most of the code
 
 At various points in this project, we will be timing code in an attempt to optimize it.  Our first object is going to be simple, but will illustrate how I plan to maintain separation between interfaces and their respective implementation.
 
-The following code is found in <i>illustrations/0_getting_started/1_timer</i>
+The following code is found in <i>illustrations/2_timing/1_timer</i>
 ```bash
-cd $stla/illustrations/0_getting_started/1_timer
+cd $stla/illustrations/2_timing/1_timer
 ```
 
 ```bash
@@ -359,7 +359,7 @@ char *p = (char *)s;
 
 Imagine you have a function which will print the value of variables of different types such as the following.
 
-Code found in <i>illustrations/0_getting_started/1_timer</i>
+Code found in <i>illustrations/2_timing/1_timer</i>
 
 void_pointers.c:
 ```c
@@ -885,7 +885,7 @@ The examples block will run everytime because it doesn't have any dependencies a
 
 In the last section, we explored how to time the reverse_string function.  In this section, we will explore how to better time the function.  One thing you may have noticed is that there is a million calls to both reverse_string and strcpy.  There is also the overhead of the loop.  To do the timing properly, we should have timed the strcpy and the loop and subtracted that from the loop which has the reverse_string function called.
 
-The timing for the work in <i>illustrations/0_getting_started/2_timer</i> was...
+The timing for the work in <i>illustrations/2_timing/2_timer</i> was...
 ```bash
 $ make
 gcc test_timer.c -o test_timer
@@ -897,7 +897,7 @@ time_spent: 20.5820ns
 overall time_spent: 67.0470ns
 ```
 
-This section's code is found in <i>illustrations/0_getting_started/2_timer</i>
+This section's code is found in <i>illustrations/2_timing/2_timer</i>
 
 ```bash
 $ make
@@ -947,7 +947,7 @@ long time_spent = (test_t2-test_t1) - (copy_t2-copy_t1);
 
 In the last section, we eliminated the cost of the strcpy and loop from the timing.  Another thing to do is to reconsider our reverse_string function.  The reverse_string calls strlen to get the length of the string s.  We could try and just pass the length of s into the call.  We can get the length of the argument outside of the repeated and timed test.  For completeness, we will compare the timing of 2_timer with 3_timer.
 
-The timing for the work in <i>illustrations/0_getting_started/2_timer</i> was...
+The timing for the work in <i>illustrations/2_timing/2_timer</i> was...
 ```bash
 $ make
 gcc test_timer.c -o test_timer
@@ -959,7 +959,7 @@ time_spent: 12.5070ns
 overall time_spent: 49.9950ns
 ```
 
-This section's code is found in <i>illustrations/0_getting_started/3_timer</i>
+This section's code is found in <i>illustrations/2_timing/3_timer</i>
 ```bash
 $ make
 gcc test_timer.c -o test_timer
@@ -1036,7 +1036,7 @@ The length is passed into the reverse_string call so that reverse_string doesn't
 
 It's important to not forget that the compiler can optimize the code further.  You can pass a flag called -O3 to gcc and sometimes see an improvement.
 
-The timing for the work in <i>illustrations/0_getting_started/3_timer</i> was...
+The timing for the work in <i>illustrations/2_timing/3_timer</i> was...
 ```bash
 $ make
 gcc test_timer.c -o test_timer
@@ -1048,7 +1048,7 @@ time_spent: 6.5320ns
 overall time_spent: 35.3460ns
 ```
 
-This section's code is found in <i>illustrations/0_getting_started/4_timer</i>
+This section's code is found in <i>illustrations/2_timing/4_timer</i>
 ```bash
 $ make
 gcc -O3 test_timer.c -o test_timer
@@ -1074,7 +1074,7 @@ The -O3 optimization (full optimization) was turned on in gcc.  It is good to ac
 
 # Splitting up your code into multiple files
 
-This section's code is found in <i>illustrations/0_getting_started/5_timer</i>
+This section's code is found in <i>illustrations/2_timing/5_timer</i>
 
 If you run diff -q . ../4_timer/, a brief summary of what changed will be displayed.
 ```bash
@@ -1353,7 +1353,7 @@ This change is helpful because it says that the test_timer block should run if a
 
 # Splitting up your code into multiple files part 2
 
-This section's code is found in <i>illustrations/0_getting_started/6_timer</i>
+This section's code is found in <i>illustrations/2_timing/6_timer</i>
 
 It is generally a good idea to make each file or group of files self-contained.  In the last section, we didn't notice errors when running make, but we did when trying to build test_reverse.  The errors didn't occur because prior to including file2.c we had already included stdio.h and sys/time.h.  In general, you want to include your custom code first as this will present the error earlier.  We should make the following change to test_timer.c
 
@@ -1378,9 +1378,9 @@ change to
 #include <time.h>
 ```
 
-If you go back and change test_timer.c in <i>illustrations/0_getting_started/5_timer</i> and then run make, you will get some of the same errors that we had when building test_reverse.
+If you go back and change test_timer.c in <i>illustrations/2_timing/5_timer</i> and then run make, you will get some of the same errors that we had when building test_reverse.
 
-in illustrations/0_getting_started/5_timer after making above change
+in illustrations/2_timing/5_timer after making above change
 ```bash
 $ make
 gcc -O3 test_timer.c -o test_timer
@@ -1404,7 +1404,7 @@ void reverse_string( char *s, size_t len ) {
 make: *** [test_timer] Error 1
 ```
 
-If we make the change in <i>illustrations/0_getting_started/6_timer</i> and run make
+If we make the change in <i>illustrations/2_timing/6_timer</i> and run make
 ```bash
 $ make
 gcc -O3 test_timer.c -o test_timer
@@ -1427,7 +1427,7 @@ It all works because we have fixed file2.c to have the right include statements.
 
 # Separating the implementation from the interface
 
-This section's code is found in <i>illustrations/0_getting_started/7_timer</i>
+This section's code is found in <i>illustrations/2_timing/7_timer</i>
 
 The key to writing large software projects that work is to clearly define objects and make them highly reusable.  When defining objects, it is best to split the object into an interface and an implementation.  Ideally, the interface will only describe what the object does and not how it works.  This is much like an automobile and a transmission.  An automobile might require a transmission with certain specifications.  That automobile doesn't care how the transmission is made.  An interface is like the specifications to a transmission.  The implementation would include how the transmission actually works.  C allows you to declare that a thing exists prior to it being defined.  Typically, this is done in header files (files that end in a .h extension), but it can be done anywhere.  In this section, we will show how to declare that the functions in file2.c without including them.
 
@@ -1483,7 +1483,7 @@ Everything works as expected.
 
 # Separating the implementation from the interface (part 2)
 
-This section's code is found in <i>illustrations/0_getting_started/8_timer</i>
+This section's code is found in <i>illustrations/2_timing/8_timer</i>
 
 Ideally, file2.c should have a corresponding file2.h that describes what exists in file2.c.  We can put the definition of get_time and reverse_string into file2.h as follows...
 
@@ -1547,7 +1547,7 @@ So that test_timer will be built if file2.h is updated.
 
 # Defining an object
 
-This section's code is found in <i>illustrations/0_getting_started/9_xxx</i>
+This section's code is found in <i>illustrations/2_timing/9_xxx</i>
 
 To build the code run...
 ```bash
@@ -1742,7 +1742,7 @@ void xxx_do_something( xxx_t *h, const char *prefix ) {
 
 # Defining the timer interface
 
-The following code is found in <i>illustrations/0_getting_started/10_timer</i>
+The following code is found in <i>illustrations/2_timing/10_timer</i>
 
 The Makefile has one minor difference.  This project will have a separate timer object.  The gcc command will run if test_timer.c, timer.c, or timer.h are changed.
 ```Makefile
@@ -2132,9 +2132,9 @@ void reverse_string( char *s, size_t len ) {
 int main( int argc, char *argv[]) {
 ```
 
-We include the interface (or header file) we just created in the first line.  The rest of the code above has already been discussed.
+We include the interface (or header file) we just created in the first line.  The rest of the code above has already been discussed.  
 
 
 
 
-# Continue to [hello buffer](1_buffer.md)!
+# Continue to [hello buffer](3_buffer.md)!

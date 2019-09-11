@@ -18,17 +18,20 @@ timer_t *timer_init(int repeat) {
   return t;
 }
 
-timer_t *timer_timer_init(timer_t *t) {
-  timer_t *r = (timer_t *)malloc(sizeof(timer_t));
-  r->repeat = t->repeat;
-  r->base = -t->time_spent;
-  r->time_spent = r->start_time = 0;
-  return r;
-}
-
 void timer_destroy(timer_t *t) {
   free(t);
 }
+
+/* get the number of times a task is meant to repeat */
+int timer_get_repeat(timer_t *t) {
+  return t->repeat;
+}
+
+/* set the number of times a task is meant to repeat */
+void timer_set_repeat(time_t *t, int repeat) {
+  t->repeat = repeat;
+}
+
 
 void timer_subtract(timer_t *t, timer_t *sub) {
   t->base -= (sub->time_spent+sub->base);
