@@ -1,9 +1,8 @@
+#include "timer.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "timer.h"
-#include "timer.h" // to show the importance of compiler directives
 
 void reverse_string( char *s, size_t len ) {
   char *e = s+len-1;

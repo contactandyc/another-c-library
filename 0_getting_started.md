@@ -1561,7 +1561,7 @@ Hello: (1, 2)
 The objects that will be created throughout the rest of this book will look something like this (where xxx is the object name):
 
 xxx.h
-```
+```c
 #ifndef _xxx_H
 #define _xxx_H
 
@@ -1579,7 +1579,7 @@ void xxx_do_something( xxx_t *h, const char *prefix );
 The header file or interface simply provides what exists and doesn't offer details into how xxx might work.  The int param1, int param2 and const char *prefix above are just examples.  The init function often doesn't have any parameters.  The init function is used to create the structure so that it can be used by the other functions within the xxx object.  The destroy function destroys the xxx_t structure.  The xxx_t structure doesn't have members.  It is just declared (like the functions after it), so that the compiler knows that the structure is defined somewhere.  By defining the structure like this, applications using the xxx object cannot access members of the structure.  The implementation is free to put whatever members in the structure to make the function work.  The only thing applications which use this object are required to do is create (or init) the object and then pass it around to the various functions that use that type.  If there is a destroy method, then the application is expected to destroy the object to clean it up.
 
 To use the above interface, you will include it and call it's methods.
-```
+```c
 #include "xxx.h"
 
 int main() {
@@ -1743,7 +1743,7 @@ void xxx_do_something( xxx_t *h, const char *prefix ) {
 
 # Defining the timer interface
 
-The following code is found in <i>illustrations/0_getting_started/5_timer</i>
+The following code is found in <i>illustrations/0_getting_started/10_timer</i>
 
 The Makefile has one minor difference.  This project will have a separate timer object.  The gcc command will run if test_timer.c, timer.c, or timer.h are changed.
 ```Makefile
@@ -1765,85 +1765,9 @@ overall time_spent: 12.2880ns
 
 The timing is the same as 4_timer.  This section will be about
 
-A typical object looks something like this (where xxx is the object name):
-
-xxx.h
-```
-#ifndef _xxx_H
-#define _xxx_H
-
-struct xxx_s;
-typedef struct xxx_s xxx_t;
-
-xxx_t * xxx_init(int param1, int param2);
-void xxx_destroy( xxx_t *h );
-
-void xxx_do_something( xxx_t *h, const char *prefix );
-
-#endif
-```
-
-To use the above interface, you will include it and call it's methods.
-```
-#include "xxx.h"
-
-int main() {
-  xxx_t *handle = xxx_init(1, 2);
-  xxx_do_something(handle);
-  xxx_destroy(handle);
-  return 0;
-}
-```
-
-xxx.h is just an interface.  The implementation of those functions would be in a C file.
-
-xxx.c:
-```c
-struct xxx_s {
-  int x;
-  int y;
-};
-
-xxx_t * xxx_init(int param1, int param2) {
-  xxx_t *h = (xxx_t *)malloc(sizeof(xxx_t));
-  h->x = param1;
-  h->y = param2;
-  return h;
-}
-
-void xxx_destroy( xxx_t *h ) {
-  free(h);
-}
-
-void xxx_do_something( xxx_t *h, const char *prefix ) {
-  printf( "%s: (%d, %d)\n", prefix, h->x, h->y );
-}
-```
-
-// these two lines of code make it possible for your C or C++ code to avoid having to type the word "struct" when
-// declaring variables.  So instead of "struct stdc_xxx_t variableName", you can type "stdc_xxx_t variableName"
-
-
-
-So to use this code, you would do something like this:
-```
-#include "stdc_xxx.h"
-
-int main() {
-  stdc_xxx_t *handle = stdc_xxx_init(...someParams);
-  stdc_xxx_do_something(handle, ...someParams);
-
-  // lots of code potentially in between because you might be reusing the handle to avoid memory allocations
-  stdc_xxx_destroy(handle)
-
-  return 0;
-}
-```
-
 In test_timer.c the following lines of code exists.
 ```c
 #include "timer.h"
-#include "timer.h" // to show the importance of compiler directives
 ```
 
 In order to make our project reusable, we need to break it up into objects (or interfaces and implementations).  In the above example, we are including timer.h (which we will make next).  
@@ -1875,17 +1799,6 @@ double timer_sec(timer_t *t);
 #endif
 ```
 
-Compiler directives always begin with a #.  We've briefly talked about #include.  #include allows filenames to be wrapped in double quotes or angle brackets.  Typically, one would use double quotes to include things that you have written and angle brackets for system or third party packages.  This is just a convention.  Most of the time, you will want header files to only be read once even if they are included multiple times (usually by different files).  Most header files will be wrapped in a #ifndef, #define, #endif block.  #ifndef checks to see if _timer_H is defined.  If it is not defined, then the next statement defines it.  The #endif statement is the end of the #ifndef block.  #define has many more uses as we will see later.
-
-```c
-#ifndef _timer_H
-#define _timer_H
-
-...
-
-#endif
-```
-
 Earlier you learned that the struct keyword allows you to group zero or more types together to form a new type.  In general, I like to name struct types with a _s suffix and then typedef them to have a _t suffix.  In the timer.h above, the timer_s struct was declared, but never actually defined.  The details of what is in the structure is part of the implementation and isn't meant to be known externally.  C allows you to define types in this way and use them as long as you only reference them as pointers.  All pointers have the same size (the number of bits that the cpu supports or the sizeof(size_t)).  For now, just recognize that there is a new type named timer_t and that timer_s will be defined in timer.c.
 
 ```c
@@ -1895,7 +1808,7 @@ typedef struct timer_s timer_t;
 
 I follow a pattern where every function is prefixed by the object name (in this case timer).  The primary type (if there is one) is usually the object name followed by _t.  Objects will typically have an init and a destroy method.  The job of the header file is to create an interface for applications to use.  It should hide implementation details as much as possible.  I usually will define an interface before defining an implementation.
 
-Initialize the timer.  repeat is necessary to indicate how many times the test was repeated so that the final result represents that.  If a thing is only being timed with a single repetition, then use a value of 1.  This function will allocate the timer_t structure and fill its members appropriately.  To free up the resources associated with this call, you must call timer_destroy with the return value of this call.
+Initialize the timer.  repeat is necessary to indicate how many times the test will be repeated within the application so that the final result represents that.  If a thing is only being timed with a single repetition, then use a value of 1.  This function will allocate the timer_t structure and fill its members appropriately.  To free up the resources associated with this call, you must call timer_destroy with the return value of this call.
 ```c
 timer_t *timer_init(int repeat);
 ```
@@ -1904,7 +1817,8 @@ Initialize a timer from another timer.  This will subtract the time spent and se
 ```c
 timer_t *timer_timer_init(timer_t *t);
 ```
-This will destroy the timer.
+
+Destroy the timer created from timer_init or timer_timer_init.
 ```c
 void timer_destroy(timer_t *t);
 ```
@@ -2103,9 +2017,123 @@ void timer_stop(timer_t *t) {
 
 timer_start is basically the same as get_time() defined earlier.  The difference is that it sets the start_time member of the struct timer_t t.
 
+Finally, the following functions are changed to.
+```c
 double timer_ns(timer_t *t);
 double timer_us(timer_t *t);
 double timer_ms(timer_t *t);
 double timer_sec(timer_t *t);
+```
+
+to
+```c
+double timer_ns(timer_t *t) {
+  double r = t->repeat * 1.0;
+  double ts = t->time_spent + t->base;
+  return (ts*1000.0) / r;
+}
+
+double timer_us(timer_t *t) {
+  double r = t->repeat * 1.0;
+  double ts = t->time_spent + t->base;
+  return ts / r;
+}
+
+double timer_ms(timer_t *t) {
+  double r = t->repeat * 1.0;
+  double ts = t->time_spent + t->base;
+  return ts / (r*1000.0);
+}
+
+double timer_sec(timer_t *t) {
+  double r = t->repeat * 1.0;
+  double ts = t->time_spent + t->base;
+  return ts / (r*1000000.0);
+}
+```
+
+The member time_spent and base are in microseconds.  Each function above does the appropriate conversions.
+
+Now that the timer interface has been defined, we can use it in our test_timer.c code.
+
+test_timer.c
+```c
+#include "timer.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void reverse_string( char *s, size_t len ) {
+  char *e = s+len-1;
+  while(s < e) {
+    char tmp = *s;
+    *s = *e;
+    *e = tmp;
+    s++;
+    e--;
+  }
+}
+
+int main( int argc, char *argv[]) {
+  int repeat_test = 1000000;
+  timer_t *overall_timer = timer_init(repeat_test);
+  for( int i=1; i<argc; i++ ) {
+    size_t len = strlen(argv[i]);
+    char *s = (char *)malloc(len+1);
+
+    timer_t *copy_timer = timer_init(repeat_test);
+    timer_start(copy_timer);
+    for( int j=0; j<repeat_test; j++ ) {
+      strcpy(s, argv[i]);
+    }
+    timer_stop(copy_timer);
+
+    timer_t *test_timer = timer_timer_init(copy_timer);
+    timer_start(test_timer);
+    for( int j=0; j<repeat_test; j++ ) {
+      strcpy(s, argv[i]);
+      reverse_string(s, len);
+    }
+    timer_stop(test_timer);
+    timer_add(overall_timer, test_timer);
+
+    printf("%s => %s\n", argv[i], s);
+    printf( "time_spent: %0.4fns\n", timer_ns(test_timer) );
+
+    timer_destroy(test_timer);
+    timer_destroy(copy_timer);
+    free(s);
+  }
+  printf( "overall time_spent: %0.4fns\n", timer_ns(overall_timer) );
+  timer_destroy(overall_timer);
+  return 0;
+}
+```
+
+The beginning should look familiar
+```s
+#include "timer.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void reverse_string( char *s, size_t len ) {
+  char *e = s+len-1;
+  while(s < e) {
+    char tmp = *s;
+    *s = *e;
+    *e = tmp;
+    s++;
+    e--;
+  }
+}
+
+int main( int argc, char *argv[]) {
+```
+
+We include the interface (or header file) we just created in the first line.  The rest of the code above has already been discussed.
+
 
 # Continue to [hello buffer](1_buffer.md)!
