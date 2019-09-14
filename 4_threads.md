@@ -76,9 +76,28 @@ global_number (should be 10000000)= 2010195
 
 Notice that the number is not 10 million.  When global_number++ happens, each thread gets the value of global_number, adds one to it, and then replaces global_number with the new value.  Much like when we initially had a friend help build the building above, each thread is doing very similar work and then overwriting other thread's work.
 
-I generally do not like to use global variables.  In the above example, global_number was a global variable.  The pthread_create function allows you an argument to the thread.  For example...
+# Threads and Optimizing Code
 
-The following code is found in <i>illustrations/4_threads/2_thread</i>
+When writing software which have resources that need protected, one should generally assume that you must protect them (using the equivalent of the stop signs mentioned above).  Sometimes, when you run software and tests, the result will look okay.  This doesn't nessarily mean that the code is thread safe.  On my computer, when I compiled the code with the -O3 option, I got the following result.
+
+```bash
+cd $stla/illustrations/4_threads/2_thread
+gcc -O3 test_code.c -o test_code -lpthread
+./test_code
+```
+
+Outputs
+```bash
+global_number (should be 10000000)= 10000000
+```
+
+which makes it look like everything is working.  A rule with writing good code is that you should assume if something can go wrong, it will go wrong.  Changing the compiler flag should not cause the code to perform differently.  Particularly, code that works when a flag is set and doesn't work when a flag is not set, is not good code.  It must work regardless of the flag.  Because the -O3 flag seems to make the program look like it is working, we will not use it.  It can happen that code works in debug mode, but not in optimized mode.
+
+# Avoid global variables when you can
+
+I generally do not like to use global variables (unless they make sense).  In the above example, global_number is a global variable.  The pthread_create function allows you to pass an argument to the thread function for the thread that is being created.  For example...
+
+The following code is found in <i>illustrations/4_threads/3_thread</i>
 
 test_code.c
 ```c
@@ -105,11 +124,17 @@ int main(int argc, char *argv[]) {
 }
 ```
 
+```bash
+$ gcc test_code.c -o test_code -lpthread
+$ ./test_code
+local_number (should be 10000000)= 2010195
+```
+
 # Mutexes
 
 The pthread library defines a type called mutex which allows your code to lock around a resource much like a stop sign.  The mutex needs initialized and destroyed.  pthread_create only allows one argument to be passed to threads.  In order to pass the local number and the mutex to the worker function, a structure must be created.  For example...
 
-The following code is found in <i>illustrations/4_threads/3_thread</i>
+The following code is found in <i>illustrations/4_threads/4_thread</i>
 
 test_code.c
 ```c
@@ -147,10 +172,11 @@ int main(int argc, char *argv[]) {
 }
 ```
 
+When the addition is protected by a mutex, the local number ends up being what we expected.
 ```bash
-$ gcc test_code.c -o test_code -lpthread
+$ gcc -O3 test_code.c -o test_code -lpthread
 $ ./test_code
-global_number (should be 10000000)= 10000000
+local_number (should be 10000000)= 10000000
 ```
 
 pthread_mutex_init and pthread_mutex_destroy both take a pointer to a mutex that needs to be initialized and destroyed.  Note that the pointer to the mutex must not be NULL.
@@ -168,5 +194,76 @@ pthread_mutex_unlock(&(w->mutex));
 ```
 
 Note that the worker_t structure (w) is shared amongst all of the threads.
+
+# Timing considerations
+
+Before ending this chapter, we should consider how long each task takes and the advantage and disadvantage of threads and coordination.
+
+```bash
+cd $stla/illustrations/4_threads/1_thread
+make
+time ./test_code
+```
+
+outputs
+```bash
+global_number (should be 10000000)= 2586841
+
+real	0m0.045s
+user	0m0.326s
+sys	0m0.003s
+```
+
+```bash
+cd $stla/illustrations/4_threads/4_thread
+make
+time ./test_code
+```
+
+outputs
+```bash
+local_number (should be 10000000)= 10000000
+
+real	0m0.641s
+user	0m0.666s
+sys	0m4.836s
+```
+
+The coordination takes time.  We can test this code in optimized mode
+```bash
+cd $stla/illustrations/4_threads/5_thread
+make
+time ./test_code
+```
+
+outputs
+```bash
+local_number (should be 10000000)= 10000000
+
+real	0m0.652s
+user	0m0.686s
+sys	0m4.940s
+```
+
+The optimized build doesn't improve the performance.
+
+Finally, if we look at the last example (6_single_thread), we can see that the performance is much faster.
+
+```bash
+cd $stla/illustrations/4_threads/6_single_thread
+make
+time ./test_code
+```
+
+outputs
+```bash
+local_number (should be 10000000)= 10000000
+
+real	0m0.027s
+user	0m0.024s
+sys	0m0.002s
+```
+
+The code in 6_single_thread is so simple, that turning on -O3 may not be a good test as the C compiler might just recognize that the final value should be 10000000.  
 
 Pthreads also support conditions which are like the pagers above.  They will be described later prior to needing them.  The next project will require a mutex.
