@@ -105,6 +105,8 @@ int main(int argc, char *argv[]) {
 }
 ```
 
+# Mutexes
+
 The pthread library defines a type called mutex which allows your code to lock around a resource much like a stop sign.  The mutex needs initialized and destroyed.  pthread_create only allows one argument to be passed to threads.  In order to pass the local number and the mutex to the worker function, a structure must be created.  For example...
 
 The following code is found in <i>illustrations/4_threads/3_thread</i>
