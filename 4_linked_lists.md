@@ -316,11 +316,11 @@ void destroy_using_iteration(node_t *root) {
 1.  Create the data structure N times (100000) using the letters that are found
     in arg.  Randomize the insertion and erase order.
 2.  Create the data structure using the letters that are found in arg by
-	  inserting them in the order of the string.  Print the whole data structure
-		using the overall print method and using iteration.
+    inserting them in the order of the string.  Print the whole data structure
+    using the overall print method and using iteration.
 3.  Finally, destroy the structure by using the first_node_to_erase,
     node_next_to_erase methods (which may be defined to be the same as
-		first/next)
+    first/next)
 */
 void test_data_structure(const char *arg) {
   printf("Creating %s for %s\n", DATA_STRUCTURE, arg);
