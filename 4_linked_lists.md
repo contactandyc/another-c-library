@@ -104,30 +104,30 @@ void node_print(node_t *root);
 
 /*
   Given a data structure, find a node given a pointer to the root node and the
-	key of interest.
+  key of interest.
 */
 node_t *node_find(char key, node_t *root);
 
 /*
-	If the key doesn't exist, an insert a node into the data structure.  The
-	node_to_insert has already been initialized by the client application (most
-	likely through node_init).  The node's physical location in memory will not
-	change as a result of inserting or erasing nodes.  Because the root might
-	change, a pointer to the root is passed to node_insert.
+  If the key doesn't exist, an insert a node into the data structure.  The
+  node_to_insert has already been initialized by the client application (most
+  likely through node_init).  The node's physical location in memory will not
+  change as a result of inserting or erasing nodes.  Because the root might
+  change, a pointer to the root is passed to node_insert.
 */
 bool node_insert(node_t *node_to_insert, node_t **root);
 
 /*
-	Once finding a node, erase the node from the data structure.  The
+  Once finding a node, erase the node from the data structure.  The
   node_to_erase is typically found through node_find.  The pointer to root is
-	passed to node_erase as the root might change.  node_erase doesn't free
-	resources used by node_to_erase.  It only unlinks it from the data structure.
+  passed to node_erase as the root might change.  node_erase doesn't free
+  resources used by node_to_erase.  It only unlinks it from the data structure.
 */
 bool node_erase(node_t *node_to_erase, node_t **root);
 
 /* Iteration
-   All of the linked structures will support first and next.
-   Some can support last and previous as well.
+  All of the linked structures will support first and next.
+  Some can support last and previous as well.
 */
 bool node_previous_supported();
 node_t *node_first(node_t *root);
@@ -135,15 +135,21 @@ node_t *node_last(node_t *root);
 node_t *node_next(node_t *n);
 node_t *node_previous(node_t *n);
 
-/* To destroy a data structure, you will need to use the following pattern...
-   node_t *n = node_first_to_erase(root);
-   while(n) {
-     node_t *next = node_next_to_erase(n);
-     node_destroy(n);
-     n = next;
-   }
+/*
+  To destroy a data structure, you will need to use the following pattern...
+  node_t *n = node_first_to_erase(root);
+  while(n) {
+    node_t *next = node_next_to_erase(n);
+    node_destroy(n);
+    n = next;
+  }
 
-	 Notice that a temporary link to the next node to erase is saved prior to destroying the node.  For binary search trees, the beginning to the end isn't the same as a sorted order.  It's known as postorder iteration.  Post order iteration can be useful for fast construction and destruction of binary search trees.  By having an alternate iterator for destruction, we can have one interface which works for a number of data structure types.
+  Notice that a temporary link to the next node to erase is saved prior to
+  destroying the node.  For binary search trees, the beginning to the end
+  isn't the same as a sorted order.  It's known as postorder iteration.  Post
+  order iteration can be useful for fast construction and destruction of binary
+  search trees.  By having an alternate iterator for destruction, we can have
+  one interface which works for a number of data structure types.
 */
 node_t *node_first_to_erase(node_t *root);
 node_t *node_next_to_erase(node_t *n);
@@ -172,13 +178,13 @@ In addition to having a common interface, I have created a set of functions to t
 #include <string.h>
 
 /*
-	 arg contains a number of characters (or letters).  Each letter is inserted
-	 into the data structure assuming that it hasn't already been inserted.
-	 The characters are inserted in the order that they are found within the
-	 string.  Because this is a tool to test the data structure, I also test that
-	 if an insert should work, that it does work.  Once the insert succeeds, test
-	 if the item can be found.  After all of the inserts are done, the root of
-	 the data structure is returned.
+  arg contains a number of characters (or letters).  Each letter is inserted
+  into the data structure assuming that it hasn't already been inserted.
+  The characters are inserted in the order that they are found within the
+  string.  Because this is a tool to test the data structure, I also test that
+  if an insert should work, that it does work.  Once the insert succeeds, test
+  if the item can be found.  After all of the inserts are done, the root of
+  the data structure is returned.
 */
 node_t *fill_data_structure(const char *arg) {
   node_t *root = NULL;
@@ -201,8 +207,8 @@ node_t *fill_data_structure(const char *arg) {
 }
 
 /*
-	This function is similar to fill_data_structure, except that the characters
-	are inserted in random order.
+  This function is similar to fill_data_structure, except that the characters
+  are inserted in random order.
 */
 node_t *fill_data_structure_randomly(const char *arg) {
   node_t *root = NULL;
@@ -229,8 +235,8 @@ node_t *fill_data_structure_randomly(const char *arg) {
 }
 
 /*
-	find_everything checks that every character in arg is properly inserted in
-	the data structure.
+  find_everything checks that every character in arg is properly inserted in
+  the data structure.
 */
 void find_everything(const char *arg, node_t *root) {
   const char *s = arg; // check that everything can still be found
@@ -244,9 +250,9 @@ void find_everything(const char *arg, node_t *root) {
 }
 
 /*
-	find_and_erase_everything iterates over all of the characters in arg in a
-	random order and erases them.  erase should succeed if find succeeds.  If it
-	doesn't an error is printed.
+  find_and_erase_everything iterates over all of the characters in arg in a
+  random order and erases them.  erase should succeed if find succeeds.  If it
+  doesn't an error is printed.
 */
 void find_and_erase_everything(const char *arg, node_t *root) {
   const char *p = arg; // find and erase all of the nodes
@@ -268,7 +274,7 @@ void find_and_erase_everything(const char *arg, node_t *root) {
 }
 
 /*
-	print the datastructure iterating over the keys using first/next
+  print the datastructure iterating over the keys using first/next
 */
 void print_using_iteration(node_t *root) {
   printf("print_using_iteration: ");
@@ -281,7 +287,7 @@ void print_using_iteration(node_t *root) {
 }
 
 /*
-	print the datastructure backwards iterating over the keys using last/previous
+  print the datastructure backwards iterating over the keys using last/previous
 */
 void print_using_reverse_iteration(node_t *root) {
   printf("print_using_reverse_iteration: ");
@@ -294,8 +300,8 @@ void print_using_reverse_iteration(node_t *root) {
 }
 
 /*
-	destroy the data structure by iterating over the keys using the
-	first_to_erase/next_to_erase methods
+  destroy the data structure by iterating over the keys using the
+  first_to_erase/next_to_erase methods
 */
 void destroy_using_iteration(node_t *root) {
   node_t *n = node_first_to_erase(root);
@@ -334,7 +340,9 @@ void test_data_structure(const char *arg) {
   printf("\n");
 }
 
-/* The various tests will use A-Z, a-z, and 0-9 for valid keys */
+/*
+  The various tests will use A-Z, a-z, and 0-9 for valid keys
+*/
 bool valid_char(int ch) {
   if(ch >= 'A' && ch <= 'Z')
     return true;
@@ -345,10 +353,11 @@ bool valid_char(int ch) {
   return false;
 }
 
-/* Create a copy of the input string (p) and only include characters which are
-	 valid (based upon valid_char above).  Also, check that each character is
-	 unique.  The wp is only updated and incremented if a character is new and is
-	 valid
+/*
+  Create a copy of the input string (p) and only include characters which are
+  valid (based upon valid_char above).  Also, check that each character is
+  unique.  The wp is only updated and incremented if a character is new and is
+  valid
 */
 char *get_valid_characters(const char *p) {
 	char *res = strdup(p);
@@ -373,11 +382,11 @@ char *get_valid_characters(const char *p) {
 
 /*
   The main function expects to have 2 or more command line arguments and calls
-	the function test_data_structure with each argument (after extracting valid
-	characters).  If there are less than two arguments, a usage statement is
-	printed and the program exits.  One useful tip from the code below is that in
-	C or C++ you can chain a series of string constants together by just having
-	spacing or a newline character separating the string constants.
+  the function test_data_structure with each argument (after extracting valid
+  characters).  If there are less than two arguments, a usage statement is
+  printed and the program exits.  One useful tip from the code below is that in
+  C or C++ you can chain a series of string constants together by just having
+  spacing or a newline character separating the string constants.
 */
 int main(int argc, char *argv[]) {
   if(argc < 2) {
