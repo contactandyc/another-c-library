@@ -5,30 +5,6 @@
   if they want to be able to take advantage of the remaining memory in a block
   in the way that pool_strdupf does. */
 
-/* When MEMORY_TRACKING is enabled, the pools that are allocated will be tracked
-  and logged to help you track down memory leaks.  By default it is turned off.
-*/
-#ifdef MEMORY_TRACKING
-#define stla_pool_init(size)                                                   \
-  _stla_pool_tracked_init(size, __FILE__, __FUNCTION__, __LINE__)
-#define stla_pool_clear(h)                                                     \
-  _stla_pool_tracked_clear(h, __FILE__, __FUNCTION__, __LINE__)
-#define stla_pool_destroy(h)                                                   \
-  _stla_pool_tracked_destroy(h, __FILE__, __FUNCTION__, __LINE__)
-#else
-#define stla_pool_init(size) _stla_pool_init(size)
-#define stla_pool_clear(h) _stla_pool_clear(h)
-#define stla_pool_destroy(h) _stla_pool_destroy(h)
-#endif
-
-/* tracked versions for debugging */
-stla_pool_t *_stla_pool_tracked_init(size_t size, const char *filename,
-                                     const char *function, int line);
-void _stla_pool_tracked_clear(stla_pool_t *h, const char *filename,
-                              const char *function, int line);
-void _stla_pool_tracked_destroy(stla_pool_t *h, const char *filename,
-                                const char *function, int line);
-
 /* used internally */
 void *_stla_pool_alloc_grow(stla_pool_t *h, size_t len);
 
@@ -43,6 +19,18 @@ typedef struct stla_pool_node_s {
 } stla_pool_node_t;
 
 struct stla_pool_s {
+#ifdef _STLA_DEBUG_MEMORY_
+  stla_allocator_dump_t dump;
+  /* The size of the initial block requires a second variable to be
+     thread-safe. */
+  size_t initial_size;
+  /* The cur_size is needed because the stla_pool_size function isn't
+     thread-safe. */
+  size_t cur_size;
+  /* Everytime the pool get's cleared, cur_size is reset */
+  size_t max_size;
+#endif
+
   /* A pointer to the current block associated with the pool.  If there is more
     than one block, the blocks are linked together via the prev pointer into
     a singly linked list. */
@@ -67,6 +55,11 @@ static inline void *stla_pool_ualloc(stla_pool_t *h, size_t len) {
   char *r = h->curp;
   if (r + len < h->current->endp) {
     h->curp = r + len;
+#ifdef _STLA_DEBUG_MEMORY_
+  h->cur_size += len;
+  if(h->cur_size > h->max_size)
+    h->max_size = h->cur_size;
+#endif
     return r;
   }
   return _stla_pool_alloc_grow(h, len);
@@ -78,6 +71,11 @@ static inline void *stla_pool_alloc(stla_pool_t *h, size_t len) {
                  (sizeof(size_t) - 1));
   if (r + len < h->current->endp) {
     h->curp = r + len;
+#ifdef _STLA_DEBUG_MEMORY_
+    h->cur_size += len;
+    if(h->cur_size > h->max_size)
+      h->max_size = h->cur_size;
+#endif
     return r;
   }
   return _stla_pool_alloc_grow(h, len);

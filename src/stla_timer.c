@@ -1,5 +1,5 @@
 #include "stla_timer.h"
-
+#include "stla_allocator.h"
 #include <sys/time.h>
 #include <time.h>
 #include <stdlib.h>
@@ -11,15 +11,22 @@ struct stla_timer_s {
   long start_time;
 };
 
-stla_timer_t *stla_timer_init(int repeat) {
-  stla_timer_t *t = (stla_timer_t *)malloc(sizeof(stla_timer_t));
+#ifdef _STLA_DEBUG_MEMORY_
+stla_timer_t *_stla_timer_init(int repeat, const char *caller) {
+  stla_timer_t *t =
+    (stla_timer_t *)_stla_malloc_d(NULL, caller,
+                                   sizeof(stla_timer_t), false);
+#else
+stla_timer_t *_stla_timer_init(int repeat) {
+  stla_timer_t *t = (stla_timer_t *)stla_malloc(sizeof(stla_timer_t));
+#endif
   t->repeat = repeat;
   t->base = t->time_spent = t->start_time = 0;
   return t;
 }
 
 void stla_timer_destroy(stla_timer_t *t) {
-  free(t);
+  stla_free(t);
 }
 
 /* get the number of times a task is meant to repeat */

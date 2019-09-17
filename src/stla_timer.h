@@ -1,6 +1,8 @@
 #ifndef _stla_timer_H
 #define _stla_timer_H
 
+#include "stla_common.h"
+
 struct stla_timer_s;
 typedef struct stla_timer_s stla_timer_t;
 
@@ -9,7 +11,13 @@ typedef struct stla_timer_s stla_timer_t;
    test was repeated so that the final result represents that.  If a thing is
    only being timed with a single repetition, then use a value of 1.
 */
-stla_timer_t *stla_timer_init(int repeat);
+#ifdef _STLA_DEBUG_MEMORY_
+#define stla_timer_init(repeat) _stla_timer_init(repeat, FILE_LINE_MACRO("stla_timer"))
+stla_timer_t *_stla_timer_init(int repeat, const char *caller);
+#else
+#define stla_timer_init(repeat) _stla_timer_init(repeat)
+stla_timer_t *_stla_timer_init(int repeat);
+#endif
 
 /* destroy the timer */
 void stla_timer_destroy(stla_timer_t *t);

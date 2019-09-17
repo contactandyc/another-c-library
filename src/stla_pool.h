@@ -5,22 +5,27 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "stla_allocator.h"
+
 struct stla_pool_s;
 typedef struct stla_pool_s stla_pool_t;
 
-/* For functions which begin with _, call them without the underscore.  They
-  are meant to be called through a macro. */
-
 /* stla_pool_init will create a working space of size bytes */
+#ifdef _STLA_DEBUG_MEMORY_
+#define stla_pool_init(size) _stla_pool_init(size, FILE_LINE_MACRO("stla_pool"))
+stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+#else
+#define stla_pool_init(size) _stla_pool_init(size)
 stla_pool_t *_stla_pool_init(size_t size);
+#endif
 
 /* stla_pool_clear will make all of the pool's memory reusable.  If the
   initial block was exceeded and additional blocks were added, those blocks
   will be freed. */
-void _stla_pool_clear(stla_pool_t *h);
+void stla_pool_clear(stla_pool_t *h);
 
 /* stla_pool_destroy frees up all memory associated with the pool object */
-void _stla_pool_destroy(stla_pool_t *h);
+void stla_pool_destroy(stla_pool_t *h);
 
 /* stla_pool_set_minimum_growth_size alters the minimum size of growth blocks.
    This is particularly useful if you don't expect the pool's block size to be

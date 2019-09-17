@@ -868,12 +868,12 @@ examples:
 	./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
 ```
 
-The lines of code after test_data_structure will run if the file called test_data_structure is older than the files after the colon.  If you edit test_timer.c, the program will be built using the following line of code.  The output is test_timer.
+The lines of code after test_timer will run if the file called test_timer is older than the files after the colon.  If you edit test_timer.c, the program will be built using the following line of code.  The output is test_timer.
 ```Makefile
 gcc test_timer.c -o test_timer
 ```
 
-If you didn't want to use a Makefile to build test_data_structure, you could do so from the command line using the following command.
+If you didn't want to use a Makefile to build test_timer, you could do so from the command line using the following command.
 
 ```bash
 gcc test_timer.c -o test_timer

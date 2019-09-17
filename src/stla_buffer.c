@@ -3,9 +3,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-stla_buffer_t *stla_buffer_init(size_t initial_size) {
-  stla_buffer_t *h = (stla_buffer_t *)malloc(sizeof(stla_buffer_t));
-  h->data = (char *)malloc(initial_size + 1);
+#ifdef _STLA_DEBUG_MEMORY_
+static void dump_buffer(FILE *out, void *p, size_t length) {
+  stla_buffer_t *bh = (stla_buffer_t *)p;
+  fprintf( out, "%s size: %lu, max_length: %lu, initial_size: %lu ", bh->dump.caller, bh->size, bh->max_length, bh->initial_size );
+}
+
+stla_buffer_t *_stla_buffer_init(size_t initial_size,
+                                 const char *caller) {
+  stla_buffer_t *h =
+    (stla_buffer_t *)_stla_malloc_d(NULL, caller, sizeof(stla_buffer_t), true);
+  h->dump.dump = dump_buffer;
+  h->dump.caller = caller;
+  h->initial_size = initial_size;
+  h->max_length = 0;
+#else
+stla_buffer_t *_stla_buffer_init(size_t initial_size) {
+  stla_buffer_t *h = (stla_buffer_t *)stla_malloc(sizeof(stla_buffer_t));
+#endif
+  h->data =
+    initial_size ? (char *)stla_malloc(initial_size + 1) : (char *)(&(h->size));
   h->data[0] = 0;
   h->length = 0;
   h->size = initial_size;
@@ -15,8 +32,8 @@ stla_buffer_t *stla_buffer_init(size_t initial_size) {
 
 void stla_buffer_destroy(stla_buffer_t *h) {
   if(!h->pool) {
-    free(h->data);
-    free(h);
+    stla_free(h->data);
+    stla_free(h);
   }
 }
 
@@ -27,6 +44,10 @@ void _stla_buffer_append(stla_buffer_t *h, const void *data, size_t length) {
   memcpy(h->data + h->length, data, length);
   h->length += length;
   h->data[h->length] = 0;
+#ifdef _STLA_DEBUG_MEMORY_
+  if(length > h->max_length)
+    h->max_length = length;
+#endif
 }
 
 void stla_buffer_appendvf(stla_buffer_t *h, const char *fmt, va_list args) {
@@ -50,4 +71,8 @@ void stla_buffer_appendvf(stla_buffer_t *h, const char *fmt, va_list args) {
     va_end(args_copy);
     h->length += n;
   }
+#ifdef _STLA_DEBUG_MEMORY_
+  if(h->length > h->max_length)
+    h->max_length = h->length;
+#endif
 }
