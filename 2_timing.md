@@ -96,7 +96,7 @@ double - eight byte decimal
 void   - this doesn't have a size and is a special type
 ```
 
-A byte is represented by 8 bits.  The range of 1 bit would be 0-1, two bits 0-3, and so on.  For 8 bits, the range is 0-255.  The short has a range of 0-((256*256)-1) or 0-65535.  C counts from 0 (all bits off) instead of 1.  In addition to this these types can be signed (the default) or unsigned.  If the data type is unsigned, the number range will start with zero.  Otherwise, the number range will begin -(2^(number of bits-1)) to (2^(number of bits-1))-1.  A signed char will range from -128 to 127.  A signed char and a char are the same thing.
+A byte is represented by 8 bits.  The range of 1 bit would be 0-1, two bits 0-3, and so on.  For 8 bits, the range is 0-255.  The short has a range of 0-((256*256)-1) or 0-65535.  C counts from 0 (all bits off) instead of 1.  Types can be signed (the default) or unsigned.  If the data type is unsigned, the number range will start with zero.  Otherwise, the number range will be between -(2^(number of bits-1)) and (2^(number of bits-1))-1.  A signed char will range from -128 to 127.  A signed char and a char are the same thing.
 
 size_t is a type that is defined in C to represent the number of bits that the cpu is and is unsigned (meaning it can't be negative).  ssize_t is a signed alternative.  On a 64 bit system, a long and ssize_t are equivalent.
 
