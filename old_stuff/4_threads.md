@@ -266,6 +266,6 @@ sys	0m0.002s
 
 The code in 6_single_thread is so simple, that turning on -O3 may not be a good test as the C compiler might just recognize that the final value should be 10000000.  
 
-It takes 0.027 seconds to do the 10 million additions for a single thread (if the program isn't using threads).  Using threads and mutexes to protect the additions, the process takes almost 5 seconds.  Thread coordination takes time (much like people coordination).  
+It takes 0.027 seconds to do the 10 million additions for a single thread (if the program isn't using threads).  Using threads and mutexes to protect the additions, the process takes almost 5 seconds.  Thread coordination takes time (much like people coordination).
 
 Pthreads also support conditions which are like the pagers above.  They will be described later prior to needing them.  The next project will require a mutex.

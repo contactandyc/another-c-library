@@ -1,0 +1,7 @@
+Standard Template Library Alternative in C
+Copyright 2019 Andy Curtis.
+
+This software contains code and ideas derived from works
+published by Robert Sedgewick relating to the Red-Black Tree
+and the Quicksort algorithm.  In the development of this work,
+many other works (both code and explanations) were studied.

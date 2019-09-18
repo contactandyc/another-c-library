@@ -553,7 +553,7 @@ node_t *node_find(char key, node_t *root) {
 }
 ```
 
-With lists, the node you pass in is the first node.  With binary search trees, the first node is the left most node.
+With lists, the root node is the first node.  With binary search trees, the first node is the left most node.
 ```c
 node_t *node_first(node_t *n) { return n; }
 ```

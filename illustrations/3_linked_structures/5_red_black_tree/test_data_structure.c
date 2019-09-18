@@ -139,12 +139,12 @@ void destroy_using_iteration(node_t *root) {
 void test_data_structure(const char *arg) {
   printf("Creating %s for %s\n", DATA_STRUCTURE, arg);
   node_t *root;
-  for( int i=0; i<100000; i++ ) {
-    root = fill_data_structure_randomly(arg);
+  /*for( int i=0; i<100000; i++ ) {
+   root = fill_data_structure_randomly(arg);
     // node_print(root);
     find_everything(arg, root);
     find_and_erase_everything(arg, root);
-  }
+  }*/
   root = fill_data_structure(arg);
   node_print(root);
   print_using_iteration(root);

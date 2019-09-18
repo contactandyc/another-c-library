@@ -60,178 +60,204 @@ bool node_insert(node_t *node_to_insert, node_t **root) {
 
 typedef struct node_print_item_s {
   size_t position;
+  size_t length;
   node_t *node;
-  bool spacer;
+  int depth;
+  struct node_print_item_s *parent;
+  struct node_print_item_s *left, *right;
+  struct node_print_item_s *next;
 } node_print_item_t;
 
-static int get_height(node_t *n) {
-  if (!n)
-    return 0;
-  int left_height = get_height(n->left);
-  int right_height = get_height(n->right);
+typedef size_t (*get_print_node_length)(node_t *n);
 
-  return (left_height > right_height) ? (left_height + 1) : (right_height + 1);
-}
 
 static int get_depth(node_t *n) {
   int depth = 0;
   while (n) {
-    depth++;
+    if(n->color == BLACK)
+      depth++;
     n = n->parent;
   }
   return depth;
 }
 
-static int _get_right_depth(node_t *n, int depth) {
-  if(n->right)
-    depth = _get_right_depth(n->right, depth+1);
-  else if(n->left)
-    depth = _get_right_depth(n->left, depth);
-  return depth;
+void print_key(node_t *n) {
+  int depth=get_depth(n);
+  int rep = n->key % 10;
+  for( int i=0; i<=rep; i++ )
+    printf( "%s%c", n->color == BLACK ? "" : "\x1B[31m", n->key );
+  printf( "%d%s", depth, n->color == BLACK ? "" : "\x1B[0m");
 }
 
-static int get_right_depth(node_t *n) {
-  return get_depth(n) + _get_right_depth(n, 0);
+size_t get_node_length(node_t *n) {
+  // int depth=get_depth(n);
+  int rep = n->key % 10;
+  return rep+2;
 }
 
-static node_t *get_root(node_t *n) {
-  while(n->parent)
-    n = n->parent;
-  return n;
+void copy_tree(node_t *node, get_print_node_length get_node_length,
+               node_print_item_t **res, node_print_item_t *parent ) {
+  node_print_item_t *copy = (node_print_item_t *)malloc(sizeof(node_print_item_t));
+  *res = copy;
+
+  copy->length = get_node_length(node);
+  copy->position = parent ? ((parent->left == copy) ? parent->position : parent->position + parent->length + 1) : 0;
+  copy->node = node;
+  copy->depth = 1;
+  copy->left = NULL;
+  copy->right = NULL;
+  copy->parent = parent;
+
+  if(node->left)
+    copy_tree(node->left, get_node_length, &copy->left, copy );
+  if(node->right)
+    copy_tree(node->right, get_node_length, &copy->right, copy );
 }
 
-static int _get_left_depth(node_t *n, int depth) {
-  int m = depth;
-  if(n->left) {
-    int d = _get_left_depth(n->left, depth+1);
-    if(d > m)
-      m = d;
+node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item, int *depth ) {
+  while(item->parent && (item->parent->right == item || !item->parent->right)) {
+    *depth += item->depth;
+    item = item->parent;
   }
-  if(n->right) {
-    int d = _get_left_depth(n->right, depth );
-    if(d > m)
-      m = d;
-  }
-  return m;
+  *depth += item->depth;
+  return item->parent;
 }
 
-static int get_left_height(node_t *n) {
-  return _get_left_depth(n, 0);
+node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth ) {
+  if(!item)
+    return NULL;
+
+  if(depth <= item->depth)
+    return item;
+  if(item->left) {
+    node_print_item_t *r = find_left_most_at_depth(item->left, depth-item->depth);
+    if(r)
+      return r;
+  }
+  if(item->right) {
+    node_print_item_t *r = find_left_most_at_depth(item->right, depth-item->depth);
+    if(r)
+      return r;
+  }
+  return NULL;
 }
 
-size_t get_print_length(buffer_t *bh) {
-  char *p = buffer_data(bh);
-  char *ep = p + buffer_length(bh);
-  size_t res = 0;
-  while(p < ep) {
-    if(*p == 0x1B) {
-      p++;
-      while(*p && *p != 'm')
-        p++;
-      if(*p == 'm')
-        p++;
-    }
-    else {
-      p++;
-      res++;
-    }
+node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) {
+  while(item) {
+    node_print_item_t *p = find_left_parent_with_right_child(item, &depth);
+    if(!p)
+      return NULL;
+    node_print_item_t *np = find_left_most_at_depth( p->right, depth );
+    if(np)
+      return np;
+    item = p;
   }
-  return res;
+  return NULL;
 }
+
+int get_node_depth( node_print_item_t *item ) {
+  int r=0;
+  while(item) {
+    r += item->depth;
+    item = item->parent;
+  }
+  return r;
+}
+
 
 void node_print(node_t *root) {
   if (!root)
     return;
-  buffer_t *new_nodes_line = buffer_init(100);
-  buffer_t *new_slashes_line = buffer_init(100);
-  buffer_t *print_items = buffer_init(100);
-  buffer_t *next_items = buffer_init(100);
 
-  node_print_item_t item;
-  item.position = 0;
-  item.node = root;
-  item.spacer = false;
-  int depth = 0;
-  buffer_set(print_items, &item, sizeof(item));
-  while (buffer_length(print_items) > 0) {
-    // line of text containing node labels
-    buffer_clear(new_nodes_line);
+  node_print_item_t *printable = NULL;
+  copy_tree(root, get_node_length, &printable, NULL );
 
-    // line of text containing slashes
-    buffer_clear(new_slashes_line);
-
-    // for the next loop
-    buffer_clear(next_items);
-    node_print_item_t *items = (node_print_item_t *)buffer_data(print_items);
-    size_t num_items = buffer_length(print_items) / sizeof(node_print_item_t);
-    depth++;
-
-    for (size_t i = 0; i < num_items; i++) {
-      items[i].spacer = false;
-      size_t total = 0;
-      for (size_t j = num_items-1; j > i; j--) {
-        /* not exactly sure what +2 to +4 does, experimentally found */
-        total += get_left_height(items[j].node)+4;
-      }
-      size_t total2 = get_left_height(get_root(items[i].node));
-      if(total && total2 <= total)
-        items[i].spacer = true;
-
-      // add leading whitespace
-      buffer_appendn(new_nodes_line, ' ',
-                     items[i].position - get_print_length(new_nodes_line));
-      buffer_appendn(new_slashes_line, ' ',
-                     items[i].position - buffer_length(new_slashes_line));
-
-      if (!items[i].spacer) {
-        char key = items[i].node->key;
-        const char *scode = "";
-        const char *ecode = "";
-        if(items[i].node->color == RED) {
-          scode = "\x1B[31m";
-          ecode = "\x1B[0m";
+  node_print_item_t *sn,*n,*n2,*n3;
+  int actual_depth, depth2;
+  int depth=1;
+  while(true) {
+    int position = 0;
+    // sn=depth==1 ? printable : find_left_most_at_depth( printable, depth );
+    sn = find_left_most_at_depth(printable, depth);
+    if(!sn)
+      break;
+    n = sn;
+    while(n) {
+      for( ; position<n->position; position++ )
+        printf( " ");
+      actual_depth=get_node_depth(n);
+      if(actual_depth == depth) {
+        n2 = find_next_peer(n, 0);
+        if(n2) {
+          depth2 = get_node_depth(n2);
+        //  printf( "\n\n%c(%d) %lu %lu %c(%d) %lu\n\n", n->node->key, depth, n->position, n->length, n2->node->key, depth2, n2->position );
         }
-        buffer_appendf(new_nodes_line, "%s%c%d%s", scode, key,
-                       get_depth(items[i].node), ecode );
-      } else
-        buffer_appendc(new_nodes_line, '|');
+        int extra = 0;
+        if(n->right)
+          extra = 2;
 
-      if (items[i].spacer || items[i].node->left) {
-        node_t *left_node =
-            items[i].spacer ? items[i].node : items[i].node->left;
-        buffer_appendc(new_slashes_line, '|');
-        item.position = items[i].position;
-        item.node = left_node;
-        item.spacer = items[i].spacer;
-        buffer_append(next_items, &item, sizeof(item));
-      } else
-        buffer_appendc(new_slashes_line, ' ');
-
-      buffer_appendn(new_slashes_line, ' ',
-                     get_print_length(new_nodes_line) -
-                         buffer_length(new_slashes_line));
-
-      if (!items[i].spacer && items[i].node->right) {
-        buffer_appendc(new_slashes_line, '\\');
-        item.position = buffer_length(new_slashes_line);
-        item.node = items[i].node->right;
-        item.spacer = false;
-        buffer_append(next_items, &item, sizeof(item));
-      } else
-        buffer_appendc(new_slashes_line, ' ');
+        if(n2 && (n->position+n->length+1+extra > n2->position)) {
+          n->depth++;
+          printf( "|");
+          position++;
+        }
+        else {
+          /*if(n2 && n->parent && n->parent->left == n) {
+            n3 = find_next_peer(n2, 1);
+            if(n3 && n2->position+n2->length+1 > n3->position) {
+              n->depth++;
+              printf( "|");
+              position++;
+            }
+            else {
+              print_key(n->node);
+              position += n->length;
+            }
+          }
+          else { */
+            print_key(n->node);
+            position += n->length;
+          // }
+        }
+        n = n2;
+      }
+      else {
+        n = find_next_peer(n, depth-actual_depth);
+        printf( "|");
+        position++;
+      }
     }
-    printf("%s\n", buffer_data(new_nodes_line));
-    printf("%s\n", buffer_data(new_slashes_line));
-    // swap next_items and print_items
-    buffer_t *tmp = print_items;
-    print_items = next_items;
-    next_items = tmp;
+    printf( "\n");
+    position = 0;
+    n = sn;
+    while(n) {
+      for( ; position<n->position; position++ )
+        printf( " ");
+      actual_depth=get_node_depth(n);
+      n2 = find_next_peer(n, depth-actual_depth);
+      if(actual_depth == depth) {
+        if(n->left) {
+          printf( "|" );
+          position++;
+        }
+        for( ; position<n->position+n->length; position++ )
+          printf( " ");
+        if(n->right) {
+          printf( "\\" );
+          position++;
+        }
+      }
+      else {
+        printf( "|");
+        position++;
+      }
+      n = n2;
+    }
+    printf( "\n");
+    depth++;
   }
-  buffer_destroy(print_items);
-  buffer_destroy(next_items);
-  buffer_destroy(new_nodes_line);
-  buffer_destroy(new_slashes_line);
 }
+
 
 void _debug_node_print(const char *function, int line, node_t *root) {
   printf( "%s:%d\n", function, line );
