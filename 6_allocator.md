@@ -567,6 +567,113 @@ Snapshots are saved in increasing intervals.
 #endif
 ```
 
+Before understanding the implementation, let's see how this get's used by other objects and code.  The stla_timer.h/c will change in the following way.
+
+Include stla_common.h
+
+stla_timer.h
+```c
+#include "stla_common.h"
+```
+
+Replace
+```c
+stla_timer_t *stla_timer_init(int repeat);
+```
+
+with
+```c
+#ifdef _STLA_DEBUG_MEMORY_
+#define stla_timer_init(repeat) _stla_timer_init(repeat, FILE_LINE_MACRO("stla_timer"))
+stla_timer_t *_stla_timer_init(int repeat, const char *caller);
+#else
+#define stla_timer_init(repeat) _stla_timer_init(repeat)
+stla_timer_t *_stla_timer_init(int repeat);
+#endif
+```
+
+The above code has two basic cases.  One where _STLA_DEBUG_MEMORY_ is defined and the other where it is not (#else).  It may be easier to break this into a couple of steps.
+
+1.  convert the init function to be prefixed with an underscore
+
+```c
+stla_timer_t *stla_timer_init(int repeat);
+```
+
+becomes
+```c
+stla_timer_t *_stla_timer_init(int repeat);
+```
+
+2.  create a macro which defines stla_timer_init as _stla_timer_init
+```c
+#define stla_timer_init(repeat) _stla_timer_init(repeat)
+stla_timer_t *_stla_timer_init(int repeat);
+```
+
+3.  define the macro if logic with the else part filled in.
+```c
+#ifdef _STLA_DEBUG_MEMORY_
+#else
+#define stla_timer_init(repeat) _stla_timer_init(repeat)
+stla_timer_t *_stla_timer_init(int repeat);
+#endif
+```
+
+4.  Add const char *caller to the debug version of _stla_timer_init
+```c
+stla_timer_t *_stla_timer_init(int repeat, const char *caller);
+```
+
+5.  define the macro to call the init function.
+```c
+#define stla_timer_init(repeat) _stla_timer_init(repeat, FILE_LINE_MACRO("stla_timer"))
+```
+
+6.  put the two calls in the #ifdef _STLA_DEBUG_MEMORY_ section.
+```c
+#ifdef _STLA_DEBUG_MEMORY_
+#define stla_timer_init(repeat) _stla_timer_init(repeat, FILE_LINE_MACRO("stla_timer"))
+stla_timer_t *_stla_timer_init(int repeat, const char *caller);
+#else
+#define stla_timer_init(repeat) _stla_timer_init(repeat)
+stla_timer_t *_stla_timer_init(int repeat);
+#endif
+```
+
+Objects will typically use the FILE_LINE_MACRO("object_name") when defining the init call as in step 5 above.
+
+Change stla_timer.c from
+```c
+stla_timer_t *stla_timer_init(int repeat) {
+  stla_timer_t *t = (stla_timer_t *)malloc(sizeof(stla_timer_t));
+```
+
+to
+```c
+#ifdef _STLA_DEBUG_MEMORY_
+stla_timer_t *_stla_timer_init(int repeat, const char *caller) {
+  stla_timer_t *t =
+    (stla_timer_t *)_stla_malloc_d(NULL, caller,
+                                   sizeof(stla_timer_t), false);
+#else
+stla_timer_t *_stla_timer_init(int repeat) {
+  stla_timer_t *t = (stla_timer_t *)stla_malloc(sizeof(stla_timer_t));
+#endif
+```
+
+1.  Change all malloc, calloc, strdup, realloc, and free calls to have<br/>
+    stla_ prefix.<br/>
+2.  Change the function name from stla_timer_init to _stla_timer_init.<br/>
+3.  Wrap the block in a #ifdef _STLA_DEBUG_MEMORY_/#else/#endif block<br/>
+4.  Define the _STLA_DEBUG_MEMORY_ portion.  The _stla_timer_init function<br/>
+    has the extra const char *caller parameter.  The allocation uses<br/>
+    _stla_malloc_d directly as shown above.<br/>
+
+
+
+In the case that _STLA_DEBUG_MEMORY_ is not defined, stla_timer_init is defined as _stla_timer_init (the original function name with an underscore prefix).  
+
 
 
 This will automatically record where all of our malloc calls come from assuming we use stla_malloc and define _STLA_DEBUG_MEMORY_.  Sometimes it is nice to be able to record additional information.  stla_buffer_init makes a call to malloc.  Ideally, we could use the file and line number from the code that calls stla_buffer_init (so the line number isn't stla_buffer.c:50).  Ideally, the macro might report that the buffer was initialized at (test_code.c:30 [stla_buffer] ...).  The buffer might also want to report statistics such as how much memory it has used vs allocated.  
