@@ -662,13 +662,10 @@ stla_timer_t *_stla_timer_init(int repeat) {
 #endif
 ```
 
-1.  Change all malloc, calloc, strdup, realloc, and free calls to have<br/>
-    stla_ prefix.<br/>
+1.  Change all malloc, calloc, strdup, realloc, and free calls to have stla_ prefix.<br/>
 2.  Change the function name from stla_timer_init to _stla_timer_init.<br/>
 3.  Wrap the block in a #ifdef _STLA_DEBUG_MEMORY_/#else/#endif block<br/>
-4.  Define the _STLA_DEBUG_MEMORY_ portion.  The _stla_timer_init function<br/>
-    has the extra const char *caller parameter.  The allocation uses<br/>
-    _stla_malloc_d directly as shown above.<br/>
+4.  Define the _STLA_DEBUG_MEMORY_ portion.  The _stla_timer_init function has the extra const char *caller parameter.  The allocation use _stla_malloc_d directly as shown above.
 
 
 
