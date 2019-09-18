@@ -39,13 +39,15 @@ static void print_node(FILE *out, const char *caller, ssize_t len, stla_allocato
 }
 
 static void _stla_dump_global_allocations(stla_allocator_t *a, FILE *out) {
-  fprintf(out, "%lu byte(s) allocated in %lu allocations (%lu byte(s) overhead)\n",
-          a->total_bytes_allocated, a->total_allocations, a->total_allocations*sizeof(stla_allocator_node_t) );
-  stla_allocator_node_t *n = a->head;
-  while(n) {
-    print_node(out, n->caller, n->length, n );
-    fprintf( out, "\n");
-    n = n->next;
+  if(a->head) {
+    fprintf(out, "%lu byte(s) allocated in %lu allocations (%lu byte(s) overhead)\n",
+            a->total_bytes_allocated, a->total_allocations, a->total_allocations*sizeof(stla_allocator_node_t) );
+    stla_allocator_node_t *n = a->head;
+    while(n) {
+      print_node(out, n->caller, n->length, n );
+      fprintf( out, "\n");
+      n = n->next;
+    }
   }
 }
 
