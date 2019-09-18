@@ -64,15 +64,6 @@ typedef struct node_print_item_s {
   bool spacer;
 } node_print_item_t;
 
-static int get_height(node_t *n) {
-  if (!n)
-    return 0;
-  int left_height = get_height(n->left);
-  int right_height = get_height(n->right);
-
-  return (left_height > right_height) ? (left_height + 1) : (right_height + 1);
-}
-
 static int get_depth(node_t *n) {
   int depth = 0;
   while (n) {
