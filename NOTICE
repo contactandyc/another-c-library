@@ -5,3 +5,7 @@ This software contains code and ideas derived from works
 published by Robert Sedgewick relating to the Red-Black Tree
 and the Quicksort algorithm.  In the development of this work,
 many other works (both code and explanations) were studied.
+I have tried to write the code without borrowing any code or
+explanations from other projects.  In algorithms, there is
+often one way to do things, so the code and/or explanations
+may look the same.
