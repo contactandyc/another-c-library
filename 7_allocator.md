@@ -50,13 +50,15 @@ One of the reasons that people tend to steer clear of C is because you must main
 #include "stla_common.h"
 
 void *stla_malloc(size_t len);
-void *stla_calloc(size_t num, size_t block_size);
+void *stla_calloc(size_t len);
 void *stla_realloc(void *p, size_t len);
 char *stla_strdup(char *p);
 void stla_free(void *p);
 
 #endif
 ```
+
+You may notice that I don't use two parameters for stla_calloc.  This is intentional as I don't see a benefit in changing the signature from malloc.  
 
 We could redefine our interface as
 
@@ -67,7 +69,7 @@ We could redefine our interface as
 #include <stdlib.h> /* for size_t */
 
 void *stla_malloc(const char *filename, int line, size_t len);
-void *stla_calloc(const char *filename, int line, size_t num, size_t block_size);
+void *stla_calloc(const char *filename, int line, size_t len);
 void *stla_realloc(const char *filename, int line, void *p, size_t len);
 char *stla_strdup(const char *filename, int line, char *p);
 void stla_free(const char *filename, void *p);
