@@ -37,15 +37,15 @@ symbol  | description
 ->  | when given a pointer to a struct to reference a member of the type.
 .  | when given a struct (not a pointer, but the actual struct value), used to reference a member of the type.
 +=  | equivalent to x = x + N where N is on the right and x is on the left.
->>=  | equivalent to x = x >> N where N is on the right and x is on the left.  Shifts the bits of x N times to the right.
+\>>=  | equivalent to x = x >> N where N is on the right and x is on the left.  Shifts the bits of x N times to the right.
 !  | Get the opposite condition of.  Ex. !true == false and !false == true.
 ==  | Is two elements equal to each other.
 =  |  Assign value on the right to the variable on the left.
-*  | Used to define a data type as a pointer (ex. char *) and to dereference or get the value of what a pointer is pointing to.
+\*  | Used to define a data type as a pointer (ex. char *) and to dereference or get the value of what a pointer is pointing to.
 & | Used to get the address of a value or to get a pointer to a given value.   
 ()  | Used to define parameters of a function and the condition in an if, while, or for loop (and a few others).
 //  | comment to the end of the line.
-/* */  | inline comment that can span zero or more lines.
+/\* \*/  | inline comment that can span zero or more lines.
 ;  |  C mostly doesn't use line breaks to separate code.  semicolons are used instead.
 
 The full source code for stla_allocator is found at <i>src/stla_allocator.c</i>
