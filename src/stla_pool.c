@@ -14,10 +14,10 @@ void stla_pool_set_minimum_growth_size(stla_pool_t *h, size_t size) {
 }
 
 #ifdef _STLA_DEBUG_MEMORY_
-static void dump_pool(FILE *out, void *p, size_t length) {
+static void dump_pool(FILE *out, const char *caller, void *p, size_t length) {
   stla_pool_t *pool = (stla_pool_t *)p;
   fprintf( out, "%s size: %lu, max_size: %lu, initial_size: %lu used: %lu ",
-           pool->dump.caller, pool->cur_size, pool->max_size, pool->initial_size, pool->used );
+           caller, pool->cur_size, pool->max_size, pool->initial_size, pool->used );
 }
 
 stla_pool_t *_stla_pool_init(size_t initial_size, const char *caller) {
@@ -48,7 +48,6 @@ stla_pool_t *_stla_pool_init(size_t initial_size) {
                                     block_size + sizeof(stla_pool_t) +
                                     sizeof(stla_pool_node_t), true);
   h->dump.dump = dump_pool;
-  h->dump.caller = caller;
   h->initial_size = initial_size;
   h->cur_size = 0;
   h->max_size = 0;

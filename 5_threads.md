@@ -270,4 +270,4 @@ It takes 0.027 seconds to do the 10 million additions for a single thread (if th
 
 Pthreads also support conditions which are like the pagers above.  They will be described later prior to needing them.  The next project will require a mutex.
 
-# Continue to build the [allocator](6_allocator.md) object!
+# Continue to understand [macros](6_macros.md)!

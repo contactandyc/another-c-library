@@ -89,16 +89,25 @@ static inline void *stla_pool_calloc(stla_pool_t *h, size_t len) {
   return dest;
 }
 
+static inline void *stla_pool_udup(stla_pool_t *h, const void *data, size_t len) {
+  /* dup will simply allocate enough bytes to hold the duplicated data,
+    copy the data, and return the newly allocated memory which contains a copy
+    of data. Because the data could need aligned, we will use stla_pool_alloc
+    instead of stla_pool_ualloc */
+  char *dest = (char *)stla_pool_ualloc(h, len);
+  memcpy(dest, data, len);
+  return dest;
+}
+
 static inline char *stla_pool_strdup(stla_pool_t *h, const char *p) {
   /* strdup will simply allocate enough bytes to hold the duplicated string,
     copy the string, and return the newly allocated string. */
   size_t len = strlen(p) + 1;
-  char *dest = (char *)stla_pool_ualloc(h, len);
-  memcpy(dest, p, len);
-  return dest;
+  return (char *)stla_pool_udup(h, p, len);
 }
 
-static inline char *stla_pool_dup(stla_pool_t *h, const void *data, size_t len) {
+
+static inline void *stla_pool_dup(stla_pool_t *h, const void *data, size_t len) {
   /* dup will simply allocate enough bytes to hold the duplicated data,
     copy the data, and return the newly allocated memory which contains a copy
     of data. Because the data could need aligned, we will use stla_pool_alloc

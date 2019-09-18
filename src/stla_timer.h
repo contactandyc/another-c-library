@@ -12,7 +12,7 @@ typedef struct stla_timer_s stla_timer_t;
    only being timed with a single repetition, then use a value of 1.
 */
 #ifdef _STLA_DEBUG_MEMORY_
-#define stla_timer_init(repeat) _stla_timer_init(repeat, FILE_LINE_MACRO("stla_timer"))
+#define stla_timer_init(repeat) _stla_timer_init(repeat, STLA_FILE_LINE_MACRO("stla_timer"))
 stla_timer_t *_stla_timer_init(int repeat, const char *caller);
 #else
 #define stla_timer_init(repeat) _stla_timer_init(repeat)

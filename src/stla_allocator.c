@@ -11,7 +11,8 @@ typedef struct stla_allocator_node_s {
 } stla_allocator_node_t;
 
 struct stla_allocator_s;
-typedef struct stla_allocator_s stla_allocator_t;
+typedef struct stla_allocator_s
+  stla_allocator_t;
 
 struct stla_allocator_s {
   stla_allocator_node_t *head;
@@ -33,7 +34,7 @@ static void print_node(FILE *out, const char *caller, ssize_t len, stla_allocato
     stla_allocator_dump_t *d = (stla_allocator_dump_t *)(n+1);
     ssize_t num = -len;
     size_t length = num;
-    d->dump(out, d, length);
+    d->dump(out, caller, d, length);
   }
 }
 
@@ -85,7 +86,7 @@ void * dump_global_allocations_thread( void *arg ) {
 
   char *tmp = (char *)malloc((strlen(a->logfile)*2)*100);
   int done = 0;
-  while(done) {
+  while(!done) {
     save_old_log(a, save, tmp);
     pthread_mutex_lock(&a->mutex);
     FILE *out = fopen(a->logfile, "wb");
@@ -163,8 +164,8 @@ void myCleanupFun (void)
 
 
 void *_stla_malloc_d(stla_allocator_t *a, const char *caller, size_t len, bool custom ) {
-  if(!len) /* let's not allow zero byte allocations */
-    abort();
+  if(!len)
+    return NULL;
 
   if(!a)
     a = global_allocator;
@@ -205,7 +206,8 @@ void *_stla_malloc_d(stla_allocator_t *a, const char *caller, size_t len, bool c
 
 void *_stla_calloc_d(stla_allocator_t *a, const char *caller, size_t len, bool custom ) {
   void *m = _stla_malloc_d(a, caller, len, custom);
-  memset(m, 0, len);
+  if(m)
+    memset(m, 0, len);
   return m;
 }
 

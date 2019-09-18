@@ -4,9 +4,9 @@
 #include <string.h>
 
 #ifdef _STLA_DEBUG_MEMORY_
-static void dump_buffer(FILE *out, void *p, size_t length) {
+static void dump_buffer(FILE *out, const char *caller, void *p, size_t length) {
   stla_buffer_t *bh = (stla_buffer_t *)p;
-  fprintf( out, "%s size: %lu, max_length: %lu, initial_size: %lu ", bh->dump.caller, bh->size, bh->max_length, bh->initial_size );
+  fprintf( out, "%s size: %lu, max_length: %lu, initial_size: %lu ", caller, bh->size, bh->max_length, bh->initial_size );
 }
 
 stla_buffer_t *_stla_buffer_init(size_t initial_size,
@@ -14,7 +14,6 @@ stla_buffer_t *_stla_buffer_init(size_t initial_size,
   stla_buffer_t *h =
     (stla_buffer_t *)_stla_malloc_d(NULL, caller, sizeof(stla_buffer_t), true);
   h->dump.dump = dump_buffer;
-  h->dump.caller = caller;
   h->initial_size = initial_size;
   h->max_length = 0;
 #else

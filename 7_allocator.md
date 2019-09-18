@@ -58,37 +58,6 @@ void stla_free(void *p);
 #endif
 ```
 
-This is what the API should look like, but we can do a little better.  These functions will all be called from a line of code which will be in a file.  The c compiler allows us to create a macro (basically defining one thing as another).  There are two special constants that can be useful for debugging.
-
-```
-__LINE__ - The line of code that you are on.
-__FILE__ - The file that the code exists in.
-```
-
-For example if you were to create this
-test_special_constants.c
-```c
-#include <stdio.h>
-
-int main( int argc, char *argv[]) {
-  printf( "This line of code is at line %d in the file %s\n", __LINE__,  __FILE__);
-  return 0;
-}
-```
-
-Build it
-```bash
-gcc test_special_constants.c -o test_special_constants
-```
-
-And run it
-```bash
-$ ./test_special_constants
-This line of code is at line 4 in function main in the file test_special_constants.c
-```
-
-__FILE__ is of the type const char * (meaning it is a sequence of read only characters).   __LINE__ is an int (integer).
-
 We could redefine our interface as
 
 ```c
@@ -119,296 +88,13 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-There is a pattern above in that everytime we call stla_malloc (and others), we would call it with __FILE__, __LINE__ as the first two parameters.  We can utilize the compiler and macros to help us here.  In C, you define a macro using #define.  
-
-For example,
-```c
-#include <stdio.h>
-
-#define multiply(x, y) x*y
-
-int main( int argc, char *argv[]) {
-  printf("5 x 6 = %d\n", multiply(5, 6));
-  return 0;
-}
-```
-
-gets interpreted as
-```c
-#include <stdio.h>
-
-#define multiply(x, y) x*y
-
-int main( int argc, char *argv[]) {
-  printf("5 x 6 = %d\n", 5*6);
-  return 0;
-}
-```
-
-Before it is turned into a binary.  The macro literally gets placed inline in the code.  For example, a macro can reference a variable that was defined in the function.
-
-```c
-#include <stdio.h>
-
-#define multiply_by_x(y) x*y
-
-int main( int argc, char *argv[]) {
-  int x = 5;
-  printf("5 x 6 = %d\n", multiply_by_x(6));
-  return 0;
-}
-```
-
-Notice that x doesn't exist when multiply_by_x is defined.  Because it is literally replaced it would look like the following.
-
-```c
-#include <stdio.h>
-
-#define multiply_by_x(y) x*y
-
-int main( int argc, char *argv[]) {
-  int x = 5;
-  printf("5 x 6 = %d\n", x*6);
-  return 0;
-}
-```
-
-If x didn't exist, the compiler would ultimately throw an error.
-
-```c
-#include <stdio.h>
-
-#define multiply_by_x(y) multiply(x, y)
-
-int multiply(int x, int y) {
-  return x*y;
-}
-
-int main( int argc, char *argv[]) {
-  int x = 5;
-  printf("5 x 6 = %d\n", multiply_by_x(6));
-  return 0;
-}
-```
-
-get's converted to
-
-```c
-#include <stdio.h>
-
-#define multiply_by_x(y) multiply(x, y)
-
-int multiply(int x, int y) {
-  return x*y;
-}
-
-int main( int argc, char *argv[]) {
-  int x = 5;
-  printf("5 x 6 = %d\n", multiply(x, 6));
-  return 0;
-}
-```
-
-Notice that multiply didn't have to exist when the macro was defined.  Macros are evaluated first.  
-
-Macros almost never end in a semicolon.  The following will throw an error.
-
-test_code.c
-```c
-#include <stdio.h>
-
-#define multiply_by_x(y) multiply(x, y);
-
-int multiply(int x, int y) {
-  return x*y;
-}
-
-int main( int argc, char *argv[]) {
-  int x = 5;
-  printf("5 x 6 = %d\n", multiply_by_x(6));
-  return 0;
-}
-```
-
-```bash
-$ gcc test_code.c -o test_code
-test_special_constants.c:11:26: error: unexpected ';' before ')'
-  printf("5 x 6 = %d\n", multiply_by_x(6));
-                         ^
-test_special_constants.c:3:40: note: expanded from macro 'multiply_by_x'
-#define multiply_by_x(y) multiply(x, y);
-                                       ^
-```
-
-The above code get's converted to
-```c
-#include <stdio.h>
-
-#define multiply_by_x(y) multiply(x, y);
-
-int multiply(int x, int y) {
-  return x*y;
-}
-
-int main( int argc, char *argv[]) {
-  int x = 5;
-  printf("5 x 6 = %d\n", multiply(x, 6););
-  return 0;
-}
-```
-
-Notice the extra semicolon after multiply.  In general, macros can have semicolons in them, but they cannot end in a semicolon.  Macros can also define multiple lines of code (or multiple statements).
-
-test_code.c
-```c
-#include <stdio.h>
-
-#define swap(a,b) \
-  tmp = a;        \
-  a = b;          \
-  b = tmp
-
-int main( int argc, char *argv[] ) {
-  int x = 5;
-  int y = 10;
-  printf( "before swap: (%d, %d)\n", x, y );
-  swap(x, y);
-  printf( "after swap: (%d, %d)\n", x, y );
-  return 0;
-}
-```
-
-```bash
-$ gcc test_code.c -o test_code
-test_special_constants.c:12:3: error: use of undeclared identifier 'tmp'
-  swap(x, y);
-  ^
-test_special_constants.c:4:3: note: expanded from macro 'swap'
-  tmp = a;        \
-  ^
-test_special_constants.c:12:3: error: use of undeclared identifier 'tmp'
-test_special_constants.c:6:7: note: expanded from macro 'swap'
-  b = tmp
-      ^
-2 errors generated.
-```
-
-The swap macro expected a tmp variable to exist.  Declaring tmp will fix the code.
-
-test_code.c
-```c
-#include <stdio.h>
-
-#define swap(a,b) \
-  tmp = a;        \
-  a = b;          \
-  b = tmp
-
-int main( int argc, char *argv[] ) {
-  int tmp;
-  int x = 5;
-  int y = 10;
-  printf( "before swap: (%d, %d)\n", x, y );
-  swap(x, y);
-  printf( "after swap: (%d, %d)\n", x, y );
-  return 0;
-}
-```
-
-```bash
-$ gcc test_code.c -o test_code
-$ ./test_code
-before swap: (5, 10)
-after swap: (10, 5)
-```
-
-One common error with multi-line macros is to put a space after the \.  The compiler will give you an error for doing this.  Also, I put the \ so that they all line up vertically.  This just makes the code more readable - the compiler doesn't care.  A second error with multi-line macros is to put the \ after the last line.  The \ continues code to the next line.  It's an error to put the \ on the last line (which may or may not get reported by the compiler in a useful way).
-
-Macros can be defined different ways depending upon another macro variable.
-
-test_code.c
-```c
-#include <stdio.h>
-
-#ifdef _DEBUG_
-#define printx(x) printf( "DEBUG: %d\n", x)
-#else
-#define printx(x) printf( "NOT DEBUG: %d\n", x)
-#endif
-
-int main( int argc, char *argv[] ) {
-  printx(5);
-  return 0;
-}
-```
-
-```bash
-$ gcc test_code.c -o test_code
-$ ./test_code
-NOT DEBUG: 5
-```
-
-You can define compiler directives from the command line using the -D option in gcc.  Multiple directives can be defined by repeating the -D option.
-```bash
-$ gcc -D_DEBUG_ test_code.c -o test_code
-$ ./test_code
-DEBUG: 5
-```
-
-Finally, we can have the compiler create a single string constant out of the __FILE__ and the __LINE__ (which can include additional information).  Converting a number to a string using #define is a little tricky due to how the preprocessor works.  It basically has to be done in two passes using a function which calls a function.  The proprocessor doesn't do recursion.  Instead, it works by doing two passes.
-
-$stla/src/stla_common.h
-```c
-#define STRINGIZE2(x) #x
-#define STRINGIZE(x) STRINGIZE2(x)
-#define __FILE_LINE__ __FILE__ ":" STRINGIZE(__LINE__)
-#define FILE_LINE_MACRO(a) __FILE_LINE__ " [" a "]"
-```
-
-To resolve, __FILE_LINE__ (assuming we have a file named test_code.c and line 5)
-
-test_code.c
-```c
-#include <stdio.h>
-#include "stla_common.h"
-
-int main( int argc, char *argv[]) {
-  printf ("%s\n", __FILE_LINE__ );
-  return 0;
-}
-```
-
-The first pass will look like...
-```c
-#include <stdio.h>
-#include "stla_common.h"
-
-int main( int argc, char *argv[]) {
-  printf ("%s\n", "test_code.c" ":" STRINGIZE2(5) );
-  return 0;
-}
-```
-
-The second pass will look like...
-
-```c
-#include <stdio.h>
-#include "stla_common.h"
-
-int main( int argc, char *argv[]) {
-  printf ("%s\n", test_code.c" ":" "5"  );
-  return 0;
-}
-```
-
-In stla_common.h, I also defined FILE_LINE_MACRO which is a macro meant for objects such as the stla_timer object.  This will become more evident as we work through the allocator object.
-
+There is a pattern above in that everytime we call stla_malloc (and others), we would call it with __FILE__, __LINE__ as the first two parameters.  
 
 In creating the global allocator, maybe we only want line numbers and malloc to be passed in when the software is defined as being in debug mode.  To define stla_malloc, we might want to do the following.  Considering that we have just identified how to merge the __FILE__ and __LINE__, we will use that.
 
 ```c
 #ifdef _STLA_DEBUG_MEMORY_
-#define stla_malloc(len) _stla_malloc_d(__FILE_LINE__, len)
+#define stla_malloc(len) _stla_malloc_d(__STLA_FILE_LINE__, len)
 #else
 #define stla_malloc(len) malloc(len)
 #endif
@@ -429,7 +115,7 @@ void *_stla_malloc_d( stla_allocator_t *a, const char *caller, size_t len );
 
 The macro changes to.
 ```c
-#define stla_malloc(len) _stla_malloc_d(NULL, __FILE_LINE__, len)
+#define stla_malloc(len) _stla_malloc_d(NULL, __STLA_FILE_LINE__, len)
 ```
 
 A NULL allocator simply means to use the global allocator.
@@ -447,7 +133,7 @@ void *_stla_malloc_d( stla_allocator_t *a, const char *caller, size_t len, bool 
 
 The macro changes to.
 ```c
-#define stla_malloc(len) _stla_malloc_d(NULL, __FILE_LINE__, len, false)
+#define stla_malloc(len) _stla_malloc_d(NULL, __STLA_FILE_LINE__, len, false)
 ```
 
 If the custom feature is enabled, the objects need a way to dump their state to a file (or to the terminal).  In C, you can define a function pointer and then associate the pointer to functions programatically.  An example is below.  The gist of it is that you specify the new function pointer type by surrounding the name in parenthesis and an extra asterisk.
@@ -488,11 +174,11 @@ $stla/src/stla_allocator.h
 #include <string.h>
 
 #ifdef _STLA_DEBUG_MEMORY_
-#define stla_malloc(len) _stla_malloc_d(NULL, __FILE_LINE__, len, false)
-#define stla_calloc(len) _stla_calloc_d(NULL, __FILE_LINE__, len, false)
-#define stla_realloc(p, len) _stla_realloc_d(NULL, __FILE_LINE__, p, len, false)
-#define stla_strdup(p) _stla_strdup_d(NULL, __FILE_LINE__, p)
-#define stla_free(p) _stla_free_d(NULL, __FILE_LINE__, p)
+#define stla_malloc(len) _stla_malloc_d(NULL, __STLA_FILE_LINE__, len, false)
+#define stla_calloc(len) _stla_calloc_d(NULL, __STLA_FILE_LINE__, len, false)
+#define stla_realloc(p, len) _stla_realloc_d(NULL, __STLA_FILE_LINE__, p, len, false)
+#define stla_strdup(p) _stla_strdup_d(NULL, __STLA_FILE_LINE__, p)
+#define stla_free(p) _stla_free_d(NULL, __STLA_FILE_LINE__, p)
 #else
 #define stla_malloc(len) malloc(len)
 #define stla_calloc(len) calloc(1, len)
@@ -529,44 +215,6 @@ void _stla_free_d(stla_allocator_t *a, const char *caller, void *p);
 #endif
 ```
 
-
-$stla/src/stla_common.h
-```c
-#ifndef _stla_common_H
-#define _stla_common_H
-
-/* defines NULL, size_t, offsetof */
-#include <stddef.h>
-/* because I like to use true, false, and bool */
-#include <stdbool.h>
-
-/*
-Defining _STLA_DEBUG_MEMORY_ will check that memory is properly
-freed (and try some rudimentary double free checks).  If memory
-doesn't seem to be previously allocated, there is a scan to find
-the closest block.  _STLA_DEBUG_MEMORY_ can be defined as NULL or
-a valid string.  If it is defined as a string, then a file will be
-written with the given name every _STLA_DEBUG_MEMORY_SPEED_ seconds.
-Snapshots are saved in increasing intervals.  
-*/
-// #define _STLA_DEBUG_MEMORY_ "memory.log"
-
-/* How often should the memory be checked? It is always checked in the
-   beginning and every _STLA_DEBUG_MEMORY_SPEED_ seconds assuming
-   _STLA_DEBUG_MEMORY_ is defined as a string (and not NULL). */
-#define _STLA_DEBUG_MEMORY_SPEED_ 60
-
-
-#define stla_parent_object(addr, base_type, field) (base_type *)((char *)addr-offsetof(base_type,field))
-
-#define STRINGIZE2(x) #x
-#define STRINGIZE(x) STRINGIZE2(x)
-#define __FILE_LINE__ __FILE__ ":" STRINGIZE(__LINE__)
-#define FILE_LINE_MACRO(a) __FILE_LINE__ " [" a "]"
-
-#endif
-```
-
 Before understanding the implementation, let's see how this get's used by other objects and code.  The stla_timer.h/c will change in the following way.
 
 Include stla_common.h
@@ -584,7 +232,7 @@ stla_timer_t *stla_timer_init(int repeat);
 with
 ```c
 #ifdef _STLA_DEBUG_MEMORY_
-#define stla_timer_init(repeat) _stla_timer_init(repeat, FILE_LINE_MACRO("stla_timer"))
+#define stla_timer_init(repeat) _stla_timer_init(repeat, STLA_FILE_LINE_MACRO("stla_timer"))
 stla_timer_t *_stla_timer_init(int repeat, const char *caller);
 #else
 #define stla_timer_init(repeat) _stla_timer_init(repeat)
@@ -627,13 +275,13 @@ stla_timer_t *_stla_timer_init(int repeat, const char *caller);
 
 5.  define the macro to call the init function.
 ```c
-#define stla_timer_init(repeat) _stla_timer_init(repeat, FILE_LINE_MACRO("stla_timer"))
+#define stla_timer_init(repeat) _stla_timer_init(repeat, STLA_FILE_LINE_MACRO("stla_timer"))
 ```
 
 6.  put the two calls in the #ifdef _STLA_DEBUG_MEMORY_ section.
 ```c
 #ifdef _STLA_DEBUG_MEMORY_
-#define stla_timer_init(repeat) _stla_timer_init(repeat, FILE_LINE_MACRO("stla_timer"))
+#define stla_timer_init(repeat) _stla_timer_init(repeat, STLA_FILE_LINE_MACRO("stla_timer"))
 stla_timer_t *_stla_timer_init(int repeat, const char *caller);
 #else
 #define stla_timer_init(repeat) _stla_timer_init(repeat)
@@ -641,7 +289,7 @@ stla_timer_t *_stla_timer_init(int repeat);
 #endif
 ```
 
-Objects will typically use the FILE_LINE_MACRO("object_name") when defining the init call as in step 5 above.
+Objects will typically use the STLA_FILE_LINE_MACRO("object_name") when defining the init call as in step 5 above.
 
 Change stla_timer.c from
 ```c
@@ -725,6 +373,8 @@ To fix the code, we need to make sure that copy_timer is destroyed and s is free
 // stla_free(s);
 ```
 
+The error reported logged the stla_timer_init line as opposed to the stla_malloc inside of stla_timer_init.  This is likely more useful unless you are testing the individual object.
+
 Go ahead and uncomment those lines and run make again
 ```bash
 $ make
@@ -736,3 +386,211 @@ Reverse => esreveR
 time_spent: 1.8180ns
 overall time_spent: 9.5440ns
 ```
+
+Go ahead and revert your changes.  You can revert your changes in the current directory by running the following git command.  If you don't specify the ., then it will revert all changes in the whole repo (so this command can be somewhat dangerous!)
+```bash
+git checkout .
+```
+
+The lines indicating memory loss are no longer printed.  In this example, _STLA_DEBUG_MEMORY_ was defined as NULL in the Makefile using following line.
+```Makefile
+FLAGS += -D_STLA_DEBUG_MEMORY_=NULL
+```
+
+If we change this to
+```Makefile
+FLAGS += -D_STLA_DEBUG_MEMORY_=\"memory.log\"
+```
+run
+```bash
+make clean
+```
+
+and then
+```bash
+$ make
+gcc -O3 -I../../../src -D_STLA_DEBUG_MEMORY_=\"memory.log\" ../../../src/stla_timer.c ../../../src/stla_allocator.c ../../../src/stla_buffer.c ../../../src/stla_pool.c test_timer.c -o test_timer
+./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
+time_spent: 5.9220ns
+Reverse => esreveR
+time_spent: 1.5720ns
+overall time_spent: 7.4940ns
+```
+
+There is a new file called memory.log in this directory.
+```bash
+$ ls
+Makefile	memory.log	test_timer	test_timer.c
+```
+
+You can view memory.log by running
+```bash
+$ cat memory.log
+99 byte(s) allocated in 4 allocations (160 byte(s) overhead)
+test_timer.c:24: 27
+test_timer.c:26 [stla_timer]: 32
+test_timer.c:24: 8
+test_timer.c:26 [stla_timer]: 32
+```
+
+If you view the test_timer.c code, you will notice that a significant portion of the main function now has the stla_ prefix.
+
+test_timer.c (main function)
+```c
+int main( int argc, char *argv[]) {
+  int repeat_test = 1000000;
+  stla_timer_t *overall_timer = stla_timer_init(repeat_test);
+  for( int i=1; i<argc; i++ ) {
+    size_t len = strlen(argv[i]);
+    char *s = (char *)stla_malloc(len+1);
+
+    stla_timer_t *copy_timer = stla_timer_init(stla_timer_get_repeat(overall_timer));
+    stla_timer_start(copy_timer);
+    for( int j=0; j<repeat_test; j++ ) {
+      strcpy(s, argv[i]);
+    }
+    stla_timer_stop(copy_timer);
+
+    stla_timer_t *test_timer = stla_timer_init(stla_timer_get_repeat(overall_timer));
+    stla_timer_start(test_timer);
+    for( int j=0; j<repeat_test; j++ ) {
+      strcpy(s, argv[i]);
+      reverse_string(s, len);
+    }
+    stla_timer_stop(test_timer);
+    stla_timer_subtract(test_timer, copy_timer);
+    stla_timer_add(overall_timer, test_timer);
+
+    printf("%s => %s\n", argv[i], s);
+    printf( "time_spent: %0.4fns\n", stla_timer_ns(test_timer) );
+
+    stla_timer_destroy(test_timer);
+    // stla_timer_destroy(copy_timer);
+    // stla_free(s);
+  }
+  printf( "overall time_spent: %0.4fns\n", stla_timer_ns(overall_timer) );
+  stla_timer_destroy(overall_timer);
+  return 0;
+}
+```
+
+Breaking out all of the stla_ statements...
+```c
+  stla_timer_t *overall_timer = stla_timer_init(repeat_test);
+    char *s = (char *)stla_malloc(len+1);
+
+    stla_timer_t *copy_timer = stla_timer_init(stla_timer_get_repeat(overall_timer));
+    stla_timer_start(copy_timer);
+
+    stla_timer_stop(copy_timer);
+
+    stla_timer_t *test_timer = stla_timer_init(stla_timer_get_repeat(overall_timer));
+    stla_timer_start(test_timer);
+
+    stla_timer_stop(test_timer);
+    stla_timer_subtract(test_timer, copy_timer);
+    stla_timer_add(overall_timer, test_timer);
+
+    stla_timer_destroy(test_timer);
+    // stla_timer_destroy(copy_timer);
+    // stla_free(s);
+  stla_timer_destroy(overall_timer);
+```
+
+If you mentally note that stla is just a prefix and view the code as
+```c
+timer_t *overall_timer = timer_init(repeat_test);
+  char *s = (char *)malloc(len+1);
+
+  timer_t *copy_timer = timer_init(timer_get_repeat(overall_timer));
+  timer_start(copy_timer);
+
+  timer_stop(copy_timer);
+
+  timer_t *test_timer = timer_init(timer_get_repeat(overall_timer));
+  timer_start(test_timer);
+
+  timer_stop(test_timer);
+  timer_subtract(test_timer, copy_timer);
+  timer_add(overall_timer, test_timer);
+
+  timer_destroy(test_timer);
+  // timer_destroy(copy_timer);
+  // free(s);
+timer_destroy(overall_timer);
+```
+
+You can see that there are timer objects, malloc, and free.  Given that malloc, calloc, realloc, strdup, and free are so common in code, I opted not to provide any extra qualifiers other than stla.  My aim is to make code highly optimized and very readable.  Another important feature of the qualified naming is that it makes it possible to search for all places something exists.  For example, to find all all cases where stla_timer are used, you can run..
+
+```bash
+cd $stla/illustrations
+grep -rn stla_timer .
+```  
+
+and your output might look like...
+```
+./2_timing/12_timer/test_timer.c:1:#include "stla_timer.h"
+./2_timing/12_timer/test_timer.c:20:  stla_timer_t *overall_timer = stla_timer_init(repeat_test);
+./2_timing/12_timer/test_timer.c:25:    stla_timer_t *copy_timer = stla_timer_init(stla_timer_get_repeat(overall_timer));
+./2_timing/12_timer/test_timer.c:26:    stla_timer_start(copy_timer);
+./2_timing/12_timer/test_timer.c:30:    stla_timer_stop(copy_timer);
+./2_timing/12_timer/test_timer.c:32:    stla_timer_t *test_timer = stla_timer_init(stla_timer_get_repeat(overall_timer));
+./2_timing/12_timer/test_timer.c:33:    stla_timer_start(test_timer);
+./2_timing/12_timer/test_timer.c:38:    stla_timer_stop(test_timer);
+./2_timing/12_timer/test_timer.c:39:    stla_timer_subtract(test_timer, copy_timer);
+./2_timing/12_timer/test_timer.c:40:    stla_timer_add(overall_timer, test_timer);
+./2_timing/12_timer/test_timer.c:43:    printf( "time_spent: %0.4fns\n", stla_timer_ns(test_timer) );
+./2_timing/12_timer/test_timer.c:45:    stla_timer_destroy(test_timer);
+./2_timing/12_timer/test_timer.c:46:    stla_timer_destroy(copy_timer);
+./2_timing/12_timer/test_timer.c:49:  printf( "overall time_spent: %0.4fns\n", stla_timer_ns(overall_timer) );
+./2_timing/12_timer/test_timer.c:50:  stla_timer_destroy(overall_timer);
+./2_timing/12_timer/Makefile:2:OBJECTS=$(ROOT)/src/stla_timer.c
+./2_timing/12_timer/Makefile:3:HEADER_FILES=$(ROOT)/src/stla_timer.h
+Binary file ./2_timing/12_timer/test_timer matches
+./2_timing/13_timer/test_timer.c:1:#include "stla_timer.h"
+./2_timing/13_timer/test_timer.c:20:  stla_timer_t *overall_timer = stla_timer_init(repeat_test);
+./2_timing/13_timer/test_timer.c:25:    stla_timer_t *copy_timer = stla_timer_init(stla_timer_get_repeat(overall_timer));
+./2_timing/13_timer/test_timer.c:26:    stla_timer_start(copy_timer);
+./2_timing/13_timer/test_timer.c:30:    stla_timer_stop(copy_timer);
+...
+```
+
+This feature alone is extremely valuable when working with a large code base.  It takes longer to write each line of code, but the reader can easily find every line of code where the object is used.  This makes it easier to find example code and to build upon the work of others.
+
+# A Quick Recap
+
+1.  The 5 basic allocation methods in C are...
+```c
+void *malloc(size_t len);
+void *calloc(size_t num, size_t len);
+void *realloc(void *p, size_t len);
+char *strdup(char *p);
+void free(void *p);
+```
+
+2.  We define those functions with the stla_ prefix such that if we are debugging memory, we can track where the allocations are made.  This allows us to recognize memory leaks and potentially a couple of other common errors.
+
+3.  Callback functions should have a suffix of _f
+
+4.  We defined an approach to find when objects are created (and not destroyed).  The basic changes to stla_timer were outlined to make it support using the stla_allocator.
+
+5.  When we are using the stla_allocator object outside of objects, the only change to the code is to replace the 5 basic allocation methods with stla_... If for some reason, you do not wish to allocate memory using the stla method, then make sure that you don't free it with the stla method.
+
+6.  We can define _STLA_DEBUG_MEMORY_ as NULL and have memory leaks reported to the terminal when the program exits.
+
+```Makefile
+FLAGS += -D_STLA_DEBUG_MEMORY_=\"memory.log\"
+```
+
+7.  We can define _STLA_DEBUG_MEMORY_ as a string and have memory leaks reported to a file periodically.  The period is defined in seconds as _STLA_DEBUG_MEMORY_SPEED_ and defaults to 60 in stla_common.h
+
+8.  You can grep for any line of code which contains an object using the following approach.  The following grep line will search all subdirectories for the string stla_timer and report the filename and line number where the text is found.
+
+```bash
+grep -rn stla_timer .
+```
+
+stla_timer can be replaced with a function name or another object name (or whatever you want to find).
+
+# Continue to build out the [allocator implementation](8_allocator_impl.md)!

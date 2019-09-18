@@ -13,7 +13,7 @@ typedef struct stla_buffer_s stla_buffer_t;
 
 /* set the buffer to an initial size, buffer will grow as needed */
 #ifdef _STLA_DEBUG_MEMORY_
-#define stla_buffer_init(size) _stla_buffer_init(size, FILE_LINE_MACRO("stla_buffer"));
+#define stla_buffer_init(size) _stla_buffer_init(size, STLA_FILE_LINE_MACRO("stla_buffer"));
 stla_buffer_t *_stla_buffer_init(size_t size, const char *caller);
 #else
 #define stla_buffer_init(size) _stla_buffer_init(size)

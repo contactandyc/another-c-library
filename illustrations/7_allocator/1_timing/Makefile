@@ -1,7 +1,7 @@
 ROOT=../../..
 include $(ROOT)/src/Makefile.include
 
-FLAGS += -D_STLA_DEBUG_MEMORY_=NULL
+FLAGS += -D_STLA_DEBUG_MEMORY_=\"memory.log\"
 
 all: test_timer examples
 
@@ -12,4 +12,4 @@ examples:
 	./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
 
 clean:
-	rm -f test_timer *~
+	rm -f test_timer *~ memory.log*

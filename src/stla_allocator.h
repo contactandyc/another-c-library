@@ -8,11 +8,11 @@
 #include <string.h>
 
 #ifdef _STLA_DEBUG_MEMORY_
-#define stla_malloc(len) _stla_malloc_d(NULL, __FILE_LINE__, len, false)
-#define stla_calloc(len) _stla_calloc_d(NULL, __FILE_LINE__, len, false)
-#define stla_realloc(p, len) _stla_realloc_d(NULL, __FILE_LINE__, p, len, false)
-#define stla_strdup(p) _stla_strdup_d(NULL, __FILE_LINE__, p)
-#define stla_free(p) _stla_free_d(NULL, __FILE_LINE__, p)
+#define stla_malloc(len) _stla_malloc_d(NULL, __STLA_FILE_LINE__, len, false)
+#define stla_calloc(len) _stla_calloc_d(NULL, __STLA_FILE_LINE__, len, false)
+#define stla_realloc(p, len) _stla_realloc_d(NULL, __STLA_FILE_LINE__, p, len, false)
+#define stla_strdup(p) _stla_strdup_d(NULL, __STLA_FILE_LINE__, p)
+#define stla_free(p) _stla_free_d(NULL, __STLA_FILE_LINE__, p)
 #else
 #define stla_malloc(len) malloc(len)
 #define stla_calloc(len) calloc(1, len)
@@ -21,11 +21,10 @@
 #define stla_free(p) free(p)
 #endif
 
-typedef void (*stla_dump_details_f)(FILE *out, void *p, size_t length);
+typedef void (*stla_dump_details_f)(FILE *out, const char *caller, void *p, size_t length);
 
 typedef struct {
   stla_dump_details_f dump;
-  const char *caller;
 } stla_allocator_dump_t;
 
 struct stla_allocator_s;

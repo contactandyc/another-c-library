@@ -13,7 +13,7 @@ doesn't seem to be previously allocated, there is a scan to find
 the closest block.  _STLA_DEBUG_MEMORY_ can be defined as NULL or
 a valid string.  If it is defined as a string, then a file will be
 written with the given name every _STLA_DEBUG_MEMORY_SPEED_ seconds.
-Snapshots are saved in increasing intervals.  
+Snapshots are saved in increasing intervals.
 */
 // #define _STLA_DEBUG_MEMORY_ "memory.log"
 
@@ -22,12 +22,15 @@ Snapshots are saved in increasing intervals.
    _STLA_DEBUG_MEMORY_ is defined as a string (and not NULL). */
 #define _STLA_DEBUG_MEMORY_SPEED_ 60
 
-
+/*
+  Given an address of a member of a structure, the base object type, and the field name,
+  return the address of the base structure.
+*/
 #define stla_parent_object(addr, base_type, field) (base_type *)((char *)addr-offsetof(base_type,field))
 
-#define STRINGIZE2(x) #x
-#define STRINGIZE(x) STRINGIZE2(x)
-#define __FILE_LINE__ __FILE__ ":" STRINGIZE(__LINE__)
-#define FILE_LINE_MACRO(a) __FILE_LINE__ " [" a "]"
+#define STLA_STRINGIZE2(x) #x
+#define STLA_STRINGIZE(x) STLA_STRINGIZE2(x)
+#define __STLA_FILE_LINE__ __FILE__ ":" STLA_STRINGIZE(__LINE__)
+#define STLA_FILE_LINE_MACRO(a) __STLA_FILE_LINE__ " [" a "]"
 
 #endif
