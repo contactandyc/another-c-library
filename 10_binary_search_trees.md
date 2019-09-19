@@ -725,39 +725,29 @@ print_using_reverse_iteration: ZYTRQPOMLEDCBA
 
 In the example above, AAAAAAAAAAA5 is pushed down until LLLLLLLLL5 is printed.  CCCCCCCCC3 is pushed down because it conflict with EEE3.  RRRRRR4 is pushed down because it would conflict with YYYYYYYYYYYYY4.
 
-The way that I have designed the print function is to print the left nodes vertically below the first character of the key and the right nodes using a back slash spaced one character after the parent key.  If a node conflicts with the next node at the same level, that node is pushed down vertically until the conflict is resolved.  The algorithm may not be the most optimal solution, but it does seem to work.  Technically, we don't need a print function to be able to use a binary search tree, but they are nice to visualize what is happening.  In addition to this, the solution is interesting and may lead to other solutions.
+The way that I have designed the print function is to print the left nodes vertically below the first character of the key and the right nodes using a back slash spaced one character after the parent key.  The algorithm may not be the most optimal solution, but it does seem to work.  Technically, we don't need a print function to be able to use a binary search tree, but they are nice to visualize what is happening.  In addition to this, the solution is interesting and may lead to other solutions.
 
+1. Each node must have a position (horizontal) and that position will not change.  The node may only be pushed down.
+2. If a node conflicts with the next node on the same level (or a vertical bar), push the given node down.
+3. If a node has a right child, then add two bytes to conflict check
+4. Determine the length of each node at the beginning to simplify the computation.
+
+To solve this, the first thing I did is create a copy of the tree which consists of the position of each node, the printed_key, the length of the printed_key, and the depth of the node from its parent (1 if directly beneath parent).  Because we are making a copy of the tree, we also need a parent, left, and right pointer.
+
+The structure of the node looks like...
 ```c
 typedef struct node_print_item_s {
   size_t position;
   char *printed_key;
   size_t length;
-  node_t *node;
   int depth;
   struct node_print_item_s *parent;
   struct node_print_item_s *left, *right;
-  struct node_print_item_s *next;
 } node_print_item_t;
+```
 
-static int get_depth(node_t *n) {
-  int depth = 0;
-  while (n) {
-    depth++;
-    n = n->parent;
-  }
-  return depth;
-}
-
-char *get_printed_key(stla_pool_t *pool, node_t *n ) {
-  int depth=get_depth(n);
-  int r=rand() % 15;
-  char *res = (char *)stla_pool_ualloc(pool, r+4);
-  for( int i=0; i<=r; i++ )
-    res[i] = n->key;
-  sprintf(res+r+1, "%d", depth);
-  return res;
-}
-
+The copy_tree function looks like
+```c
 void copy_tree(stla_pool_t *pool, node_t *node,
                node_print_item_t **res, node_print_item_t *parent ) {
   node_print_item_t *copy = (node_print_item_t *)stla_pool_alloc(pool, sizeof(node_print_item_t));
@@ -766,7 +756,6 @@ void copy_tree(stla_pool_t *pool, node_t *node,
   copy->printed_key = get_printed_key(pool, node);
   copy->length = strlen(copy->printed_key);
   copy->position = parent ? ((parent->left == copy) ? parent->position : parent->position + parent->length + 1) : 0;
-  copy->node = node;
   copy->depth = 1;
   copy->left = NULL;
   copy->right = NULL;
@@ -777,7 +766,84 @@ void copy_tree(stla_pool_t *pool, node_t *node,
   if(node->right)
     copy_tree(pool, node->right, &copy->right, copy );
 }
+```
 
+I'm using the pool to allocate each node.  copy_tree is a recursive function which allocates nodes and puts them into the 3rd parameter.  The printed_key is printed using the following function.
+```c
+char *get_printed_key(stla_pool_t *pool, node_t *n ) {
+  int depth=get_depth(n);
+  // return stla_pool_strdupf(pool, "%c%d", n->key, depth);
+
+  int r=rand() % 15;
+  char *res = (char *)stla_pool_ualloc(pool, r+4);
+  for( int i=0; i<=r; i++ )
+    res[i] = n->key;
+  sprintf(res+r+1, "%d", depth);
+  return res;
+}
+```
+
+The normal get_printed_key function would just use the stla_pool_strdupf function and print the character followed by the depth.  The depth is calculated using the following function.
+```c
+static int get_depth(node_t *n) {
+  int depth = 0;
+  while (n) {
+    depth++;
+    n = n->parent;
+  }
+  return depth;
+}
+```
+
+All that the depth function does is count how many parents a node has.  The rest of the get_printed_key method is below.  It prints the key from 1 to 15 times and then appends the depth to the key.
+```c
+int r=rand() % 15;
+char *res = (char *)stla_pool_ualloc(pool, r+4);
+for( int i=0; i<=r; i++ )
+  res[i] = n->key;
+sprintf(res+r+1, "%d", depth);
+return res;
+```
+
+copy->length is set by simply getting the length of the printed_key.
+```c
+copy->length = strlen(copy->printed_key);
+```
+
+1. If the copy doesn't have a parent, then the position is 0.
+2. If the copy has a parent and the copy is the left child, then the position is the same as the parent's position.
+3. Otherwise, the copy is the right child of the parent and the position is the parent's position plus its length + 1.
+```c
+copy->position = parent ? ((parent->left == copy) ? parent->position : parent->position + parent->length + 1) : 0;
+```
+
+Each node is initially a depth of 1 away from its parent.
+```c
+copy->depth = 1;
+```
+
+The left and right pointers are initially NULL and the parent is set to the parent that is passed into the function.
+```c
+copy->left = NULL;
+copy->right = NULL;
+copy->parent = parent;
+```
+
+If the node has a left, recurse to the left
+```c
+if(node->left)
+  copy_tree(pool, node->left, &copy->left, copy );
+```
+
+If the node has a right, recurse to the right
+```c
+if(node->right)
+  copy_tree(pool, node->right, &copy->right, copy );
+```
+
+The copy_tree method copies the node_t tree.
+
+```c
 node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item, int *depth ) {
   while(item->parent && (item->parent->right == item || !item->parent->right)) {
     *depth += item->depth;
@@ -827,7 +893,9 @@ int get_node_depth( node_print_item_t *item ) {
   }
   return r;
 }
+```
 
+```c
 void node_print(stla_pool_t *pool, node_t *root) {
   if (!root)
     return;
@@ -835,12 +903,11 @@ void node_print(stla_pool_t *pool, node_t *root) {
   node_print_item_t *printable = NULL;
   copy_tree(pool, root, &printable, NULL );
 
-  node_print_item_t *sn,*n,*n2,*n3;
+  node_print_item_t *sn,*n,*n2;
   int actual_depth, depth2;
   int depth=1;
   while(true) {
     int position = 0;
-    // sn=depth==1 ? printable : find_left_most_at_depth( printable, depth );
     sn = find_left_most_at_depth(printable, depth);
     if(!sn)
       break;

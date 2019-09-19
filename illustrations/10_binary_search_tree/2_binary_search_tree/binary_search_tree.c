@@ -59,11 +59,9 @@ typedef struct node_print_item_s {
   size_t position;
   char *printed_key;
   size_t length;
-  node_t *node;
   int depth;
   struct node_print_item_s *parent;
   struct node_print_item_s *left, *right;
-  struct node_print_item_s *next;
 } node_print_item_t;
 
 static int get_depth(node_t *n) {
@@ -93,7 +91,6 @@ void copy_tree(stla_pool_t *pool, node_t *node,
   copy->printed_key = get_printed_key(pool, node);
   copy->length = strlen(copy->printed_key);
   copy->position = parent ? ((parent->left == copy) ? parent->position : parent->position + parent->length + 1) : 0;
-  copy->node = node;
   copy->depth = 1;
   copy->left = NULL;
   copy->right = NULL;
@@ -167,7 +164,6 @@ void node_print(stla_pool_t *pool, node_t *root) {
   int depth=1;
   while(true) {
     int position = 0;
-    // sn=depth==1 ? printable : find_left_most_at_depth( printable, depth );
     sn = find_left_most_at_depth(printable, depth);
     if(!sn)
       break;

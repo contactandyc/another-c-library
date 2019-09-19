@@ -59,7 +59,6 @@ typedef struct node_print_item_s {
   size_t position;
   char *printed_key;
   size_t length;
-  node_t *node;
   int depth;
   struct node_print_item_s *parent;
   struct node_print_item_s *left, *right;
@@ -157,7 +156,7 @@ void node_print(stla_pool_t *pool, node_t *root) {
   node_print_item_t *printable = NULL;
   copy_tree(pool, root, &printable, NULL );
 
-  node_print_item_t *sn,*n,*n2,*n3;
+  node_print_item_t *sn,*n,*n2;
   int actual_depth, depth2;
   int depth=1;
   while(true) {
