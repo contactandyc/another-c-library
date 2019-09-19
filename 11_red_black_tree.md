@@ -155,12 +155,6 @@ My additional rules for clarification which are based upon the first 5 rules.
 
 To begin, let's look at a few red black trees.  If you can follow
 
-
-display: block;
-font-family: monospace;
-white-space: pre;
-margin: 1em 0;
-
 <div style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;background-color: blue">
 $ ./test_data_structure ABC
 Creating red_black_tree for ABC
