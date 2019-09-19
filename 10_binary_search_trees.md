@@ -841,8 +841,22 @@ if(node->right)
   copy_tree(pool, node->right, &copy->right, copy );
 ```
 
-The copy_tree method copies the node_t tree.
+The copy_tree method copies the node_t tree.  
 
+A few helper functions are needed to make the print work.  
+
+The first finds the first parent which is a left parent that also has a right node.
+```
+   A
+    \
+     D
+     |\
+     B E
+      \
+       C
+```
+
+In the above example, if C is the start node, then D would be the first node that is a left parent and that also has a right node (E).  In addition to finding the parent, the depth is summed up along the path to the parent node that is the left parent with a right child.
 ```c
 node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item, int *depth ) {
   while(item->parent && (item->parent->right == item || !item->parent->right)) {
@@ -852,7 +866,11 @@ node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item, 
   *depth += item->depth;
   return item->parent;
 }
+```
 
+
+The next function seeks to find the left most node at or deeper than a given depth.  This will seek from an item until the depth is less than or equal to the depth on the given node.  It recurses to the left first and only seeks to the right only if left doesn't exist.  If the path doesn't reach the given depth, the function returns NULL and through recursion, chooses another path unless none exist (at which point NULL is returned).
+```c
 node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth ) {
   if(!item)
     return NULL;
@@ -871,7 +889,10 @@ node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth 
   }
   return NULL;
 }
+```
 
+To find the next peer, find the first left parent with a right child and check if there is a left most node at the same level.  If none exists, find the next left parent with a right child (of the current left parent with a right child) and repeat the check for the left most node at the same level.  Repeat until the root is reached (and NULL is returned) or until a left most node is found at the same level.
+```c
 node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) {
   while(item) {
     node_print_item_t *p = find_left_parent_with_right_child(item, &depth);
@@ -884,7 +905,10 @@ node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) {
   }
   return NULL;
 }
+```
 
+Finally, get_node_depth sums the depth all the way to the root node
+```c
 int get_node_depth( node_print_item_t *item ) {
   int r=0;
   while(item) {
