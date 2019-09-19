@@ -319,3 +319,5 @@ stla_pool_t *_stla_pool_init(size_t size);
 A common use case for the pool is to allocate a bunch of times and then clear and repeat.  For example, if you were responding to queries from a search engine, you might want to use this object and allocate a bunch of times for parsing the query and building a response.  Once the response has been written, the pool can be cleared and used for the next query.  The pool would likely need a certain amount of bytes to satisfy the vast majority of the queries.  Given this use, it makes sense for the pool to allocate enough bytes in a single block, and then just to dole out the memory via its allocation methods.  If the single block isn't big enough for all of the allocations, overflow blocks will be allocated.  When the pool is cleared, the overflow blocks will be freed.  The main block will remain and the counter inside the pool will be reset to zero.  If we make the pool too small, the overflow blocks will continuously get used.  If we make it too big, memory is wasted.
 
 # TO BE CONTINUED
+
+# Continue to work through the [binary search tree](10_binary_search_trees.md)!

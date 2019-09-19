@@ -1137,3 +1137,5 @@ A quick note on how the stla_pool was useful.  The copy of the tree was construc
 - Erasing a node is a bit more complex.  It involves finding the successor and replacing it (perhaps look back if you don't understand it).
 - Printing a binary search tree is largely challenging because of the need to fit in a two dimensional space.  It involves copying the binary tree into a print friendly structure and pushing down nodes that don't fit.
 - The pool can be useful for constructing nodes in a tree, especially if you don't want to worry about deconstructing the tree.
+
+# Continue to work through the [red black tree](11_red_black_tree.md)!
