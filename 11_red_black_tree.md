@@ -233,13 +233,19 @@ If we could swap the colors of N and R, we would have a valid red black tree as 
 ```bash
 G1
 | \
-E2 N1
+E2 N2
      \
       R2r
 ```
 
+We could also rotate R to the left through N and get
 
+```bash
+G1
+| \
+E2 R2
+   |
+   N2r
+```
 
-
-
-then N will have a black height of  
+Typically when a node is rotated, the color remains the same of the node that is being rotated through (which ends up also being a color swap).  
