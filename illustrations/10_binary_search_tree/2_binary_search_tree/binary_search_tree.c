@@ -163,11 +163,11 @@ void node_print(stla_pool_t *pool, node_t *root) {
   int actual_depth, depth2;
   int depth=1;
   while(true) {
-    int position = 0;
     sn = find_left_most_at_depth(printable, depth);
     if(!sn)
       break;
     n = sn;
+    int position = 0;
     while(n) {
       for( ; position<n->position; position++ )
         printf( " ");

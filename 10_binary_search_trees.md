@@ -919,6 +919,7 @@ int get_node_depth( node_print_item_t *item ) {
 }
 ```
 
+Now we are ready to print the binary search tree.  Below is the node_print method which will be followed with it being broken down.
 ```c
 void node_print(stla_pool_t *pool, node_t *root) {
   if (!root)
@@ -928,7 +929,7 @@ void node_print(stla_pool_t *pool, node_t *root) {
   copy_tree(pool, root, &printable, NULL );
 
   node_print_item_t *sn,*n,*n2;
-  int actual_depth, depth2;
+  int actual_depth;
   int depth=1;
   while(true) {
     int position = 0;
@@ -942,9 +943,6 @@ void node_print(stla_pool_t *pool, node_t *root) {
       actual_depth=get_node_depth(n);
       if(actual_depth == depth) {
         n2 = find_next_peer(n, 0);
-        if(n2) {
-          depth2 = get_node_depth(n2);
-        }
         int extra = 0;
         if(n->right)
           extra = 2;
@@ -973,7 +971,6 @@ void node_print(stla_pool_t *pool, node_t *root) {
       for( ; position<n->position; position++ )
         printf( " ");
       actual_depth=get_node_depth(n);
-      n2 = find_next_peer(n, depth-actual_depth);
       if(actual_depth == depth) {
         if(n->left) {
           printf( "|" );
@@ -990,10 +987,116 @@ void node_print(stla_pool_t *pool, node_t *root) {
         printf( "|");
         position++;
       }
-      n = n2;
+      n = find_next_peer(n, depth-actual_depth);
     }
     printf( "\n");
     depth++;
   }
 }
+```
+
+If the root is NULL, there is nothing to print
+```c
+void node_print(stla_pool_t *pool, node_t *root) {
+  if (!root)
+    return;
+```
+
+The copy_tree expects the root of a tree and a pointer which is initially pointing to NULL.  When copy_tree is complete, printable will be a complete replica of the tree referenced by root.  From this point forward, root will no longer be used.
+```c
+  node_print_item_t *printable = NULL;
+  copy_tree(pool, root, &printable, NULL );
+```
+
+A few variables are declared that will be needed during the process of printing the tree.
+```c
+node_print_item_t *sn,*n,*n2;
+int actual_depth;
+```
+
+At each level, there must be at one node that can be printed.  If there isn't a left most node at the given depth, we are done printing the tree.  The left most node might be deeper than the current depth.
+```c
+int depth=1;
+while(true) {
+  sn = find_left_most_at_depth(printable, depth);
+  if(!sn)
+    break;
+
+  ...
+
+  depth++;
+}
+```
+
+sn is the starting node.  Find all of the nodes that are on the same level and print the nodes and vertical bars (as necessary).
+1. print spaces until position is equal to n->position
+2. get the actual depth of n (n might be below the current level)
+3. if the node is at the current depth
+   a. find the next peer at the same level.
+   b. compute an extra length of 2 if there is a right child of n
+   c. if there is a next peer and n's position + n's length + 1 + extra is greater than n2's position, push down the current node by increasing its depth and printing a vertical bar (and incrementing position because we wrote 1 byte).
+   d. otherwise, print the key and add the length of the key to the position.
+   e. set n to n2 (n2 may be NULL)
+4. otherwise, the node is deeper than the current depth, find the next peer, print the vertical bar and increment position.  Note that when finding the next peer, the depth we are looking for needs to offset by the difference between the current depth and the actual depth of the node.
+5. loop until n is NULL
+```c
+int position = 0;
+n = sn;
+while(n) {
+  for( ; position<n->position; position++ )
+    printf( " ");
+  actual_depth=get_node_depth(n);
+  if(actual_depth == depth) {
+    n2 = find_next_peer(n, 0);
+    int extra = 0;
+    if(n->right)
+      extra = 2;
+
+    if(n2 && (n->position+n->length+1+extra > n2->position)) {
+      n->depth++;
+      printf( "|");
+      position++;
+    }
+    else {
+      printf("%s", n->printed_key);
+      position += n->length;
+    }
+    n = n2;
+  }
+  else {
+    n = find_next_peer(n, depth-actual_depth);
+    printf( "|");
+    position++;
+  }
+}
+printf( "\n");
+```
+
+Restart the loop to print the left and right connection bars.  This is simpler because collisions have already been detected and nodes have been pushed down.  For every character that is printed, position must be incremented.  If a node is at the actual depth, print the left vertical bar if needed, fill in spaces, and print the right backslash if needed.  If the node is below the actual level, simply print the vertical bar.  Finally, find the next peer at the level and repeat until no more peers exist.
+```c
+position = 0;
+n = sn;
+while(n) {
+  for( ; position<n->position; position++ )
+    printf( " ");
+  actual_depth=get_node_depth(n);
+  if(actual_depth == depth) {
+    if(n->left) {
+      printf( "|" );
+      position++;
+    }
+    for( ; position<n->position+n->length; position++ )
+      printf( " ");
+    if(n->right) {
+      printf( "\\" );
+      position++;
+    }
+  }
+  else {
+    printf( "|");
+    position++;
+  }
+  n = find_next_peer(n, depth-actual_depth);
+}
+printf( "\n");
 ```
