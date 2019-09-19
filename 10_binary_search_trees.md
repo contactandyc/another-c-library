@@ -748,8 +748,8 @@ typedef struct node_print_item_s {
 
 The copy_tree function looks like
 ```c
-void copy_tree(stla_pool_t *pool, node_t *node,
-               node_print_item_t **res, node_print_item_t *parent ) {
+static void copy_tree(stla_pool_t *pool, node_t *node,
+                      node_print_item_t **res, node_print_item_t *parent ) {
   node_print_item_t *copy = (node_print_item_t *)stla_pool_alloc(pool, sizeof(node_print_item_t));
   *res = copy;
 
@@ -770,7 +770,7 @@ void copy_tree(stla_pool_t *pool, node_t *node,
 
 I'm using the pool to allocate each node.  copy_tree is a recursive function which allocates nodes and puts them into the 3rd parameter.  The printed_key is printed using the following function.
 ```c
-char *get_printed_key(stla_pool_t *pool, node_t *n ) {
+static char *get_printed_key(stla_pool_t *pool, node_t *n ) {
   // return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
 
   int r=rand() % 15;
@@ -809,7 +809,7 @@ copy->length is set by simply getting the length of the printed_key.
 copy->length = strlen(copy->printed_key);
 ```
 
-1. If the copy doesn't have a parent, then the position is 0.
+1. If the copy doesn't have a parent, then the position is 0 because it is the root node.
 2. If the copy has a parent and the copy is the left child, then the position is the same as the parent's position.
 3. Otherwise, the copy is the right child of the parent and the position is the parent's position plus its length + 1.
 ```c
@@ -857,7 +857,8 @@ The first finds the first parent which is a left parent that also has a right no
 
 In the above example, if C is the start node, then D would be the first node that is a left parent and that also has a right node (E).  In addition to finding the parent, the depth is summed up along the path to the parent node that is the left parent with a right child.
 ```c
-node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item, int *depth ) {
+static node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item,
+                                                             int *depth ) {
   while(item->parent && (item->parent->right == item || !item->parent->right)) {
     *depth += item->depth;
     item = item->parent;
@@ -870,7 +871,7 @@ node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item, 
 
 The next function seeks to find the left most node at or deeper than a given depth.  This will seek from an item until the depth is less than or equal to the depth on the given node.  It recurses to the left first and only seeks to the right only if left doesn't exist.  If the path doesn't reach the given depth, the function returns NULL and through recursion, chooses another path unless none exist (at which point NULL is returned).
 ```c
-node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth ) {
+static node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth ) {
   if(!item)
     return NULL;
 
@@ -892,7 +893,7 @@ node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth 
 
 To find the next peer, find the first left parent with a right child and check if there is a left most node at the same level.  If none exists, find the next left parent with a right child (of the current left parent with a right child) and repeat the check for the left most node at the same level.  Repeat until the root is reached (and NULL is returned) or until a left most node is found at the same level.
 ```c
-node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) {
+static node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) {
   while(item) {
     node_print_item_t *p = find_left_parent_with_right_child(item, &depth);
     if(!p)
@@ -908,7 +909,7 @@ node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) {
 
 Finally, get_node_depth sums the depth all the way to the root node
 ```c
-int get_node_depth( node_print_item_t *item ) {
+static int get_node_depth( node_print_item_t *item ) {
   int r=0;
   while(item) {
     r += item->depth;

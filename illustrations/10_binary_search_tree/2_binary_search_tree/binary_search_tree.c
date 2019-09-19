@@ -73,7 +73,7 @@ static int get_depth(node_t *n) {
   return depth;
 }
 
-char *get_printed_key(stla_pool_t *pool, node_t *n ) {
+static char *get_printed_key(stla_pool_t *pool, node_t *n ) {
   // return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
   int r=rand() % 15;
   char *res = (char *)stla_pool_ualloc(pool, r+4);
@@ -83,8 +83,8 @@ char *get_printed_key(stla_pool_t *pool, node_t *n ) {
   return res;
 }
 
-void copy_tree(stla_pool_t *pool, node_t *node,
-               node_print_item_t **res, node_print_item_t *parent ) {
+static void copy_tree(stla_pool_t *pool, node_t *node,
+                      node_print_item_t **res, node_print_item_t *parent ) {
   node_print_item_t *copy = (node_print_item_t *)stla_pool_alloc(pool, sizeof(node_print_item_t));
   *res = copy;
 
@@ -102,7 +102,8 @@ void copy_tree(stla_pool_t *pool, node_t *node,
     copy_tree(pool, node->right, &copy->right, copy );
 }
 
-node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item, int *depth ) {
+static node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item,
+                                                             int *depth ) {
   while(item->parent && (item->parent->right == item || !item->parent->right)) {
     *depth += item->depth;
     item = item->parent;
@@ -111,7 +112,7 @@ node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item, 
   return item->parent;
 }
 
-node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth ) {
+static node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth ) {
   if(!item)
     return NULL;
 
@@ -130,7 +131,7 @@ node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth 
   return NULL;
 }
 
-node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) {
+static node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) {
   while(item) {
     node_print_item_t *p = find_left_parent_with_right_child(item, &depth);
     if(!p)
@@ -143,7 +144,7 @@ node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) {
   return NULL;
 }
 
-int get_node_depth( node_print_item_t *item ) {
+static int get_node_depth( node_print_item_t *item ) {
   int r=0;
   while(item) {
     r += item->depth;
