@@ -1,6 +1,6 @@
 # A quick word about licensing
 
-Throughout this book you will see the following notice at the top of most of the files.
+Throughout this book, the following notice at the top of most of the files.
 
 Copyright 2019 Andy Curtis
 
@@ -16,20 +16,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-It is my goal to produce a work that is unencumbered by licenses and my hope that others will find this code or parts of it useful.
+My goal is to produce a work that is unencumbered by licenses, and hope that others will find this code or parts of it useful.
 
 # Getting Started
 
 There is a little setup to get started.
 
-Open the terminal (on a mac - Command+Space and type terminal)
+Open the terminal (on a mac - `Command+Space` and type terminal)
 
 Make sure you are in your home directory
 ```bash
 cd
 ```
 
-Optionally make a directory to place your code and change to it.
+Optionally create a directory to place your code and change to it.
 ```bash
 mkdir code
 cd code
@@ -40,12 +40,12 @@ Clone the examples in this book into your newly created code directory
 git clone https://github.com/contactandyc/standard-template-library-alternative-in-c.git
 ```
 
-Create an environment variable named stla (standard template library alternative) and make the variable available the next time you open the terminal
+Create an environment variable named stla (standard template library alternative) and create the variable available the next time you open the terminal
 ```bash
 echo stla=`pwd`/standard-template-library-alternative-in-c >> ~/.bashrc
 ```
 
-Either close the terminal and reopen it or do the following to make the last changes take effect.
+Either close the terminal and reopen it or do the following to ensure the last changes take effect.
 ```bash
 . ~/.bashrc
 ```
@@ -55,7 +55,7 @@ Change to the directory where the project exists
 cd $stla
 ```
 
-To test whether you have make and gcc installed (what's needed for this project).  Change the directory to the first example and then run make
+To test whether you have `make` and `gcc` installed (what's needed for this project).  Change the directory to the first example and then run `make`
 ```bash
 cd $stla/illustrations/1_getting_started/1_test_setup
 make
@@ -66,14 +66,14 @@ Output should be
 Success!  You are now ready to continue with the rest of the examples in the book.
 ```
 
-If an error occurs, use your favorite search engine and copy and paste the error and search for it.  This wasn't possible when I began writing software, but today, most errors are common.  It's likely that the answer will exist on sites like stackoverflow.com.  Just beware that the answers may be wrong, so you may need to look over a few answers.  This project depends upon gcc and make.  Once they are installed repeat the commands above (repeated below) until you get the Success! message.
+If an error occurs, use your favorite search engine and copy and paste the error and search for it. The answer will likely exist on sites like stackoverflow.com. These Internet resources did not exist when I began writing software. However, today, most errors are common. Just beware that the answers may be wrong, so you may need to look over a few answers. This project depends upon `gcc` and `make`. Post-installation, repeat the commands above (repeated below) until you get the "Success!" message.
 
-If you've changed directories, then you will need to rerun this.
+If you have changed directories, then you will need to rerun this.
 ```bash
 cd $stla/illustrations/1_getting_started/1_test_setup
 ```
 
-Run this command and if you get the message afterwards, you will be good to go.
+Run this command, and if you get the message afterward, you will be good to go.
 ```bash
 make
 ```
@@ -82,14 +82,14 @@ make
 Success!  You are now ready to continue with the rest of the examples in the book.
 ```
 
-Throughout this book, I will often reference how to run a command with a dollar ($) preceding it.  This is just to indicate that you are at a command prompt and that you should enter the text after the command.  For example,
+Throughout this book, I will often reference how to run a command with a dollar ($) preceding it, which indicates that you are at a command prompt. You should enter the text after the command, for example:
 
 ```bash
 make
 ```
 
 ```bash
-Success!  You are now ready to continue with the rest of the examples in the book.
+Success! You are now ready to continue with the rest of the examples in the book.
 ```
 
 might be represented as
@@ -98,7 +98,7 @@ $ make
 Success!  You are now ready to continue with the rest of the examples in the book.
 ```
 
-This simply means that if you are following along, you should enter <b>make</b> at the command line and hit enter and expect the text Success...
+Therefore, you should enter `make` at the command line and hit enter and expect the text "Success!..." if you are following along.
 
 If you change to the directory
 ```bash
@@ -106,6 +106,7 @@ cd $stla/illustrations
 ```
 
 and run
+
 ```bash
 ls -l
 ```
@@ -127,7 +128,7 @@ drwxr-xr-x   9 ac  staff  288 Aug 31 23:23 11_block_allocator
 drwxr-xr-x   9 ac  staff  288 Aug 31 23:23 12_io
 ```
 
-For each chapter, there will be a number and name that corresponds to the chapter in this book.  For example, within <i>1_getting_started</i>, there is a folder named 1_test_setup.
+For each chapter, there will be a number and name that corresponds to the chapter in this book.  For example, within <i>1_getting_started</i>, there is a folder named <i>1_test_setup</i>.
 ```bash
 ls -l 1_getting_started
 ```
@@ -137,7 +138,7 @@ total 0
 drwxr-xr-x  10 ac  staff  320 Sep 11 10:04 1_test_setup
 ```
 
-The dates and user will likely be different.  Each illustration is named based upon the general application and the order within the chapter.  I will often reference that code is in a given directory.  The expectation is that you would know how to change to that directory.  That can be done by using the following command.
+The date and user will likely be different.  Each illustration is named based upon the general application and the order within the chapter.  I will often reference that code is in a given directory.  The expectation is that you would know how to change to that directory demonstrated below.
 
 In the following, you would be expected to replace directory with the given directory
 ```bash
@@ -149,6 +150,7 @@ For example, if the code was in <i>illustrations/1_getting_started/1_test_setup<
 cd $stla/illustrations/1_getting_started/1_test_setup
 ```
 
-If you don't understand the terminal, I'd highly recommend spending some time going through tutorials to do so.  I don't plan to use many terminal related commands and I will try to detail exactly which commands that you need to run, but if there are problems, you won't have help.  Understanding the terminal is essential for any programmer.
+I would highly recommend going through tutorials if you are not familiar with the command line. Understanding the terminal is essential for any programmer. I do not plan on utilizing many terminal related commands but will try to detail the commands that are used.
+
 
 # Continue to [Timing](2_timing.md)!

@@ -1,9 +1,9 @@
 # Timing Code
 ## The first project (an introduction to C)
 
-In the project, there is an illustrations folder which contains most of the code.  There is also a src directory where final code is placed.  Normally, one would start with a hello world project.  That actually exists later in a section called Hello Buffer.  If you find yourself lost, hopefully, it'll make more sense once you get to that section.  I'd recommend reading and working through the examples in this chapter anyways and then maybe coming back to it again after working through Hello Buffer.  The code for this chapter is located in <i>illustrations/2_timing</i>
+In the project, there is an illustrations folder that contains most of the code.  There is also a src directory where the final code exists.  Normally, one would start with a hello world project. That exists later in a section called Hello Buffer.  If you are lost, hopefully, it will make more sense once you get to the Hello Buffer section. I would recommend reading and working through the examples in this chapter and then coming back after working through Hello Buffer.  The code for this chapter is located in <i>illustrations/2_timing</i>
 
-At various points in this project, we will be timing code in an attempt to optimize it.  Our first object is going to be simple, but will illustrate how I plan to maintain separation between interfaces and their respective implementation.
+At various points in this project, we will be timing code in an attempt to optimize it.  Our first object is going to be simple but will illustrate how I plan to maintain separation between interfaces and their respective implementation.
 
 The following code is found in <i>illustrations/2_timing/1_timer</i>
 ```bash
@@ -70,7 +70,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-Every c program that is capable of being executed has a main function.  The main function is typically implemented with the following two parameters to allow command line arguments to be passed to the program.  argc represents the number of arguments (the name of the program is the 1st argument).  argv represents the arguments.  argv[0] references the name of the program as called from the command line.  The main function returns an integer.  If the program executes successfully, it should return 0 which lets the command shell know that the program finished normally.  
+Every C program that is capable of being executed has a main function.  The main function typically has the following two parameters to pass in command-line arguments to the program. `argc` represents the number of arguments. The name of the program is the 1st argument. `argv` represents the arguments. `argv[0]` references the name of the program as called from the command line. The main function returns an integer. Successful execution should return 0, which lets the command shell know that the program finished normally.
 
 ```c
 int main( int argc, char *argv[] ) {
@@ -79,26 +79,24 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-C has a few built-in data types.
+C has a few built-in data types:
 
-```
-char   - a single byte
-short  - two bytes
-int    - four bytes
-long   - typically eight bytes
-size_t - on a 64 bit system, 8 bytes (or 64 bits), on a 32 bit system,
-         4 bytes (or 32 bits).
-ssize_t - signed size_t
-bool   - can be different sizes, but only has two states (true and false)
-float  - four byte decimal (I try to avoid this type as it quickly loses
-         precision)
-double - eight byte decimal
-void   - this doesn't have a size and is a special type
-```
+Data Type | Description
+---|---|---
+char | a single byte
+short | two bytes
+int | four bytes
+long | typically eight bytes
+size_t | on a 64-bit system, 8 bytes (or 64 bits), on a 32-bit system, 4 bytes (or 32 bits)
+ssize_t | signed size_t
+bool | can be different sizes, but only has two states (true and false)
+float | four-byte decimal (I try to avoid this type as it quickly loses precision)
+double | eight-byte decimal
+void | this does not have a size and is a special type
 
-A byte is represented by 8 bits.  The range of 1 bit would be 0-1, two bits 0-3, and so on.  For 8 bits, the range is 0-255.  The short has a range of 0-((256*256)-1) or 0-65535.  C counts from 0 (all bits off) instead of 1.  Types can be signed (the default) or unsigned.  If the data type is unsigned, the number range will start with zero.  Otherwise, the number range will be between -(2^(number of bits-1)) and (2^(number of bits-1))-1.  A signed char will range from -128 to 127.  A signed char and a char are the same thing.
+A byte represents 8 bits.  The range of 1 bit would be 0-1, two bits 0-3, etc. For 8 bits, the range is 0-255.  The short has a range of 0-((256*256)-1) or 0-65535.  C counts from 0 (all bits off) instead of 1.  Types can be signed (the default) or unsigned.  If the data type is unsigned, the number range will start with zero.  Otherwise, the number range will be between -(2^(number of bits-1)) and (2^(number of bits-1))-1.  A signed char will range from -128 to 127.  A signed char and a char are the same things.
 
-size_t is a type that is defined in C to represent the number of bits that the cpu is and is unsigned (meaning it can't be negative).  ssize_t is a signed alternative.  On a 64 bit system, a long and ssize_t are equivalent.
+`size_t` is a type that is defined in C to represent the number of bits that the CPU is and is unsigned (meaning it cannot be negative). `ssize_t` is a signed alternative.  On a 64-bit system, a long and `ssize_t` are equivalent.
 
 You can overflow a type.
 
@@ -111,24 +109,24 @@ b = b + 1; // b will become -128
 b = b - 1; // b will become 127 again
 ```
 
-bool is another type that is defined in C (you must include stdbool.h to get it).  bool is defined as having the value true or false.  This type can make code more readable in that it makes it clear to the reader that there is only two possible states.
+`bool` is another type defined in C (you must include `stdbool.h` to get it). `bool` is defined as having the value true or false. This type can make code more readable in that it makes it clear to the reader that there are only two possible states.
 
-double (and float) are used for decimals.  Because float only uses 32 bits, it loses precision quite easily.  I don't tend to use it for anything.  Instead I opt to use double.
+`double` (and `float`) are used for decimals.  Because `float` only uses 32 bits, it loses precision quickly.  I do not tend to use it for anything.  Instead, I opt to use `double`
 
-In C you can define your own type using typedef using the following syntax.
+`typedef` can be utilized to define your own type using the following syntax:
 
 ```
 typedef <existing type> <new type name>;
 ```
 
-for example, the following would define a new type called number_t which has an underlying type of unsigned int.
+For example, the following would define a new type called number_t, which has an underlying type of unsigned int.
 ```c
 typedef unsigned int number_t;
 
 number_t a = 100;
 ```
 
-Every data type in C has a size.  The size of a pointer is always the same (it is the same as the size_t type).  You can determine the size of a type or variable by using the sizeof() operator.  sizeof(number_t) would find the size of the number_t type (and return 4 since unsigned int is 4 bytes).  sizeof(void) is not allowed as that doesn't make sense.
+Every data type in C has a size.  The size of a pointer is always the same (it is the same as the size_t type). The `sizeof()` operator determines the size of a type or variable. `sizeof(number_t)` finds the size of the `number_t` type (and return 4 since unsigned int is 4 bytes). `sizeof(void)` is not allowed as that does not make sense.
 
 A variable can be cast from one type to another either implicitly or explicitly.  Imagine you want to convert an int to a double or vice versa.
 
@@ -140,7 +138,7 @@ x = y;
 printf( "%d\n", x ); // would print 100
 ```
 
-When the casting happens, precision is lost if the new type can't accommodate for the value.  The above example shows casting happening implicitly.  Below is an example of casting happening explicitly.
+When the casting happens, precision is lost if the new type cannot accommodate for the value.  The above example shows casting happening implicitly.  Below is an example of casting happening explicitly.
 
 ```c
 int x = 100;
@@ -160,13 +158,13 @@ or
 datatype variable_name;
 ```
 
-In the main function declaration, argv is declared in a unique way.
+In the main function declaration, `argv` is declared uniquely.
 
 ```c
 char *argv[];
 ```
 
-The asterisk means that the variable named argv is a pointer to the type char which is a single byte and is signed (signed is the default datatype prefix).  The [] after the argv indicates that argv is referencing an array of pointers.
+The asterisk means that the variable named `argv` is a pointer to the type `char` which is a single byte and is signed (signed is the default datatype prefix).  The `[]` after the `argv` indicates that `argv` is referencing an array of pointers.
 
 In the following array
 ```
@@ -174,25 +172,25 @@ In the following array
 ./test_timer This is a test
 ```
 
-argv would be an array of pointers<br/>
-argv[0] => . (at byte 0)<br/>
-argv[1] => T (at byte 13)<br/>
-argv[2] => i (at byte 18)<br/>
-argv[3] => a (at byte 21)<br/>
-argv[4] => t (at byte 23)<br/>
-argv[5] => NULL (pointing to NULL means that the pointer is not pointing at anything)<br/>
+`argv` would be an array of pointers<br/>
+`argv[0] => .` (at byte 0)<br/>
+`argv[1] => T` (at byte 13)<br/>
+`argv[2] => i` (at byte 18)<br/>
+`argv[3] => a` (at byte 21)<br/>
+`argv[4] => t` (at byte 23)<br/>
+`argv[5] => NULL` (pointing to NULL means that the pointer is not pointing at anything)<br/>
 
-Notice that the pointers refer to individual bytes.  In C (and any language), a pointer refers to a location in memory (typically RAM or random access memory).  Strings or sequences of characters are defined by looking for a terminating character (a non-printable 0).  The above example is not technically correct in that what would really happen is prior to the arguments getting to the main function, they would be split into 5 strings.
+Notice that the pointers refer to individual bytes.  In C (and any language), a pointer refers to a location in memory (typically RAM or random access memory).  Strings or sequences of characters are defined by looking for a terminating character (a non-printable 0).  The above example is not technically correct in that what would happen is before the arguments getting to the main function; they would split into 5 strings.
 
-argv would be an array of pointers<br/>
-argv[0] => "./test_timer"<br/>
-argv[1] => "This"<br/>
-argv[2] => "is"<br/>
-argv[3] => "a"<br/>
-argv[4] => "test"<br/>
-argv[5] => NULL (pointing to NULL means that the pointer is not pointing at anything)<br/>
+`argv` would be an array of pointers<br/>
+`argv[0] => "./test_timer"`<br/>
+`argv[1] => "This"`<br/>
+`argv[2] => "is"`<br/>
+`argv[3] => "a"`<br/>
+`argv[4] => "test"`<br/>
+`argv[5] => NULL` (pointing to NULL means that the pointer is not pointing at anything)<br/>
 
-The string "This" above is 4 bytes long but requires 5 bytes to be represented.  To determine the length of a string in C, you would advance a pointer until the zero is referenced.  A simple implementation to find the length of a string might look like...
+The string "This" above is 4 bytes long but requires 5 bytes to be represented.  To determine the length of a string in C, you would advance a pointer until the zero is referenced.  Simple implementation to find the length of a string might look like:
 
 ```c
 int strlen(char *s) {
@@ -203,7 +201,7 @@ int strlen(char *s) {
 }
 ```
 
-This function returns an integer (so it will only support finding the length of strings that are 2,147,483,647 or less bytes).  The function's name is strlen.  It takes as an input a single pointer to a byte in RAM.  The pointer is of type char.  Imagine that s pointed to the first character in the string "This" (or the letter T).  This functions seeks to find a pointer to the byte that is just past the end of the string (or just after the letter s) and then subtracts the two pointers.
+This function returns an integer (so it will only support finding the length of strings that are 2,147,483,647 or fewer bytes).  The function's name is `strlen`.  It takes as an input a single pointer to a byte in RAM.  The pointer is of type char.  Imagine that s pointed to the first character in the string "This" (or the letter T).  This function seeks to find a pointer to the byte that is just past the end of the string (or just after the letter s) and then subtracts the two pointers.
 
 ```
 This
@@ -221,7 +219,7 @@ The steps to finding the length of a string in C are
 3. return the difference between p and s.
 ```
 
-Pointers always reference specific bytes in RAM.  In most languages the pointer is defined to reference a type.  The purpose of the type so that when the pointer is incremented, subtracted, added, etc, that the appropriate number of bytes would be advanced.  A <i>char *</i> is a pointer which references a sequence of bytes which are of type char.  The char is a single byte, so advancing a pointer to a char by one is the same as incrementing the pointer by 1 byte.
+Pointers always reference specific bytes in RAM.  In most languages, the pointer is defined to reference a type.  The appropriate number of bytes would be advanced depending on whether the pointer is incremented, subtracted, added, etc. A `char *` is a pointer that references a sequence of bytes that are of type `char`.  The `char` is a single byte, so advancing a pointer to a char by one is the same as incrementing the pointer by 1 byte.
 
 Make a copy of the pointer s and call it p.
 ```c
@@ -234,14 +232,15 @@ while(*p != 0)
   p++;
 ```
 
-C allows for logic to be repeated until a condition is met.  A while loop is technically defined as
+C allows for logic to be repeated until a condition is met.  For example, a while loop is technically defined as
 
 ```c
 while(<condition>)
   do_something;
 ```
 
-or if there are multiple lines of code which need executed within the loop
+Alternatively, if there are multiple lines of code which need to be executed within the loop
+
 ```c
 while(<condition>) {
   do_something1;
@@ -251,7 +250,7 @@ while(<condition>) {
 }
 ```
 
-It is important to recognize the difference between comparisons and conditions.  A condition can be true or false.  Comparisons requires two objects and can evaluate to true or false.  In most (every?) computer language, loops and if logic will use conditions as opposed to comparisons.  Comparisons are a subset of conditions.  In C, true is non-zero and false is zero.
+It is essential to recognize the difference between comparisons and conditions.  A condition can be true or false.  Comparisons require two objects and can evaluate to true or false.  In most (every?) computer language, loops and if logic will use conditions as opposed to comparisons.  Comparisons are a subset of conditions.  In C, true is non-zero, and false is zero.
 
 This would never do_something.
 ```c
