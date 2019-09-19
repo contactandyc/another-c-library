@@ -239,7 +239,6 @@ E2 N1r
 - N is red and only has one black child (wrong)
 
 If we could swap the colors of N and R, we would have a valid red black tree as the only child R would be red.
-
 ```bash
 G1
 | \
@@ -259,3 +258,166 @@ E2 R2
 ```
 
 Typically when a node is rotated, the color remains the same of the node that is being rotated through (which ends up also being a color swap).  
+
+## Rotations
+
+The red black tree is balanced through rotations and changing colors.  The following examples will not include colors and are just made up.  A right rotation around R
+
+```bash
+G
+|\
+E R
+  |
+  N
+```
+
+would result in
+```bash
+G
+|\
+E R
+   \
+    N
+```
+
+A left rotation around G would result in
+```bash
+R
+|\
+G N
+|
+E
+```
+
+A right rotation around G would result in
+```bash
+R
+|\
+E N
+ \
+  G
+```
+
+In all cases after a rotation, the tree is still a valid binary search tree.
+
+The implementation of the right rotation looks like the following.
+
+```c
+void rotate_right(node_t *A, node_t **root) {
+  node_t *new_root = A->left;
+  _swap_nodes(new_root, A, root);
+
+  node_t *tmp = new_root->right;
+  new_root->right = A;
+  A->parent = new_root;
+
+  A->left = tmp;
+  if(A->left)
+    A->left->parent = A;
+}
+```
+
+When rotating to the right, the left node will become the parent and the current parent will move to the right of the parent.  
+
+If the parent's parent is the root node, the parent's parent must relink to the left node.  Otherwise, the parent is the root node, the left node will become the new root node.  This is done through _swap_nodes.
+
+```c
+static inline void _swap_nodes(node_t *dest,
+                               node_t *src,
+                               node_t **root) {
+  node_t *parent = src->parent;
+  if(parent) {
+    if(parent->left == src)
+      parent->left = dest;
+    else
+      parent->right = dest;
+    dest->parent = parent;
+  }
+  else {
+    dest->parent = NULL;
+    *root = dest;
+  }
+}
+```
+
+The old left node (which has become the parent) assigns its right pointer to the old parent node.  The parent of the old parent is set to the old left node.
+```c
+node_t *tmp = new_root->right;
+new_root->right = A;
+A->parent = new_root;
+```
+
+If the left node had a right child, that would have been saved in tmp.  Assign this to the left of the old parent.  If tmp was not NULL, set its parent to the old parent.
+```c
+A->left = tmp;
+if(tmp)
+  tmp->parent = A;
+```
+
+Rotating to the left is the same as rotating to the right, except you swap the words left and right in the explanation and code above.  For completeness, the two functions are included below.
+
+```c
+void rotate_right(node_t *A, node_t **root) {
+  node_t *new_root = A->left;
+  _swap_nodes(new_root, A, root);
+
+  node_t *tmp = new_root->right;
+  new_root->right = A;
+  A->parent = new_root;
+
+  A->left = tmp;
+  if(tmp)
+    tmp->parent = A;
+}
+```
+
+```c
+void rotate_left(node_t *A, node_t **root) {
+  node_t *new_root = A->right;
+  _swap_nodes(new_root, A, root);
+
+  node_t *tmp = new_root->left;
+  new_root->left = A;
+  A->parent = new_root;
+
+  A->right = tmp;
+  if(tmp)
+    tmp->parent = A;
+}
+```
+
+The differences are...
+```c
+void rotate_right(node_t *A, node_t **root) {
+  node_t *new_root = A->left;
+```
+
+to
+```c
+void rotate_left(node_t *A, node_t **root) {
+  node_t *new_root = A->right;
+```
+
+These lines change from
+```c
+new_root->right = A;
+A->parent = new_root;
+```
+
+to
+```c
+node_t *tmp = new_root->left;
+new_root->left = A;
+```
+
+The last change is
+```c
+A->left = tmp;
+```
+
+to
+```c
+A->right = tmp;
+```
+
+Notice that the change is literally to swap the words left and right.

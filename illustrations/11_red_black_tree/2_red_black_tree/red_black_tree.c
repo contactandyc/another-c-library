@@ -447,8 +447,8 @@ void rotate_left(node_t *A, node_t **root) {
   A->parent = new_root;
 
   A->right = tmp;
-  if(A->right)
-    A->right->parent = A;
+  if(tmp)
+    tmp->parent = A;
 }
 
 void rotate_right(node_t *A, node_t **root) {
@@ -460,8 +460,8 @@ void rotate_right(node_t *A, node_t **root) {
   A->parent = new_root;
 
   A->left = tmp;
-  if(A->left)
-    A->left->parent = A;
+  if(tmp)
+    tmp->parent = A;
 }
 
 void rotate_right_and_swap_colors(node_t *A, node_t **root) {
