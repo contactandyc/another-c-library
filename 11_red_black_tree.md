@@ -152,3 +152,12 @@ My additional rules for clarification which are based upon the first 5 rules.
 - A red black tree has a worst case of a 2logN depth, but is likely to maintain a logN depth or be very close to it.
 
 ## Building an intuition for how red black trees work
+
+To begin, let's look at a few red black trees.
+```bash
+$ ./test_data_structure ABC
+Creating red_black_tree for ABC
+B1
+| \
+A1 C1
+```
