@@ -154,8 +154,10 @@ My additional rules for clarification which are based upon the first 5 rules.
 ## Building an intuition for how red black trees work
 
 To begin, let's look at a few red black trees.
->$ ./test_data_structure ABC<br/>
->Creating red_black_tree for ABC<br/>
->B1<br/>
->| \\<br/>
->A1 C1<br/>
+```bash
+$ ./test_data_structure ABC
+Creating red_black_tree for ABC
+B1
+| \
+<span color="red">A1</span> <span color="red">C1</span>
+```
