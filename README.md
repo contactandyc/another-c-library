@@ -1,4 +1,17 @@
-# standard-template-library-alternative-in-c
+# Standard Template Library in C Table of Contents
+
+1. [Getting Started](1_getting_started.md)
+2. [Timing Your Code (the first project)](2_timing.md)
+3. [The Buffer Object](3_buffer.md)
+4. [Linked Lists](4_linked_lists.md)
+5. [Threads](5_threads.md)
+6. [Macros](6_macros.md)
+7. [The Global Allocator Object](7_allocator.md)
+8. [The Global Allocator Implementation](8_allocator_impl.md)
+9. [The Pool Object](9_pool.md)
+10. [Binary Search Trees](10_binary_search_trees.md)
+11. [The Red Black Tree](11_red_black_tree.md)
+
 # Some useful reading...
 
 This book assumes you have a basic understanding of C.  I hope to show some tricks along the way, but you should have a basic understanding of the language before continuing.  You should also know machine architecture, multithreaded programming, the bash shell, and probably read over kubernetes tutorials.  I like to avoid thread contention, context switching, and optimize cpu caching in multithreaded programming (which this will be).  To do this, I believe that you need to avoid locking as much as possible and carve out different spaces in RAM for each thread to operate in.  It's good to understand machine architecture to really understand optimizations.

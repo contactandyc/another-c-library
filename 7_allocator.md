@@ -1,5 +1,4 @@
-# The Allocator
-## A global allocation strategy
+# The Global Allocator Object
 
 A quick note about C allocation methods...
 

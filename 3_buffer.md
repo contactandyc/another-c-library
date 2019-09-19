@@ -1,4 +1,4 @@
-# Hello Buffer
+# The Buffer Object
 
 hello_buffer.c
 ```c

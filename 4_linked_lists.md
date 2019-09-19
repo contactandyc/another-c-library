@@ -1,4 +1,4 @@
-# Linked Structures
+# Linked Lists
 
 ## A Data Structure Interface
 
