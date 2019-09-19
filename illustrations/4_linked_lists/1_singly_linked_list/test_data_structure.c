@@ -166,12 +166,12 @@ void destroy_using_iteration(node_t *root) {
     node_next_to_erase methods (which may be defined to be the same as
 		first/next)
 */
-void test_data_structure(const char *arg) {
+void test_data_structure(const char *arg, int repeat) {
   printf("Creating %s for %s\n", DATA_STRUCTURE, arg);
   node_t *root;
-  for( int i=0; i<100000; i++ ) {
+  for( int i=0; i<repeat; i++ ) {
     root = fill_data_structure_randomly(arg);
-    // node_print(root);
+    node_print(root);
     find_everything(arg, root);
     find_and_erase_everything(arg, root);
   }
@@ -237,10 +237,12 @@ int main(int argc, char *argv[]) {
     printf( "  Constructs data structures and runs various tests on them.\n");
     return 0;
   }
-  for (int i = 1; i < argc; i++) {
-		char *arg = get_valid_characters(argv[i]);
-    test_data_structure(arg);
-		free(arg);
-	}
+  int repeat = 0;
+  if(argc < 3 || sscanf(argv[2], "%d", &repeat) != 1)
+    repeat = 0;
+
+	char *arg = get_valid_characters(argv[1]);
+  test_data_structure(arg, repeat);
+	free(arg);
   return 0;
 }

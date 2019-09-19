@@ -506,9 +506,9 @@ test_data_structure.c:244 [stla_pool] size: 1050, max_size: 1050, initial_size: 
 ../../../src/stla_pool.c:121: 1040
 ```
 
-The test_data_structure program allwos us to print multiple binary search trees if we pass a third argument which is the number of random trees to print (in addition to the one that is in order at the end).
+The test_data_structure program allows us to print multiple binary search trees if we pass a third argument which is the number of random trees to print (in addition to the one that is in order at the end).
 
-```c
+```bash
 $ ./test_data_structure PDCBAEMLOQTRYZ 2
 Creating binary_search_tree for PDCBAEMLOQTRYZ
 L1
@@ -575,7 +575,7 @@ test_data_structure.c:244 [stla_pool] size: 3150, max_size: 3150, initial_size: 
 
 Notice that since we printed 3 trees, the total bytes allocated increased to 4140 bytes.  Let's review the test_data_structure function for a moment.
 
-```c
+```bash
 void test_data_structure(stla_pool_t *pool, const char *arg, int repeat) {
   printf("Creating %s for %s\n", DATA_STRUCTURE, arg);
   node_t *root;

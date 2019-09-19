@@ -88,7 +88,7 @@ void stla_pool_clear(stla_pool_t *h) {
   /* remove the extra blocks (the ones where prev != NULL) */
   stla_pool_node_t *prev = h->current->prev;
   while (prev) {
-    free(h->current);
+    stla_free(h->current);
     h->current = prev;
     prev = prev->prev;
   }

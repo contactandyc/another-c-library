@@ -1,4 +1,3 @@
-#include "buffer.h"
 #include "data_structure.h"
 
 #include <stdio.h>
@@ -60,6 +59,7 @@ bool node_insert(node_t *node_to_insert, node_t **root) {
 
 typedef struct node_print_item_s {
   size_t position;
+  char *printed_key;
   size_t length;
   node_t *node;
   int depth;
@@ -67,9 +67,6 @@ typedef struct node_print_item_s {
   struct node_print_item_s *left, *right;
   struct node_print_item_s *next;
 } node_print_item_t;
-
-typedef size_t (*get_print_node_length)(node_t *n);
-
 
 static int get_depth(node_t *n) {
   int depth = 0;
@@ -81,26 +78,27 @@ static int get_depth(node_t *n) {
   return depth;
 }
 
-void print_key(node_t *n) {
+void print_key(node_print_item_t *n) {
+  printf( "%s%s%s", n->node->color == BLACK ? "" : "\x1B[31m", n->printed_key, n->node->color == BLACK ? "" : "\x1B[0m");
+}
+
+char *get_printed_key(stla_pool_t *pool, node_t *n ) {
   int depth=get_depth(n);
   int rep = n->key % 10;
+  char *r = stla_pool_ualloc(pool, rep+4 );
   for( int i=0; i<=rep; i++ )
-    printf( "%s%c", n->color == BLACK ? "" : "\x1B[31m", n->key );
-  printf( "%d%s", depth, n->color == BLACK ? "" : "\x1B[0m");
+    r[i] = n->key;
+  sprintf(r+rep+1, "%d", depth);
+  return r;
 }
 
-size_t get_node_length(node_t *n) {
-  // int depth=get_depth(n);
-  int rep = n->key % 10;
-  return rep+2;
-}
-
-void copy_tree(node_t *node, get_print_node_length get_node_length,
+void copy_tree(stla_pool_t *pool, node_t *node,
                node_print_item_t **res, node_print_item_t *parent ) {
-  node_print_item_t *copy = (node_print_item_t *)malloc(sizeof(node_print_item_t));
+  node_print_item_t *copy = (node_print_item_t *)stla_pool_alloc(pool, sizeof(node_print_item_t));
   *res = copy;
 
-  copy->length = get_node_length(node);
+  copy->printed_key = get_printed_key(pool, node);
+  copy->length = strlen(copy->printed_key);
   copy->position = parent ? ((parent->left == copy) ? parent->position : parent->position + parent->length + 1) : 0;
   copy->node = node;
   copy->depth = 1;
@@ -109,9 +107,9 @@ void copy_tree(node_t *node, get_print_node_length get_node_length,
   copy->parent = parent;
 
   if(node->left)
-    copy_tree(node->left, get_node_length, &copy->left, copy );
+    copy_tree(pool, node->left, &copy->left, copy );
   if(node->right)
-    copy_tree(node->right, get_node_length, &copy->right, copy );
+    copy_tree(pool, node->right, &copy->right, copy );
 }
 
 node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item, int *depth ) {
@@ -164,13 +162,12 @@ int get_node_depth( node_print_item_t *item ) {
   return r;
 }
 
-
-void node_print(node_t *root) {
+void node_print(stla_pool_t *pool, node_t *root) {
   if (!root)
     return;
 
   node_print_item_t *printable = NULL;
-  copy_tree(root, get_node_length, &printable, NULL );
+  copy_tree(pool, root, &printable, NULL );
 
   node_print_item_t *sn,*n,*n2,*n3;
   int actual_depth, depth2;
@@ -190,7 +187,6 @@ void node_print(node_t *root) {
         n2 = find_next_peer(n, 0);
         if(n2) {
           depth2 = get_node_depth(n2);
-        //  printf( "\n\n%c(%d) %lu %lu %c(%d) %lu\n\n", n->node->key, depth, n->position, n->length, n2->node->key, depth2, n2->position );
         }
         int extra = 0;
         if(n->right)
@@ -202,22 +198,8 @@ void node_print(node_t *root) {
           position++;
         }
         else {
-          /*if(n2 && n->parent && n->parent->left == n) {
-            n3 = find_next_peer(n2, 1);
-            if(n3 && n2->position+n2->length+1 > n3->position) {
-              n->depth++;
-              printf( "|");
-              position++;
-            }
-            else {
-              print_key(n->node);
-              position += n->length;
-            }
-          }
-          else { */
-            print_key(n->node);
-            position += n->length;
-          // }
+          print_key(n);
+          position += n->length;
         }
         n = n2;
       }
@@ -257,14 +239,6 @@ void node_print(node_t *root) {
     depth++;
   }
 }
-
-
-void _debug_node_print(const char *function, int line, node_t *root) {
-  printf( "%s:%d\n", function, line );
-  node_print(root);
-}
-
-#define debug_node_print(x) _debug_node_print(__FUNCTION__, __LINE__, x)
 
 node_t *node_first(node_t *n) {
   if (!n)
@@ -360,14 +334,14 @@ int count_black_nodes(node_t *n) {
   return black_nodes;
 }
 
-void test_red_black_tree(node_t *root) {
+void node_test(stla_pool_t *pool, node_t *root) {
   /* an empty tree is valid */
   if(!root)
     return;
   /* the root is black */
   if(root->color != BLACK) {
     printf( "The root is not black!\n" );
-    node_print(root);
+    node_print(pool, root);
     abort();
   }
   node_t *n = node_first(root);
@@ -386,28 +360,28 @@ void test_red_black_tree(node_t *root) {
     /* check if one child and that child is red */
     if(n->left && !n->right && n->left->color != RED) {
       printf( "Node(%c) has one left child and it isn't red (%c)\n", n->key, n->left->key );
-      node_print(root);
+      node_print(pool, root);
       abort();
     }
     if(!n->left && n->right && n->right->color != RED) {
       printf( "Node(%c) has one right child and it isn't red (%c)\n", n->key, n->right->key );
-      node_print(root);
+      node_print(pool, root);
       abort();
     }
     if(n->color == RED) {
       if(n->left && n->left->color == RED) {
         printf( "The red node(%c) has a red left child(%c)\n", n->key, n->left->key );
-        node_print(root);
+        node_print(pool, root);
         abort();
       }
       if(n->right && n->right->color == RED) {
         printf( "The red node(%c) has a red right child(%c)\n", n->key, n->right->key );
-        node_print(root);
+        node_print(pool, root);
         abort();
       }
       if(n->parent && n->parent->color == RED) {
         printf( "The red node(%c) has a red parent(%c)\n", n->key, n->parent->key );
-        node_print(root);
+        node_print(pool, root);
         abort();
       }
     }
@@ -417,7 +391,7 @@ void test_red_black_tree(node_t *root) {
         black_nodes = black_nodes2;
       if(black_nodes != black_nodes2) {
         printf( "Black node mismatch(%c): %d != %d\n", n->key, black_nodes, black_nodes2 );
-        node_print(root);
+        node_print(pool, root);
         abort();
       }
     }
@@ -674,7 +648,6 @@ void red_black_insert(node_t *node, node_t **root) {
       break;
     }
   }
-  test_red_black_tree(*root);
 }
 
 void node_fix_color(node_t *parent, node_t *node, node_t **root) {
@@ -1161,6 +1134,5 @@ bool node_erase(node_t *node, node_t **root) {
       }
     }
   }
-  test_red_black_tree(*root);
   return true;
 }

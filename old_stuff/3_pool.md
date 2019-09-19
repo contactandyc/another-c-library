@@ -22,13 +22,20 @@ void pool_destroy(pool_t *h);
 #endif
 ```
 
-There is also no free method.  You can call the allocation methods as often as you like and they will remain valid until pool_clear or pool_destroy is called.  In the example above, we can modify it to use the pool for allocation.
+There is no free method.  You can call the allocation methods as often as you like and they will remain valid until pool_clear or pool_destroy is called.
 
 # The Simplest Implementation
 
 When approaching algorithms, it is often a good idea to think about the simplest implementation.  This implementation doesn't need to be efficient.  It can serve to prove that a more complicated version achieves the same result.
 
-A very simple implementation of the pool interface described above is to have each allocation saved in a singly linked list on the pool_s structure.  The clear method could free all of the memory in the linked list and the destroy could free the pool_s object itself.  A singly linked list usually is linked to from a structure and then chained together using a member called next.  Each allocation would be placed in its own structure and linked to by the pool_s structure through the member head.  The two objects and implementation would probably look like the following.
+A very simple implementation of the pool interface described above.
+
+- Have each allocation saved in a singly linked list on the pool_s structure.  
+- The clear method could free all of the memory in the linked list.
+- The destroy could call clear, and then free the pool_s object itself.
+- Each allocation would require it's own link structure.
+
+A singly linked list usually is linked to from a structure and then chained together using a member called next.  Each allocation would be placed in its own structure and linked to by the pool_s structure through the member head.  The two objects and implementation would probably look like the following.
 
 ```c
 typedef struct pool_node_s {
@@ -82,7 +89,7 @@ void pool_destroy(pool_t *h) {
 }
 ```
 
-We could use a trick like we did above and allocate the desired memory and the pool_node_t together.  If we did that we wouldn't need the void *m parameter either and the memory could just exist after the pool_node_t structure.
+We could allocate the desired memory and the pool_node_t structure together.  If we did that we wouldn't need the void *m parameter and the memory requested could just exist after the pool_node_t structure.
 
 ```c
 typedef struct pool_node_s {
@@ -108,70 +115,208 @@ void pool_clear(pool_t *h) {
 }
 ```
 
-Using this simple structure, all of our allocations can be tracked and cleared by the pool object instead of requiring the application to remember where each allocation started from.  In our previous example, we can change the allocation to use the new pool object instead of malloc.
+Using this simple structure, all of our allocations can be tracked and cleared by the pool object instead of requiring the application to remember where each allocation started from.
 
-person.h
+
+# A better implementation
+
+The above implementation does save us from needing to free memory, but it doesn't really do much more.  The pool object that exists in the src directory is listed below
+
+src/stla_pool.h
 ```c
-#ifndef _person_H
-#define _person_H
+#ifndef _stla_pool_H
+#define _stla_pool_H
 
-#include "pool.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 
-typedef char person_t;
+#include "stla_allocator.h"
 
-person_t *person_init(pool_t *pool, const char *first_name, const char *last_name);
-void person_print(person_t *p);
+struct stla_pool_s;
+typedef struct stla_pool_s stla_pool_t;
 
-// The destroy method is no longer needed!
-// void person_destroy(person_t *p);
+/* stla_pool_init will create a working space of size bytes */
+#ifdef _STLA_DEBUG_MEMORY_
+#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
+stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+#else
+#define stla_pool_init(size) _stla_pool_init(size)
+stla_pool_t *_stla_pool_init(size_t size);
+#endif
+
+/* stla_pool_clear will make all of the pool's memory reusable.  If the
+  initial block was exceeded and additional blocks were added, those blocks
+  will be freed. */
+void stla_pool_clear(stla_pool_t *h);
+
+/* stla_pool_destroy frees up all memory associated with the pool object */
+void stla_pool_destroy(stla_pool_t *h);
+
+/* stla_pool_set_minimum_growth_size alters the minimum size of growth blocks.
+   This is particularly useful if you don't expect the pool's block size to be
+   exceeded by much and you don't want the default which would be to use the
+   original block size for the new block (effectively doubling memory usage). */
+void stla_pool_set_minimum_growth_size(stla_pool_t *h, size_t size);
+
+/* stla_pool_alloc allocates len uninitialized bytes which are aligned. */
+static inline void *stla_pool_alloc(stla_pool_t *h, size_t len);
+
+/* stla_pool_alloc allocates len uninitialized bytes which are unaligned. */
+static inline void *stla_pool_ualloc(stla_pool_t *h, size_t len);
+
+/* stla_pool_alloc allocates len zero'd bytes which are aligned. */
+static inline void *stla_pool_calloc(stla_pool_t *h, size_t len);
+
+/* stla_pool_strdup allocates a copy of the string p.  The memory will be
+  unaligned.  If you need the memory to be aligned, consider using stla_pool_dup
+  like char *s = stla_pool_dup(pool, p, strlen(p)+1); */
+static inline char *stla_pool_strdup(stla_pool_t *h, const char *p);
+
+/* stla_pool_dup allocates a copy of the data.  The memory will be aligned. */
+static inline void *stla_pool_dup(stla_pool_t *h, const void *data, size_t len);
+
+/* stla_pool_dup allocates a copy of the data.  The memory will be unaligned. */
+static inline void *stla_pool_udup(stla_pool_t *h, const void *data, size_t len);
+
+/* stla_pool_strdupf allocates a copy of the formatted string p. */
+static inline char *stla_pool_strdupf(stla_pool_t *h, const char *p, ...);
+
+/* stla_pool_strdupvf allocates a copy of the formatted string p. This is
+  particularly useful if you wish to extend another object which uses pool as
+  its base.  */
+char *stla_pool_strdupvf(stla_pool_t *h, const char *p, va_list args);
+
+/* stla_pool_size returns the number of bytes that have been allocated from any
+  of the alloc calls above.  */
+size_t stla_pool_size(stla_pool_t *h);
+
+/* stla_pool_used returns the number of bytes that have been allocated by the
+  pool itself.  This will always be greater than stla_pool_size as there is
+  overhead for the structures and this is independent of any allocating calls.
+*/
+size_t stla_pool_used(stla_pool_t *h);
+
+#include "impl/stla_pool.h"
 
 #endif
 ```
 
-person.c
+A few significant changes are added to the interface.
+
+- Everything uses the stla_ prefix.
+- The stla_allocator object is used for allocation.
+- stla_pool_init is changed to a macro to support memory debugging.
+- stla_pool_init takes in a size (to support allocating in larger chunks)
+- stla_pool_malloc is changed to stla_pool_alloc.
+- stla_pool_ualloc supports unaligned allocation.
+- stla_pool_dup and sla_pool_udup copy binary data.
+- stla_pool_strdupf/stla_pool_strdupvf support working with format strings.
+- stla_pool_size gets the overall number of bytes that have been allocated.
+- stla_pool_used gets the overall number of bytes that have been allocated internally.
+- impl/stla_pool.h is used to inline a number of the functions for performance.
+
+
+By this point, the code below should look pretty familiar.  Files are included, stla_pool_t is defined, and the _stla_pool_H is defined to prevent the contents of this file from being included more than once.
 ```c
-#include "person.h"
+#ifndef _stla_pool_H
+#define _stla_pool_H
 
-person_t *person_init(pool_t *pool, const char *first_name, const char *last_name) {
-  // allocate two strings plus the 2 zero terminators
-  person_t *h = (person_t *)pool_malloc(pool, strlen(first_name) + strlen(last_name) + 2);
-  char *p = (char *)(h);
-  strcpy(p, first_name);
-  p = p + strlen(p) + 1;
-  strcpy(p, last_name);
-  return h;
-}
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 
-void person_print(person_t *h) {
-  char *p = (char *)(h);
-  printf( "%s %s\n", p, p+strlen(p)+1 );
-}
+#include "stla_allocator.h"
+
+struct stla_pool_s;
+typedef struct stla_pool_s stla_pool_t;
 ```
 
-test_person will also change to initialize a pool.
-
-test_person.c
+Because this object will use the stla_allocator for debugging memory, the following is needed to define the init function.
 ```c
-#include "pool.h"
-#include "person.h"
-
-int main( int argc, char *argv[] ) {
-  pool_t *pool = pool_init(256);
-  for( int i=1; i<argc; i++ ) {
-    pool_clear(pool);
-    person_t *p = person_init(pool, argv[i-1], argv[i]);
-    person_print(p);
-  }
-  pool_destroy(pool);
-  return 0;
-}
+/* stla_pool_init will create a working space of size bytes */
+#ifdef _STLA_DEBUG_MEMORY_
+#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
+stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+#else
+#define stla_pool_init(size) _stla_pool_init(size)
+stla_pool_t *_stla_pool_init(size_t size);
+#endif
 ```
 
-The above example modifies what the first and last name are to command line arguments.  Notice how the person_destroy is never needed.  The pool could be cleared at the bottom of the loop, but I've found that it is often easier to just clear it at the top of the loop.  In general, if you are going to write high quality code, you should emphasize repeated patterns over optimization if it really doesn't make a difference.  In the above case, calling clear at the end of the loop wouldn't change the number of times it is called.  What's cool is that even if you didn't clear the pool, the program would still work fine as long as the number of arguments wasn't so large that it exhausted memory.  The pool_destroy call would release all of the memory.  
+If we weren't using the stla_allocator, our init call would look like this...
+```c
+stla_pool_t *_stla_pool_init(size_t size);
+```
 
-# A better implementation of the pool
+If you refer back to the end of the [allocator](7_allocator.md) code, there is an explanation of very similar code for the timer object conversion.
 
-The pool is initialized with an initial_size of 256 in this example.  It likely could be much smaller.  In general, you want to initialize the pool with a size that captures the vast majority of cases.  It is okay if the pool requires extra memory.  We will build support for this when we build the pool.  This should become clearer as we move through the implementation.
+Replace
+```c
+stla_pool_t *stla_pool_init(size_t size);
+```
+
+with
+```c
+#ifdef _STLA_DEBUG_MEMORY_
+#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
+stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+#else
+#define stla_pool_init(size) _stla_pool_init(size)
+stla_pool_t *_stla_pool_init(size_t size);
+#endif
+```
+
+The above code has two basic cases.  One where _STLA_DEBUG_MEMORY_ is defined and the other where it is not (#else).  It may be easier to break this into a couple of steps.
+
+1.  convert the init function to be prefixed with an underscore
+
+```c
+stla_pool_t *stla_pool_init(size_t size);
+```
+
+becomes
+```c
+stla_pool_t *_stla_pool_init(size_t size);
+```
+
+2.  create a macro which defines stla_pool_init as _stla_pool_init
+```c
+#define stla_pool_init(size) _stla_pool_init(size)
+stla_pool_t *_stla_pool_init(size_t size);
+```
+
+3.  define the macro if logic with the else part filled in.
+```c
+#ifdef _STLA_DEBUG_MEMORY_
+#else
+#define stla_pool_init(size) _stla_pool_init(size)
+stla_pool_t *_stla_pool_init(size_t size);
+#endif
+```
+
+4.  Add const char *caller to the debug version of _stla_pool_init
+```c
+stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+```
+
+5.  define the macro to call the init function.
+```c
+#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
+```
+
+6.  put the two calls in the #ifdef _STLA_DEBUG_MEMORY_ section.
+```c
+#ifdef _STLA_DEBUG_MEMORY_
+#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
+stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+#else
+#define stla_pool_init(size) _stla_pool_init(size)
+stla_pool_t *_stla_pool_init(size_t size);
+#endif
+```
+
+
 
 Most of the time, when coding something I will start from an interface and then begin to fill in the blanks.  Sometimes, I will first explore challenging bits of code to understand them first.  I will often take the header file and save it as the implementation file and then modify.
 
