@@ -1,3 +1,7 @@
+# Macros
+## [Table of Contents](/)
+
+
 The c compiler allows us to create a macro (basically defining one thing as another).  There are two special constants that can be useful for debugging.
 
 ```

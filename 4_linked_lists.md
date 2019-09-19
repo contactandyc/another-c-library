@@ -1,4 +1,5 @@
 # Linked Lists
+## [Table of Contents](/)
 
 ## A Data Structure Interface
 

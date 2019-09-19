@@ -1,4 +1,5 @@
 # The Global Allocator Object
+## [Table of Contents](/)
 
 A quick note about C allocation methods...
 

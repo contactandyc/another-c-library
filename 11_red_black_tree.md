@@ -1,4 +1,5 @@
 # The Red Black Tree
+## [Table of Contents](/)
 
 The red black tree is a mostly balanced binary search tree that was invented by Leonidas J. Guibas and Robert Sedgewick.  To understand the red black tree, it is good to have a thorough understanding of [binary search trees](10_binary_search_trees.md) first.  
 

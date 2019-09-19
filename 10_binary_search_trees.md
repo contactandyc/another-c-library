@@ -1,4 +1,5 @@
 # Binary Search Trees
+## [Table of Contents](/)
 
 A binary search tree is similar to a linked list in that nodes are linked together.  The difference is that each node has two children.  The children are generally understood as being left and right where the left is less than the given node and the right is greater.  Trees in computer science generally grow from a root down (unlike trees in nature which grow up from the root).  This is likely due to the fact that in a binary search tree, the root is considered the top of the tree.  In binary search trees, each child node is aware of its parent node.  In the example below, B is aware of D as a parent, A as a left child, and C as a right child.
 

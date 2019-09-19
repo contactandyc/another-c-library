@@ -1,4 +1,5 @@
 # The Buffer Object
+## [Table of Contents](/)
 
 hello_buffer.c
 ```c
