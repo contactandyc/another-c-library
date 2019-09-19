@@ -1,4 +1,4 @@
-### [Table of Contents](README.md)
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
 
 # The Red Black Tree
 
@@ -442,3 +442,5 @@ void rotate_left_and_swap_colors(node_t *A, node_t **root) {
 ```
 
 These functions swap colors and then do the rotation.
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis

@@ -153,4 +153,6 @@ cd $stla/illustrations/1_getting_started/1_test_setup
 
 If you don't understand the terminal, I'd highly recommend spending some time going through tutorials to do so.  I don't plan to use many terminal related commands and I will try to detail exactly which commands that you need to run, but if there are problems, you won't have help.  Understanding the terminal is essential for any programmer.
 
-# Continue to [Timing](2_timing.md)!
+# [Timing Your Code (the first project)](2_timing.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis

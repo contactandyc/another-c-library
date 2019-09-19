@@ -1,4 +1,4 @@
-### [Table of Contents](README.md)
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
 
 # Introducing Threads
 
@@ -272,4 +272,6 @@ It takes 0.027 seconds to do the 10 million additions for a single thread (if th
 
 Pthreads also support conditions which are like the pagers above.  They will be described later prior to needing them.  The next project will require a mutex.
 
-# Continue to understand [macros](6_macros.md)!
+# [Macros](6_macros.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis

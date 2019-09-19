@@ -1,4 +1,5 @@
 # Standard Template Library in C Table of Contents
+- Copyright 2019 Andy Curtis
 
 1. [Getting Started](1_getting_started.md)
 2. [Timing Your Code (the first project)](2_timing.md)

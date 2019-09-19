@@ -1,4 +1,4 @@
-### [Table of Contents](README.md)
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
 
 # The Global Allocator Implementation
 
@@ -158,4 +158,6 @@ int done;
 
 # To Be Continued
 
-# Continue to build the [pool](9_pool.md) object!
+# [The Pool Object](9_pool.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis

@@ -1,4 +1,4 @@
-### [Table of Contents](README.md)
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
 
 # Binary Search Trees
 
@@ -1140,4 +1140,6 @@ A quick note on how the stla_pool was useful.  The copy of the tree was construc
 - Printing a binary search tree is largely challenging because of the need to fit in a two dimensional space.  It involves copying the binary tree into a print friendly structure and pushing down nodes that don't fit.
 - The pool can be useful for constructing nodes in a tree, especially if you don't want to worry about deconstructing the tree.
 
-# Continue to work through the [red black tree](11_red_black_tree.md)!
+# [The Red Black Tree](11_red_black_tree.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis

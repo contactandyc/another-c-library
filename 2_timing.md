@@ -1,4 +1,4 @@
-### [Table of Contents](README.md)
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
 
 # Timing Your Code (the first project)
 
@@ -2520,4 +2520,6 @@ clean:
 
 The difference is that instead of the OBJECTS, HEADER_FILES, and FLAGS variables being specified in the Makefile, they are included by including $(ROOT)/src/Makefile.include.
 
-# Continue to create our second object [Buffer](3_buffer.md)!
+# [The Buffer Object](3_buffer.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis

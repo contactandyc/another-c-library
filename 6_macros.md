@@ -1,4 +1,4 @@
-### [Table of Contents](README.md)
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
 
 # Macros
 
@@ -399,4 +399,6 @@ int main( int argc, char *argv[] ) {
 &point == p ? "equal" : "not equal"
 ```
 
-# Continue to build the [allocator](7_allocator.md) object!
+# [The Global Allocator Object](7_allocator.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
