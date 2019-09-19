@@ -145,6 +145,7 @@ Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 
 My additional rules for clarification which are based upon the first 5 rules.
 - If a node has one child, the child must be red
+- If a node has two children, the children may be black or red
 - The parent of a red node must be black
 - The black height of any leaf node must be the same (another way of stating 5)
 - A red black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.
