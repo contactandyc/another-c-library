@@ -732,7 +732,7 @@ The way that I have designed the print function is to print the left nodes verti
 3. If a node has a right child, then add two bytes to conflict check
 4. Determine the length of each node at the beginning to simplify the computation.
 
-To solve this, the first thing I did is create a copy of the tree which consists of the position of each node, the printed_key, the length of the printed_key, and the depth of the node from its parent (1 if directly beneath parent).  Because we are making a copy of the tree, we also need a parent, left, and right pointer.
+To solve this, the first thing I did is create a copy of the tree which consists of the position of each node, the printed_key, the length of the printed_key, and the depth of the node from its parent (1 if directly beneath parent).  Because we are making a copy of the tree, we also need a parent, left, and right pointer.  I created a number of helper functions to make this work which are all declared as static so they don't conflict with the global namespace.
 
 The structure of the node looks like...
 ```c
