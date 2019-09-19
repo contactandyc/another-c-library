@@ -771,14 +771,13 @@ void copy_tree(stla_pool_t *pool, node_t *node,
 I'm using the pool to allocate each node.  copy_tree is a recursive function which allocates nodes and puts them into the 3rd parameter.  The printed_key is printed using the following function.
 ```c
 char *get_printed_key(stla_pool_t *pool, node_t *n ) {
-  int depth=get_depth(n);
-  // return stla_pool_strdupf(pool, "%c%d", n->key, depth);
+  // return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
 
   int r=rand() % 15;
   char *res = (char *)stla_pool_ualloc(pool, r+4);
   for( int i=0; i<=r; i++ )
     res[i] = n->key;
-  sprintf(res+r+1, "%d", depth);
+  sprintf(res+r+1, "%d", get_depth(n));
   return res;
 }
 ```
@@ -801,7 +800,7 @@ int r=rand() % 15;
 char *res = (char *)stla_pool_ualloc(pool, r+4);
 for( int i=0; i<=r; i++ )
   res[i] = n->key;
-sprintf(res+r+1, "%d", depth);
+sprintf(res+r+1, "%d", get_depth(n));
 return res;
 ```
 
@@ -932,10 +931,10 @@ void node_print(stla_pool_t *pool, node_t *root) {
   int actual_depth;
   int depth=1;
   while(true) {
-    int position = 0;
     sn = find_left_most_at_depth(printable, depth);
     if(!sn)
       break;
+    int position = 0;
     n = sn;
     while(n) {
       for( ; position<n->position; position++ )
@@ -1033,7 +1032,7 @@ sn is the starting node.  Find all of the nodes that are on the same level and p
 2. get the actual depth of n (n might be below the current level)
 3. if the node is at the current depth
    a. find the next peer at the same level.
-   b. compute an extra length of 2 if there is a right child of n
+   b. compute an extra length of 2 if there is a right child of n (one for the backslash and one for the vertical bar if the node needs pushed down).
    c. if there is a next peer and n's position + n's length + 1 + extra is greater than n2's position, push down the current node by increasing its depth and printing a vertical bar (and incrementing position because we wrote 1 byte).
    d. otherwise, print the key and add the length of the key to the position.
    e. set n to n2 (n2 may be NULL)
@@ -1099,4 +1098,27 @@ while(n) {
   n = find_next_peer(n, depth-actual_depth);
 }
 printf( "\n");
+```
+
+To finalize the work, we will remove the random number of prints in the get_printed_key function.
+
+```c
+char *get_printed_key(stla_pool_t *pool, node_t *n ) {
+  // return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
+
+  int r=rand() % 15;
+  char *res = (char *)stla_pool_ualloc(pool, r+4);
+  for( int i=0; i<=r; i++ )
+    res[i] = n->key;
+  sprintf(res+r+1, "%d", get_depth(n));
+  return res;
+}
+```
+
+becomes
+
+```c
+char *get_printed_key(stla_pool_t *pool, node_t *n ) {
+  return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
+}
 ```
