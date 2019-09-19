@@ -144,7 +144,7 @@ Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
   same number of black nodes.
 
 My additional rules for clarification which are based upon the first 5 rules.
-- If a node has one child, it must be red
+- If a node has one child, it child must be red
 - The parent of a red node must be black
 - The black height of any leaf node must be the same (another way of stating 5)
 
