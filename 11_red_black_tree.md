@@ -156,9 +156,9 @@ My additional rules for clarification which are based upon the first 5 rules.
 To begin, let's look at a few red black trees.  If you can follow
 
 <div style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;background-color: blue">
-$ ./test_data_structure ABC
-Creating red_black_tree for ABC
-B1
-| \
-<span style="color: red">A1<span> C1
+$ ./test_data_structure ABC<br/>
+Creating red_black_tree for ABC<br/>
+B1<br/>
+| \\<br/>
+<span style="color: red">A1<span> C1<br/>
 </div>
