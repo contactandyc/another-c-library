@@ -726,3 +726,183 @@ print_using_reverse_iteration: ZYTRQPOMLEDCBA
 In the example above, AAAAAAAAAAA5 is pushed down until LLLLLLLLL5 is printed.  CCCCCCCCC3 is pushed down because it conflict with EEE3.  RRRRRR4 is pushed down because it would conflict with YYYYYYYYYYYYY4.
 
 The way that I have designed the print function is to print the left nodes vertically below the first character of the key and the right nodes using a back slash spaced one character after the parent key.  If a node conflicts with the next node at the same level, that node is pushed down vertically until the conflict is resolved.  The algorithm may not be the most optimal solution, but it does seem to work.  Technically, we don't need a print function to be able to use a binary search tree, but they are nice to visualize what is happening.  In addition to this, the solution is interesting and may lead to other solutions.
+
+```c
+typedef struct node_print_item_s {
+  size_t position;
+  char *printed_key;
+  size_t length;
+  node_t *node;
+  int depth;
+  struct node_print_item_s *parent;
+  struct node_print_item_s *left, *right;
+  struct node_print_item_s *next;
+} node_print_item_t;
+
+static int get_depth(node_t *n) {
+  int depth = 0;
+  while (n) {
+    depth++;
+    n = n->parent;
+  }
+  return depth;
+}
+
+char *get_printed_key(stla_pool_t *pool, node_t *n ) {
+  int depth=get_depth(n);
+  int r=rand() % 15;
+  char *res = (char *)stla_pool_ualloc(pool, r+4);
+  for( int i=0; i<=r; i++ )
+    res[i] = n->key;
+  sprintf(res+r+1, "%d", depth);
+  return res;
+}
+
+void copy_tree(stla_pool_t *pool, node_t *node,
+               node_print_item_t **res, node_print_item_t *parent ) {
+  node_print_item_t *copy = (node_print_item_t *)stla_pool_alloc(pool, sizeof(node_print_item_t));
+  *res = copy;
+
+  copy->printed_key = get_printed_key(pool, node);
+  copy->length = strlen(copy->printed_key);
+  copy->position = parent ? ((parent->left == copy) ? parent->position : parent->position + parent->length + 1) : 0;
+  copy->node = node;
+  copy->depth = 1;
+  copy->left = NULL;
+  copy->right = NULL;
+  copy->parent = parent;
+
+  if(node->left)
+    copy_tree(pool, node->left, &copy->left, copy );
+  if(node->right)
+    copy_tree(pool, node->right, &copy->right, copy );
+}
+
+node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item, int *depth ) {
+  while(item->parent && (item->parent->right == item || !item->parent->right)) {
+    *depth += item->depth;
+    item = item->parent;
+  }
+  *depth += item->depth;
+  return item->parent;
+}
+
+node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth ) {
+  if(!item)
+    return NULL;
+
+  if(depth <= item->depth)
+    return item;
+  if(item->left) {
+    node_print_item_t *r = find_left_most_at_depth(item->left, depth-item->depth);
+    if(r)
+      return r;
+  }
+  if(item->right) {
+    node_print_item_t *r = find_left_most_at_depth(item->right, depth-item->depth);
+    if(r)
+      return r;
+  }
+  return NULL;
+}
+
+node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) {
+  while(item) {
+    node_print_item_t *p = find_left_parent_with_right_child(item, &depth);
+    if(!p)
+      return NULL;
+    node_print_item_t *np = find_left_most_at_depth( p->right, depth );
+    if(np)
+      return np;
+    item = p;
+  }
+  return NULL;
+}
+
+int get_node_depth( node_print_item_t *item ) {
+  int r=0;
+  while(item) {
+    r += item->depth;
+    item = item->parent;
+  }
+  return r;
+}
+
+void node_print(stla_pool_t *pool, node_t *root) {
+  if (!root)
+    return;
+
+  node_print_item_t *printable = NULL;
+  copy_tree(pool, root, &printable, NULL );
+
+  node_print_item_t *sn,*n,*n2,*n3;
+  int actual_depth, depth2;
+  int depth=1;
+  while(true) {
+    int position = 0;
+    // sn=depth==1 ? printable : find_left_most_at_depth( printable, depth );
+    sn = find_left_most_at_depth(printable, depth);
+    if(!sn)
+      break;
+    n = sn;
+    while(n) {
+      for( ; position<n->position; position++ )
+        printf( " ");
+      actual_depth=get_node_depth(n);
+      if(actual_depth == depth) {
+        n2 = find_next_peer(n, 0);
+        if(n2) {
+          depth2 = get_node_depth(n2);
+        }
+        int extra = 0;
+        if(n->right)
+          extra = 2;
+
+        if(n2 && (n->position+n->length+1+extra > n2->position)) {
+          n->depth++;
+          printf( "|");
+          position++;
+        }
+        else {
+          printf("%s", n->printed_key);
+          position += n->length;
+        }
+        n = n2;
+      }
+      else {
+        n = find_next_peer(n, depth-actual_depth);
+        printf( "|");
+        position++;
+      }
+    }
+    printf( "\n");
+    position = 0;
+    n = sn;
+    while(n) {
+      for( ; position<n->position; position++ )
+        printf( " ");
+      actual_depth=get_node_depth(n);
+      n2 = find_next_peer(n, depth-actual_depth);
+      if(actual_depth == depth) {
+        if(n->left) {
+          printf( "|" );
+          position++;
+        }
+        for( ; position<n->position+n->length; position++ )
+          printf( " ");
+        if(n->right) {
+          printf( "\\" );
+          position++;
+        }
+      }
+      else {
+        printf( "|");
+        position++;
+      }
+      n = n2;
+    }
+    printf( "\n");
+    depth++;
+  }
+}
+```
