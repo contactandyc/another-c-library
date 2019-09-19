@@ -154,12 +154,17 @@ My additional rules for clarification which are based upon the first 5 rules.
 ## Building an intuition for how red black trees work
 
 To begin, let's look at a few red black trees.  If you can follow
-```html
-<div style="background-color: blue">
+
+
+display: block;
+font-family: monospace;
+white-space: pre;
+margin: 1em 0;
+
+<div style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;background-color: blue">
 $ ./test_data_structure ABC
 Creating red_black_tree for ABC
 B1
 | \
-A1 C1
+<span style="color: red">A1<span> C1
 </div>
-```
