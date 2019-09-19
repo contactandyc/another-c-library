@@ -1,5 +1,6 @@
+### [Table of Contents](README.md)
+
 # Linked Lists
-## [Table of Contents](/)
 
 ## A Data Structure Interface
 

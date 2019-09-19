@@ -1,5 +1,6 @@
-# The Global Allocator Object
 ### [Table of Contents](README.md)
+
+# The Global Allocator Object
 
 A quick note about C allocation methods...
 

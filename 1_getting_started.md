@@ -1,3 +1,5 @@
+### [Table of Contents](README.md)
+
 # A quick word about licensing
 
 Throughout this book you will see the following notice at the top of most of the files.

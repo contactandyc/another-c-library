@@ -1,5 +1,6 @@
+### [Table of Contents](README.md)
+
 # The Buffer Object
-## [Table of Contents](/)
 
 hello_buffer.c
 ```c

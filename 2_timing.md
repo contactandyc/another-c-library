@@ -1,5 +1,6 @@
+### [Table of Contents](README.md)
+
 # Timing Your Code (the first project)
-## [Table of Contents](/)
 
 In the project, there is an illustrations folder which contains most of the code.  There is also a src directory where final code is placed.  Normally, one would start with a hello world project.  That actually exists later in a section called Hello Buffer.  If you find yourself lost, hopefully, it'll make more sense once you get to that section.  I'd recommend reading and working through the examples in this chapter anyways and then maybe coming back to it again after working through Hello Buffer.  The code for this chapter is located in <i>illustrations/2_timing</i>
 

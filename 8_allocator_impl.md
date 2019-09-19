@@ -1,5 +1,6 @@
-# The Global Allocator Implementation
 ### [Table of Contents](README.md)
+
+# The Global Allocator Implementation
 
 Implementing the allocator is rather involved and uses much of what you've learned in the prior chapters.  Understanding every implementation isn't necessary to use the standard template library alternative, but it should be help you to understand how to code or to improve it should you desire to.
 
