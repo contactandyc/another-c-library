@@ -135,9 +135,7 @@ A balanced binary search tree is useful in that you are guaranteed that finding 
 Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 
 1. Each node is either red or black.
-2. The root is black. This rule is sometimes omitted. Since the root can always
-  be changed from red to black, but not necessarily vice versa, this rule has
-  little effect on analysis.
+2. The root is black.
 3. All leaves (NIL) are black.
 4. If a node is red, then both its children are black.
 5. Every path from a given node to any of its descendant NIL nodes contains the
@@ -145,7 +143,8 @@ Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 
 My additional rules for clarification which are based upon the first 5 rules.
 - If a node has one child, the child must be red
-- If a node has two children, the children may be black or red
+- If a node has two children, one or both of the children can be red if the parent is black
+- If a node is red, it must have either two children which are black or no children at all.
 - The parent of a red node must be black
 - The black height of any leaf node must be the same (another way of stating 5)
 - A red black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.  It is possible to have more red nodes than black nodes, but it isn't typical.
@@ -153,4 +152,94 @@ My additional rules for clarification which are based upon the first 5 rules.
 
 ## Building an intuition for how red black trees work
 
-To begin, let's look at a few red black trees.  Markdown doesn't support printing color in code blocks, so the red nodes are not colored.  In order to accommodate, red nodes are suffixed with an r.
+To begin, let's look at a few red black trees.  Markdown doesn't support printing color in code blocks, so the red nodes are not colored.  They are colored if you follow along in the terminal.  In order to accommodate, red nodes are suffixed with an r.  One of the rules for a red black tree is that all of the leaf nodes must have the same black height.  Instead of printing the depth of a node, I'm printing the black depth (or black height) of the nodes.  Black height can be calculated by simply counting the number of black nodes in the path to the root.
+
+```bash
+$ ./test_data_structure ABC
+Creating red_black_tree for ABC
+B1
+| \
+|  C1r
+|     
+A1r
+```
+
+The black height of A and C are 1 because there is one black node in their path to the root (B).
+
+```bash
+$ ./test_data_structure ABCDEFGH
+Creating red_black_tree for ABCDEFGH
+D1
+| \
+|  F1r
+|  |  \
+|  E2  G2
+|        \
+B1r       H2r
+|  \         
+A2  C2
+```
+
+- The black height of A is 2 because A and D are black.  
+- The black height of H is 2 because G and D are black.  
+- The black height of all of the leaf nodes are 2.  
+- H is the only child of G and because of that H is red.
+- Because H is red, G is black.
+- F and B are red and have two black children.
+- H is red and has no children.
+- D is the root, so it is black.
+
+```bash
+$ ./test_data_structure GERMANY
+Creating red_black_tree for GERMANY
+G1
+| \
+E2 N1r
+|  |  \
+|  M2  R2
+|        \
+A2r       Y2r
+```
+
+- The black height of the leaf nodes is 2.
+- N is red, so both of its children are black.
+- Y and A are only children, so they are red.
+- G is the root, so it is black.
+
+If you think about removing nodes, you can remove A and Y, making E and R leaf nodes, without affecting black height equality.
+```bash
+G1
+| \
+E2 N1r
+   |  \
+   M2  R2
+```
+
+If you remove M
+```bash
+G1
+| \
+E2 N1r
+      \
+      R2
+```
+
+- E and R have a black height of 2, so the height is okay
+- R is an only child, but is black (wrong)
+- N is red and only has one black child (wrong)
+
+If we could swap the colors of N and R, we would have a valid red black tree as the only child R would be red.
+
+```bash
+G1
+| \
+E2 N1
+     \
+      R2r
+```
+
+
+
+
+
+then N will have a black height of  
