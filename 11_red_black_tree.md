@@ -157,5 +157,5 @@ To begin, let's look at a few red black trees.
 >$ ./test_data_structure ABC<br/>
 >Creating red_black_tree for ABC<br/>
 >B1<br/>
->| \<br/>
+>| \\<br/>
 >A1 C1<br/>
