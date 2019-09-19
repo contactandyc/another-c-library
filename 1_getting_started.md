@@ -1,4 +1,5 @@
 ### [Table of Contents](README.md)
+Copyright 2019 Andy Curtis
 
 # A quick word about licensing
 
