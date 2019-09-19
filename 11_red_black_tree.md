@@ -143,9 +143,9 @@ Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 5. Every path from a given node to any of its descendant NIL nodes contains the
   same number of black nodes.
 
-My additional rules for clarification which are based upon the first 5 rules.
-6. If a node has one child, it must be red
-7. The parent of a red node must be black
-8. The black height of any leaf node must be the same (another way of stating 5)
+My additional rules for clarification which are based upon the first 5 rules.<br/>
+6. If a node has one child, it must be red<br/>
+7. The parent of a red node must be black<br/>
+8. The black height of any leaf node must be the same (another way of stating 5)<br/>
 
 ### Black height
