@@ -13,4 +13,4 @@ examples:
 	@./test_data_structure PDCBAEMLOQTRYZ
 
 clean:
-	rm -f test_data_structure *~
+	rm -rf test_data_structure *~ *.dSYM

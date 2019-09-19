@@ -1123,3 +1123,17 @@ char *get_printed_key(stla_pool_t *pool, node_t *n ) {
   return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
 }
 ```
+
+A quick note on how the stla_pool was useful.  The copy of the tree was constructed and never had to free any of the nodes associated with it.  Both nodes and the printed keys were allocated.  If we didn't have the pool (or something like it), we would have needed to free each node in the tree.  The node_init and node_destroy methods use stla_malloc and stla_free.  If we weren't concerned with destroying the tree or erasing nodes, we could have used the pool for the allocation and never had to erase the tree at all.  A call to stla_pool_clear would make the memory reusable for another purpose (such as building another tree).  Technically, it takes as long to construct a binary search tree as it does to destroy one.  If you use the pool, you can avoid all of the destruction time.  This will be explored further once the red black tree (a balanced binary search tree is complete).
+
+# Quick Recap
+
+- To find the first node in a binary tree, find the left most node from the root.
+- To find the last node, find the right most node from the root.
+- To find the next node, consider if the current node has a right node.  If it does, the find the left most node from the right node.  Otherwise find the first parent where the child is on the left.
+- Finding the previous node is the same as finding the next node if you swap the words left and right in all places.
+- To find a given node, recursively choose the left node if the given node is less than the current node (where the left node becomes the current node), the right node if the given node is greater than the current node (where the right node becomes the current node), and if the current node is equal to the given node, return the given node.  If a NULL leaf is reached, the given node doesn't exist in the tree.
+- To insert a given node, find where the parent node where the given node should go (similar to find), and link the given node's parent to that parent.  Also, link the parent node's left or right child to the given node.
+- Erasing a node is a bit more complex.  It involves finding the successor and replacing it (perhaps look back if you don't understand it).
+- Printing a binary search tree is largely challenging because of the need to fit in a two dimensional space.  It involves copying the binary tree into a print friendly structure and pushing down nodes that don't fit.
+- The pool can be useful for constructing nodes in a tree, especially if you don't want to worry about deconstructing the tree.
