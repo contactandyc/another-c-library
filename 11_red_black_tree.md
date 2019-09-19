@@ -6,7 +6,7 @@ The red black tree is a mostly balanced binary search tree that was invented by 
 
 To start, let's explore why balancing a binary search tree is important.
 
-The following code is found in <i>illustrations/2_timing/1_timer</i>
+The following code is found in <i>illustrations/11_red_black_tree/1_binary_search_tree</i>
 ```bash
 cd $stla/illustrations/11_red_black_tree/1_binary_search_tree
 ```
@@ -153,6 +153,16 @@ My additional rules for clarification which are based upon the first 5 rules.
 ## Building an intuition for how red black trees work
 
 To begin, let's look at a few red black trees.  Markdown doesn't support printing color in code blocks, so the red nodes are not colored.  They are colored if you follow along in the terminal.  In order to accommodate, red nodes are suffixed with an r.  One of the rules for a red black tree is that all of the leaf nodes must have the same black height.  Instead of printing the depth of a node, I'm printing the black depth (or black height) of the nodes.  Black height can be calculated by simply counting the number of black nodes in the path to the root.
+
+
+The following code is found in <i>illustrations/11_red_black_tree/2_red_black_tree</i>
+```bash
+cd $stla/illustrations/11_red_black_tree/2_red_black_tree
+```
+
+```bash
+make
+```
 
 ```bash
 $ ./test_data_structure ABC
