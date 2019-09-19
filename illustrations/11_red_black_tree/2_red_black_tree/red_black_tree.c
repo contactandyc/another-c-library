@@ -80,7 +80,7 @@ static int get_black_height(node_t *n) {
 }
 
 static char *get_printed_key(stla_pool_t *pool, node_t *n ) {
-  return stla_pool_strdupf(pool, "%c%d", n->key, get_black_height(n));
+  return stla_pool_strdupf(pool, "%c%d%s", n->key, get_black_height(n), n->color == BLACK ? "" : "r");
 }
 
 static void copy_tree(stla_pool_t *pool, node_t *node,

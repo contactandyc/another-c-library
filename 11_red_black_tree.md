@@ -153,12 +153,4 @@ My additional rules for clarification which are based upon the first 5 rules.
 
 ## Building an intuition for how red black trees work
 
-To begin, let's look at a few red black trees.  If you can follow
-
-<div style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;background-color: blue">
-$ ./test_data_structure ABC<br/>
-Creating red_black_tree for ABC<br/>
-B1<br/>
-| \\<br/>
-<span style="color: red">A1<span> C1<br/>
-</div>
+To begin, let's look at a few red black trees.  Markdown doesn't support printing color in code blocks, so the red nodes are not colored.  In order to accommodate, red nodes are suffixed with an r.
