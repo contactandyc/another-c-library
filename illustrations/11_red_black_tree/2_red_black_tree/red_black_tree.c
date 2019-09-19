@@ -296,22 +296,25 @@ node_t *node_next_to_erase(node_t *n) {
 }
 
 /*
- Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
+Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 
 1. Each node is either red or black.
 2. The root is black. This rule is sometimes omitted. Since the root can always
-   be changed from red to black, but not necessarily vice versa, this rule has
-   little effect on analysis.
+  be changed from red to black, but not necessarily vice versa, this rule has
+  little effect on analysis.
 3. All leaves (NIL) are black.
 4. If a node is red, then both its children are black.
 5. Every path from a given node to any of its descendant NIL nodes contains the
-   same number of black nodes.
+  same number of black nodes.
 
 My additional rules for clarification which are based upon the first 5 rules.
-6. If a node has one child, it must be red
-7. The parent of a red node must be black
-8. The black height of any leaf node must be the same (another way of stating 5)
- */
+- If a node has one child, the child must be red
+- If a node has two children, the children may be black or red
+- The parent of a red node must be black
+- The black height of any leaf node must be the same (another way of stating 5)
+- A red black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.
+- A red black tree has a worst case of a 2logN depth, but is likely to maintain a logN depth or be very close to it.
+*/
 
 int count_black_nodes(node_t *n) {
   int black_nodes = 0;

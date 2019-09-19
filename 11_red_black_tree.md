@@ -130,7 +130,7 @@ The leaf nodes are the nodes which don't have children.  In the example above, a
 
 A balanced binary search tree is useful in that you are guaranteed that finding a node will take O(logN) time where N is the number of elements in the tree.  A binary search tree that isn't balanced has a worst case of O(N) time.  This isn't a big deal if you have 5-10 nodes, but if you have 1 million nodes, a balanced binary search tree will take at most 21 operations.  If the tree is not balanced, it might take 1 million operations!  You will often see logN used in describing how long an algorithm takes.  The base of log in this case is 2 (since computers think in terms of 0s and 1s or powers of 2).
 
-## Building an intuition for how red black trees work
+## The properties of a red black tree
 
 Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 
@@ -151,4 +151,4 @@ My additional rules for clarification which are based upon the first 5 rules.
 - A red black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.
 - A red black tree has a worst case of a 2logN depth, but is likely to maintain a logN depth or be very close to it.
 
-### Black height
+## Building an intuition for how red black trees work
