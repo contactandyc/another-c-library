@@ -421,3 +421,22 @@ A->right = tmp;
 ```
 
 Notice that the change is literally to swap the words left and right.
+
+During most of the rotations, you will also need to swap colors.
+```c
+void rotate_right_and_swap_colors(node_t *A, node_t **root) {
+  size_t tmp = A->color;
+  A->color = A->left->color;
+  A->left->color = tmp;
+  rotate_right(A, root);
+}
+
+void rotate_left_and_swap_colors(node_t *A, node_t **root) {
+  size_t tmp = A->color;
+  A->color = A->right->color;
+  A->right->color = tmp;
+  rotate_left(A, root);
+}
+```
+
+These functions swap colors and then do the rotation.
