@@ -490,11 +490,11 @@ void red_black_insert(node_t *node, node_t **root) {
     node is a leaf node.  The red black tree always initially paints the
     given node red.
   */
-  node->color = RED;
   node->left = node->right = NULL;
+  node->color = RED;
   node_t *parent, *grandparent, *uncle;
 
-  while (1) {
+  while (true) {
     parent = node->parent;
     if(!parent) {
       /* if the node is the root node, color it black */

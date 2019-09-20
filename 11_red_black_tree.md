@@ -443,4 +443,224 @@ void rotate_left_and_swap_colors(node_t *A, node_t **root) {
 
 These functions swap colors and then do the rotation.
 
+The red black tree functions in many ways similar to the binary search tree.  Iterating and finding are exactly the same.  Erasing and inserting are done in virtually the same way, except once an item is inserted or erased, the color must be fixed.  The difference between the binary search tree and red black tree node_insert is shown below.
+
+binary_search_tree.c
+```c
+bool node_insert(node_t *node_to_insert, node_t **root) {
+  node_t **n = root, *parent = NULL;
+  while (*n) {
+    parent = *n;
+    if (node_to_insert->key < parent->key)
+      n = &(parent->left);
+    else if (node_to_insert->key > parent->key)
+      n = &(parent->right);
+    else
+      return false;
+  }
+
+  node_to_insert->parent = parent;
+  node_to_insert->left = node_to_insert->right = NULL;
+  *n = node_to_insert;
+  return true;
+}
+```
+
+red_black_tree.c
+```c
+void red_black_insert(node_t *node, node_t **root);
+
+bool node_insert(node_t *node_to_insert, node_t **root) {
+  node_t **n = root, *parent = NULL;
+  while (*n) {
+    parent = *n;
+    if (node_to_insert->key < parent->key)
+      n = &(parent->left);
+    else if (node_to_insert->key > parent->key)
+      n = &(parent->right);
+    else
+      return false;
+  }
+
+  node_to_insert->parent = parent;
+  *n = node_to_insert;
+  red_black_insert(node_to_insert, root);
+  return true;
+}
+```
+
+The difference is..
+
+binary_search_tree.c
+```c
+node_to_insert->left = node_to_insert->right = NULL;
+```
+
+red_black_tree.c
+```c
+void red_black_insert(node_t *node, node_t **root);
+...
+red_black_insert(node_to_insert, root);
+```
+
+
+The red_black_insert sets the left and right pointers to NULL at the top of the function (so this part is similar).
+
+It is assumed that node is linked into its proper parent and that the node is a leaf node.  The red black tree always initially paints the given node red.
+```c
+void red_black_insert(node_t *node, node_t **root) {
+  node->left = node->right = NULL;
+  node->color = RED;
+```
+
+The insert operation will need to look at the parent, the grandparent, and the uncle (the sibling of the parent).  Declare these variables for later use.
+```c
+  node_t *parent, *grandparent, *uncle;
+```
+
+The red black tree insert may need to recurse.  Many recursion problems (this one included) can be written as a loop.  The loop will continue forever until a break is called.  
+```c
+while (true) {
+  parent = node->parent;
+```
+At this point in the code, the node is always red.
+
+The first check is to see if the given node is the root node.  If the node doesn't have a parent, it is a root node.  Root nodes are colored black and then we are done (break out of the while loop).    
+```c
+  if(!parent) {
+    node->parent = NULL;
+    node->color = BLACK;
+    break;
+  }
+```
+
+If the parent is black we are done as having a red leaf following a black parent is always valid.
+```c
+  if(parent->color == BLACK)
+    break;
+```
+
+The parent is valid and it must be red (as it must be red or black and it was determined to not be black in the last block of code).  It is a violation of the red black tree to have two red nodes in a row.  Get the grandparent (the parent's parent).
+```c
+  grandparent = parent->parent;
+```
+
+The red black tree insert operation consider's the node's uncle's color.  The uncle would be the grandparent's other child.  If the grandparent->left == parent, then the uncle is the right node.  Otherwise, the uncle is the left node.  The else block is a mirror of the if block, switching every instance of left with right.
+```c
+  if(grandparent->left == parent) {
+    uncle = grandparent->right;
+    ...
+  }
+  else {
+    uncle = grandparent->left;
+    ...
+  }
+```
+
+The next case to test is if the uncle exists and the uncle's color is red.  At this point the parent and the uncle are both red.  The red black tree needs to maintain a constant black height.
+
+```
+           A
+         /   \
+        B     C
+      /   \
+     d     e
+    /
+   n
+```
+
+Prior to inserting node (n) which is red, notice that the leaf nodes d, e, and C all have a black height of 2 meaning that there are only 2 black nodes in the path from the root to each of the leaf nodes.  If you recolor d and e black and change B to be red, it doesn't change the black height of any of the leaf nodes.
+
+```
+           A
+         /   \
+        b     C
+      /   \
+     D     E
+    /
+   n
+```
+
+Notice that in this case, the recoloring created a valid red black tree.  The black height is 2 to every leaf node.  The root is black.  There are not two red nodes in a row.  In the one case where a node only has a single child, the child is red.
+
+To recap, if the parent and uncle are red, paint the parent and uncle black and the grandparent red.  It's possible that the grandparent's parent was also red.  To handle this case, we can repeat all of the tests recursively (since the recursion is simple, continuing in a while loop works by changing the node to the grandparent - which was painted red to maintain the rule that the loop always starts with a red node).
+
+```c
+  if(grandparent->left == parent) {
+    uncle = grandparent->right;
+    if(uncle && uncle->color == RED) {
+      grandparent->color = RED;
+      parent->color = uncle->color = BLACK;
+      node = grandparent;
+      continue;
+    }
+```
+
+The last case is if the uncle is black or NULL, then rotate to the right around the grandparent.  Notice that while swapping colors during the rotate, that the placement of the black node doesn't change. This maintains the proper black height.
+```
+           A
+         /   \
+        B     C
+      /
+     d
+    /
+   n
+```
+
+becomes
+```
+         A
+       /   \
+      D     C
+    /   \
+   n     b
+```
+using a right rotation around the grandparent (B).
+
+If n was the right child of the parent, then do an extra left rotation to make the tree look like the case above before doing the right rotation (there's no need for color swapping because they're both red).
+
+```c
+           A
+         /   \
+        B     C
+      /
+     d
+      \
+       n
+```
+
+becomes
+```
+           A
+         /   \
+        B     C
+      /
+     n
+    /
+   d
+```
+
+through a left rotation around the parent (d) and then with a right rotation it ultimately becomes.
+```
+           A
+         /   \
+        N     C
+      /   \
+     d     b
+```
+
+using a right rotation around the grandparent (B).
+
+```c
+  if(parent->right == node)
+    rotate_left(parent, NULL);
+  rotate_right_and_swap_colors(grandparent, root);
+  break;
+```
+
+As stated before the else block is where the parent is the right child and the uncle is the left child.  All of the logic is reversed (left is swapped for right).
+
+
+
+
 [Table of Contents](README.md)  - Copyright 2019 Andy Curtis
