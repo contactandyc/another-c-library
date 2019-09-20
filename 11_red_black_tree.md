@@ -751,9 +751,9 @@ becomes
          / \    =>   /
         B   N       B
 ```
-    Imagine if we removing N, then B would be the only child of A so B must be red which would cause the rest of the tree to not necessarily maintain a constant black height.  Instead of changing B to red, A is marked double black and then the color is fixed.
+        Imagine if we removing N, then B would be the only child of A so B must be red which would cause the rest of the tree to not necessarily maintain a constant black height.  Instead of changing B to red, A is marked double black and then the color is fixed.
 
-    To erase a node in a binary tree when a node has two children, you must find the successor.  The successor is defined as the leftmost node to the right child.  One reasonably obvious feature of choosing the successor to replace the node to erase is that it will not have a left child.  This makes the replacement easy in as much as you can link the node to erase's left child to the successor without having to worry about it's previous left child (since it doesn't have one).  This presents four scenarios (numbered 4a, 4b, 5a, 5b).
+        To erase a node in a binary tree when a node has two children, you must find the successor.  The successor is defined as the leftmost node to the right child.  One reasonably obvious feature of choosing the successor to replace the node to erase is that it will not have a left child.  This makes the replacement easy in as much as you can link the node to erase's left child to the successor without having to worry about it's previous left child (since it doesn't have one).  This presents four scenarios (numbered 4a, 4b, 5a, 5b).
 
    4.  If the right child of the node doesn't have a left child, then the
        right child is the successor.  In this case, the successor is promoted
