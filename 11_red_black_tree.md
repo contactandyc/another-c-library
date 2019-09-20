@@ -740,26 +740,19 @@ Because of the complexity of this, I'm writing out the rules first.
     Br
 ```
 
-becomes
+&nbsp; &nbsp; &nbsp; &nbsp;becomes
 ```bash
   B
 ```
 
-3. If the node has no children or the node has two black children, then unlink the node from it's parent.  If the node itself was black, this causes the parent to be double-black and requires that the color be fixed.  A node is considered double-black if in the process of removing the node, you lose the ability to maintain a constant black height.  In the process of removing a node, there will be at most one double-black node, so that node can be fixed through rotations and recoloring (to be discussed in a bit).
+3. If the node has no children or the node has two black children, then unlink the node from it's parent.  If the node itself was black, this causes the parent to be double-black and requires that the color be fixed.  A node is considered double-black if in the process of removing the node, you lose the ability to maintain a constant black height.  In the process of removing a node, there will be at most one double-black node, so that node can be fixed through rotations and recoloring (to be discussed in a bit). Imagine if we removing N, then B would be the only child of A so B must be red which would cause the rest of the tree to not necessarily maintain a constant black height.  Instead of changing B to red, A is marked double black and then the color needs to be fixed.
 ```bash
           A           A (double-black)
          / \    =>   /
         B   N       B
 ```
-        Imagine if we removing N, then B would be the only child of A so B must be red which would cause the rest of the tree to not necessarily maintain a constant black height.  Instead of changing B to red, A is marked double black and then the color is fixed.
 
-        To erase a node in a binary tree when a node has two children, you must find the successor.  The successor is defined as the leftmost node to the right child.  One reasonably obvious feature of choosing the successor to replace the node to erase is that it will not have a left child.  This makes the replacement easy in as much as you can link the node to erase's left child to the successor without having to worry about it's previous left child (since it doesn't have one).  This presents four scenarios (numbered 4a, 4b, 5a, 5b).
-
-   4.  If the right child of the node doesn't have a left child, then the
-       right child is the successor.  In this case, the successor is promoted
-       it's parent (the node to erase).  The color of the successor and the
-       node to erase are swapped (so during the swap if the node to erase was
-       red, then the successor will become red and vice versa).
+4.  To erase a node in a binary tree when the node to erase has two children, you must find the successor.  The successor is defined as the leftmost node to the right child.  One reasonably obvious feature of choosing the successor to replace the node to erase is that it will not have a left child.  This makes the replacement easy in as much as you can link the node to erase's left child to the successor without having to worry about it's previous left child (since it doesn't have one).  This presents four scenarios (lettered a, b, c, and d).  The first two scenarios happen if the right child of the node doesn't have a left child, then the right child is the successor.  In this case, the successor is promoted its parent (the node to erase).  The color of the successor and the node to erase are swapped (so during the swap if the node to erase was red, then the successor will become red and vice versa).
 
        a) If there is a right child to the successor, then the successor must
           be black (because the right child is an only child and must be red).
@@ -843,6 +836,8 @@ becomes
        N
 
        again resulting in a black node being removed, so N must be fixed.
+
+
 
    5.  If the right child of the node does have a left child, traverse the
        left nodes until a node without a left node is found.  This is the
