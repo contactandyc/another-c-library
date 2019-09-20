@@ -391,23 +391,6 @@ void node_test(stla_pool_t *pool, node_t *root) {
   }
 }
 
-static inline void _swap_nodes(node_t *dest,
-                               node_t *src,
-                               node_t **root) {
-  node_t *parent = src->parent;
-  if(parent) {
-    if(parent->left == src)
-      parent->left = dest;
-    else
-      parent->right = dest;
-    dest->parent = parent;
-  }
-  else {
-    dest->parent = NULL;
-    *root = dest;
-  }
-}
-
 /*
 rotate_right
 A
@@ -440,7 +423,18 @@ A's left child's parent becomes A
 
 void rotate_left(node_t *A, node_t **root) {
   node_t *new_root = A->right;
-  _swap_nodes(new_root, A, root);
+  node_t *parent = A->parent;
+  if(parent) {
+    if(parent->left == A)
+      parent->left = new_root;
+    else
+      parent->right = new_root;
+    new_root->parent = parent;
+  }
+  else {
+    new_root->parent = NULL;
+    *root = new_root;
+  }
 
   node_t *tmp = new_root->left;
   new_root->left = A;
@@ -453,7 +447,18 @@ void rotate_left(node_t *A, node_t **root) {
 
 void rotate_right(node_t *A, node_t **root) {
   node_t *new_root = A->left;
-  _swap_nodes(new_root, A, root);
+  node_t *parent = A->parent;
+  if(parent) {
+    if(parent->left == A)
+      parent->left = new_root;
+    else
+      parent->right = new_root;
+    new_root->parent = parent;
+  }
+  else {
+    new_root->parent = NULL;
+    *root = new_root;
+  }
 
   node_t *tmp = new_root->right;
   new_root->right = A;
@@ -712,8 +717,8 @@ void node_fix_color(node_t *parent, node_t *node, node_t **root) {
   }
 }
 
-
-void link_child_to_parent(node_t *child, node_t *node, node_t *parent, node_t **root ) {
+static inline void replace_node_with_child(node_t *child, node_t *node, node_t **root ) {
+  node_t *parent = node->parent;
   if(parent) {
     if(parent->left == node)
       parent->left = child;
@@ -729,14 +734,13 @@ void link_child_to_parent(node_t *child, node_t *node, node_t *parent, node_t **
 }
 
 bool node_erase(node_t *node, node_t **root) {
-  // node_print(*root);
-  node_t *parent = node->parent;
   if(!node->left) {
-    if(node->right) { /* 2. node has one red right child */
-      link_child_to_parent(node->right, node, parent, root);
+    if(node->right) { /* node has one right child */
+      replace_node_with_child(node->right, node, root);
     }
-    else { /* 3. node has no children, parent becomes double black if node is black */
-      if(parent) {
+    else { /* node has no children, unlink from parent */
+      if(node->parent) {
+        node_t *parent = node->parent;
         if(parent->left == node)
           parent->left = NULL;
         else
@@ -744,32 +748,23 @@ bool node_erase(node_t *node, node_t **root) {
         if(node->color == BLACK)
           node_fix_color(parent, NULL, root);
       }
-      else { /* 1.  no children, no parent, tree is now empty */
+      else { /* no children, no parent, tree is now empty */
         *root = NULL;
       }
     }
-  } else if(!node->right) { /* 2. node has one red left child */
-    link_child_to_parent(node->left, node, parent, root );
+  } else if(!node->right) { /* node has one left child */
+    replace_node_with_child(node->left, node, root );
   } else { /* node has left and right child */
-    /* swap the successor with the current node maintaining the color of the
-       current node in the successor.  The successor will only have a right
-       child or no child at all.  If the successor only has a right child, then
-       this will be similar to 1 (if successor is to the right of the current
-       node, then only paint the successor's right child black and swap the
-       current node with the successor).  Otherwise, if the successor is black,
-       the successor's previous parent will become double black. If the successor
-       is to the right of the current node */
-
     node_t *successor = node->right;
-    if(!successor->left) {
-      node_t tmp = *successor;
-      link_child_to_parent(successor, node, parent, root);
+    if(!successor->left) { /* successor is to the right of node */
+      size_t color = successor->color;
+      replace_node_with_child(successor, node, root);
       successor->left = node->left;
       successor->left->parent = successor;
-      if(successor->right) // 4a
+      if(successor->right)
         successor->right->color = BLACK;
-      else { // 4b
-        if(tmp.color == BLACK)
+      else {
+        if(color == BLACK)
           node_fix_color(successor, NULL, root);
       }
     }
@@ -777,32 +772,39 @@ bool node_erase(node_t *node, node_t **root) {
       while(successor->left)
         successor = successor->left;
 
-      if(successor->right) { // 5a
-        link_child_to_parent(successor->right, successor, successor->parent, root);
+      if(successor->right) { /* successor is to the left of the right child
+                                of node and has a right child */
+        /* successor's parent must link to successor on the left */
+        successor->parent->left = successor->right;
+        successor->right->parent = successor->parent;
 
-        /* Replace node with successor (left, right, parent, color) */
-        link_child_to_parent(successor, node, parent, root);
+        /* replace node with successor */
+        replace_node_with_child(successor, node, root);
         successor->left = node->left;
         successor->left->parent = successor;
         successor->right = node->right;
         successor->right->parent = successor;
       }
-      else { // 5b
-        node_t tmp = *successor;
+      else {
+        /* unlink successor from its parent */
+        node_t *tmp = successor->parent;
+        if(tmp->left == successor)
+          tmp->left = NULL;
+        else
+          tmp->right = NULL;
+        if(successor->color == RED)
+          tmp = NULL;
+        size_t color = successor->color;
 
-        link_child_to_parent(successor, node, parent, root);
+        /* replace node with successor */
+        replace_node_with_child(successor, node, root);
         successor->left = node->left;
         successor->left->parent = successor;
         successor->right = node->right;
         successor->right->parent = successor;
 
-        parent = tmp.parent;
-        if(parent->left == successor)
-          parent->left = NULL;
-        else
-          parent->right = NULL;
-        if(tmp.color == BLACK)
-          node_fix_color(parent, NULL, root);
+        if(color == BLACK)
+          node_fix_color(tmp, NULL, root);
       }
     }
   }

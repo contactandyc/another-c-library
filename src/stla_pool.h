@@ -40,6 +40,12 @@ stla_pool_t *_stla_pool_init(size_t size);
   will be freed. */
 void stla_pool_clear(stla_pool_t *h);
 
+/*
+stla_pool_checkpoint_t *stla_get_checkpoint(stla_pool_t *pool);
+
+void stla_pool_clear_to(stla_pool_t *h, stla_pool_checkpoint_t *cp);
+*/
+
 /* stla_pool_destroy frees up all memory associated with the pool object */
 void stla_pool_destroy(stla_pool_t *h);
 

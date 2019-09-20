@@ -727,6 +727,8 @@ To recap
 
 ## Erase
 
+
+
 Erasing nodes in a red black tree is more complex than insertion.  In writing this and trying to visualize what is happening, I needed to keep reminding myself of the importance of maintaining black height and to a lesser extent the other rules (particularly that a node with only one child must have a red child).
 
 Because of the complexity of this, I'm writing out the rules first.

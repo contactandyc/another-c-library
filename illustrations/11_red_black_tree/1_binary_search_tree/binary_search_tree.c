@@ -237,58 +237,79 @@ void node_print(stla_pool_t *pool, node_t *root) {
   }
 }
 
-bool node_erase(node_t *node_to_erase, node_t **root) {
-  if (node_to_erase->left) {
-    if (node_to_erase->right) {
-      // case 3
-      node_t *next = node_next(node_to_erase);
-      node_erase(next, root);
-      next->left = node_to_erase->left;
-      next->right = node_to_erase->right;
-      next->parent = node_to_erase->parent;
-      if (next->left)
-        next->left->parent = next;
-      if (next->right)
-        next->right->parent = next;
-      if (!next->parent)
-        *root = next;
-      else {
-        if (next->parent->left == node_to_erase)
-          next->parent->left = next;
-        else
-          next->parent->right = next;
-      }
-    } else {
-      // case 2
-      node_to_erase->left->parent = node_to_erase->parent;
-      if (node_to_erase->parent) {
-        if (node_to_erase->parent->left == node_to_erase)
-          node_to_erase->parent->left = node_to_erase->left;
-        else
-          node_to_erase->parent->right = node_to_erase->left;
-      } else
-        *root = node_to_erase->left;
+static inline void replace_node_with_child(node_t *child, node_t *node, node_t **root ) {
+  node_t *parent = node->parent;
+  if(parent) {
+    if(parent->left == node)
+      parent->left = child;
+    else
+      parent->right = child;
+  }
+  else
+    *root = child;
+  if(child)
+    child->parent = parent;
+}
+
+bool node_erase(node_t *node, node_t **root) {
+  if(!node->left) {
+    if(node->right) { /* node has one right child */
+      replace_node_with_child(node->right, node, root);
     }
-  } else if (node_to_erase->right) {
-    // case 2
-    node_to_erase->right->parent = node_to_erase->parent;
-    if (node_to_erase->parent) {
-      if (node_to_erase->parent->left == node_to_erase) {
-        node_to_erase->parent->left = node_to_erase->right;
-      } else {
-        node_to_erase->parent->right = node_to_erase->right;
+    else { /* node has no children, unlink from parent */
+      if(node->parent) {
+        node_t *parent = node->parent;
+        if(parent->left == node)
+          parent->left = NULL;
+        else
+          parent->right = NULL;
       }
-    } else
-      *root = node_to_erase->right;
-  } else {
-    // case 1
-    if (node_to_erase->parent) {
-      if (node_to_erase->parent->left == node_to_erase)
-        node_to_erase->parent->left = NULL;
-      else
-        node_to_erase->parent->right = NULL;
-    } else
-      *root = NULL;
+      else { /* no children, no parent, tree is now empty */
+        *root = NULL;
+      }
+    }
+  } else if(!node->right) { /* node has one left child */
+    replace_node_with_child(node->left, node, root );
+  } else { /* node has left and right child */
+    node_t *successor = node->right;
+    if(!successor->left) { /* successor is to the right of node */
+      replace_node_with_child(successor, node, root);
+      successor->left = node->left;
+      successor->left->parent = successor;
+    }
+    else {
+      while(successor->left)
+        successor = successor->left;
+
+      if(successor->right) { /* successor is to the left of the right child
+                                of node and has a right child */
+        /* successor's parent must link to successor on the left */
+        successor->parent->left = successor->right;
+        successor->right->parent = successor->parent;
+
+        /* replace node with successor */
+        replace_node_with_child(successor, node, root);
+        successor->left = node->left;
+        successor->left->parent = successor;
+        successor->right = node->right;
+        successor->right->parent = successor;
+      }
+      else {
+        /* unlink successor from its parent */
+        node_t *tmp = successor->parent;
+        if(tmp->left == successor)
+          tmp->left = NULL;
+        else
+          tmp->right = NULL;
+
+        /* replace node with successor */
+        replace_node_with_child(successor, node, root);
+        successor->left = node->left;
+        successor->left->parent = successor;
+        successor->right = node->right;
+        successor->right->parent = successor;
+      }
+    }
   }
   return true;
 }
