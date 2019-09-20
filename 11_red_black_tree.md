@@ -443,6 +443,8 @@ void rotate_left_and_swap_colors(node_t *A, node_t **root) {
 
 These functions swap colors and then do the rotation.
 
+## Insert
+
 The red black tree functions in many ways similar to the binary search tree.  Iterating and finding are exactly the same.  Erasing and inserting are done in virtually the same way, except once an item is inserted or erased, the color must be fixed.  The difference between the binary search tree and red black tree node_insert is shown below.
 
 binary_search_tree.c
@@ -503,6 +505,56 @@ void red_black_insert(node_t *node, node_t **root);
 red_black_insert(node_to_insert, root);
 ```
 
+The red_black_insert method in red_black_tree.c
+```c
+void red_black_insert(node_t *node, node_t **root) {
+  node->left = node->right = NULL;
+  node->color = RED;
+  node_t *parent, *grandparent, *uncle;
+
+  while (true) {
+    parent = node->parent;
+    if(!parent) {
+      node->parent = NULL;
+      node->color = BLACK;
+      break;
+    }
+
+    if(parent->color == BLACK)
+      break;
+
+    grandparent = parent->parent;
+    if(grandparent->left == parent) {
+      uncle = grandparent->right;
+      if(uncle && uncle->color == RED) {
+        grandparent->color = RED;
+        parent->color = uncle->color = BLACK;
+        node = grandparent;
+        continue;
+      }
+
+      if(parent->right == node)
+        rotate_left(parent, NULL);
+      rotate_right_and_swap_colors(grandparent, root);
+      break;
+    }
+    else {
+      uncle = grandparent->left;
+      if(uncle && uncle->color == RED) {
+        grandparent->color = RED;
+        parent->color = uncle->color = BLACK;
+        node = grandparent;
+        continue;
+      }
+
+      if(parent->left == node)
+        rotate_right(parent, NULL);
+      rotate_left_and_swap_colors(grandparent, root);
+      break;
+    }
+  }
+}
+```
 
 The red_black_insert sets the left and right pointers to NULL at the top of the function (so this part is similar).
 
@@ -560,25 +612,25 @@ The red black tree insert operation consider's the node's uncle's color.  The un
 The next case to test is if the uncle exists and the uncle's color is red.  At this point the parent and the uncle are both red.  The red black tree needs to maintain a constant black height.
 
 ```
-           A
+           F
          /   \
-        B     C
+        D     G
       /   \
-     d     e
+     Br    Er
     /
-   n
+   Ar
 ```
 
-Prior to inserting node (n) which is red, notice that the leaf nodes d, e, and C all have a black height of 2 meaning that there are only 2 black nodes in the path from the root to each of the leaf nodes.  If you recolor d and e black and change B to be red, it doesn't change the black height of any of the leaf nodes.
+Prior to inserting node Ar which is red, notice that the leaf nodes Br, Er, and G all have a black height of 2 meaning that there are only 2 black nodes in the path from the root to each of the leaf nodes.  If you recolor Br and Er black and change B to be red, it doesn't change the black height of any of the leaf nodes.
 
 ```
-           A
+           F
          /   \
-        b     C
+        Dr    G
       /   \
-     D     E
+     B     E
     /
-   n
+   Ar
 ```
 
 Notice that in this case, the recoloring created a valid red black tree.  The black height is 2 to every leaf node.  The root is black.  There are not two red nodes in a row.  In the one case where a node only has a single child, the child is red.
@@ -596,61 +648,60 @@ To recap, if the parent and uncle are red, paint the parent and uncle black and 
     }
 ```
 
-The last case is if the uncle is black or NULL, then rotate to the right around the grandparent.  Notice that while swapping colors during the rotate, that the placement of the black node doesn't change. This maintains the proper black height.
+The next case is if the uncle is black or NULL, then rotate to the right around the grandparent.  Notice that while swapping colors during the rotate, that the placement of the black node doesn't change. This maintains the proper black height.
+
+Do a right rotation on D to the following
 ```
-           A
+           F
          /   \
-        B     C
-      /
-     d
+        D     G
+      /  
+     Br  
     /
-   n
+   Ar
+```
+
+to become
+```
+           F
+         /   \
+        B     G
+      /  \
+     Ar   Dr
+```
+
+If Br was the right child of the parent (Ar), then do an extra left rotation on Ar to make the tree look like the case above before doing the right rotation (there's no need for color swapping because they're both red).
+```
+           F
+         /   \
+        D     G
+      /  
+     Ar  
+       \
+        Br
 ```
 
 becomes
 ```
-         A
-       /   \
-      D     C
-    /   \
-   n     b
-```
-using a right rotation around the grandparent (B).
-
-If n was the right child of the parent, then do an extra left rotation to make the tree look like the case above before doing the right rotation (there's no need for color swapping because they're both red).
-
-```c
-           A
+           F
          /   \
-        B     C
-      /
-     d
-      \
-       n
-```
-
-becomes
-```
-           A
-         /   \
-        B     C
-      /
-     n
+        D     G
+      /  
+     Br  
     /
-   d
+   Ar
 ```
 
-through a left rotation around the parent (d) and then with a right rotation it ultimately becomes.
+which is the case we had before, so we can do a right rotation on D to become
 ```
-           A
+           F
          /   \
-        N     C
-      /   \
-     d     b
+        B     G
+      /  \
+     Ar   Dr
 ```
 
-using a right rotation around the grandparent (B).
-
+The code looks like the following
 ```c
   if(parent->right == node)
     rotate_left(parent, NULL);
@@ -659,6 +710,216 @@ using a right rotation around the grandparent (B).
 ```
 
 As stated before the else block is where the parent is the right child and the uncle is the left child.  All of the logic is reversed (left is swapped for right).
+
+To recap
+
+1. Link a node into the tree just like you would with a binary search tree
+2. Paint the node red
+3. Start a loop
+4. If the node doesn't have a parent, paint the node black and return
+5. If the node's parent is black, return
+6. If the node's uncle is not NULL and it is red
+   a. paint the parent and the uncle black
+   b. paint the grandparent red
+   c. set the node to be the grandparent and continue in loop (3)
+7. If the node is on the same side of the parent as the uncle is to the grandparent, rotate away from the uncle around the parent.
+8. Rotate towards the uncle around the grandparent, swap colors with the parent and the grandparent, and return.
+
+## Erase
+
+Erasing nodes in a red black tree is more complex than insertion.  In writing this and trying to visualize what is happening, I needed to keep reminding myself of the importance of maintaining black height and to a lesser extent the other rules (particularly that a node with only one child must have a red child).
+
+Because of the complexity of this, I'm writing out the rules first.
+
+1. If the node has no children and no parent, then this is the last node in the tree and *root is set to NULL.
+2. If a node has a single child, then that child must be red and the given node to erase must be black.  This is the simplest case in that you only need to swap the red child of the node to erase with the node to erase by linking the red child to the node to erase's parent.  To maintain the black height, the red child's color will change to black.
+
+```bash
+  A
+   \
+    Br
+```
+
+becomes
+```bash
+  B
+```
+
+3. If the node has no children or the node has two black children, then unlink the node from it's parent.  If the node itself was black, this causes the parent to be double-black and requires that the color be fixed.  A node is considered double-black if in the process of removing the node, you lose the ability to maintain a constant black height.  In the process of removing a node, there will be at most one double-black node, so that node can be fixed through rotations and recoloring (to be discussed in a bit).
+```bash
+          A           A (double-black)
+         / \    =>   /
+        B   N       B
+```
+Imagine if we removing N, then B would be the only child of A so B must be red which would cause the rest of the tree to not necessarily maintain a constant black height.  Instead of changing B to red, A is marked double black and then the color is fixed.
+
+   To erase a node in a binary tree when a node has two children, you must
+   find the successor.  The successor is defined as the leftmost node to the
+   right child.  One reasonably obvious feature of choosing the successor to
+   replace the node to erase is that it will not have a left child.  This
+   makes the replacement easy in as much as you can link the node to erase's
+   left child to the successor without having to worry about it's previous
+   left child (since it doesn't have one).  This presents four scenarios
+   (numbered 4a, 4b, 5a, 5b).
+
+   4.  If the right child of the node doesn't have a left child, then the
+       right child is the successor.  In this case, the successor is promoted
+       it's parent (the node to erase).  The color of the successor and the
+       node to erase are swapped (so during the swap if the node to erase was
+       red, then the successor will become red and vice versa).
+
+       a) If there is a right child to the successor, then the successor must
+          be black (because the right child is an only child and must be red).
+
+        N
+         \
+          S
+           \
+            sR (successor right child)
+
+        becomes
+
+        S
+         \
+          SR
+
+        The other case here is that the node to erase is red.  In this case,
+        the following happens.
+
+        n
+         \
+          S
+           \
+            sR (successor right child)
+
+        becomes
+
+        s
+         \
+          SR
+
+        In both cases, the black height is maintained.  In both cases,
+        color is maintained at the given tree height.  The top node stays
+        the color that it was and the successor's right child becomes black.
+
+
+       N
+        \
+         s
+
+       becomes
+
+       S
+
+       N
+        \
+         s
+          \
+           sR (successor right child)
+
+       becomes
+
+       S
+        \
+         SR
+
+       In both cases, black height is maintained.
+
+       b) If the node to erase is red and the successor does not have a right
+       child, the successor becomes double-black and needs fixed as we have
+       lost one black node in the tree.
+
+       n
+        \
+         S
+
+       becomes
+
+       n
+
+       with a black node being removed, so n must be fixed.
+
+       If the node to erase was black, the following would happen.
+
+       N
+        \
+         S
+
+       becomes
+
+       N
+
+       again resulting in a black node being removed, so N must be fixed.
+
+   5.  If the right child of the node does have a left child, traverse the
+       left nodes until a node without a left node is found.  This is the
+       successor.  The successor will have at most one right child which
+       will be red by definition (because any single child is red).
+
+       a) The successor has a right child.  In this case, the successor is
+       removed from the tree like case 2 above by simply linking the leaf
+       node (successor's right child to the successor's parent).  Once this
+       is done, the successor will replace the node to erase.  It will take on
+       the node to erase's left, right, parent, and color, and link the nodes
+       to the left, right, and parent to the successor node instead of the
+       node to erase.
+
+           N (or n)
+            \
+             A
+            /
+           B
+          /
+         C
+          \
+           d
+
+        becomes
+
+            N (or n)
+             \
+              A
+             /
+            B
+           /
+          D
+
+        with C removed
+
+        The C and N or n are swapped.
+
+           C (or c)
+            \
+             A
+            /
+           B
+          /
+         D
+
+        b) The successor does not have a right child (or any children).  If C
+        is black, then the black height will change when C is taken out and
+        put in place of N.
+
+            N (or n)
+             \
+              A
+             /
+            B
+           /
+          C
+
+        becomes
+            C (or c)
+             \
+              A
+             /
+            B
+
+        B is double-black and needs fixed since C was black.  If C was red,
+        then B will be black and okay.  The removal of C from B is like
+        case 3 above where fixing the parent node (B) is necessary if B's
+        child (C) is black.
+*/
 
 
 
