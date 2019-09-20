@@ -81,18 +81,18 @@ int main( int argc, char *argv[] ) {
 
 C has a few built-in data types:
 
-Data Type | Description
----|---|---
-char | a single byte
-short | two bytes
-int | four bytes
-long | typically eight bytes
-size_t | on a 64-bit system, 8 bytes (or 64 bits), on a 32-bit system, 4 bytes (or 32 bits)
-ssize_t | signed size_t
-bool | can be different sizes, but only has two states (true and false)
-float | four-byte decimal (I try to avoid this type as it quickly loses precision)
-double | eight-byte decimal
-void | this does not have a size and is a special type
+| Data Type | Description |
+|---|---|
+| char | a single byte |
+| short | two bytes |
+| int | four bytes |
+| long | typically eight bytes |
+| size_t | on a 64-bit system, 8 bytes (or 64 bits), on a 32-bit system, 4 bytes (or 32 bits) |
+| ssize_t | signed size_t |
+| bool | can be different sizes, but only has two states (true and false) |
+| float | four-byte decimal (I try to avoid this type as it quickly loses precision) |
+| double | eight-byte decimal |
+| void | this does not have a size and is a special type |
 
 A byte represents 8 bits.  The range of 1 bit would be 0-1, two bits 0-3, etc. For 8 bits, the range is 0-255.  The short has a range of 0-((256*256)-1) or 0-65535.  C counts from 0 (all bits off) instead of 1.  Types can be signed (the default) or unsigned.  If the data type is unsigned, the number range will start with zero.  Otherwise, the number range will be between -(2^(number of bits-1)) and (2^(number of bits-1))-1.  A signed char will range from -128 to 127.  A signed char and a char are the same things.
 
@@ -252,14 +252,16 @@ while(<condition>) {
 
 It is essential to recognize the difference between comparisons and conditions.  A condition can be true or false.  Comparisons require two objects and can evaluate to true or false.  In most (every?) computer language, loops and if logic will use conditions as opposed to comparisons.  Comparisons are a subset of conditions.  In C, true is non-zero, and false is zero.
 
-This would never do_something.
+The following would never do_something:
+
 ```c
 while(0) {
   do_something;
 }
 ```
 
-This would never stop executing do_something.
+The following would never stop executing do_something:
+
 ```c
 while(1) {
   do_something;
@@ -272,7 +274,7 @@ while(*p != 0)
   p++;
 ```
 
-Pointers are declared using an asterisk.  The value of what the pointer is pointing at is obtained through a process called dereferencing which is done by placing an asterisk before the pointer.  The first time through this loop, assuming that s pointed to "Test", p would be pointing at a value T.  *p would result in the single character 'T'.  In C, single characters are defined in single quotes.  Longer strings are defined in double quotes.  
+Pointers are declared using an asterisk. Pointers point at values obtained through a process called dereferencing. Dereferencing occurs when an asterisk precedes the pointer. The first time through this loop, assuming that s pointed to "Test", p would be pointing at a value T.  *p would result in the single character 'T'.  In C, single characters are defined in single quotes.  Longer strings are defined in double-quotes.  
 
 ```c
 while(*p != 0) /* first time *p == 'T', condition is true ('T' != 0) */
@@ -290,9 +292,10 @@ while(*p != 0) /* fourth time *p == 's', condition is true ('s' != 0) */
 while(*p != 0) /* fifth time *p == 0, so condition is no longer true */
 ```
 
-At this point, p points to just passed the letter s and has been advanced 4 times so the length is 4.
+At this point, p points to just passed the letter s and advanced 4 times, so the length is 4.
 
-It is common for developers to use int as a return type, however it is generally more efficient and less bug prone to use size_t.  In order for a 64 bit CPU to work with an int, it must split a register since the CPU is meant to work with 64 bit integers.  This split isn't cheap.  In addition, if you use size_t or (ssize_t for signed numbers), the program will be more portable to 64 bit systems where a string might be longer than 2 billion bytes.  A better implementation of strlen might look like the following.  The only difference is that the strlen returns a type size_t.  Strings can't be negative in length, so returning an unsigned number also helps people using the function to understand that.
+It is common for developers to use `int` as a return type. However, it is generally more efficient and less bug-prone to use `size_t`.  In order for a 64 bit CPU to work with an `int`, it must split a register since the CPU is meant to work with 64-bit integers.  This split is not cheap.  Additionally, if you use `size_t` or (`ssize_t` for signed numbers), the program will be more portable to 64-bit systems where a string might be longer than 2 billion bytes.  A better implementation of `strlen` might look like the following.  The only difference is that the `strlen` returns a type `size_t`.  Strings cannot be negative in length, so returning an unsigned number also helps people using the function to understand that.
+
 ```c
 size_t strlen(char *s) {
   char *p = s;
@@ -302,7 +305,8 @@ size_t strlen(char *s) {
 }
 ```
 
-C allows for variables to be declared as constant meaning that they can't change.  This is particularly useful in functions as the function can indicate that the input will not change.  In the above example, the string is not modified in determining the length.  Adding const will indicate to the user (and compiler) that what s points to will not be changed.
+C allows for variables to be declared as constant meaning that they cannot change.  Constants are particularly useful in functions because the function can indicate that the input will not change.  Above, the string remains unmodified while determining the length.  Adding `const` will indicate to the user (and compiler) that what s points to will not be changed.
+
 ```c
 size_t strlen(const char *s) {
   const char *p = s; // p must also be declared with const
@@ -312,35 +316,38 @@ size_t strlen(const char *s) {
 }
 ```
 
-Another minor optimization to the function above is to look at the while loop.  while expects a condition.
+Another minor optimization to the function above is to look at the while loop. The while loop expects a condition.
 
 ```c
 while(*p != 0)
 ```
 
-can be changed to
+can be changed to:
+
 ```c
 while(*p)
 ```
 
-As the check for 0 is redundant.  It doesn't hurt anything to add the != 0 and sometimes it makes code easier to read.
+because the check for 0 is redundant.  It doesn't hurt anything to add the != 0, and sometimes it makes code easier to read.
 
 ## The void type
 
-A function with a return type of void means that the function doesn't expect to return anything. An example might be...
+A function with a return type of void means that the function does not expect to return anything. An example might be:
+
 ```c
 void print_hello(const char *name) {
   printf("Hello %s\n", name);
 }
 ```
 
-This function prints something to the screen and doesn't return anything.
+This function prints something to the screen and does not return anything.
 
-A void pointer (void *) is a special type of pointer that must be cast to another type before it can be used.  
+A void pointer: `void *`, is a special type of pointer that must be cast to another type before implementation.
 
-Before describing the void pointer, I want to show an example of casting pointers...
+Before describing the void pointer, I want to show an example of casting pointers.
 
-The following would produce a warning.
+The following would produce a warning:
+
 ```c
 size_t strlen(const char *s) {
   char *p = s;
@@ -351,12 +358,12 @@ size_t strlen(const char *s) {
 warning: initializing 'char *' with an expression of type 'const char *' discards qualifiers
 ```
 
-To avoid such a warning, you can either change the type of p to const char * or you can cast s to char *.
+To avoid such a warning, either change the type of p to `const char *` or cast s to `char *`
 ```c
 char *p = (char *)s;
 ```
 
-Imagine you have a function which will print the value of variables of different types such as the following.
+Imagine you have a function that will print the value of variables of different types such as the following.
 
 Code found in <i>illustrations/2_timing/1_timer</i>
 
@@ -449,9 +456,9 @@ unsigned long type: 500000
 double type (with 4 decimal places): 1.5000
 ```
 
-In the program above, the void pointer can't actually be used directly.  It must be converted to a different pointer type before the value that the pointer is pointing at can be referenced.  
+In the program above, the void pointer cannot actually be used directly.  It must be converted to a different pointer type before the value that the pointer is pointing at can be referenced.  
 
-The program above introduced <i>if</i>, <i>else if</i>, and the & operator.  If statements have a similar syntax as the while statement.  
+The program above introduced `if`, `else if`, and the `&` operator.  If statements have a similar syntax as the while statement.  
 
 ```
 if(<condition>) {
@@ -467,22 +474,24 @@ else {
 
 The curly braces are not needed if there is exactly one statement.
 
-else if works in connection with if.  else if only happens if the if (or else if statements abpve it) have not been evaluated to equal a true condition.  Finally, else doesn't expect a condition and essentially becomes the default block to run if all other conditions were evaluated to be false.  It's also important to realize the difference between = and ==.  A single equal statement is used for assignment.  A double equal statement indicates an equality test.
 
-In code below, p was of type void *.  It must be converted before it can be dereferenced (to get the value of what p is pointing at).
+`else if` works in connection with `if`.  `else if` only happens if the if (or else if statements above it) have not been evaluated to equal a true condition.  Finally, else does not expect a condition and essentially becomes the default block to run if all other conditions were evaluated to be false.  It is also essential to realize the difference between = and ==.  A single equal statement is used for assignment.  A double equal statement indicates an equality test.
+
+In code below, p was of type `void *`.  It must be converted before it can be dereferenced (to get the value of what p is pointing at).
+
 ```c
 unsigned char *vp = (unsigned char *)p;
 printf( "unsigned char type: %u\n", *vp );
 ```
 
-The code above can be shortened to...
+The code above can be shortened to:
 ```c
 printf( "unsigned char type: %u\n", *(unsigned char *)p );
 ```
 
-You will find the above shortening often.  I used the two line version to make what was happening clear.
+You will find the above shortening often.  I used the two-line version to make what was happening clear.
+Placing an asterisk before a pointer results in getting the value of what the pointer is pointing at.  Placing an ampersand before a value results in a pointer to the value.  For example:
 
-Placing an asterisk before a pointer results in getting the value of what the pointer is pointing at.  Placing an ampersand before a value results in a pointer to the value.  For example...
 ```c
 double a = 1.5;
 double *p = &a;  // p points to the value 1.5
@@ -490,7 +499,8 @@ double *p = &a;  // p points to the value 1.5
 
 ## What happens during compilation
 
-In C, your code is converted to binary (which is generally very hard for humans to read).  C doesn't use line separation to separate code (except for compiler directives (lines that start with #)).  In C, there are two types of comments.  /* */ can be multiline comments.  // comments run to the end of the line.  The first thing a compiler does is remove comments.
+In C, code converts to binary (which is generally very hard for humans to read).  C does not use line separation to separate code (except for compiler directives (lines that start with #)).  In C, there are two types of comments.  /* */ can be multiline comments.  // comments run to the end of the line.  The first thing a compiler does is remove comments.
+
 
 ```c
 #include <stdio.h>

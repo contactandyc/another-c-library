@@ -1,6 +1,6 @@
 # A quick word about licensing
 
-Throughout this book, the following notice at the top of most of the files.
+Throughout this book, the following notice will appear at the top of most of the files.
 
 Copyright 2019 Andy Curtis
 
