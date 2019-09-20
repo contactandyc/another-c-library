@@ -551,7 +551,7 @@ If you look at the above code, you should be able to see that functions follow t
 <return type> <function name>([arguments]){[statements]}
 ```
 
-Semicolons form natural breaks.  If the loop (while) only has one statement, it doesn't need curly braces.  Let's slowly introduce space back into the code above.
+Semicolons form natural breaks.  If the while loop only has one statement, it does not need curly braces.  Lets slowly introduce space back into the code above.
 
 ```c
 #include <stdio.h>
@@ -648,9 +648,9 @@ int main(int argc, char *argv[]){
 }
 ```
 
-The syntax is important for the C compiler to understand where one statement ends and the next one starts.  All of the above examples compile and will work the same.  The last example is easier to read.  C doesn't force you to make the code easy to read.  It is just a very good idea to do so!
+The syntax is necessary for the C compiler to understand where one statement ends and the next starts.  All of the above examples compile and will work the same.  The last example is easier to read.  C does not force you to make the code easy to read.  It is just an excellent idea to do so!
 
-There are different types of loops in C.  The for loop is defined as follows.
+There are different types of loops in C.  The following defines the `for` loop:
 
 ```c
 for( [initialization_code]; [condition]; [post_loop code] ) {
@@ -658,7 +658,7 @@ for( [initialization_code]; [condition]; [post_loop code] ) {
 }
 ```
 
-There are 3 components of the for loop.  The initialization_code, condition, and post_loop code.  Notice that they are enclosed in [] instead of <>.  This is a standard way of indicating that the bit of code is optional.
+There are three components of the `for` loop: the initialization_code, condition, and post_loop code.  Notice the enclosure in square brackets `[]` instead of lesser/greater than signs `<>`.  Square brackets indicate the bit of code is optional.
 
 If there is no initialization_code, condition, or post_loop code, the for loop will continue forever.  The following example would print the string "Hello World!" followed by a new line character continuously forever (or until the program was stopped).
 ```c
@@ -672,15 +672,14 @@ This code will loop through the arguments skipping the name of the program (as i
 for( int i=1; i<argc; i++ ) {
 ```
 
-The example is going to reverse strings a number of times and time the process.  The arguments that are passed into your program should not be modified by the program.  If you wish to modify an argument, you should first allocate memory for your program to use and then copy the argument into the newly allocated memory.  The malloc function will allocate the number of bytes requested for use.  You can read about it by typing "man malloc" from the command line.  Programs which need extra memory to work with must request that memory from the operating system.  malloc is one of the core ways that that is done.  Memory requested should later be freed using the <i>free</i> call.  The malloc function can return NULL meaning that the memory was not available.  Trying to writing to a pointer which is pointing at NULL will cause your program to crash.  You can check for the error or just allow the program to not so gracefully crash.  In my examples, I'm going to simply allow the program to crash if NULL is returned.  The only other reasonable option would be to have the program fail early which effectively is the same thing.  In the example below, there are a few functions called.  The early writers of C decided to shorten the names of the funtions.
-
+The example is going to reverse strings several times while timing the process.  The program should not modify the arguments that are passed into your program.  If you wish to modify an argument, you should first allocate memory for your program to use and then copy the argument into the newly allocated memory.  The `malloc` function will allocate the number of bytes requested for use.  You can read about it by typing `man malloc` from the command line.  Programs that require extra memory to work with must request that memory from the operating system.  `malloc` is one of the core ways to complete this.  Memory requested should later be freed using the `free` call.  The `malloc` function can return `NULL` meaning that the memory was not available.  Trying to writing to a pointer that is pointing at NULL will cause your program to crash.  You can check for the error or just allow the program not so gracefully to crash.  In my examples, I am going to allow the program to crash if `NULL` is returned.  The only other reasonable option would be to have the program fail early, which effectively is the same thing.  In the example below, there are a few functions called.  The early writers of C decided to shorten the names of the funtions.
 ```
 malloc - memory allocate
 strlen - string length
 strcpy - string copy
 ```
 
-Once s is pointing at newly allocated memory which is the string length of argv[i] + 1 for the zero terminator (the current iteration of the loop), a string copy of the argument is performed so that s points to a copy of the given argument.
+Once s is pointing at newly allocated memory which is the string length of `argv[i] + 1` for the zero terminator (the current iteration of the loop), a string copy of the argument is performed, so that s points to a copy of the given argument.
 
 ```c
 for( int i=1; i<argc; i++ ) {
@@ -691,7 +690,7 @@ for( int i=1; i<argc; i++ ) {
   free(s);
 ```
 
-At the beginning of the program there were a few #include statements.  #include effectively copies the contents of the filename into the current program.  In order to use functions like malloc, strcpy, and free, the proper file must be included.  Files with a suffix ".h" are called header files and typically define how to call a function.  
+At the beginning of the program, there were a few `#include` statements.  `#include` effectively copies the contents of the filename into the current program.  In order to use functions like `malloc`, `strcpy`, and `free`, the proper file must be included.  Files with a suffix ".h" are called header files and typically define how to call a function.  
 
 ```c
 #include <stdio.h>
@@ -701,13 +700,15 @@ At the beginning of the program there were a few #include statements.  #include 
 #include <time.h>
 ```
 
-The include's were chosen because of the following functions that are called within the program.
-```
-stdio.h -> printf, NULL, and many other io related functions
-stdlib.h -> malloc, free, and many other standard library related functions
-string.h -> strlen, strcpy, and many other string related functions
-sys/time.h -> gettimeofday
-time.h -> sometimes an alternate location of gettimeofday
+I include the include statements above because of the following function calls:
+
+| Function | Description |
+|---|---|
+| stdio.h | printf, NULL, and many other io related functions |
+| stdlib.h | malloc, free, and many other standard library related functions |
+| string.h | strlen, strcpy, and many other string related functions |
+| sys/time.h | gettimeofday |
+| time.h | sometimes an alternate location of gettimeofday |
 ```
 
 This program is going to time how long the reverse string method takes to run.  To get the amount of time that something takes, one might get a start time and an end time and then subtract the start time from the end time.  The following function will get the time in microseconds (millionths of seconds).  Passing NULL to gettimeofday will cause gettimeofday to return the current time.  The timeval structure consists of two members (the number of seconds and the number of microseconds).  
@@ -719,9 +720,9 @@ long get_time() {
 }
 ```
 
-A quick note on using parenthesis.  I strongly believe in making code easier to read.  Technically, I could have skipped the parenthesis without harm due to order of operations, but the code becomes easier to read by adding the parenthesis.
+A quick note on using parenthesis:  I strongly believe in making code easier to read.  Technically, I could have skipped the parenthesis without harm due to the order of operations, but the code becomes simpler to read by adding the parenthesis.
 
-Reversing a string takes an extremely small amount of time.  It's so small that in order to accurately measure it, you need to repeat the test a million times to make a good measurement.  In each loop, the strcpy resets s such that it has a copy of the ith argument so that it can be reversed.  The time that the process takes is test_t2 - test_t1.  
+Reversing a string takes a minimal amount of time.  It is so small that in order to accurately measure it, you need to repeat the test a million times to make a good step.  In each loop, the `strcpy` resets s such that it has a copy of the ith argument so that it can be reversed.  The time that the process takes is `test_t2 - test_t1`.  
 ```c
 int repeat_test = 1000000;
 ...
@@ -735,7 +736,7 @@ long time_spent = test_t2-test_t1;
 overall_time += time_spent;
 ```
 
-After timing the reverse_string call, printf is used to print the string on the terminal before it was reversed and the new form of the string (s).  Printf allows for format specifiers to match arguments after the first parameter (also known as the format string).  %s indicates that there must be a string for the given argument.  %0.4f expects a floating point number and prints 4 decimal places.  test_t2 and test_t1 are both measured in microseconds.  Multiplying the difference by 1000 will change the unit type to nanoseconds.  Since the test was repeated 1 million times, the overall time needs divided by 1 million.  By multiplying or dividing a number by a decimal, it converts the type to a decimal.
+After timing the reverse_string call, printf is used to print the string on the terminal before it was reversed and the new form of the string (s).  Printf allows for format specifiers to match arguments after the first parameter (also known as the format string).  `%s` indicates that there must be a string for the given argument.  `%0.4f` expects a floating point number and prints 4 decimal places.  test_t2 and test_t1 are both measured in microseconds.  Multiplying the difference by 1000 will change the unit type to nanoseconds.  Since the test was repeated 1 million times, the overall time needs to be divided by 1 million.  By multiplying or dividing a number by a decimal, it converts the type to a decimal.
 
 ```c
     printf("%s => %s\n", argv[i], s);
@@ -762,17 +763,16 @@ void reverse_string( char *s ) {
 
 The above code works in the following way.
 ```
-1.  set a pointer e to the last character in the string.  This is found by
-    determining the length of the string s and pointing to the length-1
-    char beyond s.
+1.  set a pointer e to the last character in the string.  The last character
+    is found by determining the length of the string s and pointing to the
+    length-1 char beyond s.
 2.  while s is less than e
       swap the value that is pointed to by s and e.
       advance s by one and decrement e by one.
 ```
 
-Imagine the string "Reverse".  The strlen or length of "Reverse" is 7 because
-if you were to subtract the pointer just after the string from the pointer that
-points to the beginning of the string, you will get 7.
+Imagine the string "Reverse".  The `strlen` or length of "Reverse" is 7. Subtracting the pointer just after the string from the pointer that points to the beginning of the string, equals 7.
+
 ```
 01234567
 Reverse
@@ -863,17 +863,18 @@ When you run
 make
 ```
 
-The first block with a colon will be run.  In this Makefile, it is the following line.
+The first block with a colon will run.  In this Makefile, it is the following line:
 ```Makefile
 all: test_timer examples
 ```
 
-The all group simply refers to other groups to be built.  In this case it is test_timer and examples.
+The all group refers to other groups to be built.  In this case, it is test_timer and examples.
+
 ```Makefile
 test_timer: test_timer.c
 	gcc test_timer.c -o test_timer
 
-examples:
+Examples:
 	./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
 ```
 
@@ -882,19 +883,20 @@ The lines of code after test_timer will run if the file called test_timer is old
 gcc test_timer.c -o test_timer
 ```
 
-If you didn't want to use a Makefile to build test_timer, you could do so from the command line using the following command.
+If you did not want to use a Makefile to build test_timer, you could do so from the command line using the following command.
 
 ```bash
 gcc test_timer.c -o test_timer
 ```
 
-The examples block will run everytime because it doesn't have any dependencies and examples isn't a file that exists.  If you were to create a file called examples, then the examples block would cease to run.  By running <b>make</b>, you will effectively build test_timer if it needs built and run the examples block.  Running <b>make clean</b> will clean up the binary.  You can run any block by specifying it.  <b>make all</b> is equivalent to running <b>make</b>.  If you just want to run the examples block, you can by running <b>make examples</b>.  
+The examples block will run every time because it does not have any dependencies, and examples are not a file that exists.  If you were to create a file called examples, then the examples block would cease to run.  By running `make`, you will effectively build test_timer if it needs to build and run the examples block.  Running  `make clean` will clean up the binary.  You can run any block by specifying it. `make all` is equivalent to running `make`.  If you just want to run the examples block, you can by running `make examples`.  
 
 # Doing a better job of timing
 
-In the last section, we explored how to time the reverse_string function.  In this section, we will explore how to better time the function.  One thing you may have noticed is that there is a million calls to both reverse_string and strcpy.  There is also the overhead of the loop.  To do the timing properly, we should have timed the strcpy and the loop and subtracted that from the loop which has the reverse_string function called.
+In the last section, we explored how to time the reverse_string function.  In this section, we will explore how to time the function better.  One thing you may have noticed is that there are a million calls to both `reverse_string` and `strcpy`.  There is also the overhead of the loop.  To do the timing correctly, we should have timed the `strcpy` and the loop and subtracted that from the loop which has the reverse_string function called.
 
-The timing for the work in <i>illustrations/2_timing/2_timer</i> was...
+The timing for the work in <i>illustrations/2_timing/2_timer</i> was:
+
 ```bash
 $ make
 gcc test_timer.c -o test_timer
@@ -919,7 +921,7 @@ time_spent: 13.7250ns
 overall time_spent: 49.6200ns
 ```
 
-Running make yields a 17.5 nanosecond improvement.  The difference between 1_timer and 2_timer can be found by running...
+Running `make` yields a 17.5 nanosecond improvement.  The following test demonstrates the difference between 1_timer and 2_timer:
 
 ```bash
 $ diff test_timer.c ../1_timer/test_timer.c
