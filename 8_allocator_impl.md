@@ -1,4 +1,6 @@
-# The Allocator Implementation
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+
+# The Global Allocator Implementation
 
 Implementing the allocator is rather involved and uses much of what you've learned in the prior chapters.  Understanding every implementation isn't necessary to use the standard template library alternative, but it should be help you to understand how to code or to improve it should you desire to.
 
@@ -156,4 +158,6 @@ int done;
 
 # To Be Continued
 
-# Continue to build the [pool](9_pool.md) object!
+# [The Pool Object](9_pool.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis

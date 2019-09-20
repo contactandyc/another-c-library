@@ -1,5 +1,6 @@
-# The Allocator
-## A global allocation strategy
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+
+# The Global Allocator Object
 
 A quick note about C allocation methods...
 
@@ -596,3 +597,5 @@ grep -rn stla_timer .
 stla_timer can be replaced with a function name or another object name (or whatever you want to find).
 
 # Continue to build out the [allocator implementation](8_allocator_impl.md)!
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis

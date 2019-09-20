@@ -1,5 +1,6 @@
-# Timing Code
-## The first project (an introduction to C)
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+
+# Timing Your Code (the first project)
 
 In the project, there is an illustrations folder that contains most of the code.  There is also a src directory where the final code exists.  Normally, one would start with a hello world project. That exists later in a section called Hello Buffer.  If you are lost, hopefully, it will make more sense once you get to the Hello Buffer section. I would recommend reading and working through the examples in this chapter and then coming back after working through Hello Buffer.  The code for this chapter is located in <i>illustrations/2_timing</i>
 
@@ -2530,4 +2531,6 @@ clean:
 
 The difference is that instead of the OBJECTS, HEADER_FILES, and FLAGS variables being specified in the Makefile, they are included by including $(ROOT)/src/Makefile.include.
 
-# Continue to create our second object [Buffer](3_buffer.md)!
+# [The Buffer Object](3_buffer.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis

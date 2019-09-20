@@ -1,4 +1,6 @@
-# Pool
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+
+# The Pool Object
 
 What if our object could keep track of allocations and free memory for us?  This is generally the basis for languages which use garbage collection.  I'm going to illustrate how to build several objects which greatly reduce the number of calls to malloc and free (and reduce the risk that you will have memory leaks).  
 
@@ -320,4 +322,6 @@ A common use case for the pool is to allocate a bunch of times and then clear an
 
 # TO BE CONTINUED
 
-# Continue to work through the [binary search tree](10_binary_search_trees.md)!
+# [Binary Search Trees](10_binary_search_trees.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis

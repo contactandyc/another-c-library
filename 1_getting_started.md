@@ -1,3 +1,5 @@
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+
 # A quick word about licensing
 
 Throughout this book, the following notice will appear at the top of most of the files.
@@ -153,4 +155,6 @@ cd $stla/illustrations/1_getting_started/1_test_setup
 I would highly recommend going through tutorials if you are not familiar with the command line. Understanding the terminal is essential for any programmer. I do not plan on utilizing many terminal related commands but will try to detail the commands that are used.
 
 
-# Continue to [Timing](2_timing.md)!
+# [Timing Your Code (the first project)](2_timing.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
