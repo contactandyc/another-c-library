@@ -1,3 +1,5 @@
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+
 # Binary Search Trees
 
 A binary search tree is similar to a linked list in that nodes are linked together.  The difference is that each node has two children.  The children are generally understood as being left and right where the left is less than the given node and the right is greater.  Trees in computer science generally grow from a root down (unlike trees in nature which grow up from the root).  This is likely due to the fact that in a binary search tree, the root is considered the top of the tree.  In binary search trees, each child node is aware of its parent node.  In the example below, B is aware of D as a parent, A as a left child, and C as a right child.
@@ -1138,4 +1140,6 @@ A quick note on how the stla_pool was useful.  The copy of the tree was construc
 - Printing a binary search tree is largely challenging because of the need to fit in a two dimensional space.  It involves copying the binary tree into a print friendly structure and pushing down nodes that don't fit.
 - The pool can be useful for constructing nodes in a tree, especially if you don't want to worry about deconstructing the tree.
 
-# Continue to work through the [red black tree](11_red_black_tree.md)!
+# [The Red Black Tree](11_red_black_tree.md)
+
+[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
