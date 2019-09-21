@@ -483,6 +483,7 @@ a2 c2
       (d2)      
 
 The above tree is a valid red black tree
+```
 
 type
 ```bash
