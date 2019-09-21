@@ -383,6 +383,7 @@ next->right->parent = next;
 
 How many times will node_erase be called?  Due to how the successor works, it will be exactly one time (because it will be an only child if node_to_erase isn't considered).  I've flipped the cases, so that the easy cases are first.
 
+```c
 bool node_erase(node_t *node, node_t **root) {
   if(!node->left) {
     if(node->right) { /* node has one right child */
@@ -407,6 +408,7 @@ bool node_erase(node_t *node, node_t **root) {
   }
   return true;
 }
+```
 
 The remaining code will find the successor (or the next inorder node).
 1. If the successor is to the right of the node_to_erase, then alter the successor's parent to be the same as the node and link successor's left to the node's left.
@@ -436,7 +438,7 @@ else {
 }
 ```
 
-Our final node_erase looks like
+The final node_erase looks like
 ```c
 static inline void replace_node_with_child(node_t *child, node_t *node, node_t **root ) {
   node_t *parent = node->parent;
