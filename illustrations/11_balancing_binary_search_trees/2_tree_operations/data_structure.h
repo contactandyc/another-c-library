@@ -28,6 +28,7 @@ void node_destroy(node_t *n);
 char node_key(node_t *n);
 void node_print(stla_pool_t *pool, node_t *root);
 
+bool node_red_black_insert(node_t *node_to_insert, node_t **root);
 node_t *tree_copy(stla_pool_t *pool, node_t *root);
 void rotate_left(node_t *A, node_t **root);
 void rotate_right(node_t *A, node_t **root);

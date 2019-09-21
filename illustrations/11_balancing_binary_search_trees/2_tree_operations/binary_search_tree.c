@@ -82,6 +82,75 @@ bool node_insert(node_t *node_to_insert, node_t **root) {
   return true;
 }
 
+void red_black_insert(node_t *node, node_t **root);
+
+bool node_red_black_insert(node_t *node_to_insert, node_t **root) {
+  node_t **n = root, *parent = NULL;
+  while (*n) {
+    parent = *n;
+    if (node_to_insert->key < parent->key)
+      n = &(parent->left);
+    else if (node_to_insert->key > parent->key)
+      n = &(parent->right);
+    else
+      return false;
+  }
+
+  node_to_insert->parent = parent;
+  node_to_insert->left = node_to_insert->right = NULL;
+  *n = node_to_insert;
+  red_black_insert(node_to_insert, root);
+  return true;
+}
+
+
+void red_black_insert(node_t *node, node_t **root) {
+  node->color = RED;
+  node_t *parent, *grandparent, *uncle;
+
+  while (true) {
+    parent = node->parent;
+    if(!parent) {
+      node->parent = NULL;
+      node->color = BLACK;
+      break;
+    }
+
+    if(parent->color == BLACK)
+      break;
+
+    grandparent = parent->parent;
+    if(grandparent->left == parent) {
+      uncle = grandparent->right;
+      if(uncle && uncle->color == RED) {
+        grandparent->color = RED;
+        parent->color = uncle->color = BLACK;
+        node = grandparent;
+        continue;
+      }
+      if(parent->right == node)
+        rotate_left(parent, NULL);
+      rotate_right(grandparent, root);
+      break;
+    }
+    else {
+      uncle = grandparent->left;
+      if(uncle && uncle->color == RED) {
+        grandparent->color = RED;
+        parent->color = uncle->color = BLACK;
+        node = grandparent;
+        continue;
+      }
+      if(parent->left == node)
+        rotate_right(parent, NULL);
+      rotate_left(grandparent, root);
+      break;
+    }
+  }
+}
+
+
+
 
 void rotate_left(node_t *A, node_t **root) {
   node_t *new_root = A->right;
@@ -277,7 +346,7 @@ static node_print_item_t *find_left_parent_with_right_child( node_print_item_t *
                                                              int *depth ) {
   while(item->parent && (item->parent->right == item || !item->parent->right)) {
     *depth += item->depth;
-    item = item->parent;
+    item = item ->parent;
   }
   *depth += item->depth;
   return item->parent;

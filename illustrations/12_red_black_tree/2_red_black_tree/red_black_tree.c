@@ -484,7 +484,6 @@ void rotate_left_and_swap_colors(node_t *A, node_t **root) {
 }
 
 void red_black_insert(node_t *node, node_t **root) {
-  node->left = node->right = NULL;
   node->color = RED;
   node_t *parent, *grandparent, *uncle;
 

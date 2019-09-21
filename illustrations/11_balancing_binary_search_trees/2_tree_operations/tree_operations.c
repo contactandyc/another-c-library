@@ -36,7 +36,7 @@ node_t *fill_data_structure(stla_pool_t *pool, const char *arg) {
   while (*s != 0) {
     if (!node_find(*s, root)) {
       node_t *n = node_init(pool, *s);
-      if (!node_insert(n, &root)) {
+      if (!node_red_black_insert(n, &root)) {
         printf("Find failed for %c and insert failed as well!\n", *s);
         abort();
       }
@@ -363,9 +363,11 @@ void do_tagline() {
   printf( "(i)nsert, (e)rase, (r)ight_rotate, (l)eft_rotate, (R)ed, (b)lack, re(c)olor, (h)elp, (q)uit\n");
 }
 
-void tree_operations(stla_pool_t *pool) {
-  node_t *root = NULL;
+void tree_operations(stla_pool_t *pool, char *args) {
+  node_t *root = args ? fill_data_structure(pool, args) : NULL;
   post_good_tree(pool, root);
+  if(root)
+    node_print(pool, root);
   char str[1000];
   do_tagline();
   while(fgets(str, 999, stdin) != NULL) {
@@ -410,9 +412,33 @@ void tree_operations(stla_pool_t *pool) {
   printf("\n");
 }
 
+char *get_valid_characters(const char *p) {
+	char *res = strdup(p);
+	char *wp = res;
+	char *s;
+	while(*p != 0) {
+		if(valid_char(*p)) {
+			s = res;
+			while(s < wp) {
+				if(*p == *s)
+					break;
+				s++;
+			}
+			if(s == wp)
+				*wp++ = *p;
+		}
+		p++;
+	}
+	*wp = 0;
+	return res;
+}
+
 int main(int argc, char *argv[]) {
+  char *arg = argc > 1 ? get_valid_characters(argv[1]) : NULL;
   stla_pool_t *pool = stla_pool_init(1024);
-  tree_operations(pool);
+  tree_operations(pool, arg);
   stla_pool_destroy(pool);
+  if(arg)
+    free(arg);
   return 0;
 }

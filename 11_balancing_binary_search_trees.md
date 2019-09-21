@@ -644,4 +644,68 @@ b2
 The above tree is a valid red black tree
 ```
 
+I'll reference this tool in the explanation of the red black tree that comes next.  Hopefully, the red black tree will make more sense as we've already seen how much of it works.
+
+The tool (tree_operations) can also start with a valid red black tree which you can modify by specifying a sequence of characters in the order which you wish the characters to be inserted.
+
+```bash
+$ ./tree_operations ABC
+B1
+| \
+|  (C1)
+|      
+(A1)
+```
+
+```bash
+$ ./tree_operations ABCD
+B1
+| \
+A2 C2
+     \
+      (D2)
+```
+
+```bash
+$ ./tree_operations BADC
+B1
+| \
+A2 D2
+   |
+   (C2)
+```
+
+```bash
+$ ./tree_operations ABCDEFGHIJKLMNOPQRSTUVWXYZ
+H1
+| \
+|  P2
+|  | \
+|  |  (T2)
+|  |  |   \
+|  |  R3   V3
+|  |  | \  | \
+|  |  Q4 | U4 (X3)
+|  |     |    |   \
+|  |     S4   W4   Y4
+|  |                 \
+|  (L2)               (Z4)
+|  |   \                  
+|  J3   N3
+|  | \  | \
+|  I4 | M4 O4
+|     |      
+D2    K4
+| \     
+|  F3
+|  | \
+|  E4 G4
+|       
+B3
+| \
+A4 C4
+```
+
+Once the tool is loaded, you can insert or erase nodes and try and figure out how to make it work like a red black tree again.
+
 [Table of Contents](README.md)  - Copyright 2019 Andy Curtis
