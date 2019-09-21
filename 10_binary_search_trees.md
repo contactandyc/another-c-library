@@ -356,15 +356,17 @@ else
 
 gets replaced with
 ```c
-node_t *parent = node_to_erase->parent;
-if(parent) {
-  if(parent->left == node)
-    parent->left = NULL;
+else {
+  node_t *parent = node_to_erase->parent;
+  if(parent) {
+    if(parent->left == node)
+      parent->left = NULL;
+    else
+      parent->right = NULL;
+  }
   else
-    parent->right = NULL;
+    *root = NULL;
 }
-else
-  *root = NULL;
 ```
 
 Recursion isn't always a bad thing, but it can make code harder to follow.  The remaining code in the node_erase method is ...
@@ -379,7 +381,7 @@ next->left->parent = next;
 next->right->parent = next;
 ```
 
-How many times will node_erase be called?  Due to how the successor works, it will be exactly one time.  
+How many times will node_erase be called?  Due to how the successor works, it will be exactly one time (because it will be an only child if node_to_erase isn't considered).  I've flipped the cases, so that the easy cases are first.
 
 bool node_erase(node_t *node, node_t **root) {
   if(!node->left) {
