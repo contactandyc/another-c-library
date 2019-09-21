@@ -19,22 +19,35 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 
-struct node_s {
-  struct node_s *parent;
-  struct node_s *left;
-  struct node_s *right;
-  char key;
-};
-
-node_t *node_init(char key) {
-  node_t *n = (node_t *)stla_malloc(sizeof(node_t));
+node_t *node_init(stla_pool_t *pool, char key) {
+  node_t *n = (node_t *)stla_pool_alloc(pool, sizeof(node_t));
   n->left = n->right = n->parent = NULL;
   n->key = key;
+  n->color = BLACK;
   return n;
 }
 
+static void _tree_copy(stla_pool_t *pool, node_t *node, node_t **res, node_t *parent ) {
+  if(node) {
+    node_t *copy = (node_t *)stla_pool_alloc(pool, sizeof(node_t));
+    *res = copy;
+    *copy = *node;
+    copy->parent = parent;
+    _tree_copy(pool, node->left, &copy->left, copy);
+    _tree_copy(pool, node->right, &copy->right, copy);
+  }
+  else
+    *res = NULL;
+}
+
+node_t *tree_copy(stla_pool_t *pool, node_t *root) {
+  node_t *res = NULL;
+  _tree_copy(pool, root, &res, NULL );
+  return res;
+}
+
 void node_destroy(node_t *n) {
-  stla_free(n);
+  // stla_free(n);
 }
 
 char node_key(node_t *n) { return n->key; }
@@ -70,34 +83,200 @@ bool node_insert(node_t *node_to_insert, node_t **root) {
 }
 
 
+void rotate_left(node_t *A, node_t **root) {
+  node_t *new_root = A->right;
+  size_t tmp_color = A->color;
+  A->color = new_root->color;
+  new_root->color = tmp_color;
+  node_t *parent = A->parent;
+  if(parent) {
+    if(parent->left == A)
+      parent->left = new_root;
+    else
+      parent->right = new_root;
+    new_root->parent = parent;
+  }
+  else {
+    new_root->parent = NULL;
+    *root = new_root;
+  }
 
-typedef struct node_print_item_s {
-  size_t position;
-  char *printed_key;
-  size_t length;
-  int depth;
-  struct node_print_item_s *parent;
-  struct node_print_item_s *left, *right;
-} node_print_item_t;
+  node_t *tmp = new_root->left;
+  new_root->left = A;
+  A->parent = new_root;
 
-static int get_depth(node_t *n) {
+  A->right = tmp;
+  if(tmp)
+    tmp->parent = A;
+}
+
+void rotate_right(node_t *A, node_t **root) {
+  node_t *new_root = A->left;
+  size_t tmp_color = A->color;
+  A->color = new_root->color;
+  new_root->color = tmp_color;
+
+  node_t *parent = A->parent;
+  if(parent) {
+    if(parent->left == A)
+      parent->left = new_root;
+    else
+      parent->right = new_root;
+    new_root->parent = parent;
+  }
+  else {
+    new_root->parent = NULL;
+    *root = new_root;
+  }
+
+  node_t *tmp = new_root->right;
+  new_root->right = A;
+  A->parent = new_root;
+
+  A->left = tmp;
+  if(tmp)
+    tmp->parent = A;
+}
+
+void replace_node(node_t *replacement, node_t *node_to_replace, node_t **root) {
+  node_erase(replacement, root);
+  node_t *parent = node_to_replace->parent;
+  if(parent) {
+    if(parent->left == node_to_replace)
+      parent->left = replacement;
+    else
+      parent->right = replacement;
+  }
+  else
+    *root = replacement;
+  replacement->parent = parent;
+  replacement->left = node_to_replace->left;
+  if(replacement->left)
+    replacement->left->parent = replacement;
+  replacement->right = node_to_replace->right;
+  if(replacement->right)
+    replacement->right->parent = replacement;
+}
+
+void color_node_red( node_t *node ) {
+  node->color = RED;
+}
+
+void color_node_black( node_t *node ) {
+  node->color = BLACK;
+}
+
+void recolor( node_t *n ) {
+  if(n->color == BLACK && n->left && n->left->color == RED && n->right && n->right->color == RED) {
+    n->color = RED;
+    n->left->color = n->right->color = BLACK;
+  }
+  else {
+    printf( "Node not elegible for recoloring\n" );
+  }
+}
+
+static int get_black_height(node_t *n) {
   int depth = 0;
   while (n) {
-    depth++;
+    if(n->color == BLACK)
+      depth++;
     n = n->parent;
   }
   return depth;
 }
 
 static char *get_printed_key(stla_pool_t *pool, node_t *n ) {
-  // return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
-  int r=rand() % 15;
-  char *res = (char *)stla_pool_ualloc(pool, r+4);
-  for( int i=0; i<=r; i++ )
-    res[i] = n->key;
-  sprintf(res+r+1, "%d", get_depth(n));
-  return res;
+  return stla_pool_strdupf(pool, "%s%c%d%s", n->color == BLACK ? "" : "(",
+                           n->key, get_black_height(n),
+                           n->color == BLACK ? "" : ")");
 }
+
+void print_node_with_color(node_t *n) {
+  printf( "%s%c%d%s", n->color == BLACK ? "" : "\x1B[31m(", n->key, get_black_height(n), n->color == BLACK ? "" : ")\x1B[0m");
+}
+
+int count_black_nodes(node_t *n) {
+  int black_nodes = 0;
+  while(n) {
+    if(n->color == BLACK)
+      black_nodes++;
+    n = n->parent;
+  }
+  return black_nodes;
+}
+
+bool test_red_black_rules(stla_pool_t *pool, node_t *root) {
+  /* an empty tree is valid */
+  if(!root)
+    return true;
+  bool success = true;
+  /* the root is black */
+  if(root->color != BLACK) {
+    success = false;
+    printf( "The root is not black!\n" );
+  }
+  node_t *n = node_first(root);
+  int black_nodes = 0;
+  node_t *first_black_leaf = NULL;
+  while(n) {
+    /* check if one child and that child is red */
+    if(n->left && !n->right && n->left->color != RED) {
+      success = false;
+      print_node_with_color(n);
+      printf( " has one left child and it isn't red\n" );
+    }
+    if(!n->left && n->right && n->right->color != RED) {
+      success = false;
+      print_node_with_color(n);
+      printf( " has one right child and it isn't red\n" );
+    }
+    if(n->color == RED) {
+      if(n->left && n->left->color == RED) {
+        success = false;
+        print_node_with_color(n);
+        printf( " has a red left child and is red\n" );
+      }
+      if(n->right && n->right->color == RED) {
+        success = false;
+        print_node_with_color(n);
+        printf( " has a red right child and is red\n" );
+      }
+      if(n->parent && n->parent->color == RED) {
+        success = false;
+        print_node_with_color(n);
+        printf( " has a red parent and is red\n" );
+      }
+    }
+    if(!n->left && !n->right) { /* only consider leaf nodes */
+      int black_nodes2 = count_black_nodes(n);
+      if(!black_nodes) {
+        black_nodes = black_nodes2;
+        first_black_leaf = n;
+      }
+      if(black_nodes != black_nodes2) {
+        success = false;
+        print_node_with_color(n);
+        printf( " has a different black height than " );
+        print_node_with_color(first_black_leaf);
+        printf( "\n");
+      }
+    }
+    n = node_next(n);
+  }
+  return success;
+}
+
+
+typedef struct node_print_item_s {
+  size_t position;
+  char *printed_key;
+  size_t length;
+  bool black;
+  int depth;
+  struct node_print_item_s *parent;
+  struct node_print_item_s *left, *right;
+} node_print_item_t;
 
 static void copy_tree(stla_pool_t *pool, node_t *node,
                       node_print_item_t **res, node_print_item_t *parent ) {
@@ -107,6 +286,7 @@ static void copy_tree(stla_pool_t *pool, node_t *node,
   copy->printed_key = get_printed_key(pool, node);
   copy->length = strlen(copy->printed_key);
   copy->position = parent ? ((parent->left == copy) ? parent->position : parent->position + parent->length + 1) : 0;
+  copy->black = node->color == BLACK ? true : false;
   copy->depth = 1;
   copy->left = NULL;
   copy->right = NULL;
@@ -202,7 +382,7 @@ void node_print(stla_pool_t *pool, node_t *root) {
           position++;
         }
         else {
-          printf("%s", n->printed_key);
+          printf( "%s%s%s", n->black ? "" : "\x1B[31m", n->printed_key, n->black ? "" : "\x1B[0m");
           position += n->length;
         }
         n = n2;
@@ -301,7 +481,6 @@ bool node_erase(node_t *node, node_t **root) {
   }
   return true;
 }
-
 
 node_t *node_first(node_t *n) {
   if (!n)

@@ -248,8 +248,8 @@ static inline void replace_node_with_child(node_t *child, node_t *node, node_t *
   }
   else
     *root = child;
-  if(child)
-    child->parent = parent;
+
+  child->parent = parent;
 }
 
 bool node_erase(node_t *node, node_t **root) {
@@ -282,34 +282,16 @@ bool node_erase(node_t *node, node_t **root) {
       while(successor->left)
         successor = successor->left;
 
-      if(successor->right) { /* successor is to the left of the right child
-                                of node and has a right child */
-        /* successor's parent must link to successor on the left */
-        successor->parent->left = successor->right;
+      successor->parent->left = successor->right;
+      if(successor->right)
         successor->right->parent = successor->parent;
 
-        /* replace node with successor */
-        replace_node_with_child(successor, node, root);
-        successor->left = node->left;
-        successor->left->parent = successor;
-        successor->right = node->right;
-        successor->right->parent = successor;
-      }
-      else {
-        /* unlink successor from its parent */
-        node_t *tmp = successor->parent;
-        if(tmp->left == successor)
-          tmp->left = NULL;
-        else
-          tmp->right = NULL;
-
-        /* replace node with successor */
-        replace_node_with_child(successor, node, root);
-        successor->left = node->left;
-        successor->left->parent = successor;
-        successor->right = node->right;
-        successor->right->parent = successor;
-      }
+      /* replace node with successor */
+      replace_node_with_child(successor, node, root);
+      successor->left = node->left;
+      successor->left->parent = successor;
+      successor->right = node->right;
+      successor->right->parent = successor;
     }
   }
   return true;
