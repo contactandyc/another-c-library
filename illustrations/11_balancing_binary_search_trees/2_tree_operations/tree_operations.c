@@ -165,6 +165,8 @@ void post_good_tree(stla_pool_t *pool, node_t *root) {
   head = tail = n;
 }
 
+bool be_quiet = false;
+
 void do_test_red_black(stla_pool_t *pool, node_t *root, char *p) {
   tree_log_t *n = (tree_log_t *)stla_pool_alloc(pool, sizeof(tree_log_t));
   n->tree = tree_copy(pool, root);
@@ -175,18 +177,20 @@ void do_test_red_black(stla_pool_t *pool, node_t *root, char *p) {
 
   if(test_red_black_rules(pool, root)) {
     /* tree is okay */
-    tree_log_t *n = head;
-    while(n) {
-      if(n == head) {
-        printf( "Starting with a valid red black tree\n" );
-        printf( "====================================\n" );
+    if(!be_quiet) {
+      tree_log_t *n = head;
+      while(n) {
+        if(n == head) {
+          printf( "Starting with a valid red black tree\n" );
+          printf( "====================================\n" );
+        }
+        else
+          printf( "Operation: %s\n", n->op );
+        node_print(pool, n->tree);
+        test_red_black_rules(pool, n->tree);
+        printf( "\n" );
+        n = n->next;
       }
-      else
-        printf( "Operation: %s\n", n->op );
-      node_print(pool, n->tree);
-      test_red_black_rules(pool, n->tree);
-      printf( "\n" );
-      n = n->next;
     }
     printf( "The above tree is a valid red black tree\n" );
     post_good_tree(pool, root);
@@ -360,7 +364,8 @@ void do_left_rotate(stla_pool_t *pool, node_t **root, char *p, bool replay) {
 }
 
 void do_tagline() {
-  printf( "(i)nsert, (e)rase, (r)ight_rotate, (l)eft_rotate, (R)ed, (b)lack, re(c)olor, (h)elp, (q)uit\n");
+  if(!be_quiet)
+    printf( "(i)nsert, (e)rase, (r)ight_rotate, (l)eft_rotate, (R)ed, (b)lack, re(c)olor, (h)elp, (q)uit\n");
 }
 
 void tree_operations(stla_pool_t *pool, char *args) {
@@ -434,6 +439,11 @@ char *get_valid_characters(const char *p) {
 }
 
 int main(int argc, char *argv[]) {
+  if(argc > 1 && !strcmp(argv[1], "-q")) {
+    argc--;
+    argv++;
+    be_quiet = true;
+  }
   char *arg = argc > 1 ? get_valid_characters(argv[1]) : NULL;
   stla_pool_t *pool = stla_pool_init(1024);
   tree_operations(pool, arg);

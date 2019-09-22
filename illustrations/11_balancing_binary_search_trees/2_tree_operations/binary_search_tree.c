@@ -103,7 +103,6 @@ bool node_red_black_insert(node_t *node_to_insert, node_t **root) {
   return true;
 }
 
-
 void red_black_insert(node_t *node, node_t **root) {
   node->color = RED;
   node_t *parent, *grandparent, *uncle;
@@ -479,6 +478,7 @@ static inline void replace_node_with_child(node_t *child, node_t *node, node_t *
     *root = child;
 
   child->parent = parent;
+  child->color = node->color;
 }
 
 bool node_erase(node_t *node, node_t **root) {
