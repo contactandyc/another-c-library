@@ -13,6 +13,12 @@
 10. [Binary Search Trees](10_binary_search_trees.md)
 11. [Balancing Binary Search Trees](11_balancing_binary_search_trees.md)
 12. [The Red Black Tree](12_red_black_tree.md)
+13. (Coming soon!) Turning the Red Black Tree into a map, set
+14. (Coming soon!) The multimap
+14. (Coming soon!) Building a generic least recently used cache
+15. (Coming soon!) Binary search
+16. (Coming soon!) Heaps and priority queues
+17. (Coming soon!) Quicksort
 
 # Some useful reading...
 
