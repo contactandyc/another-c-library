@@ -22,8 +22,18 @@
    b. [A bit of history and setup](3_buffer.md#a-bit-of-history-and-setup)<br/>
    c. [The buffer interface](3_buffer.md#the-buffer-interface)<br/>
    d. [The implementation](3_buffer.md#the-implementation)<br/>
-4. [Linked Lists](4_linked_lists.md)
-5. [Threads](5_threads.md)
+4. [Linked Lists](4_linked_lists.md)<br/>
+   a. [A data structure interface](4_linked_lists.md#a-data-structure-interface)<br/>
+   b. [The data structure interface test driver](4_linked_lists.md#the-data-structure-interface-test-driver)<br/>
+   c. [The singly linked list](4_linked_lists.md#the-singly-linked-list)<br/>
+   d. [The doubly linked list](4_linked_lists.md#the-doubly-linked-list)<br/>
+5. [Threads](5_threads.md)<br/>
+   a. [Introducing threads](5_threads.md#introducing-threads)<br/>
+   b. [Creating threads](5_threads.md#creating-threads)<br/>
+   c. [Threads and optimizing code](5_threads.md#threads-and-optimizing-code)<br/>
+   d. [Avoid global variables when you can](5_threads.md#avoid-global-variables-when-you-can)<br/>
+   e. [Mutexes](5_threads.md#mutexes)<br/>
+   f. [Timing considerations](5_threads.md#timing-considerations)<br/>
 6. [Macros](6_macros.md)
 7. [The Global Allocator Object](7_allocator.md)
 8. [The Global Allocator Implementation](8_allocator_impl.md)

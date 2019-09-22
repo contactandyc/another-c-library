@@ -1,6 +1,6 @@
 [Table of Contents](README.md)  - Copyright 2019 Andy Curtis
 
-# Introducing Threads
+## Introducing threads
 
 Imagine if you were building a block building and you had to paint the level on each block up to 100 levels.  In order to know which block to paint, you would look at the last block on the building, add one to it, and go and paint your block.  Once the block is dry, you can come back and put the block on the building.  At this point, you can repeat the process.  You are only allowed to paint one block at a time and you must look at the highest block to determine what to paint on the next block.  
 
@@ -38,7 +38,7 @@ worker
 
 Computers allow for multiple threads (which are like workers or people working on the same problem).  You can put up stop signs and block everyone else until you are done.  You can also create conditions and wait on those conditions to become true (like the pager example).  Doing something as simple as incrementing a number needs to be protected with the stop signs.  
 
-# Creating Threads
+## Creating threads
 
 In C, threads are created using pthread_create.  They can be created with the expectation that they will be collected once they are done.  They can also be created in what is known as a detached state.  All this means is that your program will not wait for the thread to finish.  In both cases, if your program terminates, the threads will be destroyed.  Threads are like workers.  They run in parallel often on different processors.  The example below shows 10 threads incrementing a number a million times and ultimately printing the final number.  The threads are collected using pthread_join.
 
@@ -78,7 +78,7 @@ global_number (should be 10000000)= 2010195
 
 Notice that the number is not 10 million.  When global_number++ happens, each thread gets the value of global_number, adds one to it, and then replaces global_number with the new value.  Much like when we initially had a friend help build the building above, each thread is doing very similar work and then overwriting other thread's work.
 
-# Threads and Optimizing Code
+## Threads and optimizing code
 
 When writing software which have resources that need protected, one should generally assume that you must protect them (using the equivalent of the stop signs mentioned above).  Sometimes, when you run software and tests, the result will look okay.  This doesn't nessarily mean that the code is thread safe.  On my computer, when I compiled the code with the -O3 option, I got the following result.
 
@@ -95,7 +95,7 @@ global_number (should be 10000000)= 10000000
 
 which makes it look like everything is working.  A rule with writing good code is that you should assume if something can go wrong, it will go wrong.  Changing the compiler flag should not cause the code to perform differently.  Particularly, code that works when a flag is set and doesn't work when a flag is not set, is not good code.  It must work regardless of the flag.  Because the -O3 flag seems to make the program look like it is working, we will not use it.  It can happen that code works in debug mode, but not in optimized mode.
 
-# Avoid global variables when you can
+## Avoid global variables when you can
 
 I generally do not like to use global variables (unless they make sense).  In the above example, global_number is a global variable.  The pthread_create function allows you to pass an argument to the thread function for the thread that is being created.  For example...
 
@@ -132,7 +132,7 @@ $ ./test_code
 local_number (should be 10000000)= 2010195
 ```
 
-# Mutexes
+## Mutexes
 
 The pthread library defines a type called mutex which allows your code to lock around a resource much like a stop sign.  The mutex needs initialized and destroyed.  pthread_create only allows one argument to be passed to threads.  In order to pass the local number and the mutex to the worker function, a structure must be created.  For example...
 
@@ -197,7 +197,7 @@ pthread_mutex_unlock(&(w->mutex));
 
 Note that the worker_t structure (w) is shared amongst all of the threads.
 
-# Timing considerations
+## Timing considerations
 
 Before ending this chapter, we should consider how long each task takes and the advantage and disadvantage of threads and coordination.
 

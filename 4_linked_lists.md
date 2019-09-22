@@ -2,7 +2,7 @@
 
 # Linked Lists
 
-## A Data Structure Interface
+## A data structure interface
 
 We will explore the singly linked list, the doubly linked list, binary search trees, and finally the red black tree.  Each of these build upon each other in complexity and can actually share a similar interface.  The code and interfaces are meant more for the purpose of understanding and to show various optimizations along the way.  A linked list and binary search trees allow for inserting, finding, erasing, and iteration.
 
@@ -167,7 +167,7 @@ typedef struct node_s node_t;
 
 The rest of the functions were commented inline above.
 
-## The Data Structure Interface Test Driver
+## The data structure interface test driver
 
 In addition to having a common interface, I have created a set of functions to test the data structure.  The set of functions will include data_structure.h and test that the code is doing what it is supposed to do and show how to use the interface.
 
@@ -419,7 +419,7 @@ The include order is important.  If you place data_structure.h after the standar
 #include <stdlib.h>
 ```
 
-# The Singly Linked List
+## The singly linked list
 
 In the previous section, we implemented a basic interface.  Below is the implementation of the singly-linked list.
 
@@ -665,7 +665,7 @@ print_using_iteration: BDECFA
 
 You might notice that the linked lists are reversed.  This is because we are using the two line insert technique and putting items at the front of the list.  When using singly linked lists, it is common to maintain a head (or root) and a tail pointer.  The tail refers to the last node or NULL if the list is empty.  By maintaining a tail, one can efficiently insert items at the end of the list.  If you don't maintain a tail and still wish to insert items at the end of the list, you can do that by skipping to the last node and then linking to your new node from the last node.
 
-# The Doubly Linked List
+## The doubly linked list
 
 Doubly linked lists introduce link nodes in both directions.  A doubly linked list will have a next and a previous pointer (the naming is up to you).  For example, in the case of a doubly linked list for B -> A -> C, the following would hold true.  We will denote a link starting from a node with a - and the direction being > next or < previous.  You can think of the linkage like the following illustrations.
 
