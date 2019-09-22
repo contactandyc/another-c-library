@@ -12,6 +12,7 @@
 9. [The Pool Object](9_pool.md)
 10. [Binary Search Trees](10_binary_search_trees.md)
 11. [Balancing Binary Search Trees](11_balancing_binary_search_trees.md)
+12. [The Red Black Tree](12_red_black_tree.md)
 
 # Some useful reading...
 

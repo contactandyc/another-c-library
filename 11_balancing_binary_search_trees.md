@@ -708,4 +708,6 @@ A4 C4
 
 Once the tool is loaded, you can insert or erase nodes and try and figure out how to make it work like a red black tree again.
 
+# [The Red Black Tree](12_red_black_tree.md)
+
 [Table of Contents](README.md)  - Copyright 2019 Andy Curtis
