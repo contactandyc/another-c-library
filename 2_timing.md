@@ -2,6 +2,8 @@
 
 # Timing Your Code (the first project)
 
+## A brief introduction to C
+
 In the project, there is an illustrations folder that contains most of the code.  There is also a src directory where the final code exists.  Normally, one would start with a hello world project. That exists later in a section called Hello Buffer.  If you are lost, hopefully, it will make more sense once you get to the Hello Buffer section. I would recommend reading and working through the examples in this chapter and then coming back after working through Hello Buffer.  The code for this chapter is located in <i>illustrations/2_timing</i>
 
 At various points in this project, we will be timing code in an attempt to optimize it.  Our first object is going to be simple but will illustrate how I plan to maintain separation between interfaces and their respective implementation.
@@ -651,6 +653,7 @@ int main(int argc, char *argv[]){
 
 The syntax is necessary for the C compiler to understand where one statement ends and the next starts.  All of the above examples compile and will work the same.  The last example is easier to read.  C does not force you to make the code easy to read.  It is just an excellent idea to do so!
 
+
 There are different types of loops in C.  The following defines the `for` loop:
 
 ```c
@@ -672,6 +675,8 @@ This code will loop through the arguments skipping the name of the program (as i
 ```c
 for( int i=1; i<argc; i++ ) {
 ```
+
+## How to time code
 
 The example is going to reverse strings several times while timing the process.  The program should not modify the arguments that are passed into your program.  If you wish to modify an argument, you should first allocate memory for your program to use and then copy the argument into the newly allocated memory.  The `malloc` function will allocate the number of bytes requested for use.  You can read about it by typing `man malloc` from the command line.  Programs that require extra memory to work with must request that memory from the operating system.  `malloc` is one of the core ways to complete this.  Memory requested should later be freed using the `free` call.  The `malloc` function can return `NULL` meaning that the memory was not available.  Trying to writing to a pointer that is pointing at NULL will cause your program to crash.  You can check for the error or just allow the program not so gracefully to crash.  In my examples, I am going to allow the program to crash if `NULL` is returned.  The only other reasonable option would be to have the program fail early, which effectively is the same thing.  In the example below, there are a few functions called.  The early writers of C decided to shorten the names of the funtions.
 ```
@@ -746,6 +751,8 @@ After timing the reverse_string call, printf is used to print the string on the 
 
   printf( "overall time_spent: %0.4fns\n", overall_time*1000.0/(repeat_test*1.0));
 ```
+
+## Reversing a string
 
 The last function to examine is the reverse_string call.
 ```c
@@ -842,7 +849,7 @@ esvereR
 
 The string is now esreveR which is the reverse of Reverse.
 
-# The basic Makefile
+## The basic Makefile
 
 If you change to that directory, you will find the following Makefile.  
 
@@ -892,7 +899,7 @@ gcc test_timer.c -o test_timer
 
 The examples block will run every time because it does not have any dependencies, and examples are not a file that exists.  If you were to create a file called examples, then the examples block would cease to run.  By running `make`, you will effectively build test_timer if it needs to build and run the examples block.  Running  `make clean` will clean up the binary.  You can run any block by specifying it. `make all` is equivalent to running `make`.  If you just want to run the examples block, you can by running `make examples`.  
 
-# Doing a better job of timing
+## More accurately timing code
 
 In the last section, we explored how to time the reverse_string function.  In this section, we will explore how to time the function better.  One thing you may have noticed is that there are a million calls to both `reverse_string` and `strcpy`.  There is also the overhead of the loop.  To do the timing correctly, we should have timed the `strcpy` and the loop and subtracted that from the loop which has the reverse_string function called.
 
@@ -955,7 +962,7 @@ The second change subtracts the time spent doing everything but the reverse stri
 long time_spent = (test_t2-test_t1) - (copy_t2-copy_t1);
 ```
 
-# Doing a better job of timing continued
+## Doing a better job of timing continued
 
 In the last section, we eliminated the cost of the strcpy and loop from the timing.  Another thing to do is to reconsider our reverse_string function.  The reverse_string calls strlen to get the length of the string s.  We could try and just pass the length of s into the call.  We can get the length of the argument outside of the repeated and timed test.  For completeness, we will compare the timing of 2_timer with 3_timer.
 
@@ -1044,7 +1051,7 @@ reverse_string(s, len);
 
 The length is passed into the reverse_string call so that reverse_string doesn't have to calculate it.  This optimization yielded another 14.5 nanoseconds.
 
-# Compiler optimizations
+## Compiler optimizations
 
 It's important to not forget that the compiler can optimize the code further.  You can pass a flag called -O3 to gcc and sometimes see an improvement.
 
@@ -1084,7 +1091,7 @@ diff ./Makefile ../3_timer/Makefile
 
 The -O3 optimization (full optimization) was turned on in gcc.  It is good to actually compare time with optimizations turned on because sometimes the fastest code is slower once optimizations are turned on.
 
-# Splitting up your code into multiple files
+# Splitting up code into multiple files
 
 This section's code is found in <i>illustrations/2_timing/5_timer</i>
 
@@ -1363,7 +1370,7 @@ test_timer: test_timer.c file2.c
 
 This change is helpful because it says that the test_timer block should run if any of the files have changed.  Now that test_timer is made up of two files, we should list both files.  Internally, make simply looks at the time stamp of test_timer and of test_timer.c and file2.c.  If test_timer.c or file2.c has a time stamp that is greater than test_timer (or test_timer doesn't exist), then the block will be run again.
 
-# Splitting up your code into multiple files part 2
+## Splitting up your code into multiple files part 2
 
 This section's code is found in <i>illustrations/2_timing/6_timer</i>
 
@@ -1437,7 +1444,7 @@ In this section, I also removed the following two lines from test_timer.c as tes
 
 It all works because we have fixed file2.c to have the right include statements.  Particularly if you are developing a new package, it is a good idea to include your own packages before outside or system packages.
 
-# Separating the implementation from the interface
+## Separating the implementation from the interface
 
 This section's code is found in <i>illustrations/2_timing/7_timer</i>
 
@@ -1493,7 +1500,7 @@ overall time_spent: 10.6030ns
 
 Everything works as expected.
 
-# Separating the implementation from the interface (part 2)
+## Separating the implementation from the interface (part 2)
 
 This section's code is found in <i>illustrations/2_timing/8_timer</i>
 
@@ -1557,7 +1564,7 @@ test_timer: test_timer.c file2.h file2.c
 
 So that test_timer will be built if file2.h is updated.
 
-# Defining an object
+## Defining an object
 
 This section's code is found in <i>illustrations/2_timing/9_xxx</i>
 
@@ -1752,7 +1759,7 @@ void xxx_do_something( xxx_t *h, const char *prefix ) {
 
 
 
-# Defining the timer interface
+## The timer interface
 
 The following code is found in <i>illustrations/2_timing/10_timer</i>
 
@@ -2343,7 +2350,7 @@ printf( "time_spent: %0.4fns\n", timer_ns(test_timer) );
 
 which again reduces complexity.  It is also easy to switch from nanoseconds to another measure if desired.
 
-# Making the timer object reusable
+## Making the timer object reusable
 
 The following code is found in <i>illustrations/2_timing/11_timer</i>
 
@@ -2423,8 +2430,8 @@ stla_timer_t *overall_timer = stla_timer_init(repeat_test);
 
 and so on.
 
-# Moving stla_timer to src (and variables in Makefile)
-## splitting up a project into multiple directories
+## Splitting up a project into multiple directories
+ - Moving stla_timer to src (and variables in Makefile)
 
 The following code is found in <i>illustrations/2_timing/12_timer</i>
 
@@ -2499,7 +2506,7 @@ clean:
 
 make allows you to create variables using the <name>=<value> syntax outside of sections.  You can then reference the value of those variables by enclosing the name in $(<name>).  One variable can reference another variable (see OBJECTS and ROOT above).  In order for gcc to find the stla_timer.h file, the src path needs to be added to gcc's include path.  That is done by using the -I<directory> option.  If you have multiple include paths, you can specify -I<directory> multiple times.  
 
-# Splitting up the Makefile
+## Splitting up the Makefile
 
 The following code is found in <i>illustrations/2_timing/13_timer</i>
 
