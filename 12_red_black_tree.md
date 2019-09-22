@@ -261,7 +261,17 @@ B2   E2
 
 Notice that in this case, the recoloring created a valid red black tree.  The black height is 2 to every leaf node.  The root is black.  There are not two red nodes in a row.  In the one case (A2) where a node only has a single child, the child is red.
 
-To recap, if the parent and uncle are red, paint the parent and uncle black and the grandparent red.  It's possible that the grandparent's parent was also red.  To handle this case, we can repeat all of the tests recursively (since the recursion is simple, continuing in a while loop works by changing the node to the grandparent - which was painted red to maintain the rule that the loop always starts with a red node).
+To recap, if the parent and uncle are red, paint the parent and uncle black and the grandparent red.  It's possible that the grandparent's parent was also red.  To handle this case, we can repeat all of the tests recursively (since the recursion is simple, continuing in a while loop works by changing the node to the grandparent - which was painted red to maintain the rule that the loop always starts with a red node).  The code is below...
+```c
+  if(grandparent->left == parent) {
+    uncle = grandparent->right;
+    if(uncle && uncle->color == RED) {
+      grandparent->color = RED;
+      parent->color = uncle->color = BLACK;
+      node = grandparent;
+      continue;
+    }
+```
 
 The following example adds the letter 0 (zero) to the left of (A2).  This creates the same case as above, but when recoloring happens (c B), (B1) and (D1) are both red. D becomes the new node. It is an example where recoloring creates a parent and child which are both red.
 
@@ -331,20 +341,9 @@ A2   C2
 (D1) has a red left child and is red
 ```
 
-```c
-  if(grandparent->left == parent) {
-    uncle = grandparent->right;
-    if(uncle && uncle->color == RED) {
-      grandparent->color = RED;
-      parent->color = uncle->color = BLACK;
-      node = grandparent;
-      continue;
-    }
-```
-
 The next case is if the uncle is black or NULL, then rotate to the right around the grandparent.  
 
-The code looks like the following
+The code is below...
 ```c
   if(parent->right == node)
     rotate_left(parent, NULL);
@@ -432,7 +431,7 @@ B2
 (A2)
 ```
 
-If Br was the right child of the parent (Ar), then do an extra left rotation on Ar to make the tree look like the case above before doing the right rotation (there's no need for color swapping because they're both red).
+In the example below, C is inserted to the left of B.  Both C and B are red.  Left rotate around B (the parent) before right rotating through D (the grandparent).
 
 ```bash
 Starting with a valid red black tree
