@@ -2,6 +2,7 @@
 
 # The Buffer Object
 
+## How it compares to other languages
 hello_buffer.c
 ```c
 #include "buffer.h"
@@ -78,7 +79,7 @@ and so on...
 
 buffer.h is part of this project (it'll later be changed to stla_buffer.h).  stla stands for standard template library alternative.  C doesn't have a built in mechanism to handle growing strings or arrays.  Anyone who has done C will have created an object like buffer or reused someone else's code.  I'm just attempting to create standardized objects which others can use.
 
-## A Bit of History and Setup
+## A bit of history and setup
 
 In order to build solid C code, you need to build reusable objects.  Those objects will then often be used to build larger objects.  The buffer has been one of the most used objects throughout my career.  In other languages, it would generally replace the string and the array.  This object will change in its final form as this object ultimately will build upon another object which I've called <b>pool</b> that is also one of my goto objects.  The pool will be described after the section on linked structures.  This object plays an important role in printing binary search trees (described in the linked structures section).  
 
@@ -130,7 +131,7 @@ Print the contents of the buffer (bh) by using the buffer_data(bh) to access its
 printf( "%s\n", buffer_data(bh) );
 ```
 
-## The Buffer Interface
+## The buffer interface
 
 Buffer defines a number of other functions which will be described shortly.  Here is the full interface used for this tutorial.
 
@@ -200,7 +201,7 @@ void buffer_destroy(buffer_t *h);
 
 One thing that you may notice is that there isn't any details as to how the buffer is implemented in the interface.  It is very important to separate interfaces from implementations.  If you do this, you continually improve upon the interface.  If hardware changes over time, you can reimplement the implementation part as needed without effecting the rest of the code bases.  Getting interfaces right is somewhat of an art.  There is a balance between getting specific work done and creating reusable objects.  One element of the coding style that I use is that you can use <b>grep</b> to find every line where a given object is used.  I'm not alone in using this coding style.  Projects like libcurl, libuv (behind Google Chrome), and others use similar approaches.
 
-## The Implementation
+## The implementation
 
 buffer.c
 ```c

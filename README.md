@@ -17,7 +17,11 @@
    l. [Making the timer object reusable](2_timing.md#making-the-timer-object-reusable)<br/>
    m. [Splitting up a project into multiple directories](2_timing.md#splitting-up-a-project-into-multiple-directories)<br/>
    n. [Splitting up the Makefile](2_timing.md#splitting-up-the-makefile)<br/>
-3. [The Buffer Object](3_buffer.md)
+3. [The Buffer Object](3_buffer.md)<br/>
+   a. [How it compares to other languages](3_buffer.md#how-it-compares-to-other-languages)<br/>
+   b. [A bit of history and setup](3_buffer.md#a-bit-of-history-and-setup)<br/>
+   c. [The buffer interface](3_buffer.md#the-buffer-interface)<br/>
+   d. [The implementation](3_buffer.md#the-implementation)<br/>
 4. [Linked Lists](4_linked_lists.md)
 5. [Threads](5_threads.md)
 6. [Macros](6_macros.md)
