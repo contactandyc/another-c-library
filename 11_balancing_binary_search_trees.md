@@ -15,6 +15,8 @@ make
 
 In this case, I've not included examples in the Makefile.  I've also commented out printing the data structure using iteration and reverse iteration as it isn't relevant to understanding how the red black tree works.
 
+## Why balancing is important
+
 To understand why balancing a binary search tree is important, let's look at some worst case and bad scenarios.
 
 One worst case scenario
