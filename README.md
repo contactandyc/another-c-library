@@ -12,9 +12,9 @@
 9. [The Pool Object](9_pool.md)
 10. [Binary Search Trees](10_binary_search_trees.md)
 11. [Balancing Binary Search Trees](11_balancing_binary_search_trees.md)
-  - (Properties of a red black tree)(11_balancing_binary_search_trees.md#the-properties-of-a-red-black-tree)
-  - (Coloring)(11_balancing_binary_search_trees.md#coloring)
-  - (Rotations)(11_balancing_binary_search_trees.md#rotations)
+  - [Properties of a red black tree](11_balancing_binary_search_trees.md#the-properties-of-a-red-black-tree)
+  - [Coloring](11_balancing_binary_search_trees.md#coloring)
+  - [Rotations](11_balancing_binary_search_trees.md#rotations)
 12. [The Red Black Tree](12_red_black_tree.md)
 13. (Coming soon!) Turning the Red Black Tree into a map, set
 14. (Coming soon!) The multimap
