@@ -45,6 +45,109 @@ q
 
 To make sure that it is working.
 
+The code for this section is found in <i>illustrations/12_red_black_tree/1_red_black_tree</i>
+```bash
+cd $stla/illustrations/12_red_black_tree/1_red_black_tree
+make
+```
+
+Most of the code is in red_black_tree.c
+
+## Testing the red black tree properties
+
+When an algorithm can be tested through a function, it is often a good idea to write such a functon.  Functions like the one to follow should be pretty straight-forward given the rules above.
+
+```c
+bool test_red_black_rules(stla_pool_t *pool, node_t *root) {
+  /* an empty tree is valid */
+  if(!root)
+    return true;
+  bool success = true;
+  /* the root is black */
+  if(root->color != BLACK) {
+    success = false;
+    printf( "The root is not black!\n" );
+  }
+  node_t *n = node_first(root);
+  int black_nodes = 0;
+  node_t *first_black_leaf = NULL;
+  node_t *sn = n;
+  while(n) {
+    if(!n->left && !n->right) { /* only consider leaf nodes */
+      black_nodes = count_black_nodes(n);
+      first_black_leaf = n;
+      break;
+    }
+    n = node_next(n);
+  }
+  n = sn;
+  while(n) {
+    /* check if one child and that child is red */
+    if(!n->left) {
+      if(n->right) {
+        int bn = count_black_nodes(n);
+        if(bn != black_nodes) {
+          success = false;
+          print_node_with_color(n);
+          printf( " has a NULL left child with a different black height than " );
+          print_node_with_color(first_black_leaf);
+          printf( "\n");
+        }
+      }
+    }
+    else if(!n->right) {
+      int bn = count_black_nodes(n);
+      if(bn != black_nodes) {
+        success = false;
+        print_node_with_color(n);
+        printf( " has a NULL right child with a different black height than " );
+        print_node_with_color(first_black_leaf);
+        printf( "\n");
+      }
+    }
+
+    if(n->left && !n->right && n->left->color != RED) {
+      success = false;
+      print_node_with_color(n);
+      printf( " has one left child and it isn't red\n" );
+    }
+    if(!n->left && n->right && n->right->color != RED) {
+      success = false;
+      print_node_with_color(n);
+      printf( " has one right child and it isn't red\n" );
+    }
+    if(n->color == RED) {
+      if(n->left && n->left->color == RED) {
+        success = false;
+        print_node_with_color(n);
+        printf( " has a red left child and is red\n" );
+      }
+      if(n->right && n->right->color == RED) {
+        success = false;
+        print_node_with_color(n);
+        printf( " has a red right child and is red\n" );
+      }
+      if(n->parent && n->parent->color == RED) {
+        success = false;
+        print_node_with_color(n);
+        printf( " has a red parent and is red\n" );
+      }
+    }
+    if(!n->left && !n->right) { /* only consider leaf nodes */
+      int bn = count_black_nodes(n);
+      if(black_nodes != bn) {
+        success = false;
+        print_node_with_color(n);
+        printf( " has a different black height than " );
+        print_node_with_color(first_black_leaf);
+        printf( "\n");
+      }
+    }
+    n = node_next(n);
+  }
+  return success;
+}
+```
 
 ## Insert
 

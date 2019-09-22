@@ -35,12 +35,15 @@ node_t *fill_data_structure(stla_pool_t *pool, const char *arg) {
   const char *s = arg;
   while (*s != 0) {
     if (!node_find(*s, root)) {
-      node_t *n = node_init(*s);
+      node_t *n = node_init(pool, *s);
       if (!node_insert(n, &root)) {
         printf("Find failed for %c and insert failed as well!\n", *s);
         abort();
       }
-      node_test(pool, root);
+      if(!test_red_black_rules(pool, root)) {
+        node_print(pool, root);
+        abort();
+      }
       if (!node_find(*s, root)) {
         printf("Find failed for %c after insert succeeded!\n", *s);
         abort();
@@ -64,12 +67,16 @@ node_t *fill_data_structure_randomly(stla_pool_t *pool, const char *arg) {
     int pos = rand() % len;
     const char *s = p+pos;
     if (!node_find(*s, root)) {
-      node_t *n = node_init(*s);
+      node_t *n = node_init(pool, *s);
+      // printf( "inserting %c\n", *s);
       if (!node_insert(n, &root)) {
         printf("Find failed for %c and insert failed as well!\n", *s);
         abort();
       }
-      node_test(pool, root);
+      if(!test_red_black_rules(pool, root)) {
+        node_print(pool, root);
+        abort();
+      }
       num_inserted++;
       if (!node_find(*s, root)) {
         printf("Find failed for %c after insert succeeded!\n", *s);
@@ -108,12 +115,17 @@ void find_and_erase_everything(stla_pool_t *pool, const char *arg, node_t *root)
     int pos = rand() % len;
     const char *s = p+pos;
     node_t *node_to_erase = node_find(*s, root);
+    // printf( "erasing %c\n", *s );
+    // node_print(pool, root);
     if (node_to_erase) {
       if (!node_erase(node_to_erase, &root)) {
         printf("Erase failed for %c after find succeeded!\n", *s);
         abort();
       }
-      node_test(pool, root);
+      if(!test_red_black_rules(pool, root)) {
+        node_print(pool, root);
+        abort();
+      }
       num_destroyed++;
       node_destroy(node_to_erase);
     }
@@ -174,7 +186,7 @@ void test_data_structure(stla_pool_t *pool, const char *arg, int repeat) {
   node_t *root;
   for( int i=0; i<repeat; i++ ) {
     root = fill_data_structure_randomly(pool, arg);
-    node_print(pool, root);
+    // node_print(pool, root);
     find_everything(arg, root);
     find_and_erase_everything(pool, arg, root);
   }
@@ -224,6 +236,8 @@ char *get_valid_characters(const char *p) {
 	return res;
 }
 
+
+stla_pool_t *gpool = NULL;
 /*
   The main function expects to have 2 or more command line arguments and calls
 	the function test_data_structure with each argument (after extracting valid
@@ -245,6 +259,7 @@ int main(int argc, char *argv[]) {
     repeat = 0;
 
   stla_pool_t *pool = stla_pool_init(1024);
+  gpool = pool;
 	char *arg = get_valid_characters(argv[1]);
   test_data_structure(pool, arg, repeat);
 	free(arg);
