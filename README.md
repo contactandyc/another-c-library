@@ -11,7 +11,7 @@
 8. [The Global Allocator Implementation](8_allocator_impl.md)
 9. [The Pool Object](9_pool.md)
 10. [Binary Search Trees](10_binary_search_trees.md)
-11. [Balancing Binary Search Trees](11_balancing_binary_search_trees.md)
+11. [Balancing Binary Search Trees](11_balancing_binary_search_trees.md)<br/>
   - [Properties of a red black tree](11_balancing_binary_search_trees.md#the-properties-of-a-red-black-tree)
   - [Coloring](11_balancing_binary_search_trees.md#coloring)
   - [Rotations](11_balancing_binary_search_trees.md#rotations)
