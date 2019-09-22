@@ -950,9 +950,112 @@ static void fix_color_for_erase(node_t *parent, node_t *node, node_t **root) {
 }
 ```
 
-The fix_color_for_erase function
+The fix_color_for_erase function is a large function but can be split into sections which largely mirror each other.
+
+```c
+static void fix_color_for_erase(node_t *parent, node_t *node, node_t **root) {
+  node_t *sibling;
+  if(parent->right != node) {
+    sibling = parent->right;
+    ...
+  }
+  else {
+    sibling = parent->left;
+    ...
+  }
+}
+```
+
+The only difference between the if and the else statement is that every left and right are swapped.  The rest of the explanation will focus where the sibling is on the right.
+
+The insert color fixing method of the red black tree uses the uncle's color to help decide actions.  The erase color fixing method uses the sibling.  If the sibling is red, we can rotate away from the sibling around the parent and set the sibling to be the parent's right node.
+
+```c
+if(sibling->color == RED) {
+  rotate_left(parent, root);
+  sibling = parent->right;
+}
+```
 
 
+In the example below, erase A, the sibling is O which is red, the parent is E.
+```bash
+$ $stla/bin/tree_operations -q AEIOUY
+E1
+| \
+A2 (O1)
+   |   \
+   I2   U2
+          \
+           (Y2)
 
+e A
+E1
+  \
+   (O1)
+   |   \
+   I2   U2
+          \
+           (Y2)
+
+E1 has a NULL left child with a different black height than I2
+
+l E
+O1
+| \
+|  U2
+|    \
+|     (Y2)
+|         
+(E1)
+    \
+     I2
+
+(E1) has a NULL left child with a different black height than I2
+(E1) has one right child and it isn't red
+```
+
+After the rotation, E becomes red and I becomes the sibling which is black.  
+
+To recap - If the sibling is red, rotate away from the sibling and set the sibling to be equal to what is on the same side of the parent again.  The sibling will be black and we can proceed with the cases which expect the sibling to be black.
+
+```c
+if(sibling->right && sibling->right == RED) {
+  sibling->right->color = BLACK;
+  rotate_left(parent, root);  
+}
+else if(sibling->left && sibling->left == RED) {
+  rotate_right(sibling, root);
+  rotate_left(parent, root);
+  sibling->color = BLACK;  
+}
+else {
+  sibling->color = RED;
+  if(parent->parent && parent->color == BLACK)
+    fix_color_for_erase(parent->parent, parent, root);
+  else
+    parent->color = BLACK;  
+}
+```
+
+If the sibling is to the right and is black.
+
+First check to see if the sibling's right child is red.  If it is, color it black and rotate left around the parent.
+
+```bash
+EXAMPLE
+```
+
+If not, check if the sibling's left child is red.  If it is, rotate right around the sibling, then left around the parent.  Finally, color the sibling black (the rotations will have changed the sibling's color).
+
+```bash
+EXAMPLE
+```
+
+Finally, if neither of the sibling's children are red, color the sibling red.  If the parent is red or is the root, color the parent black.  Otherwise, fix the color for the parent's parent and set the node to pair up with a sibling to be the parent.
+
+```bash
+EXAMPLE
+```
 
 [Table of Contents](README.md)  - Copyright 2019 Andy Curtis

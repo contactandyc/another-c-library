@@ -249,6 +249,8 @@ int count_black_nodes(node_t *n) {
   return black_nodes;
 }
 
+
+
 bool test_red_black_rules(stla_pool_t *pool, node_t *root) {
   /* an empty tree is valid */
   if(!root)
@@ -262,8 +264,41 @@ bool test_red_black_rules(stla_pool_t *pool, node_t *root) {
   node_t *n = node_first(root);
   int black_nodes = 0;
   node_t *first_black_leaf = NULL;
+  node_t *sn = n;
+  while(n) {
+    if(!n->left && !n->right) { /* only consider leaf nodes */
+      black_nodes = count_black_nodes(n);
+      first_black_leaf = n;
+      break;
+    }
+    n = node_next(n);
+  }
+  n = sn;
   while(n) {
     /* check if one child and that child is red */
+    if(!n->left) {
+      if(n->right) {
+        int bn = count_black_nodes(n);
+        if(bn != black_nodes) {
+          success = false;
+          print_node_with_color(n);
+          printf( " has a NULL left child with a different black height than " );
+          print_node_with_color(first_black_leaf);
+          printf( "\n");
+        }
+      }
+    }
+    else if(!n->right) {
+      int bn = count_black_nodes(n);
+      if(bn != black_nodes) {
+        success = false;
+        print_node_with_color(n);
+        printf( " has a NULL right child with a different black height than " );
+        print_node_with_color(first_black_leaf);
+        printf( "\n");
+      }
+    }
+
     if(n->left && !n->right && n->left->color != RED) {
       success = false;
       print_node_with_color(n);
@@ -292,12 +327,8 @@ bool test_red_black_rules(stla_pool_t *pool, node_t *root) {
       }
     }
     if(!n->left && !n->right) { /* only consider leaf nodes */
-      int black_nodes2 = count_black_nodes(n);
-      if(!black_nodes) {
-        black_nodes = black_nodes2;
-        first_black_leaf = n;
-      }
-      if(black_nodes != black_nodes2) {
+      int bn = count_black_nodes(n);
+      if(black_nodes != bn) {
         success = false;
         print_node_with_color(n);
         printf( " has a different black height than " );
