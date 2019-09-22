@@ -2,22 +2,21 @@
 - Copyright 2019 Andy Curtis
 
 1. [Getting Started](1_getting_started.md)
-2. [Timing Your Code (the first project)](2_timing.md)
-   a. [A brief introduction to C](2_timing.md#a-brief-introduction-to-c)
-   b. [What happens during compilation](2_timing.md#what-happens-during-compilation)
-   c. [How to time code](2_timing.md#how-to-time-code)
-   d. [Reversing a string](2_timing.md#reversing-a-string)
-   e. [The basic Makefile](2_timing.md#the-basic-makefile)
-   f. [More accurately timing code](2_timing.md#more-accurately-timing-code)
-   g. [Compiler optimizations](2_timing.md#compiler-optimizations)
-   h. [Splitting up code into multiple files](2_timing.md#splitting-up-code-into-multiple-files)
-   i. [Separating the implementation from the interface](2_timing.md#separating-the-implementation-from-the-interface)
-   j. [Defining an object](2_timing.md#defining-an-object)
-   k. [The timer interface](2_timing.md#the-timer-interface)
-   l. [Making the timer object reusable](2_timing.md#making-the-timer-object-reusable)
-   m. [Splitting up a project into multiple directories](2_timing.md#splitting-up-a-project-into-multiple-directories)
-   n. [Splitting up the Makefile](2_timing.md#splitting-up-the-makefile)
-   o. 
+2. [Timing Your Code (the first project)](2_timing.md)<br/>
+   a. [A brief introduction to C](2_timing.md#a-brief-introduction-to-c)<br/>
+   b. [What happens during compilation](2_timing.md#what-happens-during-compilation)<br/>
+   c. [How to time code](2_timing.md#how-to-time-code)<br/>
+   d. [Reversing a string](2_timing.md#reversing-a-string)<br/>
+   e. [The basic Makefile](2_timing.md#the-basic-makefile)<br/>
+   f. [More accurately timing code](2_timing.md#more-accurately-timing-code)<br/>
+   g. [Compiler optimizations](2_timing.md#compiler-optimizations)<br/>
+   h. [Splitting up code into multiple files](2_timing.md#splitting-up-code-into-multiple-files)<br/>
+   i. [Separating the implementation from the interface](2_timing.md#separating-the-implementation-from-the-interface)<br/>
+   j. [Defining an object](2_timing.md#defining-an-object)<br/>
+   k. [The timer interface](2_timing.md#the-timer-interface)<br/>
+   l. [Making the timer object reusable](2_timing.md#making-the-timer-object-reusable)<br/>
+   m. [Splitting up a project into multiple directories](2_timing.md#splitting-up-a-project-into-multiple-directories)<br/>
+   n. [Splitting up the Makefile](2_timing.md#splitting-up-the-makefile)<br/>
 3. [The Buffer Object](3_buffer.md)
 4. [Linked Lists](4_linked_lists.md)
 5. [Threads](5_threads.md)
