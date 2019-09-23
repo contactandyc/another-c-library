@@ -510,6 +510,7 @@ bool node_erase(node_t *node, node_t **root) {
 }
 ```
 
+## Postorder iteration
 
 Postorder iteration means to iterate through a tree visiting the left and the right nodes before each root.  Postorder starts from the left deepest node of the tree and then iterates through children before parents.  Given the following example, the iteration will look like.
 
@@ -595,6 +596,8 @@ node_t *node_next_to_erase(node_t *n) {
     return parent;
 }
 ```
+
+## Printing a binary tree
 
 The last function to build is a method to print the tree.  It presented a different kind of challenge that programmers often face and so I'm separating it out.  In order to print the binary search tree, I've implemented an approach that requires copying the tree into a different structure.  Because we have built the stla_allocator and the stla_pool.  I've decided to go ahead and use them.  To demonstrate how they can be useful, I've commented out the free and stla_pool_destroy calls.  Before getting into how to print, let's review the changes to test_data_structure.c and data_structure.h.
 
@@ -1411,7 +1414,7 @@ char *get_printed_key(stla_pool_t *pool, node_t *n ) {
 
 A quick note on how the stla_pool was useful.  The copy of the tree was constructed and never had to free any of the nodes associated with it.  Both nodes and the printed keys were allocated.  If we didn't have the pool (or something like it), we would have needed to free each node in the tree.  The node_init and node_destroy methods use stla_malloc and stla_free.  If we weren't concerned with destroying the tree or erasing nodes, we could have used the pool for the allocation and never had to erase the tree at all.  A call to stla_pool_clear would make the memory reusable for another purpose (such as building another tree).  Technically, it takes as long to construct a binary search tree as it does to destroy one.  If you use the pool, you can avoid all of the destruction time.  This will be explored further once the red black tree (a balanced binary search tree is complete).
 
-# Quick Recap
+## Quick Recap
 
 - To find the first node in a binary tree, find the left most node from the root.
 - To find the last node, find the right most node from the root.
