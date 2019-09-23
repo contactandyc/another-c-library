@@ -42,7 +42,7 @@
    a. [The basic structure](10_binary_search_trees.md#the-basic-structure)<br/>
    b. [Find](10_binary_search_trees.md#find)<br/>
    c. [Insert](10_binary_search_trees.md#insert)<br/>
-   d. [First, Last, Next, Previous](10_binary_search_trees.md#first,-last,-next,-previous)<br/>
+   d. [First, Last, Next, Previous](10_binary_search_trees.md#first-last-next-previous)<br/>
    e. [Erase](10_binary_search_trees.md#erase)<br/>
    f. [Postorder iteration](10_binary_search_trees.md#postorder_iteration)<br/>
    g. [Printing a binary tree](10_binary_search_trees.md#printing-a-binary-tree)<br/>
