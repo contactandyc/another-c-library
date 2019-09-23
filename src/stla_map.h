@@ -85,35 +85,36 @@ bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root);
   leaf.
 */
 
-stla_map_node_t *stla_map_node_find(stla_map_node_t *p, stla_map_node_t *root) {
-  while (root) {
-    if (p < root)
-      root = root->left;
-    else if(p > root)
-      root = root->right;
-    else
-      return root;
-  }
-  return NULL;
-}
-
-bool stla_map_node_insert(stla_map_node_t *node_to_insert, stla_map_node_t **root) {
-  stla_map_node_t **n = root, *parent = NULL;
-  while (*n) {
-    parent = *n;
-    /*
-    if (node_to_insert->key < parent->key)
-      n = &(parent->left);
-    else if (node_to_insert->key > parent->key)
-      n = &(parent->right);
-    else
-      return false;
-      */
+#define stla_map_node_find_m(name, keytype, datatype, compare) \
+  datatype *name(keytype p, stla_map_node_t *root) { \
+    while (root) {                                   \
+      int n=compare(p, (datatype *)root);            \
+      if(n < 0)                                      \
+        root = root->left;                           \
+      else if(n > 0)                                 \
+        root = root->right;                          \
+      else                                           \
+        return root;                                 \
+    }                                                \
+    return NULL;                                     \
   }
 
-  *n = node_to_insert;
-  stla_map_fix_insert(node_to_insert, parent, root);
-  return true;
-}
+#define stla_map_node_insert_m(name, datatype, compare) \
+  bool name(datatype *node, stla_map_node_t **root) { \
+    stla_map_node_t **np = root, *parent = NULL;      \
+    while (*np) {                                     \
+      parent = *np;                                   \
+      int n=compare(node, (datatype *)parent);        \
+      if(n < 0)                                       \
+        np = &(parent->left);                         \
+      else if(n > 0)                                  \
+        np = &(parent->right);                        \
+      else                                            \
+        return false;                                 \
+    }                                                 \
+    *np = (stla_map_node_t *)node;                    \
+    stla_map_fix_insert(*np, parent, root);           \
+    return true;                                      \
+  }
 
 #endif
