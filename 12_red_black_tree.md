@@ -1219,6 +1219,7 @@ n = n->parent;
 becomes
 ```c
 n = rb_parent(n);
+```
 
 ```c
 n->color = RED;
@@ -1227,6 +1228,7 @@ becomes
 ```c
 rb_set_red(n);
 ```
+
 
 ```c
 if(n->color == RED)
