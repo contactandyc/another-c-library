@@ -1221,6 +1221,8 @@ becomes
 ```c
 n = rb_parent(n);
 ```
+<br/>
+<br/>
 
 rb_set_red
 ```c
@@ -1230,6 +1232,8 @@ becomes
 ```c
 rb_set_red(n);
 ```
+<br/>
+<br/>
 
 rb_is_red
 ```c
@@ -1239,6 +1243,8 @@ becomes
 ```c
 if(rb_is_red(n))
 ```
+<br/>
+<br/>
 
 rb_clear_black
 ```c
