@@ -29,11 +29,14 @@ struct node_s {
 #define rb_color(n) ((n)->parent_color & 1)
 #define rb_is_red(n) (((n)->parent_color & 1) == 0)
 #define rb_is_black(n) (((n)->parent_color & 1) == 1)
-#define rb_set_black(n) (n)->parent_color |= 1
-#define rb_clear_black(n) (n)->parent_color = 1
-#define rb_set_red(n) (n)->parent_color -= ((n)->parent_color & 1)
 #define rb_parent(n) (node_t *)((n)->parent_color - ((n)->parent_color & 1))
+
+#define rb_set_black(n) (n)->parent_color |= 1
+#define rb_set_red(n) (n)->parent_color -= ((n)->parent_color & 1)
 #define rb_set_parent(n, parent) (n)->parent_color = ((n)->parent_color & 1) + (size_t)(parent)
+
+#define rb_clear_black(n) (n)->parent_color = 1
+
 
 node_t *node_init(stla_pool_t *pool, char key) {
   node_t *n = (node_t *)stla_pool_alloc(pool, sizeof(node_t));

@@ -55,6 +55,7 @@
    a. [Testing the red black tree properties](12_red_black_tree.md#testing-the-red-black-tree-properties)<br/>
    b. [Insert](12_red_black_tree.md#insert)<br/>
    c. [Erase](12_red_black_tree.md#erase)<br/>
+   d. [Packing color into the parent node](12_red_black_tree.md#packing-color-into-the-parent-node)<br/>
 13. (Coming soon!) Turning the Red Black Tree into a map, set
 14. (Coming soon!) The multimap
 14. (Coming soon!) Building a generic least recently used cache

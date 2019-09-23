@@ -1161,4 +1161,82 @@ Finally, if neither of the sibling's children are red, color the sibling red.  I
 EXAMPLE
 ```
 
+## Packing color into the parent node
+
+The code for this section is found in <i>illustrations/12_red_black_tree/2_red_black_tree</i>
+```bash
+cd $stla/illustrations/12_red_black_tree/2_red_black_tree
+make
+```
+
+The red_black_tree code above used the following node data structure.
+
+```c
+struct node_s {
+  size_t color;
+  struct node_s *parent;
+  struct node_s *left;
+  struct node_s *right;
+  char key;
+};
+```
+
+This requires 8 bytes (on a 64 bit machine) for the color and 8 bytes for the parent.  Since pointers to structures are typically aligned, we can use the 0 bit of the parent for the color and save 8 bytes per node structure.  Our new structure will look like.
+
+```c
+struct node_s {
+  size_t parent_color;
+  struct node_s *left;
+  struct node_s *right;
+  char key;
+};
+```
+
+We can then use the following #define macros to access and set the parent node and the color.
+
+```c
+#define rb_color(n) ((n)->parent_color & 1)
+#define rb_is_red(n) (((n)->parent_color & 1) == 0)
+#define rb_is_black(n) (((n)->parent_color & 1) == 1)
+#define rb_parent(n) (node_t *)((n)->parent_color - ((n)->parent_color & 1))
+
+#define rb_set_black(n) (n)->parent_color |= 1
+#define rb_set_red(n) (n)->parent_color -= ((n)->parent_color & 1)
+#define rb_set_parent(n, parent) (n)->parent_color = ((n)->parent_color & 1) + (size_t)(parent)
+
+#define rb_clear_black(n) (n)->parent_color = 1
+```
+
+The rest of the change involves converting code which accesses the parent pointer or the color to one of these macros.  You can run the following command to find all of the diffs.  I'll show a few.
+
+```bash
+diff red_black_tree.c ../1_red_black_tree/red_black_tree.c | less
+```
+
+```c
+n = n->parent;
+```
+becomes
+```c
+n = rb_parent(n);
+
+```c
+n->color = RED;
+```
+becomes
+```c
+rb_set_red(n);
+```
+
+```c
+if(n->color == RED)
+```
+becomes
+```c
+if(rb_is_red(n))
+```
+
+and so on.
+
+
 [Table of Contents](README.md)  - Copyright 2019 Andy Curtis
