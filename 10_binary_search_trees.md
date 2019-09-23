@@ -1,6 +1,8 @@
 [Table of Contents](README.md)  - Copyright 2019 Andy Curtis
 
 # Binary Search Trees
+## The basic structure
+
 
 A binary search tree is similar to a linked list in that nodes are linked together.  The difference is that each node has two children.  The children are generally understood as being left and right where the left is less than the given node and the right is greater.  Trees in computer science generally grow from a root down (unlike trees in nature which grow up from the root).  This is likely due to the fact that in a binary search tree, the root is considered the top of the tree.  In binary search trees, each child node is aware of its parent node.  In the example below, B is aware of D as a parent, A as a left child, and C as a right child.
 
@@ -40,6 +42,8 @@ node_t *root = NULL;
 
 To build the tree, we will need functionality to insert new nodes.  For now, we will assume that our tree maintains unique keys (no duplicate letters).  In a binary search tree insert method, you first find the place where the node would go, and then if it doesn't already exist, you add the node.  It is often a good idea to search for the node prior to inserting.  This will eliminate the need to create and destroy the node needlessly, if it already existed.  It also is easier to understand the find method, so it comes next.
 
+# Find
+
 ```c
 node_t *node_find(char key, node_t *root) {
   while(root) {
@@ -69,6 +73,8 @@ node_t *node_find(char key, node_t *root) {
 
 The recursive method requires less code, but is less efficient as the recursion requires more stack manipulation.  Recursive functions are extremely powerful, but when they can be represented as a non-recursive method that is more efficient, it is usually best to use the non-recursive method.
 
+# Insert
+
 The node_insert method will require a pointer to the root pointer so that it can potentially modify what the root is. Insert works much like find, except that it needs to find the spot where the new node can fit.  To find that spot, the parent of that spot must be saved and the actual spot itself.  Because the spot where the new node can fit will be NULL, you can use the parent pointer from a given node.  Once a place is found, the node to insert's parent is to set to the saved parent, the left and right pointers are set to NULL, and the spot is set to reference the node.
 ```c
 #include <stdbool.h>
@@ -91,6 +97,8 @@ bool node_insert(node_t *node_to_insert, node_t **root) {
   return true;
 }
 ```
+
+## First, Last, Next, Previous
 
 Before getting to erasing nodes, I'm going to cover basic iteration.  Iteration is needed to solve one case of erasing nodes, so we will cover iteration first.
 
@@ -147,6 +155,8 @@ node_t *node_previous(node_t *n) {
   return n->parent;
 }
 ```
+
+## Erase
 
 Erasing nodes is a bit more complicated than insertion because the tree may need to be shuffled a bit for nodes which have children.  Consider our example from before.
 

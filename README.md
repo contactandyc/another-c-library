@@ -38,13 +38,23 @@
 7. [The Global Allocator Object](7_allocator.md)
 8. [The Global Allocator Implementation](8_allocator_impl.md)
 9. [The Pool Object](9_pool.md)
-10. [Binary Search Trees](10_binary_search_trees.md)
+10. [Binary Search Trees](10_binary_search_trees.md)<br/>
+   a. [The basic structure](10_binary_search_trees.md#the-basic-structure)<br/>
+   b. [Find](10_binary_search_trees.md#find)<br/>
+   c. [Insert](10_binary_search_trees.md#insert)<br/>
+   d. [First, Last, Next, Previous](10_binary_search_trees.md#first,-last,-next,-previous)<br/>
+   e. [Erase](10_binary_search_trees.md#erase)<br/>
+   f. [Postorder iteration](10_binary_search_trees.md#postorder_iteration)<br/>
+   g. [Printing a binary tree](10_binary_search_trees.md#printing-a-binary-tree)<br/>
 11. [Balancing Binary Search Trees](11_balancing_binary_search_trees.md)<br/>
-  a. [Why balancing is important](11_balancing_binary_search_trees.md#why-balancing-is-important)<br/>
-  b. [Properties of a red black tree](11_balancing_binary_search_trees.md#the-properties-of-a-red-black-tree)<br/>
-  c. [Coloring](11_balancing_binary_search_trees.md#coloring)<br/>
-  d. [Rotations](11_balancing_binary_search_trees.md#rotations)<br/>
-12. [The Red Black Tree](12_red_black_tree.md)
+   a. [Why balancing is important](11_balancing_binary_search_trees.md#why-balancing-is-important)<br/>
+   b. [Properties of a red black tree](11_balancing_binary_search_trees.md#the-properties-of-a- red-black-tree)<br/>
+   c. [Coloring](11_balancing_binary_search_trees.md#coloring)<br/>
+   d. [Rotations](11_balancing_binary_search_trees.md#rotations)<br/>
+12. [The Red Black Tree](12_red_black_tree.md)<br/>
+   a. [Testing the red black tree properties](12_red_black_tree.md#testing-the-red-black-tree-properties)<br/>
+   b. [Insert](12_red_black_tree.md#insert)<br/>
+   c. [Erase](12_red_black_tree.md#erase)<br/>
 13. (Coming soon!) Turning the Red Black Tree into a map, set
 14. (Coming soon!) The multimap
 14. (Coming soon!) Building a generic least recently used cache
