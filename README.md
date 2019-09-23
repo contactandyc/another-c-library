@@ -48,7 +48,7 @@
    g. [Printing a binary tree](10_binary_search_trees.md#printing-a-binary-tree)<br/>
 11. [Balancing Binary Search Trees](11_balancing_binary_search_trees.md)<br/>
    a. [Why balancing is important](11_balancing_binary_search_trees.md#why-balancing-is-important)<br/>
-   b. [Properties of a red black tree](11_balancing_binary_search_trees.md#the-properties-of-a- red-black-tree)<br/>
+   b. [Properties of a red black tree](11_balancing_binary_search_trees.md#properties-of-a-red-black-tree)<br/>
    c. [Coloring](11_balancing_binary_search_trees.md#coloring)<br/>
    d. [Rotations](11_balancing_binary_search_trees.md#rotations)<br/>
 12. [The Red Black Tree](12_red_black_tree.md)<br/>

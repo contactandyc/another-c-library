@@ -133,7 +133,7 @@ A balanced binary search tree is useful in that you are guaranteed that finding 
 
 The red black tree is a mostly balanced binary search tree that was invented by Leonidas J. Guibas and Robert Sedgewick.  There are certain properties that make a red black tree valid.  
 
-## The properties of a red black tree
+## Properties of a red black tree
 
 Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 
