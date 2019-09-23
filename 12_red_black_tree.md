@@ -1213,6 +1213,7 @@ The rest of the change involves converting code which accesses the parent pointe
 diff red_black_tree.c ../1_red_black_tree/red_black_tree.c | less
 ```
 
+rb_parent
 ```c
 n = n->parent;
 ```
@@ -1221,6 +1222,7 @@ becomes
 n = rb_parent(n);
 ```
 
+rb_set_red
 ```c
 n->color = RED;
 ```
@@ -1229,13 +1231,23 @@ becomes
 rb_set_red(n);
 ```
 
-
+rb_is_red
 ```c
 if(n->color == RED)
 ```
 becomes
 ```c
 if(rb_is_red(n))
+```
+
+rb_clear_black
+```c
+n->parent = NULL;
+n->color = BLACK;
+```
+becomes
+```c
+rb_clear_black(n);
 ```
 
 and so on.
