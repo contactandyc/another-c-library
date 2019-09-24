@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 #define stla_map_find_m(name, keytype, datatype, compare) \
-  datatype *name(keytype p, stla_map_node_t *root) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root) { \
     while (root) {                                   \
       int n=compare(p, (datatype *)root);            \
       if(n < 0)                                      \
@@ -30,7 +30,7 @@ limitations under the License.
 
 
 #define stla_map_find2_m(name, keytype, datatype, mapname, compare) \
-  datatype *name(keytype p, stla_map_node_t *root) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root) { \
     while (root) {                                   \
       datatype *d =                                  \
         stla_parent_object(root, datatype, mapname); \
@@ -46,7 +46,7 @@ limitations under the License.
   }
 
 #define stla_map_find_least_m(name, keytype, datatype, compare) \
-  datatype *name(keytype p, stla_map_node_t *root) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root) { \
     stla_map_node_t *parent = NULL;                  \
     int n;                                           \
     while (root) {                                   \
@@ -72,7 +72,7 @@ limitations under the License.
   }
 
 #define stla_map_find_least2_m(name, keytype, datatype, mapname, compare) \
-  datatype *name(keytype p, stla_map_node_t *root) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root) { \
     stla_map_node_t *parent = NULL;                  \
     int n;                                           \
     while (root) {                                   \
@@ -101,7 +101,7 @@ limitations under the License.
 
 
 #define stla_map_find_least_or_next_m(name, keytype, datatype, compare) \
-  datatype *name(keytype p, stla_map_node_t *root) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root) { \
     stla_map_node_t *parent = NULL;                  \
     int n;                                           \
     while (root) {                                   \
@@ -124,7 +124,7 @@ limitations under the License.
   }
 
 #define stla_map_find_least2_or_next_m(name, keytype, datatype, mapname, compare) \
-  datatype *name(keytype p, stla_map_node_t *root) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root) { \
     stla_map_node_t *parent = NULL;                  \
     int n;                                           \
     while (root) {                                   \
@@ -151,7 +151,7 @@ limitations under the License.
 
 
 #define stla_map_find_greatest_m(name, keytype, datatype, compare) \
-  datatype *name(keytype p, stla_map_node_t *root) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root) { \
     stla_map_node_t *parent = NULL;                  \
     int n;                                           \
     while (root) {                                   \
@@ -177,7 +177,7 @@ limitations under the License.
   }
 
 #define stla_map_find_greatest2_m(name, keytype, datatype, mapname, compare) \
-  datatype *name(keytype p, stla_map_node_t *root) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root) { \
     stla_map_node_t *parent = NULL;                  \
     int n;                                           \
     while (root) {                                   \
@@ -294,7 +294,7 @@ limitations under the License.
 
 
 #define stla_map_find_arg_m(name, keytype, datatype, compare) \
-  datatype *name(keytype p, stla_map_node_t *root, void *arg) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root, void *arg) { \
     while (root) {                                   \
       int n=compare(p, (datatype *)root, arg);       \
       if(n < 0)                                      \
@@ -309,7 +309,7 @@ limitations under the License.
 
 
 #define stla_map_find2_arg_m(name, keytype, datatype, mapname, compare) \
-  datatype *name(keytype p, stla_map_node_t *root, void *arg) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root, void *arg) { \
     while (root) {                                   \
       datatype *d =                                  \
         stla_parent_object(root, datatype, mapname); \
@@ -325,7 +325,7 @@ limitations under the License.
   }
 
 #define stla_map_find_least_arg_m(name, keytype, datatype, compare) \
-  datatype *name(keytype p, stla_map_node_t *root, void *arg) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root, void *arg) { \
     stla_map_node_t *parent = NULL;                  \
     int n;                                           \
     while (root) {                                   \
@@ -351,7 +351,7 @@ limitations under the License.
   }
 
 #define stla_map_find_least2_arg_m(name, keytype, datatype, mapname, compare) \
-  datatype *name(keytype p, stla_map_node_t *root, void *arg) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root, void *arg) { \
     stla_map_node_t *parent = NULL;                  \
     int n;                                           \
     while (root) {                                   \
@@ -380,7 +380,7 @@ limitations under the License.
 
 
 #define stla_map_find_greatest_arg_m(name, keytype, datatype, compare) \
-  datatype *name(keytype p, stla_map_node_t *root, void *arg) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root, void *arg) { \
     stla_map_node_t *parent = NULL;                  \
     int n;                                           \
     while (root) {                                   \
@@ -406,7 +406,7 @@ limitations under the License.
   }
 
 #define stla_map_find_greatest2_arg_m(name, keytype, datatype, mapname, compare) \
-  datatype *name(keytype p, stla_map_node_t *root, void *arg) { \
+  datatype *name(const keytype *p, const stla_map_node_t *root, void *arg) { \
     stla_map_node_t *parent = NULL;                  \
     int n;                                           \
     while (root) {                                   \

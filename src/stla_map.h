@@ -125,24 +125,137 @@ void stla_map_fix_insert(stla_map_node_t *node,
      2_m or 2_arg_m is a suffix for all macros which don't have stla_map_node_t
        structure defined as the first field.
 
+  The find macros are listed below (they are defined in impl/stla_map.h)
 
+  stla_map_find_m(name, keytype, datatype, compare)
+    expects: int compare(const keytype *key, const datatype *value);
+    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
 
+  stla_map_find2_m(name, keytype, datatype, mapname, compare)
+    expects: int compare(const keytype *key, const datatype *value);
+    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
 
+  stla_map_find_arg_m(name, keytype, datatype, compare)
+    expects: int compare(const keytype *key, const datatype *value, void *arg);
+    returns: datatype *name(const keytype *key,
+                            const stla_map_node_t *root,
+                            void *arg);
 
-  #define stla_map_find2_m(name, keytype, datatype, mapname, compare) \
+  stla_map_find2_arg_m(name, keytype, datatype, mapname, compare)
+    expects: int compare(const keytype *key, const datatype *value, void *arg);
+    returns: datatype *name(const keytype *key,
+                            const stla_map_node_t *root,
+                            void *arg);
 
+  stla_map_find_least_m(name, keytype, datatype, compare)
+    expects: int compare(const keytype *key, const datatype *value);
+    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
 
+  stla_map_find_least2_m(name, keytype, datatype, mapname, compare)
+    expects: int compare(const keytype *key, const datatype *value);
+    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
 
+  stla_map_find_least_arg_m(name, keytype, datatype, compare)
+    expects: int compare(const keytype *key, const datatype *value, void *arg);
+    returns: datatype *name(const keytype *key,
+                            const stla_map_node_t *root,
+                            void *arg);
 
-  The stla_map_find and stla_map_insert methods are the only functions which
-  require access to the key/value members of the structure.  Because of this,
-  it is efficient to define these as macros.  stla_map_insert must call the
-  stla_map_fix_insert call to balance the tree after the node is inserted as a
-  leaf.
-*/
+  stla_map_find_least2_arg_m(name, keytype, datatype, mapname, compare)
+    expects: int compare(const keytype *key, const datatype *value, void *arg);
+    returns: datatype *name(const keytype *key,
+                            const stla_map_node_t *root,
+                            void *arg);
 
-/*
+  stla_map_find_least_or_next_m(name, keytype, datatype, compare)
+    expects: int compare(const keytype *key, const datatype *value);
+    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
 
+  stla_map_find_least_or_next2_m(name, keytype, datatype, mapname, compare)
+    expects: int compare(const keytype *key, const datatype *value);
+    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+
+  stla_map_find_least_or_next_arg_m(name, keytype, datatype, compare)
+    expects: int compare(const keytype *key, const datatype *value, void *arg);
+    returns: datatype *name(const keytype *key,
+                            const stla_map_node_t *root,
+                            void *arg);
+
+  stla_map_find_least_or_next2_arg_m(name, keytype, datatype, mapname, compare)
+    expects: int compare(const keytype *key, const datatype *value, void *arg);
+    returns: datatype *name(const keytype *key,
+                            const stla_map_node_t *root,
+                            void *arg);
+
+  stla_map_find_greatest_m(name, keytype, datatype, compare)
+    expects: int compare(const keytype *key, const datatype *value);
+    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+
+  stla_map_find_greatest2_m(name, keytype, datatype, mapname, compare)
+    expects: int compare(const keytype *key, const datatype *value);
+    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+
+  stla_map_find_greatest_arg_m(name, keytype, datatype, compare)
+    expects: int compare(const keytype *key, const datatype *value, void *arg);
+    returns: datatype *name(const keytype *key,
+                            const stla_map_node_t *root,
+                            void *arg);
+
+  stla_map_find_greatest2_arg_m(name, keytype, datatype, mapname, compare)
+    expects: int compare(const keytype *key, const datatype *value, void *arg);
+    returns: datatype *name(const keytype *key,
+                            const stla_map_node_t *root,
+                            void *arg);
+
+  The insert macros are listed below (they are defined in impl/stla_map.h)
+
+  stla_map_insert_m(name, datatype, compare)
+    expects: int compare(const datatype *node_to_insert, const datatype *value);
+    returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+
+  stla_map_insert2_m(name, datatype, mapname, compare)
+    expects: int compare(const datatype *node_to_insert, const datatype *value);
+    returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+
+  stla_map_insert_arg_m(name, datatype, compare)
+    expects: int compare(const datatype *node_to_insert,
+                         const datatype *value,
+                         void *arg);
+    returns: datatype *name(datatype *node_to_insert,
+                            stla_map_node_t **root,
+                            void *arg);
+
+  stla_map_insert2_arg_m(name, datatype, mapname, compare)
+    expects: int compare(const datatype *node_to_insert,
+                         const datatype *value,
+                         void *arg);
+    returns: datatype *name(datatype *node_to_insert,
+                            stla_map_node_t **root,
+                            void *arg);
+
+  stla_multimap_insert_m(name, datatype, compare)
+    expects: int compare(const datatype *node_to_insert, const datatype *value);
+    returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+
+  stla_multimap_insert2_m(name, datatype, mapname, compare)
+    expects: int compare(const datatype *node_to_insert, const datatype *value);
+    returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+
+  stla_multimap_insert_arg_m(name, datatype, compare)
+    expects: int compare(const datatype *node_to_insert,
+                         const datatype *value,
+                         void *arg);
+    returns: datatype *name(datatype *node_to_insert,
+                            stla_map_node_t **root,
+                            void *arg);
+
+  stla_multimap_insert2_arg_m(name, datatype, mapname, compare)
+    expects: int compare(const datatype *node_to_insert,
+                         const datatype *value,
+                         void *arg);
+    returns: datatype *name(datatype *node_to_insert,
+                            stla_map_node_t **root,
+                            void *arg);
 */
 
 #include "impl/stla_map.h"
