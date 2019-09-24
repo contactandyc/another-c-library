@@ -25,14 +25,11 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 
-struct stla_map_node_s;
-typedef struct stla_map_node_s stla_map_node_t;
-
-struct stla_map_node_s {
+typedef struct stla_map_node_s {
   size_t parent_color;
-  stla_map_node_t *left;
-  stla_map_node_t *right;
-};
+  struct stla_map_node_s *left;
+  struct stla_map_node_s *right;
+} stla_map_node_t;
 
 /* iteration */
 stla_map_node_t * stla_map_first( stla_map_node_t *n );
