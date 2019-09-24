@@ -149,9 +149,20 @@ static void print_node_with_color_to_buffer(stla_buffer_t *bh,
     stla_buffer_appends(bh, "\x1B[0m)");
 }
 
+bool stla_map_valid(stla_pool_t *pool,
+                    stla_map_node_t *root,
+                    print_node_to_string_f print_node ) {
+  stla_buffer_t *bh = stla_buffer_init(10000);
+  bool valid = stla_map_valid_to_buffer(bh, pool, root, print_node);
+  if(!valid)
+    printf( "%s\n", stla_buffer_data(bh) );
+  stla_buffer_destroy(bh);
+  return valid;
+}
+
 /* test if valid */
-bool stla_map_valid(stla_buffer_t *bh, stla_pool_t *pool,
-                    stla_map_node_t *root, print_node_to_string_f print_node ) {
+bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
+                              stla_map_node_t *root, print_node_to_string_f print_node ) {
   /* an empty tree is valid */
   if(!root)
     return true;
@@ -357,6 +368,15 @@ static int get_node_depth( stla_map_node_print_t *item ) {
   return r;
 }
 
+void stla_map_print(stla_pool_t *pool, stla_map_node_t *root,
+                    print_node_to_string_f print_node,
+                    int flags ) {
+  stla_buffer_t *bh = stla_buffer_init(10000);
+  stla_map_print_to_buffer(bh, pool, root, print_node, flags);
+  if(stla_buffer_length(bh))
+    printf( "%s\n", stla_buffer_data(bh) );
+  stla_buffer_destroy(bh);
+}
 
 void stla_map_print_to_buffer(stla_buffer_t *bh,
                               stla_pool_t *pool, stla_map_node_t *root,

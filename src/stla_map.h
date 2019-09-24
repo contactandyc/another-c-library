@@ -60,8 +60,12 @@ typedef char * (*print_node_to_string_f)(stla_pool_t *pool, stla_map_node_t *n);
 
 stla_map_node_t * stla_map_copy( stla_map_node_t *root, stla_map_copy_node_f copy, void *tag);
 
-bool stla_map_valid(stla_buffer_t *bh, stla_pool_t *pool,
-                    stla_map_node_t *root, print_node_to_string_f print_node );
+bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
+                              stla_map_node_t *root, print_node_to_string_f print_node );
+
+bool stla_map_valid(stla_pool_t *pool,
+                    stla_map_node_t *root,
+                    print_node_to_string_f print_node);
 
 #define STLA_MAP_DONT_PRINT_RED 1
 #define STLA_MAP_DONT_PRINT_BLACK_HEIGHT 2
@@ -70,6 +74,10 @@ void stla_map_print_to_buffer(stla_buffer_t *bh,
                               stla_pool_t *pool, stla_map_node_t *node,
                               print_node_to_string_f print_node,
                               int flags );
+
+void stla_map_print(stla_pool_t *pool, stla_map_node_t *node,
+                    print_node_to_string_f print_node,
+                    int flags );
 
 void stla_map_fix_insert(stla_map_node_t *node,
                          stla_map_node_t *parent,
@@ -85,7 +93,7 @@ bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root);
   leaf.
 */
 
-#define stla_map_node_find_m(name, keytype, datatype, compare) \
+#define stla_map_find_m(name, keytype, datatype, compare) \
   datatype *name(keytype p, stla_map_node_t *root) { \
     while (root) {                                   \
       int n=compare(p, (datatype *)root);            \
@@ -94,12 +102,12 @@ bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root);
       else if(n > 0)                                 \
         root = root->right;                          \
       else                                           \
-        return root;                                 \
+        return (datatype *)root;                     \
     }                                                \
     return NULL;                                     \
   }
 
-#define stla_map_node_insert_m(name, datatype, compare) \
+#define stla_map_insert_m(name, datatype, compare)    \
   bool name(datatype *node, stla_map_node_t **root) { \
     stla_map_node_t **np = root, *parent = NULL;      \
     while (*np) {                                     \
