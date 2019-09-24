@@ -56,12 +56,12 @@
    b. [Insert](12_red_black_tree.md#insert)<br/>
    c. [Erase](12_red_black_tree.md#erase)<br/>
    d. [Packing color into the parent node](12_red_black_tree.md#packing-color-into-the-parent-node)<br/>
-13. (Started 9/23/19) [Turning the Red Black Tree into a map or set](13_map.md)
-14. (Coming soon!) The multimap
-14. (Coming soon!) Building a generic least recently used cache
-15. (Coming soon!) Binary search
-16. (Coming soon!) Heaps and priority queues
-17. (Coming soon!) Quicksort
+13. (Started 9/23/19) [Turning the Red Black Tree into a map](13_map.md)
+14. [The set and multimap](14_set_and_multimap.md)
+15. (Coming soon!) Building a generic least recently used cache
+16. (Coming soon!) Binary search
+17. (Coming soon!) Heaps and priority queues
+18. (Coming soon!) Quicksort
 
 # Some useful reading...
 

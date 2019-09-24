@@ -1,5 +1,5 @@
 # The Map Object
-- Turning the red black tree into a map or set
+- Turning the red black tree into a map
 
 *This and the src/stla_map.h/c files were started on Monday 9/23/19 and is still a work in progress.*
 
