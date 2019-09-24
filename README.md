@@ -56,7 +56,7 @@
    b. [Insert](12_red_black_tree.md#insert)<br/>
    c. [Erase](12_red_black_tree.md#erase)<br/>
    d. [Packing color into the parent node](12_red_black_tree.md#packing-color-into-the-parent-node)<br/>
-13. (Coming soon!) Turning the Red Black Tree into a map, set
+13. (Started 9/23/19) [Turning the Red Black Tree into a map or set](13_map.md)
 14. (Coming soon!) The multimap
 14. (Coming soon!) Building a generic least recently used cache
 15. (Coming soon!) Binary search

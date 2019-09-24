@@ -21,13 +21,10 @@ limitations under the License.
 #include <stdlib.h>
 #include <string.h>
 
-struct node_s;
-typedef struct node_s node_t;
-
-struct node_s {
+typedef struct {
   stla_map_node_t map;
   char key;
-};
+} node_t;
 
 static inline int compare_node(node_t *v1, node_t *v2) {
   if(v1->key != v2->key)

@@ -46,6 +46,8 @@ stla_map_node_t * stla_map_postorder_next( stla_map_node_t *n );
 */
 typedef stla_map_node_t * (*stla_map_copy_node_f)( stla_map_node_t *n, void *tag );
 
+stla_map_node_t * stla_map_copy( stla_map_node_t *root, stla_map_copy_node_f copy, void *tag);
+
 /*
   print_node_to_string_f is a callback meant to print the value of the node n.
   There is an expectation that the value will be printed on a single line.
@@ -53,9 +55,6 @@ typedef stla_map_node_t * (*stla_map_copy_node_f)( stla_map_node_t *n, void *tag
   and doesn't need to be complete.
 */
 typedef char * (*print_node_to_string_f)(stla_pool_t *pool, stla_map_node_t *n);
-
-
-stla_map_node_t * stla_map_copy( stla_map_node_t *root, stla_map_copy_node_f copy, void *tag);
 
 bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
                               stla_map_node_t *root, print_node_to_string_f print_node );
@@ -76,11 +75,11 @@ void stla_map_print(stla_pool_t *pool, stla_map_node_t *node,
                     print_node_to_string_f print_node,
                     int flags );
 
+bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root);
+
 void stla_map_fix_insert(stla_map_node_t *node,
                          stla_map_node_t *parent,
                          stla_map_node_t **root);
-
-bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root);
 
 /*
   The stla_map_find and stla_map_insert methods are the only functions which
