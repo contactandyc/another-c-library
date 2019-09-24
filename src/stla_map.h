@@ -29,7 +29,8 @@ typedef struct stla_map_node_s {
   size_t parent_color;
   struct stla_map_node_s *left;
   struct stla_map_node_s *right;
-} stla_map_node_t;
+} stla_map_node_t __attribute__((aligned(2)));
+/* The alignment is needed because the color uses the lowest bit */
 
 /* iteration */
 stla_map_node_t * stla_map_first( stla_map_node_t *n );
@@ -82,6 +83,57 @@ void stla_map_fix_insert(stla_map_node_t *node,
                          stla_map_node_t **root);
 
 /*
+  Finding and insertion cannot be made easily generic due to the need to access
+  the key and value members of the structure.  Finding is a pretty trivial
+  operation in binary search trees.  I've implemented a number of macros to
+  create functions since most use cases will be the same.
+
+  The macros have the following parameters (not all are used in all functions).
+
+  name     - the name of the function you wish to create
+  keytype  - the type of the key (only used in find functions)
+  datatype - the type of the structure which utilizes the stla_map_node_t
+     structure.
+  mapname  - the name of the field in your structure which references the
+     stla_map_node_t structure.  This is only used in macros with a 2 in the
+     name such as stla_map_find2_m.
+  compare  - the find function will expect the signature to look like
+     int compare(keytype key, datatype *d);
+       or
+     int compare(keytype key, datatype *d, void *arg);
+       if there is _arg_ in the macro name such as stla_map_find_arg_m.
+
+     The insert function will expect the signature of the compare function to be
+     int compare(datatype *d1, datatype *d2);
+       or
+     int compare(datatype *d1, datatype *d2);
+       if there is _arg_ in the macro name such as stla_map_insert_arg_m.
+
+  The macros have the following naming convention.
+     stla_map_find prefix for find functions
+     stla_map_find_least prefix to find the least instance of a key
+     stla_map_find_greatest prefix to find the greatest instance of a key
+     stla_map_find_least_or_next to find the least instance of a key or the
+       next item if it doesn't exist
+     stla_map_insert prefix for all map insert functions where items must be
+       unique
+     stla_multimap_insert prefix for all map insert functions where items can
+       be repeated
+
+     _m is a suffix for all macros to create functions.
+     _arg_m is a suffix for all macros where the compare function has an arg.
+     2_m or 2_arg_m is a suffix for all macros which don't have stla_map_node_t
+       structure defined as the first field.
+
+
+
+
+
+  #define stla_map_find2_m(name, keytype, datatype, mapname, compare) \
+
+
+
+
   The stla_map_find and stla_map_insert methods are the only functions which
   require access to the key/value members of the structure.  Because of this,
   it is efficient to define these as macros.  stla_map_insert must call the
@@ -89,36 +141,11 @@ void stla_map_fix_insert(stla_map_node_t *node,
   leaf.
 */
 
-#define stla_map_find_m(name, keytype, datatype, compare) \
-  datatype *name(keytype p, stla_map_node_t *root) { \
-    while (root) {                                   \
-      int n=compare(p, (datatype *)root);            \
-      if(n < 0)                                      \
-        root = root->left;                           \
-      else if(n > 0)                                 \
-        root = root->right;                          \
-      else                                           \
-        return (datatype *)root;                     \
-    }                                                \
-    return NULL;                                     \
-  }
+/*
 
-#define stla_map_insert_m(name, datatype, compare)    \
-  bool name(datatype *node, stla_map_node_t **root) { \
-    stla_map_node_t **np = root, *parent = NULL;      \
-    while (*np) {                                     \
-      parent = *np;                                   \
-      int n=compare(node, (datatype *)parent);        \
-      if(n < 0)                                       \
-        np = &(parent->left);                         \
-      else if(n > 0)                                  \
-        np = &(parent->right);                        \
-      else                                            \
-        return false;                                 \
-    }                                                 \
-    *np = (stla_map_node_t *)node;                    \
-    stla_map_fix_insert(*np, parent, root);           \
-    return true;                                      \
-  }
+*/
+
+#include "impl/stla_map.h"
+
 
 #endif
