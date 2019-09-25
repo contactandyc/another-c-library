@@ -16,7 +16,7 @@ limitations under the License.
 #ifndef _stla_map_H
 #define _stla_map_H
 
-/* still a bit incomplete */
+/* Still a bit incomplete */
 
 #include "stla_common.h"
 #include "stla_pool.h"

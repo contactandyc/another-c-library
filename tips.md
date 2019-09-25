@@ -1,0 +1,48 @@
+# Things that have been helpful to me
+
+## Line spacing in markdown
+Just use a br html tag to create a single line break.  
+
+## Remember to escape characters in markdown
+Use the \\ to escape characters in markdown such as the underscore or asterisk.
+
+## Atom-beautify (beautifying C code)
+I use Atom with atom-beautify when coding.  Recently, I ran across an error where I couldn't get it to work with C/C++ code.  I had to do the following to get it to work.
+
+Install llvm
+```bash
+brew install llvm
+```
+
+Add path in Atom (path may be different to llvm)<br/>
+Atom => Preferences => Packages => atom-beautify => Settings => Executables => ClangFormat<br/>
+```bash
+/usr/local/Cellar/llvm/9.0.0/bin
+```
+
+Fix coffee script per https://github.com/Glavin001/atom-beautify/issues/2290
+
+In the file,
+```
+~/.atom/packages/atom-beautify/src/beautifiers/clang-format.coffee
+```
+
+At line 84
+```coffee
+return @exe("clang-format").run([
+  @dumpToFile(dumpFile, text)
+  ["--style=file"]
+  ]).finally( ->
+    fs.unlink(dumpFile)
+  )
+```
+
+Add the -> in the fs.unlink to look like
+```coffee
+return @exe("clang-format").run([
+  @dumpToFile(dumpFile, text)
+  ["--style=file"]
+  ]).finally( ->
+    fs.unlink(dumpFile, ->)
+  )
+```
