@@ -7,7 +7,7 @@ Just use a br html tag to create a single line break.
 Use the \\ to escape characters in markdown such as the underscore or asterisk.
 
 ## Create a multiline macro in C
-On a mac, Command-F to get find and replace to show up on the bottom.  Next, select the \.\* option on the right side of the find and replace pane.  Replace *$* with * \\*.
+On a mac, Command-F to get find and replace to show up on the bottom.  Next, select the _\.\*_ option on the right side of the find and replace pane.  Replace _$_ with _ \\_.
 
 ## Atom-beautify (beautifying C code)
 I use Atom with atom-beautify when coding.  Recently, I ran across an error where I couldn't get it to work with C/C++ code.  I had to do the following to get it to work.
