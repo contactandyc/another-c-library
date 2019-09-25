@@ -1,6 +1,3 @@
-#ifndef _stla_sort_H
-#define _stla_sort_H
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1828,5 +1825,3 @@ typedef struct {
       }                                                                        \
     }                                                                          \
   }
-
-#endif
