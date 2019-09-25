@@ -18,9 +18,9 @@ limitations under the License.
 
 /* Still a bit incomplete */
 
+#include "stla_buffer.h"
 #include "stla_common.h"
 #include "stla_pool.h"
-#include "stla_buffer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,21 +33,22 @@ typedef struct stla_map_node_s {
 /* The alignment is needed because the color uses the lowest bit */
 
 /* iteration */
-stla_map_node_t * stla_map_first( stla_map_node_t *n );
-stla_map_node_t * stla_map_last( stla_map_node_t *n );
-stla_map_node_t * stla_map_next( stla_map_node_t *n );
-stla_map_node_t * stla_map_previous( stla_map_node_t *n );
-stla_map_node_t * stla_map_postorder_first( stla_map_node_t *n );
-stla_map_node_t * stla_map_postorder_next( stla_map_node_t *n );
+stla_map_node_t *stla_map_first(stla_map_node_t *n);
+stla_map_node_t *stla_map_last(stla_map_node_t *n);
+stla_map_node_t *stla_map_next(stla_map_node_t *n);
+stla_map_node_t *stla_map_previous(stla_map_node_t *n);
+stla_map_node_t *stla_map_postorder_first(stla_map_node_t *n);
+stla_map_node_t *stla_map_postorder_next(stla_map_node_t *n);
 
 /*
   stla_map_copy_node_f is a callback meant to be used with stla_map_copy to
   copy one map to another given a root node.  The tag will typically be an
   allocator such as the pool.
 */
-typedef stla_map_node_t * (*stla_map_copy_node_f)( stla_map_node_t *n, void *tag );
+typedef stla_map_node_t *(*stla_map_copy_node_f)(stla_map_node_t *n, void *tag);
 
-stla_map_node_t * stla_map_copy( stla_map_node_t *root, stla_map_copy_node_f copy, void *tag);
+stla_map_node_t *stla_map_copy(stla_map_node_t *root, stla_map_copy_node_f copy,
+                               void *tag);
 
 /*
   print_node_to_string_f is a callback meant to print the value of the node n.
@@ -55,31 +56,28 @@ stla_map_node_t * stla_map_copy( stla_map_node_t *root, stla_map_copy_node_f cop
   Printing the internal representation of the tree is largely meant for testing
   and doesn't need to be complete.
 */
-typedef char * (*print_node_to_string_f)(stla_pool_t *pool, stla_map_node_t *n);
+typedef char *(*print_node_to_string_f)(stla_pool_t *pool, stla_map_node_t *n);
 
 bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
-                              stla_map_node_t *root, print_node_to_string_f print_node );
+                              stla_map_node_t *root,
+                              print_node_to_string_f print_node);
 
-bool stla_map_valid(stla_pool_t *pool,
-                    stla_map_node_t *root,
+bool stla_map_valid(stla_pool_t *pool, stla_map_node_t *root,
                     print_node_to_string_f print_node);
 
 #define STLA_MAP_DONT_PRINT_RED 1
 #define STLA_MAP_DONT_PRINT_BLACK_HEIGHT 2
 
-void stla_map_print_to_buffer(stla_buffer_t *bh,
-                              stla_pool_t *pool, stla_map_node_t *node,
-                              print_node_to_string_f print_node,
-                              int flags );
+void stla_map_print_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
+                              stla_map_node_t *node,
+                              print_node_to_string_f print_node, int flags);
 
 void stla_map_print(stla_pool_t *pool, stla_map_node_t *node,
-                    print_node_to_string_f print_node,
-                    int flags );
+                    print_node_to_string_f print_node, int flags);
 
 bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root);
 
-void stla_map_fix_insert(stla_map_node_t *node,
-                         stla_map_node_t *parent,
+void stla_map_fix_insert(stla_map_node_t *node, stla_map_node_t *parent,
                          stla_map_node_t **root);
 
 /*
@@ -259,6 +257,5 @@ void stla_map_fix_insert(stla_map_node_t *node,
 */
 
 #include "impl/stla_map.h"
-
 
 #endif

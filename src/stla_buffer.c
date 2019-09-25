@@ -22,13 +22,13 @@ limitations under the License.
 #ifdef _STLA_DEBUG_MEMORY_
 static void dump_buffer(FILE *out, const char *caller, void *p, size_t length) {
   stla_buffer_t *bh = (stla_buffer_t *)p;
-  fprintf( out, "%s size: %lu, max_length: %lu, initial_size: %lu ", caller, bh->size, bh->max_length, bh->initial_size );
+  fprintf(out, "%s size: %lu, max_length: %lu, initial_size: %lu ", caller,
+          bh->size, bh->max_length, bh->initial_size);
 }
 
-stla_buffer_t *_stla_buffer_init(size_t initial_size,
-                                 const char *caller) {
-  stla_buffer_t *h =
-    (stla_buffer_t *)_stla_malloc_d(NULL, caller, sizeof(stla_buffer_t), true);
+stla_buffer_t *_stla_buffer_init(size_t initial_size, const char *caller) {
+  stla_buffer_t *h = (stla_buffer_t *)_stla_malloc_d(
+      NULL, caller, sizeof(stla_buffer_t), true);
   h->dump.dump = dump_buffer;
   h->initial_size = initial_size;
   h->max_length = 0;
@@ -36,8 +36,8 @@ stla_buffer_t *_stla_buffer_init(size_t initial_size,
 stla_buffer_t *_stla_buffer_init(size_t initial_size) {
   stla_buffer_t *h = (stla_buffer_t *)stla_malloc(sizeof(stla_buffer_t));
 #endif
-  h->data =
-    initial_size ? (char *)stla_malloc(initial_size + 1) : (char *)(&(h->size));
+  h->data = initial_size ? (char *)stla_malloc(initial_size + 1)
+                         : (char *)(&(h->size));
   h->data[0] = 0;
   h->length = 0;
   h->size = initial_size;
@@ -46,7 +46,7 @@ stla_buffer_t *_stla_buffer_init(size_t initial_size) {
 }
 
 void stla_buffer_destroy(stla_buffer_t *h) {
-  if(!h->pool) {
+  if (!h->pool) {
     stla_free(h->data);
     stla_free(h);
   }
@@ -60,7 +60,7 @@ void _stla_buffer_append(stla_buffer_t *h, const void *data, size_t length) {
   h->length += length;
   h->data[h->length] = 0;
 #ifdef _STLA_DEBUG_MEMORY_
-  if(length > h->max_length)
+  if (length > h->max_length)
     h->max_length = length;
 #endif
 }
@@ -87,7 +87,7 @@ void stla_buffer_appendvf(stla_buffer_t *h, const char *fmt, va_list args) {
     h->length += n;
   }
 #ifdef _STLA_DEBUG_MEMORY_
-  if(h->length > h->max_length)
+  if (h->length > h->max_length)
     h->max_length = h->length;
 #endif
 }

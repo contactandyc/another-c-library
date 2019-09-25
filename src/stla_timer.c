@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "stla_timer.h"
 #include "stla_allocator.h"
+#include "stla_timer.h"
+#include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
-#include <stdlib.h>
 
 struct stla_timer_s {
   long base;
@@ -30,8 +30,7 @@ struct stla_timer_s {
 #ifdef _STLA_DEBUG_MEMORY_
 stla_timer_t *_stla_timer_init(int repeat, const char *caller) {
   stla_timer_t *t =
-    (stla_timer_t *)_stla_malloc_d(NULL, caller,
-                                   sizeof(stla_timer_t), false);
+      (stla_timer_t *)_stla_malloc_d(NULL, caller, sizeof(stla_timer_t), false);
 #else
 stla_timer_t *_stla_timer_init(int repeat) {
   stla_timer_t *t = (stla_timer_t *)stla_malloc(sizeof(stla_timer_t));
@@ -41,27 +40,20 @@ stla_timer_t *_stla_timer_init(int repeat) {
   return t;
 }
 
-void stla_timer_destroy(stla_timer_t *t) {
-  stla_free(t);
-}
+void stla_timer_destroy(stla_timer_t *t) { stla_free(t); }
 
 /* get the number of times a task is meant to repeat */
-int stla_timer_get_repeat(stla_timer_t *t) {
-  return t->repeat;
-}
+int stla_timer_get_repeat(stla_timer_t *t) { return t->repeat; }
 
 /* set the number of times a task is meant to repeat */
-void stla_timer_set_repeat(stla_timer_t *t, int repeat) {
-  t->repeat = repeat;
-}
-
+void stla_timer_set_repeat(stla_timer_t *t, int repeat) { t->repeat = repeat; }
 
 void stla_timer_subtract(stla_timer_t *t, stla_timer_t *sub) {
-  t->base -= (sub->time_spent+sub->base);
+  t->base -= (sub->time_spent + sub->base);
 }
 
 void stla_timer_add(stla_timer_t *t, stla_timer_t *add) {
-  t->base += (add->time_spent+add->base);
+  t->base += (add->time_spent + add->base);
 }
 
 void stla_timer_start(stla_timer_t *t) {
@@ -81,7 +73,7 @@ void stla_timer_stop(stla_timer_t *t) {
 double stla_timer_ns(stla_timer_t *t) {
   double r = t->repeat * 1.0;
   double ts = t->time_spent + t->base;
-  return (ts*1000.0) / r;
+  return (ts * 1000.0) / r;
 }
 
 double stla_timer_us(stla_timer_t *t) {
@@ -93,11 +85,11 @@ double stla_timer_us(stla_timer_t *t) {
 double stla_timer_ms(stla_timer_t *t) {
   double r = t->repeat * 1.0;
   double ts = t->time_spent + t->base;
-  return ts / (r*1000.0);
+  return ts / (r * 1000.0);
 }
 
 double stla_timer_sec(stla_timer_t *t) {
   double r = t->repeat * 1.0;
   double ts = t->time_spent + t->base;
-  return ts / (r*1000000.0);
+  return ts / (r * 1000000.0);
 }

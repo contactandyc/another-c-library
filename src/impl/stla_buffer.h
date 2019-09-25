@@ -28,9 +28,10 @@ struct stla_buffer_s {
   stla_pool_t *pool;
 };
 
-
-static inline stla_buffer_t *stla_buffer_pool_init(stla_pool_t *pool, size_t initial_size) {
-  stla_buffer_t *h = (stla_buffer_t *)stla_pool_alloc(pool, sizeof(stla_buffer_t));
+static inline stla_buffer_t *stla_buffer_pool_init(stla_pool_t *pool,
+                                                   size_t initial_size) {
+  stla_buffer_t *h =
+      (stla_buffer_t *)stla_pool_alloc(pool, sizeof(stla_buffer_t));
   h->data = (char *)stla_pool_alloc(pool, initial_size + 1);
   h->data[0] = 0;
   h->length = 0;
@@ -49,15 +50,14 @@ static inline size_t stla_buffer_length(stla_buffer_t *h) { return h->length; }
 
 static inline void _stla_buffer_grow(stla_buffer_t *h, size_t length) {
   size_t len = (length + 50) + (h->size >> 3);
-  if(!h->pool) {
+  if (!h->pool) {
     char *data = (char *)stla_malloc(len + 1);
     memcpy(data, h->data, h->length + 1);
-    if(h->size)
+    if (h->size)
       stla_free(h->data);
     h->data = data;
-  }
-  else
-    h->data = (char *)stla_pool_dup(h->pool, h->data, len+1);
+  } else
+    h->data = (char *)stla_pool_dup(h->pool, h->data, len + 1);
   h->size = len;
 }
 
@@ -67,7 +67,7 @@ static inline void *stla_buffer_resize(stla_buffer_t *h, size_t length) {
   h->length = length;
   h->data[h->length] = 0;
 #ifdef _STLA_DEBUG_MEMORY_
-  if(length > h->max_length)
+  if (length > h->max_length)
     h->max_length = length;
 #endif
   return h->data;
@@ -80,7 +80,7 @@ static inline void *stla_buffer_append_alloc(stla_buffer_t *h, size_t length) {
   h->length += length;
   r[h->length] = 0;
 #ifdef _STLA_DEBUG_MEMORY_
-  if(length > h->max_length)
+  if (length > h->max_length)
     h->max_length = length;
 #endif
   return r;
@@ -88,7 +88,8 @@ static inline void *stla_buffer_append_alloc(stla_buffer_t *h, size_t length) {
 
 void _stla_buffer_append(stla_buffer_t *h, const void *data, size_t length);
 
-static inline void stla_buffer_append(stla_buffer_t *h, const void *data, size_t length) {
+static inline void stla_buffer_append(stla_buffer_t *h, const void *data,
+                                      size_t length) {
   _stla_buffer_append(h, data, length);
 }
 
@@ -105,7 +106,7 @@ static inline void stla_buffer_appendc(stla_buffer_t *h, char ch) {
   *d = 0;
   h->length++;
 #ifdef _STLA_DEBUG_MEMORY_
-  if(h->length > h->max_length)
+  if (h->length > h->max_length)
     h->max_length = h->length;
 #endif
 }
@@ -123,20 +124,19 @@ static inline void stla_buffer_appendn(stla_buffer_t *h, char ch, ssize_t n) {
   *d = 0;
   h->length += n;
 #ifdef _STLA_DEBUG_MEMORY_
-  if(h->length > h->max_length)
+  if (h->length > h->max_length)
     h->max_length = h->length;
 #endif
 }
 
 static inline void _stla_buffer_alloc(stla_buffer_t *h, size_t length) {
   size_t len = (length + 50) + (h->size >> 3);
-  if(!h->pool) {
-    if(h->size)
+  if (!h->pool) {
+    if (h->size)
       stla_free(h->data);
     h->data = (char *)stla_malloc(len + 1);
-  }
-  else
-    h->data = (char *)stla_pool_alloc(h->pool, len+1);
+  } else
+    h->data = (char *)stla_pool_alloc(h->pool, len + 1);
   h->size = len;
 }
 
@@ -145,39 +145,46 @@ static inline void *stla_buffer_alloc(stla_buffer_t *h, size_t length) {
     _stla_buffer_alloc(h, length);
   h->length = length;
 #ifdef _STLA_DEBUG_MEMORY_
-  if(length > h->max_length)
+  if (length > h->max_length)
     h->max_length = length;
 #endif
   h->data[h->length] = 0;
   return h->data;
 }
 
-static inline void _stla_buffer_set(stla_buffer_t *h, const void *data, size_t length) {
+static inline void _stla_buffer_set(stla_buffer_t *h, const void *data,
+                                    size_t length) {
   if (length > h->size)
     _stla_buffer_alloc(h, length);
   memcpy(h->data, data, length);
   h->length = length;
 #ifdef _STLA_DEBUG_MEMORY_
-  if(length > h->max_length)
+  if (length > h->max_length)
     h->max_length = length;
 #endif
   h->data[length] = 0;
 }
 
-static inline void stla_buffer_set(stla_buffer_t *h, const void *data, size_t length) {
+static inline void stla_buffer_set(stla_buffer_t *h, const void *data,
+                                   size_t length) {
   _stla_buffer_set(h, data, length);
 }
 
-static inline void stla_buffer_sets(stla_buffer_t *h, const char *s) { _stla_buffer_set(h, s, strlen(s)); }
+static inline void stla_buffer_sets(stla_buffer_t *h, const char *s) {
+  _stla_buffer_set(h, s, strlen(s));
+}
 
-static inline void stla_buffer_setc(stla_buffer_t *h, char c) { _stla_buffer_set(h, &c, 1); }
+static inline void stla_buffer_setc(stla_buffer_t *h, char c) {
+  _stla_buffer_set(h, &c, 1);
+}
 
 static inline void stla_buffer_setn(stla_buffer_t *h, char ch, ssize_t n) {
   h->length = 0;
   stla_buffer_appendn(h, ch, n);
 }
 
-static inline void stla_buffer_setvf(stla_buffer_t *h, const char *fmt, va_list args) {
+static inline void stla_buffer_setvf(stla_buffer_t *h, const char *fmt,
+                                     va_list args) {
   h->length = 0;
   stla_buffer_appendvf(h, fmt, args);
 }

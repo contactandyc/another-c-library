@@ -72,9 +72,9 @@ static inline void *stla_pool_ualloc(stla_pool_t *h, size_t len) {
   if (r + len < h->current->endp) {
     h->curp = r + len;
 #ifdef _STLA_DEBUG_MEMORY_
-  h->cur_size += len;
-  if(h->cur_size > h->max_size)
-    h->max_size = h->cur_size;
+    h->cur_size += len;
+    if (h->cur_size > h->max_size)
+      h->max_size = h->cur_size;
 #endif
     return r;
   }
@@ -89,7 +89,7 @@ static inline void *stla_pool_alloc(stla_pool_t *h, size_t len) {
     h->curp = r + len;
 #ifdef _STLA_DEBUG_MEMORY_
     h->cur_size += len;
-    if(h->cur_size > h->max_size)
+    if (h->cur_size > h->max_size)
       h->max_size = h->cur_size;
 #endif
     return r;
@@ -105,7 +105,8 @@ static inline void *stla_pool_calloc(stla_pool_t *h, size_t len) {
   return dest;
 }
 
-static inline void *stla_pool_udup(stla_pool_t *h, const void *data, size_t len) {
+static inline void *stla_pool_udup(stla_pool_t *h, const void *data,
+                                   size_t len) {
   /* dup will simply allocate enough bytes to hold the duplicated data,
     copy the data, and return the newly allocated memory which contains a copy
     of data. Because the data could need aligned, we will use stla_pool_alloc
@@ -122,8 +123,8 @@ static inline char *stla_pool_strdup(stla_pool_t *h, const char *p) {
   return (char *)stla_pool_udup(h, p, len);
 }
 
-
-static inline void *stla_pool_dup(stla_pool_t *h, const void *data, size_t len) {
+static inline void *stla_pool_dup(stla_pool_t *h, const void *data,
+                                  size_t len) {
   /* dup will simply allocate enough bytes to hold the duplicated data,
     copy the data, and return the newly allocated memory which contains a copy
     of data. Because the data could need aligned, we will use stla_pool_alloc

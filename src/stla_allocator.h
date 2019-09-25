@@ -26,7 +26,8 @@ limitations under the License.
 #ifdef _STLA_DEBUG_MEMORY_
 #define stla_malloc(len) _stla_malloc_d(NULL, __STLA_FILE_LINE__, len, false)
 #define stla_calloc(len) _stla_calloc_d(NULL, __STLA_FILE_LINE__, len, false)
-#define stla_realloc(p, len) _stla_realloc_d(NULL, __STLA_FILE_LINE__, p, len, false)
+#define stla_realloc(p, len)                                                   \
+  _stla_realloc_d(NULL, __STLA_FILE_LINE__, p, len, false)
 #define stla_strdup(p) _stla_strdup_d(NULL, __STLA_FILE_LINE__, p)
 #define stla_free(p) _stla_free_d(NULL, __STLA_FILE_LINE__, p)
 #else
@@ -37,7 +38,8 @@ limitations under the License.
 #define stla_free(p) free(p)
 #endif
 
-typedef void (*stla_dump_details_f)(FILE *out, const char *caller, void *p, size_t length);
+typedef void (*stla_dump_details_f)(FILE *out, const char *caller, void *p,
+                                    size_t length);
 
 typedef struct {
   stla_dump_details_f dump;
@@ -51,13 +53,16 @@ void stla_allocator_destroy(stla_allocator_t *a);
 
 void stla_dump_global_allocations(stla_allocator_t *a, FILE *out);
 
-void *_stla_malloc_d(stla_allocator_t *a, const char *caller, size_t len, bool custom );
+void *_stla_malloc_d(stla_allocator_t *a, const char *caller, size_t len,
+                     bool custom);
 
-void *_stla_calloc_d(stla_allocator_t *a, const char *caller, size_t len, bool custom );
+void *_stla_calloc_d(stla_allocator_t *a, const char *caller, size_t len,
+                     bool custom);
 
-void *_stla_realloc_d(stla_allocator_t *a, const char *caller, void *p, size_t len, bool custom);
+void *_stla_realloc_d(stla_allocator_t *a, const char *caller, void *p,
+                      size_t len, bool custom);
 
-char *_stla_strdup_d(stla_allocator_t *a, const char *caller, const char *p );
+char *_stla_strdup_d(stla_allocator_t *a, const char *caller, const char *p);
 
 void _stla_free_d(stla_allocator_t *a, const char *caller, void *p);
 

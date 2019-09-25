@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "stla_pool.h"
 #include "stla_allocator.h"
+#include "stla_pool.h"
 #include <stdlib.h>
 
 size_t stla_pool_size(stla_pool_t *h) {
@@ -25,15 +25,17 @@ size_t stla_pool_size(stla_pool_t *h) {
 size_t stla_pool_used(stla_pool_t *h) { return h->used; }
 
 void stla_pool_set_minimum_growth_size(stla_pool_t *h, size_t size) {
-  if(size == 0) abort();  /* this doesn't make sense */
+  if (size == 0)
+    abort(); /* this doesn't make sense */
   h->minimum_growth_size = size;
 }
 
 #ifdef _STLA_DEBUG_MEMORY_
 static void dump_pool(FILE *out, const char *caller, void *p, size_t length) {
   stla_pool_t *pool = (stla_pool_t *)p;
-  fprintf( out, "%s size: %lu, max_size: %lu, initial_size: %lu used: %lu ",
-           caller, pool->cur_size, pool->max_size, pool->initial_size, pool->used );
+  fprintf(out, "%s size: %lu, max_size: %lu, initial_size: %lu used: %lu ",
+          caller, pool->cur_size, pool->max_size, pool->initial_size,
+          pool->used);
 }
 
 stla_pool_t *_stla_pool_init(size_t initial_size, const char *caller) {
@@ -41,10 +43,10 @@ stla_pool_t *_stla_pool_init(size_t initial_size, const char *caller) {
 stla_pool_t *_stla_pool_init(size_t initial_size) {
 #endif
   if (initial_size == 0)
-   abort(); /* this doesn't make any sense */
+    abort(); /* this doesn't make any sense */
   /* round initial_size up to be properly aligned */
   initial_size += ((sizeof(size_t) - (initial_size & (sizeof(size_t) - 1))) &
-                  (sizeof(size_t) - 1));
+                   (sizeof(size_t) - 1));
 
   /* Allocate the stla_pool_t structure, the first node, and the memory in one
    call.  This keeps the memory in close proximity which is better for the CPU
@@ -56,13 +58,13 @@ stla_pool_t *_stla_pool_init(size_t initial_size) {
    so that the actual memory allocated via the system malloc is 4096 bytes. */
   size_t block_size = initial_size;
   if ((block_size & 4096) == 0)
-   block_size -= (sizeof(stla_pool_t) + sizeof(stla_pool_node_t));
+    block_size -= (sizeof(stla_pool_t) + sizeof(stla_pool_node_t));
 
   stla_pool_t *h;
 #ifdef _STLA_DEBUG_MEMORY_
-  h = (stla_pool_t *)_stla_malloc_d(NULL, caller,
-                                    block_size + sizeof(stla_pool_t) +
-                                    sizeof(stla_pool_node_t), true);
+  h = (stla_pool_t *)_stla_malloc_d(
+      NULL, caller, block_size + sizeof(stla_pool_t) + sizeof(stla_pool_node_t),
+      true);
   h->dump.dump = dump_pool;
   h->initial_size = initial_size;
   h->cur_size = 0;
@@ -72,7 +74,7 @@ stla_pool_t *_stla_pool_init(size_t initial_size) {
                                  sizeof(stla_pool_node_t));
 #endif
   if (!h) /* what else might we do? */
-   abort();
+    abort();
   h->used = initial_size + sizeof(stla_pool_t) + sizeof(stla_pool_node_t);
   h->size = 0;
   h->current = (stla_pool_node_t *)(h + 1);
@@ -121,7 +123,7 @@ void *_stla_pool_alloc_grow(stla_pool_t *h, size_t len) {
       (stla_pool_node_t *)stla_malloc(sizeof(stla_pool_node_t) + block_size);
   if (!block)
     abort();
-  if(h->current->prev)
+  if (h->current->prev)
     h->size += (h->current->endp - h->curp);
   h->used += sizeof(stla_pool_node_t) + block_size;
   block->prev = h->current;
@@ -131,7 +133,7 @@ void *_stla_pool_alloc_grow(stla_pool_t *h, size_t len) {
   h->curp = r + len;
 #ifdef _STLA_DEBUG_MEMORY_
   h->cur_size += len;
-  if(h->cur_size > h->max_size)
+  if (h->cur_size > h->max_size)
     h->max_size = h->cur_size;
 #endif
   return r;
@@ -149,8 +151,8 @@ char *stla_pool_strdupvf(stla_pool_t *pool, const char *fmt, va_list args) {
   if (n < leftover) {
     pool->curp += n + 1;
 #ifdef _STLA_DEBUG_MEMORY_
-    pool->cur_size += (n+1);
-    if(pool->cur_size > pool->max_size)
+    pool->cur_size += (n + 1);
+    if (pool->cur_size > pool->max_size)
       pool->max_size = pool->cur_size;
 #endif
     return r;

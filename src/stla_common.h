@@ -39,10 +39,11 @@ Snapshots are saved in increasing intervals.
 #define _STLA_DEBUG_MEMORY_SPEED_ 60
 
 /*
-  Given an address of a member of a structure, the base object type, and the field name,
-  return the address of the base structure.
+  Given an address of a member of a structure, the base object type, and the
+  field name, return the address of the base structure.
 */
-#define stla_parent_object(addr, base_type, field) (base_type *)((char *)addr-offsetof(base_type,field))
+#define stla_parent_object(addr, base_type, field)                             \
+  (base_type *)((char *)addr - offsetof(base_type, field))
 
 #define STLA_STRINGIZE2(x) #x
 #define STLA_STRINGIZE(x) STLA_STRINGIZE2(x)

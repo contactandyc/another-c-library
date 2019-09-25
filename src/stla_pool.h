@@ -28,7 +28,8 @@ typedef struct stla_pool_s stla_pool_t;
 
 /* stla_pool_init will create a working space of size bytes */
 #ifdef _STLA_DEBUG_MEMORY_
-#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
+#define stla_pool_init(size)                                                   \
+  _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
 stla_pool_t *_stla_pool_init(size_t size, const char *caller);
 #else
 #define stla_pool_init(size) _stla_pool_init(size)
@@ -73,7 +74,8 @@ static inline char *stla_pool_strdup(stla_pool_t *h, const char *p);
 static inline void *stla_pool_dup(stla_pool_t *h, const void *data, size_t len);
 
 /* stla_pool_dup allocates a copy of the data.  The memory will be unaligned. */
-static inline void *stla_pool_udup(stla_pool_t *h, const void *data, size_t len);
+static inline void *stla_pool_udup(stla_pool_t *h, const void *data,
+                                   size_t len);
 
 /* stla_pool_strdupf allocates a copy of the formatted string p. */
 static inline char *stla_pool_strdupf(stla_pool_t *h, const char *p, ...);
