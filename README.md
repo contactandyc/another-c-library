@@ -66,7 +66,7 @@
 # [Things that have been helpful to me](tips.md)
 1. [Line spacing in markdown](tips.md#line-spacing-in-markdown)
 2. [Escape characters in markdown](tips.md#escape-characters-in-markdown)
-3. [Create a multiline macro in C](tips.md#create-multiline-macro-in-c)
+3. [Create multiline macro in C](tips.md#create-multiline-macro-in-c)
 4. [Atom-beautify problems](tips.md#atom-beautify-problems)
 
 
