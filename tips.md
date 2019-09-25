@@ -6,7 +6,7 @@ Just use a br html tag to create a single line break.
 ## Escape characters in markdown
 Use the \\ to escape characters in markdown such as the underscore or asterisk.
 
-## Create a multiline macro in C
+## Create multiline macro in C
 On a mac, Command-F to get find and replace to show up on the bottom.  Next, select the [<b>\.\*</b>] button on the right side of the find and replace pane.  Replace dollar (<b>$</b>) with a space followed by a backslash (<b> \\</b>).  If you have atom-beautify installed, you can beautify (I have beautify on save enabled for the C and C++ languages and clang-format as beautifier).  If you have trouble with Atom-beautify, see next tip.
 
 ## Atom-beautify problems
