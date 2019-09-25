@@ -238,6 +238,114 @@ limitations under the License.
     return NULL;                                                               \
   }
 
+#define stla_map_least_compare_m(name, keytype, datatype)                      \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value)) {     \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      parent = root;                                                           \
+      int n = compare(p, d);                                                   \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = parent->parent;                                               \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      if (!compare(p, (datatype *)parent))                                     \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_least2_compare_m(name, keytype, datatype, mapname)            \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value)) {     \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      parent = root;                                                           \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      int n = compare(p, d);                                                   \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = parent->parent;                                               \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      datatype *d = stla_parent_object(parent, datatype, mapname);             \
+      if (!compare(p, d))                                                      \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_least_compare_arg_m(name, keytype, datatype)                  \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value),       \
+                 void *arg) {                                                  \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      parent = root;                                                           \
+      int n = compare(p, d, arg);                                              \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = stla_map_next(parent);                                        \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      if (!compare(p, (datatype *)parent, arg))                                \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_least2_compare_arg_m(name, keytype, datatype, mapname)        \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value),       \
+                 void *arg) {                                                  \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      parent = root;                                                           \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      int n = compare(p, d, arg);                                              \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = stla_map_next(parent);                                        \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      datatype *d = stla_parent_object(parent, datatype, mapname);             \
+      if (!compare(p, d, arg))                                                 \
+        return d;                                                              \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
 #define stla_map_greatest_m(name, keytype, datatype, compare)                  \
   datatype *name(const keytype *p, const stla_map_node_t *root) {              \
     stla_map_node_t *parent = NULL;                                            \
@@ -340,6 +448,114 @@ limitations under the License.
     return NULL;                                                               \
   }
 
+#define stla_map_greatest_compare_m(name, keytype, datatype)                   \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value)) {     \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      parent = root;                                                           \
+      int n = compare(p, d);                                                   \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = parent->parent;                                               \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      if (!compare(p, (datatype *)parent))                                     \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_greatest2_compare_m(name, keytype, datatype, mapname)         \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value)) {     \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      parent = root;                                                           \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      int n = compare(p, d);                                                   \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = parent->parent;                                               \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      datatype *d = stla_parent_object(parent, datatype, mapname);             \
+      if (!compare(p, d))                                                      \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_greatest_compare_arg_m(name, keytype, datatype)               \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value),       \
+                 void *arg) {                                                  \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      parent = root;                                                           \
+      int n = compare(p, d, arg);                                              \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = stla_map_next(parent);                                        \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      if (!compare(p, (datatype *)parent, arg))                                \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_greatest2_compare_arg_m(name, keytype, datatype, mapname)     \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value),       \
+                 void *arg) {                                                  \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      parent = root;                                                           \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      int n = compare(p, d, arg);                                              \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = stla_map_next(parent);                                        \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      datatype *d = stla_parent_object(parent, datatype, mapname);             \
+      if (!compare(p, d, arg))                                                 \
+        return d;                                                              \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
 #define stla_map_begin_m(name, keytype, datatype, compare)                     \
   datatype *name(const keytype *p, const stla_map_node_t *root) {              \
     stla_map_node_t *parent = NULL;                                            \
@@ -432,6 +648,114 @@ limitations under the License.
     return NULL;                                                               \
   }
 
+#define stla_map_begin_compare_m(name, keytype, datatype)                      \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value)) {     \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      parent = root;                                                           \
+      int n = compare(p, d);                                                   \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = parent->parent;                                               \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      if (!compare(p, (datatype *)parent))                                     \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_begin2_compare_m(name, keytype, datatype, mapname)            \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value)) {     \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      parent = root;                                                           \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      int n = compare(p, d);                                                   \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = parent->parent;                                               \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      datatype *d = stla_parent_object(parent, datatype, mapname);             \
+      if (!compare(p, d))                                                      \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_begin_compare_arg_m(name, keytype, datatype)                  \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value),       \
+                 void *arg) {                                                  \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      parent = root;                                                           \
+      int n = compare(p, d, arg);                                              \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = stla_map_next(parent);                                        \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      if (!compare(p, (datatype *)parent, arg))                                \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_begin2_compare_arg_m(name, keytype, datatype, mapname)        \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value),       \
+                 void *arg) {                                                  \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      parent = root;                                                           \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      int n = compare(p, d, arg);                                              \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = stla_map_next(parent);                                        \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      datatype *d = stla_parent_object(parent, datatype, mapname);             \
+      if (!compare(p, d, arg))                                                 \
+        return d;                                                              \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
 #define stla_map_end_m(name, keytype, datatype, compare)                       \
   datatype *name(const keytype *p, const stla_map_node_t *root) {              \
     stla_map_node_t *parent = NULL;                                            \
@@ -520,6 +844,114 @@ limitations under the License.
           return NULL;                                                         \
       }                                                                        \
       return stla_parent_object(parent, datatype, mapname);                    \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_end_compare_m(name, keytype, datatype)                        \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value)) {     \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      parent = root;                                                           \
+      int n = compare(p, d);                                                   \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = parent->parent;                                               \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      if (!compare(p, (datatype *)parent))                                     \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_end2_compare_m(name, keytype, datatype, mapname)              \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value)) {     \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      parent = root;                                                           \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      int n = compare(p, d);                                                   \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = parent->parent;                                               \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      datatype *d = stla_parent_object(parent, datatype, mapname);             \
+      if (!compare(p, d))                                                      \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_end_compare_arg_m(name, keytype, datatype)                    \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value),       \
+                 void *arg) {                                                  \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      parent = root;                                                           \
+      int n = compare(p, d, arg);                                              \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = stla_map_next(parent);                                        \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      if (!compare(p, (datatype *)parent, arg))                                \
+        return (datatype *)parent;                                             \
+    }                                                                          \
+    return NULL;                                                               \
+  }
+
+#define stla_map_end2_compare_arg_m(name, keytype, datatype, mapname)          \
+  datatype *name(const keytype *p, const stla_map_node_t *root,                \
+                 int compare(const keytype *key, const datatype *value),       \
+                 void *arg) {                                                  \
+    stla_map_node_t *parent = NULL;                                            \
+    int n;                                                                     \
+    while (root) {                                                             \
+      parent = root;                                                           \
+      datatype *d = stla_parent_object(root, datatype, mapname);               \
+      int n = compare(p, d, arg);                                              \
+      if (n < 0)                                                               \
+        root = root->left;                                                     \
+      else                                                                     \
+        root = root->right;                                                    \
+    }                                                                          \
+    if (parent) {                                                              \
+      if (n < 0) {                                                             \
+        parent = stla_map_next(parent);                                        \
+        if (!parent)                                                           \
+          return NULL;                                                         \
+      }                                                                        \
+      datatype *d = stla_parent_object(parent, datatype, mapname);             \
+      if (!compare(p, d, arg))                                                 \
+        return d;                                                              \
     }                                                                          \
     return NULL;                                                               \
   }
