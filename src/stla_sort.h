@@ -1,0 +1,81 @@
+#ifndef _stla_sort_H
+#define _stla_sort_H
+
+/*
+  In general, you will only need to use the sort macros.  The print and test
+  macros are meant for testing.
+*/
+
+/*
+  Sort macros
+  =====================================================================
+
+  stla_sort_m(name, less, datatype)
+    expects: bool less(const datatype *a, const datatype *b);
+    returns: void name(type *base, size_t num_elements);
+
+  stla_sort_arg_m(name, less, datatype)
+    expects: bool less(const datatype *a, const datatype *b, void *arg);
+    returns: void name(type *base, size_t num_elements, void *arg);
+
+  stla_sort_less_m(name, datatype)
+    returns: void name(type *base, size_t num_elements,
+                       bool less(const datatype *a, const datatype *b));
+
+  stla_sort_less_arg_m(name, datatype)
+    returns: void name(type *base, size_t num_elements,
+                       bool less(const datatype *a,
+                                 const datatype *b, void *arg),
+                       void *arg);
+*/
+
+/*
+  Print macros (used to print sorted set for debugging mostly)
+  =====================================================================
+
+  stla_sort_print_m(name, datatype)
+    returns: void name(const char *func_line, datatype *base,
+                       ssize_t num_elements,
+                       void (*print_element)(const datatype *el));
+
+  stla_sort_print_arg_m(name, datatype)
+    returns: void name(const char *func_line, datatype *base,
+                       ssize_t num_elements,
+                       void (*print_element)(const datatype *el, void *arg),
+                       void *arg);
+*/
+
+/*
+  Test macros (used to test that a list is in sorted order)
+  =====================================================================
+  stla_sort_test_m(name, less, datatype)
+    returns: void name(const char *func_line,
+                       datatype *base, ssize_t num_elements,
+                       void (*print_element)(const datatype *el));
+
+  stla_sort_test_arg_m(name, less, datatype)
+    returns: void name(const char *func_line,
+                       datatype *base, ssize_t num_elements,
+                       void (*print_element)(const datatype *el, void *arg),
+                       void *arg);
+
+  stla_sort_test_less_m(name, datatype)
+    returns: void name(const char *func_line,
+                       datatype *base, ssize_t num_elements,
+                       bool (*less)(const datatype *a,
+                                    const datatype *b),
+                       void (*print_element)(const datatype *el));
+
+  stla_sort_test_less_arg_m(name, datatype)
+    returns: void name(const char *func_line,
+                       datatype *base, ssize_t num_elements,
+                       bool (*less)(const datatype *a,
+                                    const datatype *b,
+                                    void *arg),
+                       void (*print_element)(const datatype *el, void *arg),
+                       void *arg);
+*/
+
+#include "impl/stla_sort.h"
+
+#endif
