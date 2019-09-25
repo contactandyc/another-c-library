@@ -63,6 +63,8 @@
 17. (Coming soon!) Heaps and priority queues
 18. (Coming soon!) Quicksort
 
+(Things that have been helpful to me)[tips.md]
+
 # Some useful reading...
 
 This book assumes you have a basic understanding of C.  I hope to show some tricks along the way, but you should have a basic understanding of the language before continuing.  You should also know machine architecture, multithreaded programming, the bash shell, and probably read over kubernetes tutorials.  I like to avoid thread contention, context switching, and optimize cpu caching in multithreaded programming (which this will be).  To do this, I believe that you need to avoid locking as much as possible and carve out different spaces in RAM for each thread to operate in.  It's good to understand machine architecture to really understand optimizations.
