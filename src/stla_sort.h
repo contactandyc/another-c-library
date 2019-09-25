@@ -49,11 +49,13 @@
   Test macros (used to test that a list is in sorted order)
   =====================================================================
   stla_sort_test_m(name, less, datatype)
+    expects: bool less(const datatype *a, const datatype *b);
     returns: void name(const char *func_line,
                        datatype *base, ssize_t num_elements,
                        void (*print_element)(const datatype *el));
 
   stla_sort_test_arg_m(name, less, datatype)
+    expects: bool less(const datatype *a, const datatype *b, void *arg);
     returns: void name(const char *func_line,
                        datatype *base, ssize_t num_elements,
                        void (*print_element)(const datatype *el, void *arg),
