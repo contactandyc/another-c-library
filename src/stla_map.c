@@ -22,8 +22,7 @@ limitations under the License.
 #define rb_color(n) ((n)->parent_color & 1)
 #define rb_is_red(n) (((n)->parent_color & 1) == 0)
 #define rb_is_black(n) (((n)->parent_color & 1) == 1)
-#define rb_parent(n)                                                           \
-  (stla_map_node_t *)((n)->parent_color - ((n)->parent_color & 1))
+#define rb_parent(n) (stla_map_t *)((n)->parent_color - ((n)->parent_color & 1))
 
 #define rb_set_black(n) (n)->parent_color |= 1
 #define rb_set_red(n) (n)->parent_color -= ((n)->parent_color & 1)
@@ -33,7 +32,7 @@ limitations under the License.
 #define rb_clear_black(n) (n)->parent_color = 1
 
 /* iteration */
-stla_map_node_t *stla_map_first(stla_map_node_t *n) {
+stla_map_t *stla_map_first(stla_map_t *n) {
   if (!n)
     return NULL;
   while (n->left)
@@ -41,7 +40,7 @@ stla_map_node_t *stla_map_first(stla_map_node_t *n) {
   return n;
 }
 
-stla_map_node_t *stla_map_last(stla_map_node_t *n) {
+stla_map_t *stla_map_last(stla_map_t *n) {
   if (!n)
     return NULL;
   while (n->right)
@@ -49,14 +48,14 @@ stla_map_node_t *stla_map_last(stla_map_node_t *n) {
   return n;
 }
 
-stla_map_node_t *stla_map_next(stla_map_node_t *n) {
+stla_map_t *stla_map_next(stla_map_t *n) {
   if (n->right) {
     n = n->right;
     while (n->left)
       n = n->left;
     return n;
   }
-  stla_map_node_t *parent = rb_parent(n);
+  stla_map_t *parent = rb_parent(n);
   while (parent && parent->right == n) {
     n = parent;
     parent = rb_parent(n);
@@ -64,14 +63,14 @@ stla_map_node_t *stla_map_next(stla_map_node_t *n) {
   return parent;
 }
 
-stla_map_node_t *stla_map_previous(stla_map_node_t *n) {
+stla_map_t *stla_map_previous(stla_map_t *n) {
   if (n->left) {
     n = n->left;
     while (n->right)
       n = n->right;
     return n;
   }
-  stla_map_node_t *parent = rb_parent(n);
+  stla_map_t *parent = rb_parent(n);
   while (parent && parent->left == n) {
     n = parent;
     parent = rb_parent(n);
@@ -79,7 +78,7 @@ stla_map_node_t *stla_map_previous(stla_map_node_t *n) {
   return parent;
 }
 
-static inline stla_map_node_t *left_deepest_node(stla_map_node_t *n) {
+static inline stla_map_t *left_deepest_node(stla_map_t *n) {
   while (true) {
     if (n->left)
       n = n->left;
@@ -90,14 +89,14 @@ static inline stla_map_node_t *left_deepest_node(stla_map_node_t *n) {
   }
 }
 
-stla_map_node_t *stla_map_postorder_first(stla_map_node_t *n) {
+stla_map_t *stla_map_postorder_first(stla_map_t *n) {
   if (!n)
     return NULL;
   return left_deepest_node(n);
 }
 
-stla_map_node_t *stla_map_postorder_next(stla_map_node_t *n) {
-  stla_map_node_t *parent = rb_parent(n);
+stla_map_t *stla_map_postorder_next(stla_map_t *n) {
+  stla_map_t *parent = rb_parent(n);
   if (parent && n == parent->left && parent->right)
     return left_deepest_node(parent->right);
   else
@@ -105,10 +104,9 @@ stla_map_node_t *stla_map_postorder_next(stla_map_node_t *n) {
 }
 
 /* copy */
-static void tree_copy(stla_map_node_t *n, stla_map_node_t **res,
-                      stla_map_node_t *parent, stla_map_copy_node_f copy,
-                      void *tag) {
-  stla_map_node_t *c = copy(n, tag);
+static void tree_copy(stla_map_t *n, stla_map_t **res, stla_map_t *parent,
+                      stla_map_copy_node_f copy, void *tag) {
+  stla_map_t *c = copy(n, tag);
   c->parent_color = n->parent_color;
   rb_set_parent(c, parent);
   if (n->left)
@@ -121,15 +119,15 @@ static void tree_copy(stla_map_node_t *n, stla_map_node_t **res,
     c->right = NULL;
 }
 
-stla_map_node_t *stla_map_copy(stla_map_node_t *root, stla_map_copy_node_f copy,
-                               void *tag) {
-  stla_map_node_t *res = NULL;
+stla_map_t *stla_map_copy(stla_map_t *root, stla_map_copy_node_f copy,
+                          void *tag) {
+  stla_map_t *res = NULL;
   if (root)
     tree_copy(root, &res, NULL, copy, tag);
   return res;
 }
 
-static int count_black_nodes(stla_map_node_t *n) {
+static int count_black_nodes(stla_map_t *n) {
   int black_nodes = 0;
   while (n) {
     if (rb_is_black(n))
@@ -140,8 +138,7 @@ static int count_black_nodes(stla_map_node_t *n) {
 }
 
 static void print_node_with_color_to_buffer(stla_buffer_t *bh,
-                                            stla_pool_t *pool,
-                                            stla_map_node_t *n,
+                                            stla_pool_t *pool, stla_map_t *n,
                                             print_node_to_string_f print_node) {
   bool red = rb_is_red(n);
   char *s = print_node(pool, n);
@@ -152,7 +149,7 @@ static void print_node_with_color_to_buffer(stla_buffer_t *bh,
     stla_buffer_appends(bh, "\x1B[0m)");
 }
 
-bool stla_map_valid(stla_pool_t *pool, stla_map_node_t *root,
+bool stla_map_valid(stla_pool_t *pool, stla_map_t *root,
                     print_node_to_string_f print_node) {
   stla_buffer_t *bh = stla_buffer_init(10000);
   bool valid = stla_map_valid_to_buffer(bh, pool, root, print_node);
@@ -164,7 +161,7 @@ bool stla_map_valid(stla_pool_t *pool, stla_map_node_t *root,
 
 /* test if valid */
 bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
-                              stla_map_node_t *root,
+                              stla_map_t *root,
                               print_node_to_string_f print_node) {
   /* an empty tree is valid */
   if (!root)
@@ -175,10 +172,10 @@ bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
     success = false;
     stla_buffer_appendf(bh, "The root is not black!\n");
   }
-  stla_map_node_t *n = stla_map_first(root);
+  stla_map_t *n = stla_map_first(root);
   int black_nodes = 0;
-  stla_map_node_t *first_black_leaf = NULL, *parent;
-  stla_map_node_t *sn = n;
+  stla_map_t *first_black_leaf = NULL, *parent;
+  stla_map_t *sn = n;
   while (n) {
     if (!n->left && !n->right) { /* only consider leaf nodes */
       black_nodes = count_black_nodes(n);
@@ -259,17 +256,17 @@ bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
 }
 
 /* print */
-typedef struct stla_map_node_print_s {
+typedef struct stla_map_print_s {
   size_t position;
   char *printed_key;
   size_t length;
   bool black;
   int depth;
-  struct stla_map_node_print_s *parent;
-  struct stla_map_node_print_s *left, *right;
-} stla_map_node_print_t;
+  struct stla_map_print_s *parent;
+  struct stla_map_print_s *left, *right;
+} stla_map_print_t;
 
-static int get_black_height(stla_map_node_t *n) {
+static int get_black_height(stla_map_t *n) {
   int depth = 0;
   while (n) {
     if (rb_is_black(n))
@@ -279,7 +276,7 @@ static int get_black_height(stla_map_node_t *n) {
   return depth;
 }
 
-static char *get_printed_key(stla_pool_t *pool, stla_map_node_t *n,
+static char *get_printed_key(stla_pool_t *pool, stla_map_t *n,
                              print_node_to_string_f print_node, int flags) {
   char *s = print_node(pool, n);
   bool red = rb_is_red(n);
@@ -293,12 +290,11 @@ static char *get_printed_key(stla_pool_t *pool, stla_map_node_t *n,
     return stla_pool_strdupf(pool, "%s%s%s", red ? "(" : "", s, red ? ")" : "");
 }
 
-static void copy_tree_to_print(stla_pool_t *pool, stla_map_node_t *node,
-                               stla_map_node_print_t **res,
-                               stla_map_node_print_t *parent,
+static void copy_tree_to_print(stla_pool_t *pool, stla_map_t *node,
+                               stla_map_print_t **res, stla_map_print_t *parent,
                                print_node_to_string_f print_node, int flags) {
-  stla_map_node_print_t *copy = (stla_map_node_print_t *)stla_pool_alloc(
-      pool, sizeof(stla_map_node_print_t));
+  stla_map_print_t *copy =
+      (stla_map_print_t *)stla_pool_alloc(pool, sizeof(stla_map_print_t));
   *res = copy;
 
   copy->printed_key = get_printed_key(pool, node, print_node, flags);
@@ -320,8 +316,8 @@ static void copy_tree_to_print(stla_pool_t *pool, stla_map_node_t *node,
                        flags);
 }
 
-static stla_map_node_print_t *
-find_left_parent_with_right_child(stla_map_node_print_t *item, int *depth) {
+static stla_map_print_t *
+find_left_parent_with_right_child(stla_map_print_t *item, int *depth) {
   while (item->parent &&
          (item->parent->right == item || !item->parent->right)) {
     *depth += item->depth;
@@ -331,21 +327,21 @@ find_left_parent_with_right_child(stla_map_node_print_t *item, int *depth) {
   return item->parent;
 }
 
-static stla_map_node_print_t *
-find_left_most_at_depth(stla_map_node_print_t *item, int depth) {
+static stla_map_print_t *find_left_most_at_depth(stla_map_print_t *item,
+                                                 int depth) {
   if (!item)
     return NULL;
 
   if (depth <= item->depth)
     return item;
   if (item->left) {
-    stla_map_node_print_t *r =
+    stla_map_print_t *r =
         find_left_most_at_depth(item->left, depth - item->depth);
     if (r)
       return r;
   }
   if (item->right) {
-    stla_map_node_print_t *r =
+    stla_map_print_t *r =
         find_left_most_at_depth(item->right, depth - item->depth);
     if (r)
       return r;
@@ -353,13 +349,12 @@ find_left_most_at_depth(stla_map_node_print_t *item, int depth) {
   return NULL;
 }
 
-static stla_map_node_print_t *find_next_peer(stla_map_node_print_t *item,
-                                             int depth) {
+static stla_map_print_t *find_next_peer(stla_map_print_t *item, int depth) {
   while (item) {
-    stla_map_node_print_t *p = find_left_parent_with_right_child(item, &depth);
+    stla_map_print_t *p = find_left_parent_with_right_child(item, &depth);
     if (!p)
       return NULL;
-    stla_map_node_print_t *np = find_left_most_at_depth(p->right, depth);
+    stla_map_print_t *np = find_left_most_at_depth(p->right, depth);
     if (np)
       return np;
     item = p;
@@ -367,7 +362,7 @@ static stla_map_node_print_t *find_next_peer(stla_map_node_print_t *item,
   return NULL;
 }
 
-static int get_node_depth(stla_map_node_print_t *item) {
+static int get_node_depth(stla_map_print_t *item) {
   int r = 0;
   while (item) {
     r += item->depth;
@@ -376,7 +371,7 @@ static int get_node_depth(stla_map_node_print_t *item) {
   return r;
 }
 
-void stla_map_print(stla_pool_t *pool, stla_map_node_t *root,
+void stla_map_print(stla_pool_t *pool, stla_map_t *root,
                     print_node_to_string_f print_node, int flags) {
   stla_buffer_t *bh = stla_buffer_init(10000);
   stla_map_print_to_buffer(bh, pool, root, print_node, flags);
@@ -386,15 +381,15 @@ void stla_map_print(stla_pool_t *pool, stla_map_node_t *root,
 }
 
 void stla_map_print_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
-                              stla_map_node_t *root,
+                              stla_map_t *root,
                               print_node_to_string_f print_node, int flags) {
   if (!root)
     return;
 
-  stla_map_node_print_t *printable = NULL;
+  stla_map_print_t *printable = NULL;
   copy_tree_to_print(pool, root, &printable, NULL, print_node, flags);
 
-  stla_map_node_print_t *sn, *n, *n2;
+  stla_map_print_t *sn, *n, *n2;
   int actual_depth;
   int depth = 1;
   while (true) {
@@ -461,13 +456,13 @@ void stla_map_print_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
   }
 }
 
-static void rotate_left(stla_map_node_t *A, stla_map_node_t **root) {
-  stla_map_node_t *new_root = A->right;
+static void rotate_left(stla_map_t *A, stla_map_t **root) {
+  stla_map_t *new_root = A->right;
 
   size_t tmp_pc = A->parent_color;
   A->parent_color = new_root->parent_color;
   new_root->parent_color = tmp_pc;
-  stla_map_node_t *parent = rb_parent(new_root);
+  stla_map_t *parent = rb_parent(new_root);
   if (parent) {
     if (parent->left == A)
       parent->left = new_root;
@@ -476,7 +471,7 @@ static void rotate_left(stla_map_node_t *A, stla_map_node_t **root) {
   } else
     *root = new_root;
 
-  stla_map_node_t *tmp = new_root->left;
+  stla_map_t *tmp = new_root->left;
   new_root->left = A;
   rb_set_parent(A, new_root);
 
@@ -485,12 +480,12 @@ static void rotate_left(stla_map_node_t *A, stla_map_node_t **root) {
     rb_set_parent(tmp, A);
 }
 
-static void rotate_right(stla_map_node_t *A, stla_map_node_t **root) {
-  stla_map_node_t *new_root = A->left;
+static void rotate_right(stla_map_t *A, stla_map_t **root) {
+  stla_map_t *new_root = A->left;
   size_t tmp_pc = A->parent_color;
   A->parent_color = new_root->parent_color;
   new_root->parent_color = tmp_pc;
-  stla_map_node_t *parent = rb_parent(new_root);
+  stla_map_t *parent = rb_parent(new_root);
   if (parent) {
     if (parent->left == A)
       parent->left = new_root;
@@ -499,7 +494,7 @@ static void rotate_right(stla_map_node_t *A, stla_map_node_t **root) {
   } else
     *root = new_root;
 
-  stla_map_node_t *tmp = new_root->right;
+  stla_map_t *tmp = new_root->right;
   new_root->right = A;
   rb_set_parent(A, new_root);
 
@@ -508,13 +503,13 @@ static void rotate_right(stla_map_node_t *A, stla_map_node_t **root) {
     rb_set_parent(tmp, A);
 }
 
-void stla_map_fix_insert(stla_map_node_t *node, stla_map_node_t *parent,
-                         stla_map_node_t **root) {
+void stla_map_fix_insert(stla_map_t *node, stla_map_t *parent,
+                         stla_map_t **root) {
   rb_set_red(node);
   rb_set_parent(node, parent);
   node->left = node->right = NULL;
 
-  stla_map_node_t *grandparent, *uncle;
+  stla_map_t *grandparent, *uncle;
 
   while (true) {
     parent = rb_parent(node);
@@ -557,9 +552,9 @@ void stla_map_fix_insert(stla_map_node_t *node, stla_map_node_t *parent,
   }
 }
 
-static void fix_color_for_erase(stla_map_node_t *parent, stla_map_node_t *node,
-                                stla_map_node_t **root) {
-  stla_map_node_t *sibling;
+static void fix_color_for_erase(stla_map_t *parent, stla_map_t *node,
+                                stla_map_t **root) {
+  stla_map_t *sibling;
   if (parent->right != node) {
     sibling = parent->right;
     if (rb_is_red(sibling)) {
@@ -603,10 +598,9 @@ static void fix_color_for_erase(stla_map_node_t *parent, stla_map_node_t *node,
   }
 }
 
-static inline void replace_node_with_child(stla_map_node_t *child,
-                                           stla_map_node_t *node,
-                                           stla_map_node_t **root) {
-  stla_map_node_t *parent = rb_parent(node);
+static inline void replace_node_with_child(stla_map_t *child, stla_map_t *node,
+                                           stla_map_t **root) {
+  stla_map_t *parent = rb_parent(node);
   if (parent) {
     if (parent->left == node)
       parent->left = child;
@@ -618,8 +612,8 @@ static inline void replace_node_with_child(stla_map_node_t *child,
   child->parent_color = node->parent_color;
 }
 
-bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root) {
-  stla_map_node_t *parent = rb_parent(node);
+bool stla_map_erase(stla_map_t *node, stla_map_t **root) {
+  stla_map_t *parent = rb_parent(node);
   if (!node->left) {
     if (node->right)
       replace_node_with_child(node->right, node, root);
@@ -637,7 +631,7 @@ bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root) {
   } else if (!node->right)
     replace_node_with_child(node->left, node, root);
   else {
-    stla_map_node_t *successor = node->right;
+    stla_map_t *successor = node->right;
     if (!successor->left) {
       bool black = rb_is_black(successor);
       replace_node_with_child(successor, node, root);
@@ -654,8 +648,8 @@ bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root) {
         successor = successor->left;
 
       bool black = rb_is_black(successor);
-      stla_map_node_t *right = successor->right;
-      stla_map_node_t *parent = rb_parent(successor);
+      stla_map_t *right = successor->right;
+      stla_map_t *parent = rb_parent(successor);
       parent->left = right;
       if (right) {
         rb_clear_black(right);

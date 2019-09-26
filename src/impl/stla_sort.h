@@ -18,8 +18,8 @@ limitations under the License.
 #include <stdlib.h>
 
 #define stla_sort_print_m(name, datatype)                                      \
-  void name(const char *func_line, datatype *base, ssize_t num_elements,       \
-            void (*print_element)(const datatype *el)) {                       \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            void (*print_element)(datatype * el)) {                            \
     if (func_line)                                                             \
       printf("%s ", func_line);                                                \
     printf("%ld elements\n", num_elements);                                    \
@@ -32,8 +32,8 @@ limitations under the License.
   }
 
 #define stla_sort_print_arg_m(name, datatype)                                  \
-  void name(const char *func_line, datatype *base, ssize_t num_elements,       \
-            void (*print_element)(const datatype *el, void *arg), void *arg) { \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            void (*print_element)(datatype * el, void *arg), void *arg) {      \
     if (func_line)                                                             \
       printf("%s ", func_line);                                                \
     printf("%ld elements\n", num_elements);                                    \
@@ -46,8 +46,8 @@ limitations under the License.
   }
 
 #define stla_sort_test_m(name, less, datatype)                                 \
-  void name(const char *func_line, datatype *base, ssize_t num_elements,       \
-            void (*print_element)(const datatype *el)) {                       \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            void (*print_element)(datatype * el)) {                            \
     datatype *ep = base + num_elements;                                        \
     base++;                                                                    \
     int n;                                                                     \
@@ -67,8 +67,8 @@ limitations under the License.
   }
 
 #define stla_sort_test_arg_m(name, less, datatype)                             \
-  void name(const char *func_line, datatype *base, ssize_t num_elements,       \
-            void (*print_element)(const datatype *el, void *arg), void *arg) { \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            void (*print_element)(datatype * el, void *arg), void *arg) {      \
     datatype *ep = base + num_elements;                                        \
     base++;                                                                    \
     int n;                                                                     \
@@ -88,9 +88,9 @@ limitations under the License.
   }
 
 #define stla_sort_test_less_m(name, datatype)                                  \
-  void name(const char *func_line, datatype *base, ssize_t num_elements,       \
-            bool (*less)(const datatype *a, const datatype *b),                \
-            void (*print_element)(const datatype *el)) {                       \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            bool (*less)(datatype * a, datatype * b),                          \
+            void (*print_element)(datatype * el)) {                            \
     datatype *ep = base + num_elements;                                        \
     base++;                                                                    \
     int n;                                                                     \
@@ -110,9 +110,9 @@ limitations under the License.
   }
 
 #define stla_sort_test_less_arg_m(name, datatype)                              \
-  void name(const char *func_line, datatype *base, ssize_t num_elements,       \
-            bool (*less)(const datatype *a, const datatype *b, void *arg),     \
-            void (*print_element)(const datatype *el, void *arg), void *arg) { \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            bool (*less)(datatype * a, datatype * b, void *arg),               \
+            void (*print_element)(datatype * el, void *arg), void *arg) {      \
     datatype *ep = base + num_elements;                                        \
     base++;                                                                    \
     int n;                                                                     \
@@ -143,8 +143,14 @@ typedef struct {
 
 #define stla_sort_m(name, less, type)                                          \
   void name(type *base, size_t num_elements) {                                 \
-    type *a, *b, *c, *d, *e;                                                   \
-    type *mid, *high, tmp;                                                     \
+    type *a;                                                                   \
+    type *b;                                                                   \
+    type *c;                                                                   \
+    type *d;                                                                   \
+    type *e;                                                                   \
+    type *mid;                                                                 \
+    type *high;                                                                \
+    type tmp;                                                                  \
     ssize_t pivot;                                                             \
     sort_stack_t stack[64];                                                    \
     sort_stack_t *top = stack;                                                 \
@@ -567,8 +573,14 @@ typedef struct {
 
 #define stla_sort_arg_m(name, less, type)                                      \
   void name(type *base, size_t num_elements, void *arg) {                      \
-    type *a, *b, *c, *d, *e;                                                   \
-    type *mid, *high, tmp;                                                     \
+    type *a;                                                                   \
+    type *b;                                                                   \
+    type *c;                                                                   \
+    type *d;                                                                   \
+    type *e;                                                                   \
+    type *mid;                                                                 \
+    type *high;                                                                \
+    type tmp;                                                                  \
     ssize_t pivot;                                                             \
     sort_stack_t stack[64];                                                    \
     sort_stack_t *top = stack;                                                 \
@@ -991,7 +1003,7 @@ typedef struct {
   }
 
 #define stla_sort_less_m(name, type)                                           \
-  void name(type *base, bool (*less)(const datatype *a, const datatype *b),    \
+  void name(type *base, bool (*less)(datatype * a, datatype * b),              \
             size_t num_elements) {                                             \
     type *a, *b, *c, *d, *e;                                                   \
     type *mid, *high, tmp;                                                     \
@@ -1417,8 +1429,7 @@ typedef struct {
 
 #define stla_sort_less_arg_m(name, type)                                       \
   void name(type *base, size_t num_elements,                                   \
-            bool (*less)(const datatype *a, const datatype *b, void *arg),     \
-            void *arg) {                                                       \
+            bool (*less)(datatype * a, datatype * b, void *arg), void *arg) {  \
     type *a, *b, *c, *d, *e;                                                   \
     type *mid, *high, tmp;                                                     \
     ssize_t pivot;                                                             \

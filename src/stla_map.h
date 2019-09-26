@@ -25,30 +25,30 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct stla_map_node_s {
+typedef struct stla_map_s {
   size_t parent_color;
-  struct stla_map_node_s *left;
-  struct stla_map_node_s *right;
-} stla_map_node_t __attribute__((aligned(2)));
+  struct stla_map_s *left;
+  struct stla_map_s *right;
+} stla_map_t __attribute__((aligned(2)));
 /* The alignment is needed because the color uses the lowest bit */
 
 /* iteration */
-stla_map_node_t *stla_map_first(stla_map_node_t *n);
-stla_map_node_t *stla_map_last(stla_map_node_t *n);
-stla_map_node_t *stla_map_next(stla_map_node_t *n);
-stla_map_node_t *stla_map_previous(stla_map_node_t *n);
-stla_map_node_t *stla_map_postorder_first(stla_map_node_t *n);
-stla_map_node_t *stla_map_postorder_next(stla_map_node_t *n);
+stla_map_t *stla_map_first(stla_map_t *n);
+stla_map_t *stla_map_last(stla_map_t *n);
+stla_map_t *stla_map_next(stla_map_t *n);
+stla_map_t *stla_map_previous(stla_map_t *n);
+stla_map_t *stla_map_postorder_first(stla_map_t *n);
+stla_map_t *stla_map_postorder_next(stla_map_t *n);
 
 /*
   stla_map_copy_node_f is a callback meant to be used with stla_map_copy to
   copy one map to another given a root node.  The tag will typically be an
   allocator such as the pool.
 */
-typedef stla_map_node_t *(*stla_map_copy_node_f)(stla_map_node_t *n, void *tag);
+typedef stla_map_t *(*stla_map_copy_node_f)(stla_map_t *n, void *tag);
 
-stla_map_node_t *stla_map_copy(stla_map_node_t *root, stla_map_copy_node_f copy,
-                               void *tag);
+stla_map_t *stla_map_copy(stla_map_t *root, stla_map_copy_node_f copy,
+                          void *tag);
 
 /*
   print_node_to_string_f is a callback meant to print the value of the node n.
@@ -56,29 +56,29 @@ stla_map_node_t *stla_map_copy(stla_map_node_t *root, stla_map_copy_node_f copy,
   Printing the internal representation of the tree is largely meant for testing
   and doesn't need to be complete.
 */
-typedef char *(*print_node_to_string_f)(stla_pool_t *pool, stla_map_node_t *n);
+typedef char *(*print_node_to_string_f)(stla_pool_t *pool, stla_map_t *n);
 
 bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
-                              stla_map_node_t *root,
+                              stla_map_t *root,
                               print_node_to_string_f print_node);
 
-bool stla_map_valid(stla_pool_t *pool, stla_map_node_t *root,
+bool stla_map_valid(stla_pool_t *pool, stla_map_t *root,
                     print_node_to_string_f print_node);
 
 #define STLA_MAP_DONT_PRINT_RED 1
 #define STLA_MAP_DONT_PRINT_BLACK_HEIGHT 2
 
 void stla_map_print_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
-                              stla_map_node_t *node,
+                              stla_map_t *node,
                               print_node_to_string_f print_node, int flags);
 
-void stla_map_print(stla_pool_t *pool, stla_map_node_t *node,
+void stla_map_print(stla_pool_t *pool, stla_map_t *node,
                     print_node_to_string_f print_node, int flags);
 
-bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root);
+bool stla_map_erase(stla_map_t *node, stla_map_t **root);
 
-void stla_map_fix_insert(stla_map_node_t *node, stla_map_node_t *parent,
-                         stla_map_node_t **root);
+void stla_map_fix_insert(stla_map_t *node, stla_map_t *parent,
+                         stla_map_t **root);
 
 /*
   Finding and insertion cannot be made easily generic due to the need to access
@@ -90,10 +90,10 @@ void stla_map_fix_insert(stla_map_node_t *node, stla_map_node_t *parent,
 
   name     - the name of the function you wish to create
   keytype  - the type of the key (only used in find functions)
-  datatype - the type of the structure which utilizes the stla_map_node_t
+  datatype - the type of the structure which utilizes the stla_map_t
      structure.
   mapname  - the name of the field in your structure which references the
-     stla_map_node_t structure.  This is only used in macros with a 2 in the
+     stla_map_t structure.  This is only used in macros with a 2 in the
      name such as stla_map_find2_m.
   compare  - the find function will expect the signature to look like
      int compare(keytype key, datatype *d);
@@ -130,328 +130,328 @@ void stla_map_fix_insert(stla_map_node_t *node, stla_map_node_t *parent,
      _compare_arg_m suffix for all macros which expect user to provide compare
        function with an extra arg field to resulting function.
      2_m, 2_arg_m, 2_compare_m, 2_compare_arg_m suffix for all macros
-       which don't have stla_map_node_t structure defined as the first field.
+       which don't have stla_map_t structure defined as the first field.
 
   The find macros are listed below (they are defined in impl/stla_map.h)
 
   stla_map_find_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name( keytype *key,  stla_map_t *root);
 
   stla_map_find2_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name( keytype *key,  stla_map_t *root);
 
   stla_map_find_arg_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(const keytype *key,
-                            const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name( keytype *key,
+                             stla_map_t *root,
                             void *arg);
 
   stla_map_find2_arg_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(const keytype *key,
-                            const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name( keytype *key,
+                             stla_map_t *root,
                             void *arg);
 
   stla_map_find_compare_m(name, keytype, datatype)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_find2_compare_m(name, keytype, datatype, mapname)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_find_compare_arg_m(name, keytype, datatype)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_find2_compare_arg_m(name, keytype, datatype, mapname)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_least_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name( keytype *key,  stla_map_t *root);
 
   stla_map_least2_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name( keytype *key,  stla_map_t *root);
 
   stla_map_least_arg_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(const keytype *key,
-                            const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name( keytype *key,
+                             stla_map_t *root,
                             void *arg);
 
   stla_map_least2_arg_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(const keytype *key,
-                            const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name( keytype *key,
+                             stla_map_t *root,
                             void *arg);
 
   stla_map_least_compare_m(name, keytype, datatype)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_least2_compare_m(name, keytype, datatype, mapname)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_least_compare_arg_m(name, keytype, datatype)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_least2_compare_arg_m(name, keytype, datatype, mapname)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_greatest_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name( keytype *key,  stla_map_t *root);
 
   stla_map_greatest2_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name( keytype *key,  stla_map_t *root);
 
   stla_map_greatest_arg_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(const keytype *key,
-                            const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name( keytype *key,
+                             stla_map_t *root,
                             void *arg);
 
   stla_map_greatest2_arg_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(const keytype *key,
-                            const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name( keytype *key,
+                             stla_map_t *root,
                             void *arg);
 
   stla_map_greatest_compare_m(name, keytype, datatype)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_greatest2_compare_m(name, keytype, datatype, mapname)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_greatest_compare_arg_m(name, keytype, datatype)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_greatest2_compare_arg_m(name, keytype, datatype, mapname)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_lower_bound_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name( keytype *key,  stla_map_t *root);
 
   stla_map_lower_bound2_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name( keytype *key,  stla_map_t *root);
 
   stla_map_lower_bound_arg_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(const keytype *key,
-                            const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name( keytype *key,
+                             stla_map_t *root,
                             void *arg);
 
   stla_map_lower_bound2_arg_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(const keytype *key,
-                            const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name( keytype *key,
+                             stla_map_t *root,
                             void *arg);
 
   stla_map_lower_bound_compare_m(name, keytype, datatype)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_lower_bound2_compare_m(name, keytype, datatype, mapname)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_lower_bound_compare_arg_m(name, keytype, datatype)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_lower_bound2_compare_arg_m(name, keytype, datatype, mapname)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_upper_bound_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name( keytype *key,  stla_map_t *root);
 
   stla_map_upper_bound2_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name( keytype *key,  stla_map_t *root);
 
   stla_map_upper_bound_arg_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(const keytype *key,
-                            const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name( keytype *key,
+                             stla_map_t *root,
                             void *arg);
 
   stla_map_upper_bound2_arg_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(const keytype *key,
-                            const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name( keytype *key,
+                             stla_map_t *root,
                             void *arg);
 
   stla_map_upper_bound_compare_m(name, keytype, datatype)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_upper_bound2_compare_m(name, keytype, datatype, mapname)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_upper_bound_compare_arg_m(name, keytype, datatype)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_upper_bound2_compare_arg_m(name, keytype, datatype, mapname)
-    returns: datatype *name(const keytype *key, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name( keytype *key,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_range_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(datatype **upper_bound, const keytype *start,
-                            const keytype *end, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name(datatype **upper_bound,  keytype *start,
+                             keytype *end,  stla_map_t *root);
 
   stla_map_range2_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value);
-    returns: datatype *name(datatype **upper_bound, const keytype *start,
-                            const keytype *end, const stla_map_node_t *root);
+    expects: int compare( keytype *key,  datatype *value);
+    returns: datatype *name(datatype **upper_bound,  keytype *start,
+                             keytype *end,  stla_map_t *root);
 
   stla_map_range_arg_m(name, keytype, datatype, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(datatype **upper_bound, const keytype *start,
-                            const keytype *end, const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name(datatype **upper_bound,  keytype *start,
+                             keytype *end,  stla_map_t *root,
                             void *arg);
 
   stla_map_range2_arg_m(name, keytype, datatype, mapname, compare)
-    expects: int compare(const keytype *key, const datatype *value, void *arg);
-    returns: datatype *name(datatype **upper_bound, const keytype *start,
-                            const keytype *end, const stla_map_node_t *root,
+    expects: int compare( keytype *key,  datatype *value, void *arg);
+    returns: datatype *name(datatype **upper_bound,  keytype *start,
+                             keytype *end,  stla_map_t *root,
                             void *arg);
 
   stla_map_range_compare_m(name, keytype, datatype)
-    returns: datatype *name(datatype **upper_bound, const keytype *start,
-                            const keytype *end, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name(datatype **upper_bound,  keytype *start,
+                             keytype *end,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_range2_compare_m(name, keytype, datatype, mapname)
-    returns: datatype *name(datatype **upper_bound, const keytype *start,
-                            const keytype *end, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value));
+    returns: datatype *name(datatype **upper_bound,  keytype *start,
+                             keytype *end,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value));
 
   stla_map_range_compare_arg_m(name, keytype, datatype)
-    returns: datatype *name(datatype **upper_bound, const keytype *start,
-                            const keytype *end, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name(datatype **upper_bound,  keytype *start,
+                             keytype *end,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   stla_map_range2_compare_arg_m(name, keytype, datatype)
-    returns: datatype *name(datatype **upper_bound, const keytype *start,
-                            const keytype *end, const stla_map_node_t *root,
-                            int compare(const keytype *key,
-                                        const datatype *value,
+    returns: datatype *name(datatype **upper_bound,  keytype *start,
+                             keytype *end,  stla_map_t *root,
+                            int compare( keytype *key,
+                                         datatype *value,
                                         void *arg),
                             void *arg);
 
   The insert macros are listed below (they are defined in impl/stla_map.h)
 
   stla_map_insert_m(name, datatype, compare)
-    expects: int compare(const datatype *node_to_insert, const datatype *value);
-    returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+    expects: int compare( datatype *node_to_insert,  datatype *value);
+    returns: datatype *name(datatype *node_to_insert, stla_map_t **root);
 
   stla_map_insert2_m(name, datatype, mapname, compare)
-    expects: int compare(const datatype *node_to_insert, const datatype *value);
-    returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+    expects: int compare( datatype *node_to_insert,  datatype *value);
+    returns: datatype *name(datatype *node_to_insert, stla_map_t **root);
 
   stla_map_insert_arg_m(name, datatype, compare)
-    expects: int compare(const datatype *node_to_insert,
-                         const datatype *value,
+    expects: int compare( datatype *node_to_insert,
+                          datatype *value,
                          void *arg);
     returns: datatype *name(datatype *node_to_insert,
-                            stla_map_node_t **root,
+                            stla_map_t **root,
                             void *arg);
 
   stla_map_insert2_arg_m(name, datatype, mapname, compare)
-    expects: int compare(const datatype *node_to_insert,
-                         const datatype *value,
+    expects: int compare( datatype *node_to_insert,
+                          datatype *value,
                          void *arg);
     returns: datatype *name(datatype *node_to_insert,
-                            stla_map_node_t **root,
+                            stla_map_t **root,
                             void *arg);
 
   stla_multimap_insert_m(name, datatype, compare)
-    expects: int compare(const datatype *node_to_insert, const datatype *value);
-    returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+    expects: int compare( datatype *node_to_insert,  datatype *value);
+    returns: datatype *name(datatype *node_to_insert, stla_map_t **root);
 
   stla_multimap_insert2_m(name, datatype, mapname, compare)
-    expects: int compare(const datatype *node_to_insert, const datatype *value);
-    returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+    expects: int compare( datatype *node_to_insert,  datatype *value);
+    returns: datatype *name(datatype *node_to_insert, stla_map_t **root);
 
   stla_multimap_insert_arg_m(name, datatype, compare)
-    expects: int compare(const datatype *node_to_insert,
-                         const datatype *value,
+    expects: int compare( datatype *node_to_insert,
+                          datatype *value,
                          void *arg);
     returns: datatype *name(datatype *node_to_insert,
-                            stla_map_node_t **root,
+                            stla_map_t **root,
                             void *arg);
 
   stla_multimap_insert2_arg_m(name, datatype, mapname, compare)
-    expects: int compare(const datatype *node_to_insert,
-                         const datatype *value,
+    expects: int compare( datatype *node_to_insert,
+                          datatype *value,
                          void *arg);
     returns: datatype *name(datatype *node_to_insert,
-                            stla_map_node_t **root,
+                            stla_map_t **root,
                             void *arg);
 */
 
