@@ -141,7 +141,7 @@ typedef struct {
   ssize_t num_elements;
 } sort_stack_t;
 
-#define stla_sort_m(name, less, type)                                          \
+#define stla_sort_m(name, type, less)                                          \
   void name(type *base, size_t num_elements) {                                 \
     type *a;                                                                   \
     type *b;                                                                   \
@@ -571,7 +571,7 @@ typedef struct {
     }                                                                          \
   }
 
-#define stla_sort_arg_m(name, less, type)                                      \
+#define stla_sort_arg_m(name, type, less)                                      \
   void name(type *base, size_t num_elements, void *arg) {                      \
     type *a;                                                                   \
     type *b;                                                                   \
