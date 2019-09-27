@@ -67,7 +67,8 @@
 1. [Line spacing in markdown](tips.md#line-spacing-in-markdown)
 2. [Escape characters in markdown](tips.md#escape-characters-in-markdown)
 3. [Create multiline macro in C](tips.md#create-multiline-macro-in-c)
-4. [Atom-beautify problems](tips.md#atom-beautify-problems)
+4. [Static inline vs inline](tips.md#static-inline-vs-inline)
+5. [Atom-beautify problems](tips.md#atom-beautify-problems)
 
 
 # Some useful reading...
