@@ -8,6 +8,7 @@ Goals of this project...
 2. To help engineers understand algorithms and C better, so that they can create their own
 3. To show that it is possible to overcome many of the known challenges with C
 4. To help people to learn what it takes to create something new
+5. Build scalable applications using technology like Kubernetes, nginx, and docker.
 
 My hope is that others will contribute!  
 
