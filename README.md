@@ -1,6 +1,15 @@
 # Standard Template Library in C Table of Contents
 - Copyright 2019 Andy Curtis
 
+This software contains code and ideas derived from works published by Robert Sedgewick relating to the Red-Black Tree and the Quicksort algorithm.  In the development of this work, many other works (both code and explanations) were studied.  I've spent a lot of time reviewing many open source implementations over the years including the details of the linux kernel.  I have tried to write the code without borrowing any code or explanations from other projects, but I'm sure that my approaches, variable names, etc will look similar due to the amount of time that I've worked in the space.  I've worked with brilliant engineers over the years and certainly borrowed approaches from their work.  I will try and call out where I have learned things if
+they were largely derived from someone else's work.  My goal in starting this project is that others would eventually contribute and that my work would serve as a start for something better.  I'm sure that there are better ways to do things and welcome help!  A second goal is to help engineers understand algorithms and code better.  One of my favorite books is Introduction to Algorithms by MIT Press.  I've often wondered if there was a follow up book (as the implication in the title is that it is for beginners).  I think the idea is that one should understand known algorithms to build better algorithms.  I hope this can provide the basis for building real applications that are efficient AND enough of an understanding that you might be able to invent newer and better algorithms.
+
+```bash
+git clone https://github.com/contactandyc/standard-template-library-alternative-in-c.git
+cd standard-template-library-alternative-in-c/demo
+make
+```
+
 1. [Getting Started](1_getting_started.md)
 2. [Timing Your Code (the first project)](2_timing.md)<br/>
    a. [A brief introduction to C](2_timing.md#a-brief-introduction-to-c)<br/>
@@ -62,6 +71,7 @@
 16. (Coming soon!) Binary search
 17. (Coming soon!) Heaps and priority queues
 18. (Coming soon!) Quicksort
+19. (Coming soon!) Building web services in C
 
 # [Things that have been helpful to me](tips.md)
 1. [Line spacing in markdown](tips.md#line-spacing-in-markdown)
