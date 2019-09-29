@@ -123,6 +123,16 @@ static inline char *stla_pool_strdup(stla_pool_t *h, const char *p) {
   return (char *)stla_pool_udup(h, p, len);
 }
 
+static inline char *stla_pool_strndup(stla_pool_t *h, const char *p,
+                                      size_t length) {
+  /* strdup will simply allocate enough bytes to hold the duplicated string,
+    copy the string, and return the newly allocated string. */
+  size_t len = strlen(p);
+  if (len > length)
+    len = length;
+  return (char *)stla_pool_udup(h, p, len + 1);
+}
+
 static inline void *stla_pool_dup(stla_pool_t *h, const void *data,
                                   size_t len) {
   /* dup will simply allocate enough bytes to hold the duplicated data,

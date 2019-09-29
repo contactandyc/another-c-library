@@ -94,6 +94,10 @@ static inline void stla_buffer_setf(stla_buffer_t *h, const char *fmt, ...);
    will retain the original data in the buffer for up to length bytes. */
 static inline void *stla_buffer_resize(stla_buffer_t *h, size_t length);
 
+/* shrink the buffer by length bytes, if the buffer is not length bytes, buffer
+   will be cleared. */
+static inline void *stla_buffer_shrink_by(stla_buffer_t *h, size_t length);
+
 /* grow the buffer by length bytes and return pointer to the new memory.  This
    will retain the original data in the buffer for up to length bytes. */
 static inline void *stla_buffer_append_alloc(stla_buffer_t *h, size_t length);

@@ -15,9 +15,9 @@ limitations under the License.
 */
 
 #define stla_map_find_m(name, keytype, datatype, compare)                      \
-  datatype *name(keytype *p, stla_map_t *root) {                               \
+  datatype *name(const keytype *p, const stla_map_t *root) {                   \
     while (root) {                                                             \
-      int n = compare(p, (datatype *)root);                                    \
+      int n = compare(p, (const datatype *)root);                              \
       if (n < 0)                                                               \
         root = root->left;                                                     \
       else if (n > 0)                                                          \
@@ -29,7 +29,7 @@ limitations under the License.
   }
 
 #define stla_map_find2_m(name, keytype, datatype, mapname, compare)            \
-  datatype *name(keytype *p, stla_map_t *root) {                               \
+  datatype *name(const keytype *p, const stla_map_t *root) {                   \
     while (root) {                                                             \
       datatype *d = stla_parent_object(root, datatype, mapname);               \
       int n = compare(p, d);                                                   \
@@ -44,9 +44,9 @@ limitations under the License.
   }
 
 #define stla_map_find_arg_m(name, keytype, datatype, compare)                  \
-  datatype *name(keytype *p, stla_map_t *root, void *arg) {                    \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg) {        \
     while (root) {                                                             \
-      int n = compare(p, (datatype *)root, arg);                               \
+      int n = compare(p, (const datatype *)root, arg);                         \
       if (n < 0)                                                               \
         root = root->left;                                                     \
       else if (n > 0)                                                          \
@@ -58,7 +58,7 @@ limitations under the License.
   }
 
 #define stla_map_find2_arg_m(name, keytype, datatype, mapname, compare)        \
-  datatype *name(keytype *p, stla_map_t *root, void *arg) {                    \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg) {        \
     while (root) {                                                             \
       datatype *d = stla_parent_object(root, datatype, mapname);               \
       int n = compare(p, d, arg);                                              \
@@ -73,10 +73,10 @@ limitations under the License.
   }
 
 #define stla_map_find_compare_m(name, keytype, datatype)                       \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value)) {                 \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value)) {     \
     while (root) {                                                             \
-      int n = compare(p, (datatype *)root);                                    \
+      int n = compare(p, (const datatype *)root);                              \
       if (n < 0)                                                               \
         root = root->left;                                                     \
       else if (n > 0)                                                          \
@@ -88,8 +88,8 @@ limitations under the License.
   }
 
 #define stla_map_find2_compare_m(name, keytype, datatype, mapname)             \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value)) {                 \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value)) {     \
     while (root) {                                                             \
       datatype *d = stla_parent_object(root, datatype, mapname);               \
       int n = compare(p, d);                                                   \
@@ -104,10 +104,12 @@ limitations under the License.
   }
 
 #define stla_map_find_compare_arg_m(name, keytype, datatype)                   \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value), void *arg) {      \
+  datatype *name(                                                              \
+      const keytype *p, const stla_map_t *root,                                \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     while (root) {                                                             \
-      int n = compare(p, (datatype *)root, arg);                               \
+      int n = compare(p, (const datatype *)root, arg);                         \
       if (n < 0)                                                               \
         root = root->left;                                                     \
       else if (n > 0)                                                          \
@@ -119,8 +121,10 @@ limitations under the License.
   }
 
 #define stla_map_find2_compare_arg_m(name, keytype, mapname, datatype)         \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value), void *arg) {      \
+  datatype *name(                                                              \
+      const keytype *p, const stla_map_t *root,                                \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     while (root) {                                                             \
       datatype *d = stla_parent_object(root, datatype, mapname);               \
       int n = compare(p, d, arg);                                              \
@@ -135,11 +139,11 @@ limitations under the License.
   }
 
 #define stla_map_least_m(name, keytype, datatype, compare)                     \
-  datatype *name(keytype *p, stla_map_t *root) {                               \
+  datatype *name(const keytype *p, const stla_map_t *root) {                   \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root);                                        \
+      n = compare(p, (const datatype *)root);                                  \
       if (n <= 0) {                                                            \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -152,7 +156,7 @@ limitations under the License.
   }
 
 #define stla_map_least2_m(name, keytype, datatype, mapname, compare)           \
-  datatype *name(keytype *p, stla_map_t *root) {                               \
+  datatype *name(const keytype *p, const stla_map_t *root) {                   \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -170,11 +174,11 @@ limitations under the License.
   }
 
 #define stla_map_least_arg_m(name, keytype, datatype, compare)                 \
-  datatype *name(keytype *p, stla_map_t *root, void *arg) {                    \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg) {        \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root, arg);                                   \
+      n = compare(p, (const datatype *)root, arg);                             \
       if (n <= 0) {                                                            \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -187,7 +191,7 @@ limitations under the License.
   }
 
 #define stla_map_least2_arg_m(name, keytype, datatype, mapname, compare)       \
-  datatype *name(keytype *p, stla_map_t *root, void *arg) {                    \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg) {        \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -205,12 +209,12 @@ limitations under the License.
   }
 
 #define stla_map_least_compare_m(name, keytype, datatype)                      \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value)) {                 \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value)) {     \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root);                                        \
+      n = compare(p, (const datatype *)root);                                  \
       if (n <= 0) {                                                            \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -223,8 +227,8 @@ limitations under the License.
   }
 
 #define stla_map_least2_compare_m(name, keytype, datatype, mapname)            \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value)) {                 \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value)) {     \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -242,12 +246,14 @@ limitations under the License.
   }
 
 #define stla_map_least_compare_arg_m(name, keytype, datatype)                  \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value), void *arg) {      \
+  datatype *name(                                                              \
+      const keytype *p, const stla_map_t *root,                                \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root, arg);                                   \
+      n = compare(p, (const datatype *)root, arg);                             \
       if (n <= 0) {                                                            \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -260,8 +266,10 @@ limitations under the License.
   }
 
 #define stla_map_least2_compare_arg_m(name, keytype, datatype, mapname)        \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value), void *arg) {      \
+  datatype *name(                                                              \
+      const keytype *p, const stla_map_t *root,                                \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -279,11 +287,11 @@ limitations under the License.
   }
 
 #define stla_map_greatest_m(name, keytype, datatype, compare)                  \
-  datatype *name(keytype *p, stla_map_t *root) {                               \
+  datatype *name(const keytype *p, const stla_map_t *root) {                   \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root);                                        \
+      n = compare(p, (const datatype *)root);                                  \
       if (n < 0)                                                               \
         root = root->left;                                                     \
       else {                                                                   \
@@ -297,7 +305,7 @@ limitations under the License.
   }
 
 #define stla_map_greatest2_m(name, keytype, datatype, mapname, compare)        \
-  datatype *name(keytype *p, stla_map_t *root) {                               \
+  datatype *name(const keytype *p, const stla_map_t *root) {                   \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -316,11 +324,11 @@ limitations under the License.
   }
 
 #define stla_map_greatest_arg_m(name, keytype, datatype, compare)              \
-  datatype *name(keytype *p, stla_map_t *root, void *arg) {                    \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg) {        \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root, arg);                                   \
+      n = compare(p, (const datatype *)root, arg);                             \
       if (n < 0)                                                               \
         root = root->left;                                                     \
       else {                                                                   \
@@ -334,7 +342,7 @@ limitations under the License.
   }
 
 #define stla_map_greatest2_arg_m(name, keytype, datatype, mapname, compare)    \
-  datatype *name(keytype *p, stla_map_t *root, void *arg) {                    \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg) {        \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -353,12 +361,12 @@ limitations under the License.
   }
 
 #define stla_map_greatest_compare_m(name, keytype, datatype)                   \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value)) {                 \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value)) {     \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root);                                        \
+      n = compare(p, (const datatype *)root);                                  \
       if (n < 0)                                                               \
         root = root->left;                                                     \
       else {                                                                   \
@@ -372,8 +380,8 @@ limitations under the License.
   }
 
 #define stla_map_greatest2_compare_m(name, keytype, datatype, mapname)         \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value)) {                 \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value)) {     \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -392,12 +400,13 @@ limitations under the License.
   }
 
 #define stla_map_greatest_compare_arg_m(name, keytype, datatype)               \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value), void *arg) {      \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value, arg),  \
+                 void *arg) {                                                  \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root, arg);                                   \
+      n = compare(p, (const datatype *)root, arg);                             \
       if (n < 0)                                                               \
         root = root->left;                                                     \
       else {                                                                   \
@@ -411,8 +420,10 @@ limitations under the License.
   }
 
 #define stla_map_greatest2_compare_arg_m(name, keytype, datatype, mapname)     \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value), void *arg) {      \
+  datatype *name(                                                              \
+      const keytype *p, const stla_map_t *root,                                \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -431,11 +442,11 @@ limitations under the License.
   }
 
 #define stla_map_lower_bound_m(name, keytype, datatype, compare)               \
-  datatype *name(keytype *p, stla_map_t *root) {                               \
+  datatype *name(const keytype *p, const stla_map_t *root) {                   \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root);                                        \
+      n = compare(p, (const datatype *)root);                                  \
       if (n <= 0) {                                                            \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -446,7 +457,7 @@ limitations under the License.
   }
 
 #define stla_map_lower_bound2_m(name, keytype, datatype, mapname, compare)     \
-  datatype *name(keytype *p, stla_map_t *root) {                               \
+  datatype *name(const keytype *p, const stla_map_t *root) {                   \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -462,11 +473,11 @@ limitations under the License.
   }
 
 #define stla_map_lower_bound_arg_m(name, keytype, datatype, compare)           \
-  datatype *name(keytype *p, stla_map_t *root, void *arg) {                    \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg) {        \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root, arg);                                   \
+      n = compare(p, (const datatype *)root, arg);                             \
       if (n <= 0) {                                                            \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -477,7 +488,7 @@ limitations under the License.
   }
 
 #define stla_map_lower_bound2_arg_m(name, keytype, datatype, mapname, compare) \
-  datatype *name(keytype *p, stla_map_t *root, void *arg) {                    \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg) {        \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -493,12 +504,12 @@ limitations under the License.
   }
 
 #define stla_map_lower_bound_compare_m(name, keytype, datatype)                \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value)) {                 \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value)) {     \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root);                                        \
+      n = compare(p, (const datatype *)root);                                  \
       if (n <= 0) {                                                            \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -509,8 +520,8 @@ limitations under the License.
   }
 
 #define stla_map_lower_bound2_compare_m(name, keytype, datatype, mapname)      \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value)) {                 \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value)) {     \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -526,12 +537,14 @@ limitations under the License.
   }
 
 #define stla_map_lower_bound_compare_arg_m(name, keytype, datatype)            \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value), void *arg) {      \
+  datatype *name(                                                              \
+      const keytype *p, const stla_map_t *root,                                \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root, arg);                                   \
+      n = compare(p, (const datatype *)root, arg);                             \
       if (n <= 0) {                                                            \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -542,8 +555,10 @@ limitations under the License.
   }
 
 #define stla_map_lower_bound2_compare_arg_m(name, keytype, datatype, mapname)  \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value), void *arg) {      \
+  datatype *name(                                                              \
+      const keytype *p, const stla_map_t *root,                                \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -559,11 +574,11 @@ limitations under the License.
   }
 
 #define stla_map_upper_bound_m(name, keytype, datatype, compare)               \
-  datatype *name(keytype *p, stla_map_t *root) {                               \
+  datatype *name(const keytype *p, const stla_map_t *root) {                   \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root);                                        \
+      n = compare(p, (const datatype *)root);                                  \
       if (n < 0) {                                                             \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -574,7 +589,7 @@ limitations under the License.
   }
 
 #define stla_map_upper_bound2_m(name, keytype, datatype, mapname, compare)     \
-  datatype *name(keytype *p, stla_map_t *root) {                               \
+  datatype *name(const keytype *p, const stla_map_t *root) {                   \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -590,11 +605,11 @@ limitations under the License.
   }
 
 #define stla_map_upper_bound_arg_m(name, keytype, datatype, compare)           \
-  datatype *name(keytype *p, stla_map_t *root, void *arg) {                    \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg) {        \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root, arg);                                   \
+      n = compare(p, (const datatype *)root, arg);                             \
       if (n < 0) {                                                             \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -605,7 +620,7 @@ limitations under the License.
   }
 
 #define stla_map_upper_bound2_arg_m(name, keytype, datatype, mapname, compare) \
-  datatype *name(keytype *p, stla_map_t *root, void *arg) {                    \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg) {        \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -621,12 +636,12 @@ limitations under the License.
   }
 
 #define stla_map_upper_bound_compare_m(name, keytype, datatype)                \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value)) {                 \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value)) {     \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root);                                        \
+      n = compare(p, (const datatype *)root);                                  \
       if (n < 0) {                                                             \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -637,8 +652,8 @@ limitations under the License.
   }
 
 #define stla_map_upper_bound2_compare_m(name, keytype, datatype, mapname)      \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value)) {                 \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value)) {     \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
@@ -654,12 +669,14 @@ limitations under the License.
   }
 
 #define stla_map_upper_bound_compare_arg_m(name, keytype, datatype)            \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value), void *arg) {      \
+  datatype *name(                                                              \
+      const keytype *p, const stla_map_t *root,                                \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \
-      n = compare(p, (datatype *)root, arg);                                   \
+      n = compare(p, (const datatype *)root, arg);                             \
       if (n < 0) {                                                             \
         res = (datatype *)root;                                                \
         root = root->left;                                                     \
@@ -670,8 +687,10 @@ limitations under the License.
   }
 
 #define stla_map_upper_bound2_compare_arg_m(name, keytype, datatype, mapname)  \
-  datatype *name(keytype *p, stla_map_t *root,                                 \
-                 int compare(keytype *key, datatype *value), void *arg) {      \
+  datatype *name(                                                              \
+      const keytype *p, const stla_map_t *root,                                \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     int n = 0;                                                                 \
     datatype *res = NULL;                                                      \
     while (root) {                                                             \

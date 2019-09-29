@@ -70,6 +70,10 @@ static inline void *stla_pool_calloc(stla_pool_t *h, size_t len);
   like char *s = stla_pool_dup(pool, p, strlen(p)+1); */
 static inline char *stla_pool_strdup(stla_pool_t *h, const char *p);
 
+/* like stla_pool_strdup, limited to length (+1 for zero terminator) bytes */
+static inline char *stla_pool_strndup(stla_pool_t *h, const char *p,
+                                      size_t length);
+
 /* stla_pool_dup allocates a copy of the data.  The memory will be aligned. */
 static inline void *stla_pool_dup(stla_pool_t *h, const void *data, size_t len);
 

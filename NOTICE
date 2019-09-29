@@ -5,7 +5,15 @@ This software contains code and ideas derived from works
 published by Robert Sedgewick relating to the Red-Black Tree
 and the Quicksort algorithm.  In the development of this work,
 many other works (both code and explanations) were studied.
-I have tried to write the code without borrowing any code or
-explanations from other projects.  In algorithms, there is
-often one way to do things, so the code and/or explanations
-may look the same.
+I've spent a lot of time reviewing the standard template
+library in C++'s implementation and details of the linux
+kernel.  I have tried to write the code without borrowing any code
+or explanations from other projects, but I'm sure that my
+approaches, variable names, etc will look similar due to the
+amount of time that I've worked in the space.  I've worked with
+brilliant engineers over the years and certainly borrowed approaches
+from their work.  I will try and call out where I learned things if
+I they were largely derived from someone else's work.  My goal in
+starting this project is that others would eventually contribute
+and that my work would serve as a start for something better.  I'm
+sure that there are better ways to do things and welcome help!

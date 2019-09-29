@@ -61,6 +61,15 @@ static inline void _stla_buffer_grow(stla_buffer_t *h, size_t length) {
   h->size = len;
 }
 
+static inline void *stla_buffer_shrink_by(stla_buffer_t *h, size_t length) {
+  if (h->length > length)
+    h->length -= length;
+  else
+    h->length = 0;
+  h->data[h->length] = 0;
+  return h->data;
+}
+
 static inline void *stla_buffer_resize(stla_buffer_t *h, size_t length) {
   if (length > h->size)
     _stla_buffer_grow(h, length);
