@@ -14,6 +14,11 @@ My hope is that others will contribute!
 
 One of my favorite books is the Introduction to Algorithms by MIT Press.  I've often wondered if there was a follow up book (as the implication in the title is that it is for beginners).  I believe that the author wanted to convey that one should understand known algorithms to build better algorithms.  
 
+This package depends on libuv for the stla_object_pipe.c/h and demo6.  On a mac, use the following command to install libuv.
+```bash
+brew install libuv
+```
+
 ```bash
 git clone https://github.com/contactandyc/standard-template-library-alternative-in-c.git
 cd standard-template-library-alternative-in-c/demo
