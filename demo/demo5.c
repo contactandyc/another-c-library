@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
   name_t **names = (name_t **)stla_buffer_data(bh);
   size_t num_names = stla_buffer_length(bh) / sizeof(name_t *);
 
-  int repeat = 100;
+  int repeat = 1000;
   name_t **names_backup =
       (name_t **)stla_pool_dup(pool, names, num_names * sizeof(name_t *));
   stla_timer_t *c = stla_timer_init(repeat);
