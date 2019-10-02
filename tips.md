@@ -12,6 +12,14 @@ On a mac, Command-F to get find and replace to show up on the bottom.  Next, sel
 ## Static inline vs inline
 At least on my mac, when I compile code into binaries in debug mode (-g vs -O3), I get a linking error for functions which were declared inline vs static inline.
 
+## Regex find replace
+```
+Find: less\(([^,]*),([^),]*)\)
+Replace: less($1,$2, arg)
+```
+
+To find and replace all instances of less(a, b) with less(a, b, arg)
+
 ## Atom-beautify problems
 I use Atom with atom-beautify when coding.  Recently, I ran across an error where I couldn't get it to work with C/C++ code.  I had to do the following to get it to work.
 

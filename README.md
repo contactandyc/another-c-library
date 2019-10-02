@@ -95,7 +95,8 @@ make
 2. [Escape characters in markdown](tips.md#escape-characters-in-markdown)
 3. [Create multiline macro in C](tips.md#create-multiline-macro-in-c)
 4. [Static inline vs inline](tips.md#static-inline-vs-inline)
-5. [Atom-beautify problems](tips.md#atom-beautify-problems)
+5. [Regex find replace](tips.md#regex-find-replace)
+6. [Atom-beautify problems](tips.md#atom-beautify-problems)
 
 
 # Some useful reading...
