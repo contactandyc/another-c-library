@@ -12,7 +12,7 @@ Goals of this project...
 
 My hope is that others will contribute!  
 
-One of my favorite books is the Introduction to Algorithms by MIT Press.  I've often wondered if there was a follow up book (as the implication in the title is that it is for beginners).  I believe that the author wanted to convey that one should understand known algorithms to build better algorithms.  To that end, I found an improvement to quicksort.  I have no idea if my improvement to quicksort is new.  I could not find it in any existing open source implementation.  Read about it [here](quicksort_improvement.md)
+One of my favorite books is the Introduction to Algorithms by MIT Press.  I've often wondered if there was a follow up book (as the implication in the title is that it is for beginners).  I believe that the author wanted to convey that one should understand known algorithms to build better algorithms.  To that end, I found an improvement to quicksort.  I have no idea if my improvement to quicksort is new.  I could not find it in any existing open source implementation.  Read about it on [Medium](https://medium.com/@contactandyc/improving-quicksorts-worst-case-ef48f756bd4e) or [LinkedIn](https://www.linkedin.com/pulse/improving-60-year-old-algorithm-andy-curtis/)
 
 ```bash
 git clone https://github.com/contactandyc/standard-template-library-alternative-in-c.git
