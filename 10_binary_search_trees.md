@@ -1132,6 +1132,7 @@ The copy_tree method copies the node_t tree.
 
 A few helper functions are needed to make the print work.  
 
+## Finding Peers
 The first finds the first parent which is a left parent that also has a right node.
 ```
    A
