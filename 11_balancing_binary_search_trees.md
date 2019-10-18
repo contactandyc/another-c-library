@@ -13,11 +13,11 @@ cd $stla/illustrations/11_balancing_binary_search_trees/1_binary_search_tree
 make
 ```
 
-In this case, I've not included examples in the Makefile.  I've also commented out printing the data structure using iteration and reverse iteration as it isn't relevant to understanding how the red black tree works.
+In this case, I've not included examples in the Makefile.  I've also commented out printing the data structure using iteration and reverse iteration as it isn't relevant to understanding how the red-black tree works.
 
 ## Why balancing is important
 
-To understand why balancing a binary search tree is important, let's look at some worst case and bad scenarios.
+To understand why balancing a binary search tree is important, let's look at some worst-case and bad scenarios.
 
 One worst case scenario
 ```bash
@@ -42,7 +42,7 @@ A1
                         I9
 ```
 
-Another worst case scenario
+Another worst-case scenario
 ```bash
 $ ./test_data_structure IHGFEDCBA
 Creating binary_search_tree for IHGFEDCBA
@@ -89,7 +89,7 @@ B8
 A9
 ```
 
-Yet another worst case scenario.
+Yet another worst-case scenario.
 ```bash
 $ ./test_data_structure Izpagkml
 Creating binary_search_tree for Izpagkml
@@ -126,14 +126,14 @@ a2
 I3 g3
 ```
 
-The leaf nodes are the nodes which don't have children.  In the example above, all of the leaves have a depth of 3, except l which has a depth of 4.  At the first level of a binary search tree, a fully balanced tree can have at most 1 node (the root node).  At the second level, 2 nodes (+1 for the first level).  At the third level, 4 nodes (+3 for the first and second), and so on.  The example above has 8 nodes and the entire first, second, and third levels are full.  This tree is balanced.
+The leaf nodes are the nodes that don't have children.  In the example above, all of the leaves have a depth of 3, except l, which has a depth of 4.  At the first level of a binary search tree, a fully balanced tree can have at most 1 node (the root node).  At the second level, 2 nodes (+1 for the first level).  At the third level, 4 nodes (+3 for the first and second), and so on.  The example above has 8 nodes, and the entire first, second, and third levels are full.  This tree is balanced.
 
-A balanced binary search tree is useful in that you are guaranteed that finding a node will take O(logN) time where N is the number of elements in the tree.  A binary search tree that isn't balanced has a worst case of O(N) time.  This isn't a big deal if you have 5-10 nodes, but if you have 1 million nodes, a balanced binary search tree will take at most 21 operations.  If the tree is not balanced, it might take 1 million operations!  You will often see logN used in describing how long an algorithm takes.  The base of log in this case is 2 (since computers think in terms of 0s and 1s or powers of 2).
+A balanced binary search tree is useful in that you are guaranteed that finding a node will take O(logN) time where N is the number of elements in the tree.  A binary search tree that isn't balanced has a worst case of O(N) time.  This isn't a big deal if you have 5-10 nodes, but if you have 1 million nodes, a balanced binary search tree will take at most 21 operations.  If the tree is not balanced, it might take 1 million operations!  You will often see logN used in describing how long an algorithm takes.  The base of log, in this case, is 2 (since computers think in terms of 0s and 1s or powers of 2).
 
 
-The red black tree is a mostly balanced binary search tree that was invented by Leonidas J. Guibas and Robert Sedgewick.  There are certain properties that make a red black tree valid.  
+The red-black tree is a mostly balanced binary search tree that was invented by Leonidas J. Guibas and Robert Sedgewick.  Certain properties make a red-black tree valid.  
 
-## Properties of a red black tree
+## Properties of a red-black tree
 
 Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 
@@ -141,23 +141,22 @@ Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 2. The root is black.
 3. All leaves (NIL) are black.
 4. If a node is red, then both its children are black.
-5. Every path from a given node to any of its descendant NIL nodes contains the
-  same number of black nodes.
+5. Every path from a given node to any of its descendant NIL nodes contains the same number of black nodes.
 
 My additional rules for clarification which are based upon the first 5 rules.
 - If a node has one child, the child must be red
 - If a node has two children, one or both of the children can be red if the parent is black
-- If a node is red, it must have either two children which are black or no children at all.
+- If a node is red, it must have either two children who are black or no children at all.
 - The parent of a red node must be black
 - The black height of any leaf node must be the same (another way of stating 5)
-- A red black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.  It is possible to have more red nodes than black nodes, but it isn't typical.
-- A red black tree has a worst case of a 2logN depth, but is likely to maintain a logN depth or be very close to it.
+- A red-black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.  It is possible to have more red nodes than black nodes, but it isn't typical.
+- A red-black tree has a worst case of a 2logN depth but is likely to maintain a logN depth or be very close to it.
 
-The red black tree uses coloring and tree rotations to balance the binary search tree.  
+The red-black tree uses coloring and tree rotations to balance the binary search tree.  
 
 ## Coloring
 
-In a red black tree, a red and black color are introduced.  Typically, this is represented as a single bit with 0 meaning black and 1 meaning red.  
+In a red-black tree, the red and black colors are introduced.  Typically, this is represented as a single bit with 0 meaning black and 1, meaning red.  
 
 To color a node red, set the color to RED (RED is defined as 1).
 ```c
@@ -173,7 +172,7 @@ void color_node_black( node_t *node ) {
 }
 ```
 
-Recoloring a node, involves painting a node RED and its children (which both must exist) BLACK.
+Recoloring a node involves painting a node RED and its children (which both must exist) BLACK.
 ```c
 void recolor( node_t *n ) {
   n->color = RED;
@@ -183,7 +182,7 @@ void recolor( node_t *n ) {
 
 ## Rotations
 
-Rotations are used to balance binary search trees when using the red black tree algorithm.  The following examples will not include colors and are just made up.  A right rotation around R
+Rotations are used to balance binary search trees when using the red-black tree algorithm.  The following examples will not include colors and are just made up.  A right rotation around R
 
 ```bash
 G
@@ -220,12 +219,12 @@ E R
   G
 ```
 
-In all cases after a rotation, the tree is still a valid binary search tree.  In order to do a right rotation around a node, that node must reference a left node.  The left node and itself will exchange colors.  When doing a left rotation around a node, that node must reference a right node.  The right node and itself will exchange colors.
+In all cases, after a rotation, the tree is still a valid binary search tree.  To do a right rotation around a node, that node must reference a left node.  The left node and itself will exchange colors.  When doing a left rotation around a node, that node must reference a right node.  The right node and itself will exchange colors.
 
 rotate_left does the following.
 - assign new_root to A->right.
 - swap the color between A and new_root.
-- if A has a parent, link the parent to new_root, otherwise, link root to new_root.
+- if A has a parent, link the parent to new_root; otherwise, link root to new_root.
 - put A to the left of new_root and what was previously to the right of new_root to the left of A.
 
 ```c
@@ -293,7 +292,7 @@ The root is not black!
 (i)nsert, (e)rase, (r)ight_rotate, (l)eft_rotate, (R)ed, (b)lack, re(c)olor, (h)elp, (q)uit
 ```
 
-If the node is in parenthesis, it is red.  On your terminal, it should print in the red color as well.  Whenever you insert a node, it is painted red.  You can use the tool to try and turn this into a proper red black tree.  In the red black tree, the root is always black.  We can paint a black by typing the following.
+If the node is in parenthesis, it is red.  On your terminal, it should print in the red color, as well.  Whenever you insert a node, it is painted red.  You can use the tool to try and turn this into a proper red-black tree.  In the red-black tree, the root is always black.  We can paint a black by typing the following.
 
 type
 ```bash
@@ -315,10 +314,10 @@ The root is not black!
 Operation: black a
 a1
 
-The above tree is a valid red black tree
+The above tree is a valid red-black tree
 ```
 
-The first operation was **insert a** broke the red black tree rules.  It was fixed by painting the root node black.
+The first operation was **insert a** broke the red-black tree rules.  It was fixed by painting the root node black.
 
 type
 ```bash
@@ -341,7 +340,7 @@ a1
    (b1)
 
 
-The above tree is a valid red black tree
+The above tree is a valid red-black tree
 ```
 
 In this case, nothing needed to be done because b's parent was black.
@@ -400,7 +399,7 @@ b1
 |      
 (a1)
 
-The above tree is a valid red black tree
+The above tree is a valid red-black tree
 ```
 
 type
@@ -484,7 +483,7 @@ a2 c2
      \
       (d2)      
 
-The above tree is a valid red black tree
+The above tree is a valid red-black tree
 ```
 
 type
@@ -551,7 +550,7 @@ a2 d2
    (c2)
 
 
-The above tree is a valid red black tree
+The above tree is a valid red-black tree
 ```
 
 The tool will also allow you to erase nodes.  Let\'s erase a to start.
@@ -569,7 +568,7 @@ b1
    |      
    (c2)
 
-b1 has one right child and it isn't red
+b1 has one right child, and it isn't red
 ```
 
 We can try a left rotation around b
@@ -588,7 +587,7 @@ b2
 
 (e1) has a different black height than (c2)
 ```
-If we color e black, the tree will be a proper red black tree.
+If we color e black, the tree will be a proper red-black tree.
 ```bash
 b e
 ```
@@ -621,7 +620,7 @@ b1
    |      
    (c2)
 
-b1 has one right child and it isn't red
+b1 has one right child, and it isn't red
 
 Operation: left_rotate b
 d1
@@ -643,12 +642,12 @@ b2
   \
    (c2)
 
-The above tree is a valid red black tree
+The above tree is a valid red-black tree
 ```
 
-I'll reference this tool in the explanation of the red black tree that comes next.  Hopefully, the red black tree will make more sense as we've already seen how much of it works.
+I'll reference this tool in the explanation of the red-black tree that comes next.  Hopefully, the red-black tree will make more sense as we've already seen how much of it works.
 
-The tool (tree_operations) can also start with a valid red black tree which you can modify by specifying a sequence of characters in the order which you wish the characters to be inserted.
+The tool (tree_operations) can also start with a valid red-black tree, which you can modify by specifying a sequence of characters in the order in which you wish the characters to be inserted.
 
 ```bash
 $ ./tree_operations ABC
@@ -708,7 +707,7 @@ B3
 A4 C4
 ```
 
-Once the tool is loaded, you can insert or erase nodes and try and figure out how to make it work like a red black tree again.
+Once the tool is loaded, you can insert or erase nodes and try and figure out how to make it work as a red-black tree again.
 
 # [The Red Black Tree](12_red_black_tree.md)
 
