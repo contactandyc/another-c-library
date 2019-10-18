@@ -2,9 +2,9 @@
 
 # The Pool Object
 
-What if our object could keep track of allocations and free memory for us?  This is generally the basis for languages which use garbage collection.  I'm going to illustrate how to build several objects which greatly reduce the number of calls to malloc and free (and reduce the risk that you will have memory leaks).  
+What if our object could keep track of allocations and free memory for us?  This is generally the basis for languages that use garbage collection.  I'm going to illustrate how to build several objects which greatly reduce the number of calls to malloc and free (and reduce the risk that you will have memory leaks).  
 
-The first is an object which I've used for almost my whole career.  I've called it a pool.  The basic idea with this object is that you can allocate and clear.  It has no free function.  When you clear, you clear all of the memory that has been previously allocated from the pool (internally, it is very efficient in that all it typically does is reset a counter to zero).  The base interface will look something like the following.
+The first is an object which I've used for almost my whole career.  I've called it a pool.  The basic idea with this object is that you can allocate and clear.  It has no free function.  When you clear, you clear all of the memory that has been previously allocated from the pool. Internally, it is very efficient in that all it typically does is reset a counter to zero.  The base interface will look something like the following.
 
 pool.h
 ```c
@@ -24,13 +24,13 @@ void pool_destroy(pool_t *h);
 #endif
 ```
 
-There is no free method.  You can call the allocation methods as often as you like and they will remain valid until pool_clear or pool_destroy is called.
+There is no free method.  You can call the allocation methods as often as you like, and they will remain valid until pool_clear or pool_destroy is called.
 
 # The Simplest Implementation
 
 When approaching algorithms, it is often a good idea to think about the simplest implementation.  This implementation doesn't need to be efficient.  It can serve to prove that a more complicated version achieves the same result.
 
-A very simple implementation of the pool interface described above.
+Below describes a simple implementation of the pool interface:
 
 - Have each allocation saved in a singly linked list on the pool_s structure.  
 - The clear method could free all of the memory in the linked list.
@@ -91,7 +91,7 @@ void pool_destroy(pool_t *h) {
 }
 ```
 
-We could allocate the desired memory and the pool_node_t structure together.  If we did that we wouldn't need the void *m parameter and the memory requested could just exist after the pool_node_t structure.
+We could allocate the desired memory and the pool_node_t structure together.  If we did that, we wouldn't need the void *m parameter, and the memory requested could just exist after the pool_node_t structure.
 
 ```c
 typedef struct pool_node_s {
@@ -117,12 +117,12 @@ void pool_clear(pool_t *h) {
 }
 ```
 
-Using this simple structure, all of our allocations can be tracked and cleared by the pool object instead of requiring the application to remember where each allocation started from.
+Using the simple structure above, our allocations can be tracked and cleared by the pool object instead of requiring the application to remember where each allocation started from.
 
 
 # A better implementation
 
-The above implementation does save us from needing to free memory, but it doesn't really do much more.  The pool object that exists in the src directory is listed below
+The above implementation does save us from needing to free memory, but it doesn't do much more.  The pool object that exists in the src directory is listed below:
 
 src/stla_pool.h
 ```c
@@ -157,7 +157,7 @@ void stla_pool_destroy(stla_pool_t *h);
 
 /* stla_pool_set_minimum_growth_size alters the minimum size of growth blocks.
    This is particularly useful if you don't expect the pool's block size to be
-   exceeded by much and you don't want the default which would be to use the
+   exceeded by much, and you don't want the default, which would be to use the
    original block size for the new block (effectively doubling memory usage). */
 void stla_pool_set_minimum_growth_size(stla_pool_t *h, size_t size);
 
@@ -195,7 +195,7 @@ size_t stla_pool_size(stla_pool_t *h);
 
 /* stla_pool_used returns the number of bytes that have been allocated by the
   pool itself.  This will always be greater than stla_pool_size as there is
-  overhead for the structures and this is independent of any allocating calls.
+  overhead for the structures, and this is independent of any allocating calls.
 */
 size_t stla_pool_used(stla_pool_t *h);
 
@@ -246,12 +246,12 @@ stla_pool_t *_stla_pool_init(size_t size);
 #endif
 ```
 
-If we weren't using the stla_allocator, our init call would look like this...
+If we weren't using the stla_allocator, our init call would look like this:
 ```c
 stla_pool_t *_stla_pool_init(size_t size);
 ```
 
-If you refer back to the end of the [allocator](7_allocator.md) code, there is an explanation of very similar code for the timer object conversion.
+If you refer back to the end of the [allocator](7_allocator.md) code, there is an explanation of similar code for the timer object conversion.
 
 Replace
 ```c
@@ -269,7 +269,7 @@ stla_pool_t *_stla_pool_init(size_t size);
 #endif
 ```
 
-The above code has two basic cases.  One where _STLA_DEBUG_MEMORY_ is defined and the other where it is not (#else).  It may be easier to break this into a couple of steps.
+The above code has two basic cases:  one where _STLA_DEBUG_MEMORY_ is defined, and the other where it is not (#else).  It may be easier to break this into a couple of steps.
 
 1.  convert the init function to be prefixed with an underscore
 
@@ -318,7 +318,7 @@ stla_pool_t *_stla_pool_init(size_t size);
 #endif
 ```
 
-A common use case for the pool is to allocate a bunch of times and then clear and repeat.  For example, if you were responding to queries from a search engine, you might want to use this object and allocate a bunch of times for parsing the query and building a response.  Once the response has been written, the pool can be cleared and used for the next query.  The pool would likely need a certain amount of bytes to satisfy the vast majority of the queries.  Given this use, it makes sense for the pool to allocate enough bytes in a single block, and then just to dole out the memory via its allocation methods.  If the single block isn't big enough for all of the allocations, overflow blocks will be allocated.  When the pool is cleared, the overflow blocks will be freed.  The main block will remain and the counter inside the pool will be reset to zero.  If we make the pool too small, the overflow blocks will continuously get used.  If we make it too big, memory is wasted.
+A common use case for the pool is to allocate a bunch of times and then clear and repeat.  For example, if you were responding to queries from a search engine, you might want to use this object and allocate a bunch of times for parsing the query and building a response.  Once the response has been written, the pool can be cleared and used for the next query.  The pool would likely need a certain amount of bytes to satisfy the vast majority of the queries.  Given this use, it makes sense for the pool to allocate enough bytes in a single block, and then just to dole out the memory via its allocation methods.  If the single block isn't big enough for all of the allocations, overflow blocks will be allocated.  When the pool is cleared, the overflow blocks will be freed.  The main block will remain, and the counter inside the pool will be reset to zero.  If we make the pool too small, the overflow blocks will continuously get used.  If we make it too big, we waste memory.
 
 # TO BE CONTINUED
 

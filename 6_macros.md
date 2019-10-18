@@ -2,7 +2,7 @@
 
 # Macros
 
-The c compiler allows us to create a macro (basically defining one thing as another).  There are two special constants that can be useful for debugging.
+The C compiler allows us to create a macro (basically defining one thing as another).  Two individual constants can be useful for debugging.
 
 ```
 __LINE__ - The line of code that you are on.
@@ -31,7 +31,7 @@ $ ./test_special_constants
 This line of code is at line 4 in function main in the file test_special_constants.c
 ```
 
-__FILE__ is of the type const char * (meaning it is a sequence of read only characters).   __LINE__ is an int (integer).
+__FILE__ is of the type const char * (meaning it is a sequence of read-only characters).   __LINE__ is an int (integer).
 
 We can utilize the compiler and macros to help us here.  In C, you define a macro using #define.  
 
@@ -59,7 +59,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-Before it is turned into a binary.  The macro literally gets placed inline in the code.  For example, a macro can reference a variable that was defined in the function.
+Before, it is turned into a binary.  The macro gets placed inline in the code.  For example, a macro can reference a variable that was defined in the function.
 
 ```c
 #include <stdio.h>
@@ -73,7 +73,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-Notice that x doesn't exist when multiply_by_x is defined.  Because it is literally replaced it would look like the following.
+Notice that x doesn't exist when multiply_by_x is defined.  Because it is replaced, it would look like the following.
 
 ```c
 #include <stdio.h>
@@ -125,7 +125,7 @@ int main( int argc, char *argv[]) {
 
 Notice that multiply didn't have to exist when the macro was defined.  Macros are evaluated first.  
 
-Macros almost never end in a semicolon.  The following will throw an error.
+Macros rarely end in a semicolon.  The following will throw an error.
 
 test_code.c
 ```c
@@ -171,7 +171,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-Notice the extra semicolon after multiply.  In general, macros can have semicolons in them, but they cannot end in a semicolon.  Macros can also define multiple lines of code (or multiple statements).
+Notice the extra semicolon after multiply.  Generally, macros can contain semicolons but cannot end in semicolons.  Macros can also define multiple lines of code (or multiple statements).
 
 test_code.c
 ```c
@@ -238,7 +238,7 @@ after swap: (10, 5)
 
 One common error with multi-line macros is to put a space after the \.  The compiler will give you an error for doing this.  Also, I put the \ so that they all line up vertically.  This just makes the code more readable - the compiler doesn't care.  A second error with multi-line macros is to put the \ after the last line.  The \ continues code to the next line.  It's an error to put the \ on the last line (which may or may not get reported by the compiler in a useful way).
 
-Macros can be defined different ways depending upon another macro variable.
+Macros can be defined in different ways depending upon another macro variable.
 
 test_code.c
 ```c
@@ -269,7 +269,7 @@ $ ./test_code
 DEBUG: 5
 ```
 
-Finally, we can have the compiler create a single string constant out of the __FILE__ and the __LINE__ (which can include additional information).  Converting a number to a string using #define is a little tricky due to how the preprocessor works.  It basically has to be done in two passes using a function which calls a function.  The proprocessor doesn't do recursion.  Instead, it works by doing two passes.
+Finally, we can have the compiler create a single string constant out of the __FILE__ and the __LINE__ (which can include additional information).  Converting a number to a string using #define is a little tricky due to how the preprocessor works.  It has to be done in two passes using a function which calls a function.  The preprocessor doesn't do recursion.  Instead, it works by doing two passes.
 
 For example,
 ```c
@@ -296,7 +296,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-The first pass will look like...
+The first pass will look like:
 ```c
 #include <stdio.h>
 
@@ -327,7 +327,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-In stla_common.h, I also defined STLA_FILE_LINE_MACRO which is a macro meant for objects such as the stla_timer object.  This will become more evident as we work through the allocator object.  As usual, it's a good idea to define macros using stla or STLA as a prefix to insure that your code doesn't conflict with other code bases.  I've chosen STLA for two reasons.  STLA is an acronym for standard template library alternative and it is generally a short unique string of characters that can be changed easily if needed.
+In stla_common.h, I also defined STLA_FILE_LINE_MACRO, which is a macro meant for objects such as the stla_timer object.  This will become more evident as we work through the allocator object.  As usual, it's a good idea to define macros using stla or STLA as a prefix to ensure that your code doesn't conflict with other codebases.  I've chosen STLA for two reasons.  STLA is an acronym for standard template library alternative, and it is generally a short unique string of characters that can be changed if needed.
 
 $stla/src/stla_common.h
 ```c
@@ -341,7 +341,7 @@ $stla/src/stla_common.h
 
 /*
 Defining _STLA_DEBUG_MEMORY_ will check that memory is properly
-freed (and try some rudimentary double free checks).  If memory
+freed (and try some rudimentary double-free checks).  If memory
 doesn't seem to be previously allocated, there is a scan to find
 the closest block.  _STLA_DEBUG_MEMORY_ can be defined as NULL or
 a valid string.  If it is defined as a string, then a file will be
@@ -369,7 +369,7 @@ Snapshots are saved in increasing intervals.
 #endif
 ```
 
-The stla_parent_object macro is useful for finding the address of a structure given a pointer to a member of the structure.
+The stla_parent_object macro is useful for finding the address of a structure when given a pointer to a member of the structure.
 
 ```c
 #include "stla_common.h"

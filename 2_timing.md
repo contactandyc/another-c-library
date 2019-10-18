@@ -114,7 +114,7 @@ b = b - 1; // b will become 127 again
 
 `bool` is another type defined in C (you must include `stdbool.h` to get it). `bool` is defined as having the value true or false. This type can make code more readable in that it makes it clear to the reader that there are only two possible states.
 
-`double` (and `float`) are used for decimals.  Because `float` only uses 32 bits, it loses precision quickly.  I do not tend to use it for anything.  Instead, I opt to use `double`
+`double` (and `float`) are used for decimals.  Because `float` only uses 32 bits, it loses precision quickly.  I do not tend to use it for anything.  Instead, I opt to use `double`.
 
 `typedef` can be utilized to define your own type using the following syntax:
 
@@ -129,9 +129,9 @@ typedef unsigned int number_t;
 number_t a = 100;
 ```
 
-Every data type in C has a size.  The size of a pointer is always the same (it is the same as the size_t type). The `sizeof()` operator determines the size of a type or variable. `sizeof(number_t)` finds the size of the `number_t` type (and return 4 since unsigned int is 4 bytes). `sizeof(void)` is not allowed as that does not make sense.
+Every data type in C has a size.  The size of a pointer is always the same (it is the same as the size_t type). The `sizeof()` operator determines the size of a type or variable. `sizeof(number_t)` finds the size of the `number_t` type (and return four since unsigned int is four bytes). `sizeof(void)` is not allowed as that does not make sense.
 
-A variable can be cast from one type to another either implicitly or explicitly.  Imagine you want to convert an int to a double or vice versa.
+A variable can be cast from one type to another, either implicitly or explicitly.  Imagine you want to convert an int to a double or vice versa.
 
 ```c
 int x = 100;
@@ -167,7 +167,7 @@ In the main function declaration, `argv` is declared uniquely.
 char *argv[];
 ```
 
-The asterisk means that the variable named `argv` is a pointer to the type `char` which is a single byte and is signed (signed is the default datatype prefix).  The `[]` after the `argv` indicates that `argv` is referencing an array of pointers.
+The asterisk means that the variable named `argv` is a pointer to the type `char`, which is a single byte and is signed (signed is the default datatype prefix).  The `[]` after the `argv` indicates that `argv` is referencing an array of pointers.
 
 In the following array
 ```
@@ -183,7 +183,7 @@ In the following array
 `argv[4] => t` (at byte 23)<br/>
 `argv[5] => NULL` (pointing to NULL means that the pointer is not pointing at anything)<br/>
 
-Notice that the pointers refer to individual bytes.  In C (and any language), a pointer refers to a location in memory (typically RAM or random access memory).  Strings or sequences of characters are defined by looking for a terminating character (a non-printable 0).  The above example is not technically correct in that what would happen is before the arguments getting to the main function; they would split into 5 strings.
+Notice that the pointers refer to individual bytes.  In C (and any language), a pointer refers to a location in memory (typically RAM or random access memory).  Strings or sequences of characters are defined by looking for a terminating character (a non-printable 0).  The above example is not technically correct in that what would happen is before the arguments getting to the main function; they would split into five strings.
 
 `argv` would be an array of pointers<br/>
 `argv[0] => "./test_timer"`<br/>
@@ -235,14 +235,14 @@ while(*p != 0)
   p++;
 ```
 
-C allows for logic to be repeated until a condition is met.  For example, a while loop is technically defined as
+C allows for repeated logic until a given condition evaluates true.  For example, a while loop is technically defined as
 
 ```c
 while(<condition>)
   do_something;
 ```
 
-Alternatively, if there are multiple lines of code which need to be executed within the loop
+Alternatively, if there are multiple lines of code which need to be executed within the loop:
 
 ```c
 while(<condition>) {
@@ -253,7 +253,7 @@ while(<condition>) {
 }
 ```
 
-It is essential to recognize the difference between comparisons and conditions.  A condition can be true or false.  Comparisons require two objects and can evaluate to true or false.  In most (every?) computer language, loops and if logic will use conditions as opposed to comparisons.  Comparisons are a subset of conditions.  In C, true is non-zero, and false is zero.
+It is essential to recognize the difference between comparisons and conditions.  A condition can be true or false.  Comparisons require two objects and can evaluate to true or false.  In most (every?) computer language, loops, and if logic will use conditions as opposed to comparisons.  Comparisons are a subset of conditions.  In C, true is non-zero, and false is zero.
 
 The following would never do_something:
 
@@ -277,7 +277,7 @@ while(*p != 0)
   p++;
 ```
 
-Pointers are declared using an asterisk. Pointers point at values obtained through a process called dereferencing. Dereferencing occurs when an asterisk precedes the pointer. The first time through this loop, assuming that s pointed to "Test", p would be pointing at a value T.  *p would result in the single character 'T'.  In C, single characters are defined in single quotes.  Longer strings are defined in double-quotes.  
+Pointers are declared using an asterisk. Pointers point at values obtained through a process called dereferencing. Dereferencing occurs when an asterisk precedes the pointer. The first time through this loop, assuming that s pointed to "Test", p would be pointing at a value T.  *p would result in the single character 'T'.  In C, single quotes define single characters.  Double-quotes define longer strings.
 
 ```c
 while(*p != 0) /* first time *p == 'T', condition is true ('T' != 0) */
@@ -295,9 +295,9 @@ while(*p != 0) /* fourth time *p == 's', condition is true ('s' != 0) */
 while(*p != 0) /* fifth time *p == 0, so condition is no longer true */
 ```
 
-At this point, p points to just passed the letter s and advanced 4 times, so the length is 4.
+At this point, p points to just passed the letter s and advanced four times, so the length is four.
 
-It is common for developers to use `int` as a return type. However, it is generally more efficient and less bug-prone to use `size_t`.  In order for a 64 bit CPU to work with an `int`, it must split a register since the CPU is meant to work with 64-bit integers.  This split is not cheap.  Additionally, if you use `size_t` or (`ssize_t` for signed numbers), the program will be more portable to 64-bit systems where a string might be longer than 2 billion bytes.  A better implementation of `strlen` might look like the following.  The only difference is that the `strlen` returns a type `size_t`.  Strings cannot be negative in length, so returning an unsigned number also helps people using the function to understand that.
+It is common for developers to use `int` as a return type. However, it is generally more efficient and less bug-prone to use `size_t`.  For a 64 bit CPU to work with an `int`, it must split a register since the CPU is meant to work with 64-bit integers.  This split is not cheap.  Additionally, if you use `size_t` or (`ssize_t` for signed numbers), the program will be more portable to 64-bit systems where a string might be longer than 2 billion bytes.  A better implementation of `strlen` might look like the following.  The only difference is that the `strlen` returns a type `size_t`.  Strings cannot be negative in length, so returning an unsigned number also helps people using the function to understand that.
 
 ```c
 size_t strlen(char *s) {
@@ -308,7 +308,7 @@ size_t strlen(char *s) {
 }
 ```
 
-C allows for variables to be declared as constant meaning that they cannot change.  Constants are particularly useful in functions because the function can indicate that the input will not change.  Above, the string remains unmodified while determining the length.  Adding `const` will indicate to the user (and compiler) that what s points to will not be changed.
+C allows for variables to be declared as constant, meaning that they cannot change.  Constants are particularly useful in functions because the function can indicate that the input will not change.  Above, the string remains unmodified while determining the length.  Adding `const` will indicate to the user (and compiler) that what s points to will not be changed.
 
 ```c
 size_t strlen(const char *s) {
@@ -345,7 +345,7 @@ void print_hello(const char *name) {
 
 This function prints something to the screen and does not return anything.
 
-A void pointer: `void *`, is a special type of pointer that must be cast to another type before implementation.
+A void pointer: `void *`, is a special type of pointer that must cast to another type before implementation.
 
 Before describing the void pointer, I want to show an example of casting pointers.
 
@@ -366,7 +366,7 @@ To avoid such a warning, either change the type of p to `const char *` or cast s
 char *p = (char *)s;
 ```
 
-Imagine you have a function that will print the value of variables of different types such as the following.
+Imagine you have a function that will print the value of variables of different types, such as the following.
 
 Code found in <i>illustrations/2_timing/1_timer</i>
 
@@ -456,12 +456,12 @@ int type: -500000
 unsigned int type: 500000
 long type: -500000
 unsigned long type: 500000
-double type (with 4 decimal places): 1.5000
+double type (with four decimal places): 1.5000
 ```
 
-In the program above, the void pointer cannot actually be used directly.  It must be converted to a different pointer type before the value that the pointer is pointing at can be referenced.  
+In the program above, the void pointer cannot be used directly.  It must be converted to a different pointer type before the value that the pointer is pointing at can be referenced.  
 
-The program above introduced `if`, `else if`, and the `&` operator.  If statements have a similar syntax as the while statement.  
+The program above introduced `if`, `else if`, and the `&` operator.  If statements have similar syntax as while statements.  
 
 ```
 if(<condition>) {
@@ -678,7 +678,7 @@ for( int i=1; i<argc; i++ ) {
 
 ## How to time code
 
-The example is going to reverse strings several times while timing the process.  The program should not modify the arguments that are passed into your program.  If you wish to modify an argument, you should first allocate memory for your program to use and then copy the argument into the newly allocated memory.  The `malloc` function will allocate the number of bytes requested for use.  You can read about it by typing `man malloc` from the command line.  Programs that require extra memory to work with must request that memory from the operating system.  `malloc` is one of the core ways to complete this.  Memory requested should later be freed using the `free` call.  The `malloc` function can return `NULL` meaning that the memory was not available.  Trying to writing to a pointer that is pointing at NULL will cause your program to crash.  You can check for the error or just allow the program not so gracefully to crash.  In my examples, I am going to allow the program to crash if `NULL` is returned.  The only other reasonable option would be to have the program fail early, which effectively is the same thing.  In the example below, there are a few functions called.  The early writers of C decided to shorten the names of the funtions.
+The example is going to reverse strings several times while timing the process.  The program should not modify the arguments that are passed into your program.  If you wish to modify an argument, you should first allocate memory for your program to use and then copy the argument into the newly allocated memory.  The `malloc` function will allocate the number of bytes requested for use.  You can read about it by typing `man malloc` from the command line.  Programs that require extra memory to work with must request that memory from the operating system.  `malloc` is one of the core ways to complete this.  Memory requested should later be freed using the `free` call.  The `malloc` function can return `NULL`, meaning that the memory was not available.  Trying to writing to a pointer that is pointing at NULL will cause your program to crash.  You can check for the error or just allow the program not so gracefully to crash.  In my examples, I am going to allow the program to crash if `NULL` is returned.  The only other reasonable option would be to have the program fail early, which effectively is the same thing.  In the example below, there are a few functions called.  The early writers of C decided to shorten the names of the functions.
 ```
 malloc - memory allocate
 strlen - string length
@@ -696,7 +696,7 @@ for( int i=1; i<argc; i++ ) {
   free(s);
 ```
 
-At the beginning of the program, there were a few `#include` statements.  `#include` effectively copies the contents of the filename into the current program.  In order to use functions like `malloc`, `strcpy`, and `free`, the proper file must be included.  Files with a suffix ".h" are called header files and typically define how to call a function.  
+At the beginning of the program, there were a few `#include` statements.  `#include` effectively copies the contents of the filename into the current program.  To use functions like `malloc`, `strcpy`, and `free`, the proper file must be included.  Files with a suffix ".h" are called header files and typically define how to call a function.  
 
 ```c
 #include <stdio.h>
@@ -711,7 +711,7 @@ I include the include statements above because of the following function calls:
 | Function | Description |
 |---|---|
 | stdio.h | printf, NULL, and many other io related functions |
-| stdlib.h | malloc, free, and many other standard library related functions |
+| stdlib.h | malloc, free, and many other standard library-related functions |
 | string.h | strlen, strcpy, and many other string related functions |
 | sys/time.h | gettimeofday |
 | time.h | sometimes an alternate location of gettimeofday |
@@ -728,7 +728,7 @@ long get_time() {
 
 A quick note on using parenthesis:  I strongly believe in making code easier to read.  Technically, I could have skipped the parenthesis without harm due to the order of operations, but the code becomes simpler to read by adding the parenthesis.
 
-Reversing a string takes a minimal amount of time.  It is so small that in order to accurately measure it, you need to repeat the test a million times to make a good step.  In each loop, the `strcpy` resets s such that it has a copy of the ith argument so that it can be reversed.  The time that the process takes is `test_t2 - test_t1`.  
+Reversing a string takes a minimal amount of time.  It is so small that to accurately measure it, you need to repeat the test a million times to make a good step.  In each loop, the `strcpy` resets s such that it has a copy of the ith argument so that it can be reversed.  The time that the process takes is `test_t2 - test_t1`.  
 ```c
 int repeat_test = 1000000;
 ...
@@ -742,7 +742,7 @@ long time_spent = test_t2-test_t1;
 overall_time += time_spent;
 ```
 
-After timing the reverse_string call, printf is used to print the string on the terminal before it was reversed and the new form of the string (s).  Printf allows for format specifiers to match arguments after the first parameter (also known as the format string).  `%s` indicates that there must be a string for the given argument.  `%0.4f` expects a floating point number and prints 4 decimal places.  test_t2 and test_t1 are both measured in microseconds.  Multiplying the difference by 1000 will change the unit type to nanoseconds.  Since the test was repeated 1 million times, the overall time needs to be divided by 1 million.  By multiplying or dividing a number by a decimal, it converts the type to a decimal.
+After timing the reverse_string call, printf is used to print the string on the terminal before it was reversed and the new form of the string (s).  Printf allows for format specifiers to match arguments after the first parameter (also known as the format string).  `%s` indicates that there must be a string for the given argument.  `%0.4f` expects a floating-point number and prints four decimal places.  test_t2 and test_t1 are both measured in microseconds.  Multiplying the difference by 1000 will change the unit type to nanoseconds.  Since the test was repeated 1 million times, the overall time needs to be divided by 1 million.  By multiplying or dividing a number by a decimal, it converts the type to a decimal.
 
 ```c
     printf("%s => %s\n", argv[i], s);
@@ -847,7 +847,7 @@ esvereR
    e
 ```
 
-The string is now esreveR which is the reverse of Reverse.
+The string is now esreveR, which is the reverse of Reverse.
 
 ## The basic Makefile
 
@@ -901,7 +901,7 @@ The examples block will run every time because it does not have any dependencies
 
 ## More accurately timing code
 
-In the last section, we explored how to time the reverse_string function.  In this section, we will explore how to time the function better.  One thing you may have noticed is that there are a million calls to both `reverse_string` and `strcpy`.  There is also the overhead of the loop.  To do the timing correctly, we should have timed the `strcpy` and the loop and subtracted that from the loop which has the reverse_string function called.
+In the last section, we explored how to time the reverse_string function.  In this section, we will explore how to time the function better.  One thing you may have noticed is that there are a million calls to both `reverse_string` and `strcpy`.  There is also the overhead of the loop.  To do the timing correctly, we should have timed the `strcpy` and the loop and subtracted that from the loop, which has the reverse_string function called.
 
 The timing for the work in <i>illustrations/2_timing/2_timer</i> was:
 
@@ -948,7 +948,7 @@ $ diff test_timer.c ../1_timer/test_timer.c
 
 The less than symbols mean that the change is in the file in the first parameter (test_timer.c).  The greater than symbol indicates that the change is in the file in the second parameter (../1_timer/test_timer.c).  You should also notice three dashes (---) between the two lines indicating time_spent.  The 30,35d29 means that the lines were added after line 29 as lines 30-35.  The 42c36 means that line 42 in test_timer.c was compared with line 36 in ../1_timer/test_timer.c.
 
-As you can see from above, there are two changes.  The first times everything but the reverse_string.
+As shown above, there are two changes.  The first times everything but reverse_string.
 ```c
   long copy_t1 = get_time();
   for( int j=0; j<repeat_test; j++ ) {
@@ -1053,7 +1053,7 @@ The length is passed into the reverse_string call so that reverse_string doesn't
 
 ## Compiler optimizations
 
-It's important to not forget that the compiler can optimize the code further.  You can pass a flag called -O3 to gcc and sometimes see an improvement.
+It's important not to forget that the compiler can optimize the code further.  You can pass a flag called -O3 to gcc and sometimes see an improvement.
 
 The timing for the work in <i>illustrations/2_timing/3_timer</i> was...
 ```bash
@@ -1089,7 +1089,7 @@ diff ./Makefile ../3_timer/Makefile
 > 	gcc test_timer.c -o test_timer
 ```
 
-The -O3 optimization (full optimization) was turned on in gcc.  It is good to actually compare time with optimizations turned on because sometimes the fastest code is slower once optimizations are turned on.
+The -O3 optimization (full optimization) was turned on in gcc.  It is good actually to compare time with optimizations turned on because sometimes the fastest code is slower once optimizations are turned on.
 
 # Splitting up code into multiple files
 
@@ -1137,7 +1137,7 @@ int main( int argc, char *argv[]) {
 ...
 ```
 
-The compiler basically inserts the contents of file2.c into test_timer.c.  At this point, if there was another source file that wanted to use these functions, all they would have to do is #include "file2.c".  For example...
+The compiler inserts the contents of file2.c into test_timer.c.  At this point, if there was another source file that wanted to use these functions, all they would have to do is #include "file2.c".  For example:
 
 test_reverse.c
 ```c
@@ -1182,7 +1182,7 @@ test_reverse.c:8:15: note: include the header <string.h> or explicitly provide a
 2 warnings and 3 errors generated.
 ```
 
-As you can see there are lots of errors.  It's generally best to work through errors starting from the first one and working down as the first error may cause other errors to occur.
+As you can see, there are lots of errors.  It's generally best to work through errors starting from the first one, and working down as the first error may cause other errors to occur.
 
 The first error is
 ```
@@ -1191,7 +1191,7 @@ In file included from test_reverse.c:1:
 void reverse_string( char *s, size_t len ) {
 ```
 
-The error indicates that the type size_t is not known.  Use your favorite search engine and query "error: unknown type name 'size_t'".  You should be able to find that it is defined in stdio.h, so the solution is to include stdio.h.  Notice that we actually do include stdio.h in test_reverse.c, but it is after we include file2.c.  Ideally, file2.c would be complete, so let's modify file2.c to include stdio.h and rerun gcc.  You will have to add the following line to the beginning of file2.c.
+The error indicates that the type size_t is not known.  Use your favorite search engine and query "error: unknown type name 'size_t'".  You should be able to find that it is defined in stdio.h, so the solution is to include stdio.h.  Notice that we do include stdio.h in test_reverse.c, but it is after we include file2.c.  Ideally, file2.c would be complete, so let's modify file2.c to include stdio.h and rerun gcc.  You will have to add the following line to the beginning of file2.c.
 
 ```c
 #include <stdio.h>
@@ -1233,7 +1233,7 @@ void reverse_string( char *s, size_t len ) {
   gettimeofday(&tv, NULL);
 ```
 
-NULL was also defined in stdio.h, so by fixing the first error, we actually fixed another error.  This is a big reason that I fix errors from the beginning to the end.  Often the fixes, fix other problems.
+NULL was also defined in stdio.h, so by fixing the first error, we fixed another error.  This is a big reason that I fix errors from the beginning to the end. Often the fixes, fix other problems.
 
 The next error is
 ```c
@@ -1265,7 +1265,7 @@ void reverse_string( char *s, size_t len ) {
 1 warning and 1 error generated.
 ```
 
-Again, by fixing the one error, we actually fixed more.  Let's continue with the next warning.
+Again, by fixing the one error, we fixed more.  Let's continue with the next warning.
 ```
 test_reverse.c:8:15: warning: implicitly declaring library function 'strdup' with type 'char *(const char *)' [-Wimplicit-function-declaration]
     char *s = strdup(argv[i]); // string duplicate
@@ -1294,7 +1294,7 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-We don't have to recompile everytime.  We can go ahead and look at the next error and try and fix more than one.
+We don't have to recompile every time.  We can go ahead and look at the next error and try and fix more than one.
 ```
 test_reverse.c:9:21: error: too few arguments to function call, expected 2, have 1
     reverse_string(s);
@@ -1325,7 +1325,7 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-Now if you run gcc...
+Now if you run gcc:
 ```bash
 $ gcc test_reverse.c -o test_reverse
 $
@@ -1368,13 +1368,13 @@ changed to
 test_timer: test_timer.c file2.c
 ```
 
-This change is helpful because it says that the test_timer block should run if any of the files have changed.  Now that test_timer is made up of two files, we should list both files.  Internally, make simply looks at the time stamp of test_timer and of test_timer.c and file2.c.  If test_timer.c or file2.c has a time stamp that is greater than test_timer (or test_timer doesn't exist), then the block will be run again.
+This change is helpful because it says that the test_timer block should run if any of the files have changed.  Now that test_timer is made up of two files, we should list both files.  Internally, make simply looks at the time stamp of test_timer and test_timer.c and file2.c.  If test_timer.c or file2.c has a timestamp that is greater than test_timer (or test_timer doesn't exist), then the block will be run again.
 
 ## Splitting up your code into multiple files part 2
 
 This section's code is found in <i>illustrations/2_timing/6_timer</i>
 
-It is generally a good idea to make each file or group of files self-contained.  In the last section, we didn't notice errors when running make, but we did when trying to build test_reverse.  The errors didn't occur because prior to including file2.c we had already included stdio.h and sys/time.h.  In general, you want to include your custom code first as this will present the error earlier.  We should make the following change to test_timer.c
+It is generally a good idea to make each file or group of files self-contained.  In the last section, we didn't notice errors when running make, but we did when trying to build test_reverse.  The errors didn't occur because before including file2.c we had already included stdio.h and sys/time.h.  In general, you want to include your custom code first, as this will present the error earlier.  We should make the following change to test_timer.c
 
 ```c
 #include <stdio.h>
@@ -1419,7 +1419,7 @@ void reverse_string( char *s, size_t len ) {
 ./file2.c:14:21: error: use of undeclared identifier 'NULL'
   gettimeofday(&tv, NULL);
                     ^
-1 warning and 3 errors generated.
+One warning and three errors generated.
 make: *** [test_timer] Error 1
 ```
 
@@ -1435,20 +1435,22 @@ time_spent: 1.7670ns
 overall time_spent: 9.3670ns
 ```
 
-In this section, I also removed the following two lines from test_timer.c as test_timer.c doesn't directly call any time related functions.
+In this section, I also removed the following two lines from test_timer.c as test_timer.c doesn't directly call any time-related functions.
 
 ```c
 #include <sys/time.h>
 #include <time.h>
 ```
 
-It all works because we have fixed file2.c to have the right include statements.  Particularly if you are developing a new package, it is a good idea to include your own packages before outside or system packages.
+It all works because we have fixed file2.c to have the right include statements.  Particularly if you are developing a new package, it is a good idea to include your packages before outside or system packages.
 
 ## Separating the implementation from the interface
 
 This section's code is found in <i>illustrations/2_timing/7_timer</i>
 
-The key to writing large software projects that work is to clearly define objects and make them highly reusable.  When defining objects, it is best to split the object into an interface and an implementation.  Ideally, the interface will only describe what the object does and not how it works.  This is much like an automobile and a transmission.  An automobile might require a transmission with certain specifications.  That automobile doesn't care how the transmission is made.  An interface is like the specifications to a transmission.  The implementation would include how the transmission actually works.  C allows you to declare that a thing exists prior to it being defined.  Typically, this is done in header files (files that end in a .h extension), but it can be done anywhere.  In this section, we will show how to declare that the functions in file2.c without including them.
+The key to writing large software projects that work is to define objects and make them highly reusable clearly.  When defining objects, it is best to split the object into an interface and an implementation.  Ideally, the interface will only describe what the object does and not how it works.  
+
+This is much like an automobile and a transmission.  An automobile might require a transmission with certain specifications.  That automobile doesn't care how the transmission is made.  An interface is like the specifications to a transmission.  The implementation would include how the transmission works.  C allows you to declare that a thing exists before it being defined.  Typically, this is done in header files (files that end in a .h extension), but it can be done anywhere.  In this section, we will show how to declare that the functions in file2.c without including them.
 
 In test_timer.c
 ```c
@@ -1504,7 +1506,7 @@ Everything works as expected.
 
 This section's code is found in <i>illustrations/2_timing/8_timer</i>
 
-Ideally, file2.c should have a corresponding file2.h that describes what exists in file2.c.  We can put the definition of get_time and reverse_string into file2.h as follows...
+Ideally, file2.c should have a corresponding file2.h that describes what exists in file2.c.  We can put the definition of get_time and reverse_string into file2.h as follows:
 
 file2.h:
 ```c
@@ -1519,9 +1521,9 @@ long get_time();
 #endif
 ```
 
-The #ifndef, #define, #endif block basically prevents the compiler from including the same code over and over again.  It checks to see if _file2_H has been defined and if it hasn't, it defines it.  If it has been defined previously, the block is skipped by the compiler.
+The #ifndef, #define, #endif block prevents the compiler from including the same code over and over again.  It checks to see if _file2_H has been defined and if it hasn't, it defines it.  If it has been defined previously, the compiler skips the block.
 
-size_t is used in reverse_string which is defined in stdlib.h, so we include stdlib.h.  One last change is to update file2.c to include file2.h so that we can be sure that file2.c and file2.h don't get out of sync.
+size_t is used in reverse_string, which is defined in stdlib.h, so we include stdlib.h.  One last change is to update file2.c to include file2.h so that we can be sure that file2.c and file2.h don't get out of sync.
 
 file2.c
 ```c
@@ -1550,7 +1552,7 @@ to
 #include "file2.h"
 ```
 
-Again, since this is something that is our own, we should include it before system or third party includes.  The Makefile changed slightly
+Again, since this is something that is our own, we should include it before the system or third party includes.  The Makefile changed slightly.
 
 Makefile changed from
 ```Makefile
@@ -1594,9 +1596,9 @@ void xxx_do_something( xxx_t *h, const char *prefix );
 #endif
 ```
 
-The header file or interface simply provides what exists and doesn't offer details into how xxx might work.  The int param1, int param2 and const char *prefix above are just examples.  The init function often doesn't have any parameters.  The init function is used to create the structure so that it can be used by the other functions within the xxx object.  The destroy function destroys the xxx_t structure.  The xxx_t structure doesn't have members.  It is just declared (like the functions after it), so that the compiler knows that the structure is defined somewhere.  By defining the structure like this, applications using the xxx object cannot access members of the structure.  The implementation is free to put whatever members in the structure to make the function work.  The only thing applications which use this object are required to do is create (or init) the object and then pass it around to the various functions that use that type.  If there is a destroy method, then the application is expected to destroy the object to clean it up.
+The header file or interface simply provides what exists and doesn't offer details into how xxx might work.  The int param1, int param2, and const char *prefix above are just examples.  The init function often doesn't have any parameters.  The init function is used to create the structure so that the other functions can use it within the xxx object.  The destroy function destroys the xxx_t structure.  The xxx_t structure doesn't have members.  It is just declared (like the functions after it) so that the compiler knows that the structure is defined somewhere.  By defining the structure like this, applications using the xxx object cannot access members of the structure.  The implementation is free to put whatever members in the structure to make the function work.  The only thing applications which use this object are required to do is create (or init) the object and then pass it around to the various functions that use that type.  If there is a destroy method, then the application is expected to destroy the object to clean it up.
 
-To use the above interface, you will include it and call it's methods.
+To use the above interface, you will include it and call its methods.
 ```c
 #include "xxx.h"
 
@@ -1639,7 +1641,7 @@ void xxx_do_something( xxx_t *h, const char *prefix ) {
 
 One thing that hasn't been talked about much is the struct keyword.
 
-In C, you can group multiple data types as variables together to define a larger structure.  A classic example is to create a point structure.  Typically, they would be defined as follows...
+In C, you can group multiple data types as variables to define a larger structure.  A classic example is to create a point structure.  Typically, they would be defined as follows:
 ```c
 #include <stdio.h>
 
@@ -1788,7 +1790,7 @@ In test_timer.c the following lines of code exists.
 #include "timer.h"
 ```
 
-In order to make our project reusable, we need to break it up into objects (or interfaces and implementations).  In the above example, we are including timer.h (which we will make next).  
+To make our project reusable, we need to break it up into objects (or interfaces and implementations).  In the above example, we are including timer.h (which we will make next).  
 
 timer.h (comments removed)
 ```c
@@ -1817,21 +1819,21 @@ double timer_sec(timer_t *t);
 #endif
 ```
 
-Earlier you learned that the struct keyword allows you to group zero or more types together to form a new type.  In general, I like to name struct types with a _s suffix and then typedef them to have a _t suffix.  In the timer.h above, the timer_s struct was declared, but never actually defined.  The details of what is in the structure is part of the implementation and isn't meant to be known externally.  C allows you to define types in this way and use them as long as you only reference them as pointers.  All pointers have the same size (the number of bits that the cpu supports or the sizeof(size_t)).  For now, just recognize that there is a new type named timer_t and that timer_s will be defined in timer.c.
+Earlier, you learned that the struct keyword allows you to group zero or more types to form a new type.  In general, I like to name struct types with a _s suffix and then typedef them to have a _t suffix.  In the timer.h above, the timer_s struct was declared, but never actually defined.  The details of what is in the structure are part of the implementation and aren't meant to be known externally.  C allows you to define types in this way and use them as long as you only reference them as pointers.  All pointers have the same size (the number of bits that the CPU supports or the sizeof(size_t)).  For now, just recognize that there is a new type named timer_t and that timer_s will be defined in timer.c.
 
 ```c
 struct timer_s;
 typedef struct timer_s timer_t;
 ```
 
-I follow a pattern where every function is prefixed by the object name (in this case timer).  The primary type (if there is one) is usually the object name followed by _t.  Objects will typically have an init and a destroy method.  The job of the header file is to create an interface for applications to use.  It should hide implementation details as much as possible.  I usually will define an interface before defining an implementation.
+I follow a pattern where every function is prefixed by the object name (in this case, timer).  The primary type (if there is one) is usually the object name followed by _t.  Objects will typically have an init, and a destroy method.  The job of the header file is to create an interface for applications to use.  It should hide the implementation details as much as possible.  I usually will define an interface before defining an implementation.
 
 Initialize the timer.  repeat is necessary to indicate how many times the test will be repeated within the application so that the final result represents that.  If a thing is only being timed with a single repetition, then use a value of 1.  This function will allocate the timer_t structure and fill its members appropriately.  To free up the resources associated with this call, you must call timer_destroy with the return value of this call.
 ```c
 timer_t *timer_init(int repeat);
 ```
 
-Initialize a timer from another timer.  This will subtract the time spent and set the repeat from the timer which is passed as a parameter to timer_timer_init.
+Initialize a timer from another timer.  This will subtract the time spent and set the repeat from the timer, which is passed as a parameter to timer_timer_init.
 ```c
 timer_t *timer_timer_init(timer_t *t);
 ```
@@ -1869,7 +1871,7 @@ double timer_ms(timer_t *t);
 double timer_sec(timer_t *t);
 ```
 
-Notice that timer.h doesn't mention how it is going to be implemented in any way.  It simply names functions in a way that are useable and describes what they do.
+Notice that timer.h doesn't mention how it is going to be implemented in any way.  It simply names functions in a way that is useable and describes what they do.
 
 I usually copy the .h (header file) to a similarly named .c (implementation file) and then fill in the details.
 
@@ -1927,7 +1929,7 @@ double timer_ms(timer_t *t);
 double timer_sec(timer_t *t);
 ```
 
-The next thing to do is to fill in the the timer_s details and remove the typedef that follows.
+The next thing to do is to fill in the timer_s details and remove the typedef that follows.
 
 ```c
 struct timer_s;
@@ -1944,7 +1946,7 @@ struct timer_s {
 };
 ```
 
-repeat is the number of times that the test will be repeated.  time_spent is the total time that has been spent within this object so far.  start_time is recorded everytime timer_start is called.  base is used to track how much time should be added or subtracted from the final time spent based upon other timers.
+repeat is the number of times that the test will be repeated.  time_spent is the total time that has been spent within this object so far.  start_time is recorded every time timer_start is called.  base is used to track how much time should be added or subtracted from the final time spent based upon other timers.
 
 ```c
 timer_t *timer_init(int repeat);
@@ -2241,7 +2243,7 @@ int main( int argc, char *argv[]) {
 
 We include the interface (or header file) we just created in the first line.  The rest of the code above has already been discussed.  
 
-To understand the rest of the code, it is helpful to consider what it looked like prior to using the timer object.
+Considering what the code looked like before using the timer object offers insight into understanding the code.
 
 Consider the following code from <i>illustrations/2_timing/8_timer</i>
 ```c
@@ -2272,9 +2274,9 @@ for( int i=1; i<argc; i++ ) {
   timer_stop(copy_timer);
 ```
 
-First, it is important to recognize that the new code is actually longer.  The number of lines of code isn't always a good measure to decide to create an object.  In the case of the timer object, the get_time() function is hidden in the timer object.  
+First, it is important to recognize that the new code is longer.  The number of lines of code isn't always a good measure to decide to create an object.  In the case of the timer object, the get_time() function is hidden in the timer object.  
 
-Instead of just having a counter for the overall time, I've replaced it with an timer object named overall_timer.
+Instead of just having a counter for the overall time, I've replaced it with a timer object named overall_timer.
 ```c
 long overall_time = 0;
 ```
@@ -2308,9 +2310,9 @@ The timer_init call gets the repeat_test variable from the overall_timer since t
 timer_t *copy_timer = timer_init(repeat_test);
 ```
 
-but that would require that the repeat_test variable be separately.  This becomes important in more complex timings, but for now I'm primarily showing how timer_get_repeat can be useful.  In C, parameters to functions can be the result of other functions.  The timer_get_repeat call would be resolved prior to calling timer_init.
+but that would require that the repeat_test variable be separate.  This becomes important in more complex timings, but for now, I'm primarily showing how timer_get_repeat can be useful.  In C, parameters to functions can be the result of other functions.  The timer_get_repeat call would be resolved before calling timer_init.
 
-To find the time spent in the first example, you need to subtract copy_t1 from copy_t2 and then divide that by the repeat factor.  This will return the number of microseconds that elapsed.  The timer_us(copy_timer) would yield the same result.  With the timer object, it is easy to get the time spent in microseconds, but also nanoseconds, milliseconds, and seconds.  In addition, the timer object automatically converts the time spent to a double (a decimal).
+To find the time spent in the first example, you need to subtract copy_t1 from copy_t2 and then divide that by the repeat factor.  This will return the number of microseconds that elapsed.  The timer_us(copy_timer) would yield the same result.  With the timer object, it is easy to get the time spent in microseconds, but also nanoseconds, milliseconds, and seconds.  Also, the timer object automatically converts the time spent to a double (a decimal).
 
 
 The next section of code times the test (the reverse call) in the same way that the copy timer worked.
@@ -2354,9 +2356,9 @@ which again reduces complexity.  It is also easy to switch from nanoseconds to a
 
 The following code is found in <i>illustrations/2_timing/11_timer</i>
 
-This timer object is done and is ready to be reused.  In C, all of your functions share the same name space.  If another project has a function named timer_init, there will be a conflict.  To prevent this, projects typically adopt a package prefix in addition to the object prefix.  For this project, we will use stla (standard template library alternative).
+This timer object is done and is ready to be reused.  In C, all of your functions share the same namespace.  If another project has a function named timer_init, there will be a conflict.  Projects typically adopt a package prefix in addition to the object prefix to prevent conflicts.  For this project, we will use stla (standard template library alternative).
 
-My rules for adding the prefix are...
+My rules for adding the prefix are:
 ```
 1.  Comments should refer to the object name only.
 2.  All code references should be prefixed.
@@ -2364,7 +2366,7 @@ My rules for adding the prefix are...
     referenced in the name
 ```
 
-The first thing to do is to copy timer.h to stla_timer.h and then apply the rules mentioned above.  The stla_timer header file exists in the current directory what follows is a partial diff.
+The first thing to do is to copy timer.h to stla_timer.h and then apply the rules mentioned above.  The stla_timer header file exists in the current directory. What follows is a partial diff.
 
 ```
 $ diff timer.h stla_timer.h
@@ -2408,7 +2410,7 @@ $ diff timer.c stla_timer.c
 ...
 ```
 
-Finally, the test_timer.c needs to change to use stla_timer instead of timer.
+Finally, test_timer.c needs to change to use stla_timer instead of timer.
 
 ```c
 #include "stla_timer.h"
@@ -2442,7 +2444,7 @@ This command will not work because it was done for you.
 mv stla_timer.h stla_timer.c $stla/src
 ```
 
-You can see that the files are there by running
+You can see that the files exist by running
 ```bash
 cd $stla/src
 ls -l stla_timer.*
@@ -2466,7 +2468,7 @@ cd $stla/illustrations/2_timing/12_timer
 
 cd - allows you to change to the directory that you were in previously and is useful.
 
-To make the program build properly, there are a few changes to Makefile that are needed.  The diff looks like the following.
+Ensuring the program builds properly requires a few changes to Makefile. The diff looks like the following:
 
 ```bash
 $ diff Makefile ../11_timer/Makefile
@@ -2504,13 +2506,13 @@ clean:
 	rm -f test_timer *~
 ```
 
-make allows you to create variables using the <name>=<value> syntax outside of sections.  You can then reference the value of those variables by enclosing the name in $(<name>).  One variable can reference another variable (see OBJECTS and ROOT above).  In order for gcc to find the stla_timer.h file, the src path needs to be added to gcc's include path.  That is done by using the -I<directory> option.  If you have multiple include paths, you can specify -I<directory> multiple times.  
+make allows you to create variables using the <name>=<value> syntax outside of sections.  You can then reference the value of those variables by enclosing the name in $(<name>).  One variable can reference another variable (see OBJECTS and ROOT above).  For gcc to find the stla_timer.h file, the src path needs to be added to gcc's include path.  That is done by using the -I<directory> option.  If you have multiple include paths, you can specify -I<directory> multiple times.  
 
 ## Splitting up the Makefile
 
 The following code is found in <i>illustrations/2_timing/13_timer</i>
 
-Ideally, the objects in src could be defined by a Makefile in src and that Makefile could be included.  In src, there is a file named Makefile.include which defines the variables that were in the Makefile in the last section (as well as for other objects in src).
+Ideally, the objects in src could be defined by a Makefile in src, and that Makefile could be included.  In src, there is a file named Makefile.include, which defines the variables that were in the Makefile in the last section (as well as for other objects in src).
 
 Makefile.include in src
 ```Makefile

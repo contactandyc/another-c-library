@@ -2,7 +2,7 @@
 
 # The Global Allocator Object
 
-A quick note about C allocation methods...
+A quick note about C allocation methods:
 
 In C, there are five basic functions for allocating memory (technically there are more, but they are rarely used).
 ```c
@@ -42,7 +42,7 @@ char *strdup(char *p) {
 
 It's important to realize that malloc (memory alloc) is the core behind all of these functions or at a minimum, they are derivates of malloc.
 
-One of the reasons that people tend to steer clear of C is because you must maintain pointers to memory that you allocate so that it can later be freed.  In the last chapter, I introduced doubly linked lists.  We can implement a way of tracking allocations using a doubly linked list.  The functions that we will implement are the ones defined above - so the interface will be pretty straight forward.  To prevent naming conflicts, we will use the stla prefix.
+One of the reasons that people tend to steer clear of C is because you must maintain pointers to memory that you allocate so that it can later be freed.  In the last chapter, I introduced doubly-linked lists.  We can implement a way of tracking allocations using a doubly-linked list.  The functions that we will implement are the ones defined above - so the interface will be pretty straight forward.  To prevent naming conflicts, we will use the stla prefix.
 
 ```c
 #ifndef _stla_allocator_H
@@ -91,7 +91,7 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-There is a pattern above in that everytime we call stla_malloc (and others), we would call it with __FILE__, __LINE__ as the first two parameters.  
+There is a pattern above in that every time we call stla_malloc (and others), we would call it with __FILE__, __LINE__, as the first two parameters.  
 
 In creating the global allocator, maybe we only want line numbers and malloc to be passed in when the software is defined as being in debug mode.  To define stla_malloc, we might want to do the following.  Considering that we have just identified how to merge the __FILE__ and __LINE__, we will use that.
 
@@ -123,7 +123,7 @@ The macro changes to.
 
 A NULL allocator simply means to use the global allocator.
 
-The second feature is to allow for a mechanism to allow for custom content in place of the caller.  For example, if we allocated a buffer and keep changing its size, we might want to know where the buffer was initialized at, the maximum size of the buffer, its initial size, etc.  This custom feature can be denoted by passing a boolean at the end which defaults to false.
+The second feature is to allow for a mechanism to allow for custom content in place of the caller.  For example, if we allocate a buffer and keep changing its size, we might want to know the following: where the buffer was initialized, the maximum size of the buffer, its initial size, etc. Passing a boolean at the end denotes this custom feature, which defaults to false.
 
 ```c
 void *_stla_malloc_d( stla_allocator_t *a, const char *caller, size_t len );
@@ -139,14 +139,14 @@ The macro changes to.
 #define stla_malloc(len) _stla_malloc_d(NULL, __STLA_FILE_LINE__, len, false)
 ```
 
-If the custom feature is enabled, the objects need a way to dump their state to a file (or to the terminal).  In C, you can define a function pointer and then associate the pointer to functions programatically.  An example is below.  The gist of it is that you specify the new function pointer type by surrounding the name in parenthesis and an extra asterisk.
+If the custom feature is enabled, the objects need a way to dump their state to a file (or to the terminal).  In C, you can define a function pointer and then associate the pointer to functions programmatically.  An example is below.  The gist of it is that you specify the new function pointer type by surrounding the name in parenthesis and an extra asterisk.
 
 For example,
 ```c
 typedef void (*my_function)();
 ```
 
-would declare a function pointer type named my_function which took no arguments and didn't return anything (it has a void return type).  I recommend using a suffix for function pointers (I'm going to use _f).  The allocator needs to define a function pointer to allow other objects to dump their details.
+would declare a function pointer type named my_function, which took no arguments and didn't return anything (it has a void return type).  I recommend using a suffix for function pointers (I'm going to use _f).  The allocator needs to define a function pointer to allow other objects to dump their details.
 
 ```c
 typedef void (*stla_dump_details_f)(FILE *out, void *p, size_t length);
@@ -161,7 +161,7 @@ typedef struct {
 } stla_allocator_dump_t;
 ```
 
-Another useful feature is to have the state of the memory usage dumped every so often.  All this means is that if _STLA_DEBUG_MEMORY_ is defined as a filename, any program which uses the allocator will record all of the memory allocations every N seconds and rotate the previous snapshot.  In order to maintain a smaller number of output files, the rotations will rotate files with an ever expanding gap between them.
+Another useful feature is to have the state of the memory usage dumped every so often.  All this means is that if _STLA_DEBUG_MEMORY_ is defined as a filename, any program which uses the allocator will record all of the memory allocations every N seconds and rotate the previous snapshot.  To maintain a smaller number of output files, the rotations will rotate files with an ever-expanding gap between them.
 
 The full allocator interface is below.
 
@@ -218,7 +218,7 @@ void _stla_free_d(stla_allocator_t *a, const char *caller, void *p);
 #endif
 ```
 
-Before understanding the implementation, let's see how this get's used by other objects and code.  The stla_timer.h/c will change in the following way.
+Before understanding the implementation, let's see how other objects and code use this.  The stla_timer.h/c will change in the following way:
 
 Include stla_common.h
 
@@ -243,7 +243,7 @@ stla_timer_t *_stla_timer_init(int repeat);
 #endif
 ```
 
-The above code has two basic cases.  One where _STLA_DEBUG_MEMORY_ is defined and the other where it is not (#else).  It may be easier to break this into a couple of steps.
+The above code has two basic cases: one where _STLA_DEBUG_MEMORY_ is defined, and one where it is not (#else).  It may be easier to break this into a couple of steps.
 
 1.  convert the init function to be prefixed with an underscore
 
@@ -292,7 +292,7 @@ stla_timer_t *_stla_timer_init(int repeat);
 #endif
 ```
 
-Objects will typically use the STLA_FILE_LINE_MACRO("object_name") when defining the init call as in step 5 above.
+Objects will typically use the STLA_FILE_LINE_MACRO("object_name") when defining the init call, as in step 5 above.
 
 Change stla_timer.c from
 ```c
@@ -316,7 +316,7 @@ stla_timer_t *_stla_timer_init(int repeat) {
 1.  Change all malloc, calloc, strdup, realloc, and free calls to have stla_ prefix.<br/>
 2.  Change the function name from stla_timer_init to _stla_timer_init.<br/>
 3.  Wrap the block in a #ifdef _STLA_DEBUG_MEMORY_/#else/#endif block<br/>
-4.  Define the _STLA_DEBUG_MEMORY_ portion.  The _stla_timer_init function has the extra const char *caller parameter.  The allocation use _stla_malloc_d directly as shown above.
+4.  Define the _STLA_DEBUG_MEMORY_ portion.  The _stla_timer_init function has the extra const char *caller parameter.  The allocation uses _stla_malloc_d directly, as shown above.
 
 To test these changes out, I've modified code from $stla/illustrations/2_timing/13_timer
 
@@ -358,7 +358,7 @@ test_timer.c:24: 8
 test_timer.c:26 [stla_timer]: 32
 ```
 
-This indicates that there were 4 allocations that were not properly freed.
+This indicates that 4 allocations were not properly freed.
 
 line 24
 ```c
@@ -395,7 +395,7 @@ Go ahead and revert your changes.  You can revert your changes in the current di
 git checkout .
 ```
 
-The lines indicating memory loss are no longer printed.  In this example, _STLA_DEBUG_MEMORY_ was defined as NULL in the Makefile using following line.
+The lines indicating memory loss are no longer printed.  In this example, _STLA_DEBUG_MEMORY_ was defined as NULL in the Makefile using the following line.
 ```Makefile
 FLAGS += -D_STLA_DEBUG_MEMORY_=NULL
 ```
@@ -478,7 +478,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-Breaking out all of the stla_ statements...
+Breaking out all of the stla_ statements:
 ```c
   stla_timer_t *overall_timer = stla_timer_init(repeat_test);
     char *s = (char *)stla_malloc(len+1);
@@ -524,7 +524,7 @@ timer_t *overall_timer = timer_init(repeat_test);
 timer_destroy(overall_timer);
 ```
 
-You can see that there are timer objects, malloc, and free.  Given that malloc, calloc, realloc, strdup, and free are so common in code, I opted not to provide any extra qualifiers other than stla.  My aim is to make code highly optimized and very readable.  Another important feature of the qualified naming is that it makes it possible to search for all places something exists.  For example, to find all all cases where stla_timer are used, you can run..
+You can see that there are timer objects, malloc, and free.  Given that malloc, calloc, realloc, strdup, and free are so common in code, I opted not to provide any extra qualifiers other than stla.  I aim to make code highly optimized and very readable.  Another important feature of qualified naming is that it makes it possible to search for all places something exists.  For example, to find all cases where stla_timer are used, you can run..
 
 ```bash
 cd $stla/illustrations
@@ -559,7 +559,7 @@ Binary file ./2_timing/12_timer/test_timer matches
 ...
 ```
 
-This feature alone is extremely valuable when working with a large code base.  It takes longer to write each line of code, but the reader can easily find every line of code where the object is used.  This makes it easier to find example code and to build upon the work of others.
+This feature alone is extremely valuable when working with a large codebase.  It takes longer to write each line of code, but the reader can easily find every line of code where the object is used.  This makes it easier to find example code and to build upon the work of others.
 
 # A Quick Recap
 
@@ -578,7 +578,7 @@ void free(void *p);
 
 4.  We defined an approach to find when objects are created (and not destroyed).  The basic changes to stla_timer were outlined to make it support using the stla_allocator.
 
-5.  When we are using the stla_allocator object outside of objects, the only change to the code is to replace the 5 basic allocation methods with stla_... If for some reason, you do not wish to allocate memory using the stla method, then make sure that you don't free it with the stla method.
+5.  When we are using the stla_allocator object outside of objects, the only change to the code is to replace the 5 basic allocation methods with `stla_...` If, for some reason, you do not wish to allocate memory using the stla method, then make sure that you don't free it with the stla method.
 
 6.  We can define _STLA_DEBUG_MEMORY_ as NULL and have memory leaks reported to the terminal when the program exits.
 

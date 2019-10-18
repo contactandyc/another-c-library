@@ -1,9 +1,9 @@
 [Table of Contents](README.md)  - Copyright 2019 Andy Curtis
 
-# The Red Black Tree
+# The Red-Black Tree
 
-The red black tree is a mostly balanced binary search tree that was invented by Leonidas J. Guibas and Robert Sedgewick.
-## The properties of a red black tree
+The red-black tree is a mostly balanced binary search tree that was invented by Leonidas J. Guibas and Robert Sedgewick.
+## The properties of a red-black tree
 
 Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 
@@ -11,19 +11,18 @@ Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 2. The root is black.
 3. All leaves (NIL) are black.
 4. If a node is red, then both its children are black.
-5. Every path from a given node to any of its descendant NIL nodes contains the
-  same number of black nodes.
+5. Every path from a given node to any of its descendant NIL nodes contains the same number of black nodes.
 
 My additional rules for clarification which are based upon the first 5 rules.
 - If a node has one child, the child must be red
 - If a node has two children, one or both of the children can be red if the parent is black
-- If a node is red, it must have either two children which are black or no children at all.
+- If a node is red, it must have either two children who are black or no children at all.
 - The parent of a red node must be black
 - The black height of any leaf node must be the same (another way of stating 5)
-- A red black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.  It is possible to have more red nodes than black nodes, but it isn't typical.
-- A red black tree has a worst case of a 2logN depth, but is likely to maintain a logN depth or be very close to it.
+- A red-black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.  It is possible to have more red nodes than black nodes, but it isn't typical.
+- A red-black tree has a worst case of a 2logN depth but is likely to maintain a logN depth or be very close to it.
 
-The red black tree is balanced through rotations and changing colors which were discussed in [Balancing Binary Search Trees](11_balancing_binary_search_trees.md).  Make sure the tree_operations tool is built from the last section if you want to follow along.
+The red-black tree is balanced through rotations and changing colors, which were discussed in [Balancing Binary Search Trees](11_balancing_binary_search_trees.md).  Make sure the tree_operations tool is built from the last section if you want to follow along.
 
 ```bash
 cd $stla/illustrations/11_balancing_binary_search_trees/2_tree_operations
@@ -53,9 +52,9 @@ make
 
 Most of the code is in red_black_tree.c
 
-## Testing the red black tree properties
+## Testing the red-black tree properties
 
-When an algorithm can be tested through a function, it is often a good idea to write such a functon.  Functions like the one to follow should be pretty straight-forward given the rules above.
+When an algorithm can be tested through a function, it is often a good idea to write such a function.  Functions like the one to follow should be pretty straight-forward, given the rules above.
 
 ```c
 bool test_red_black_rules(stla_pool_t *pool, node_t *root) {
@@ -151,7 +150,7 @@ bool test_red_black_rules(stla_pool_t *pool, node_t *root) {
 
 ## Insert
 
-The red black tree functions in many ways similar to the binary search tree.  Iterating and finding are exactly the same.  Erasing and inserting are done in virtually the same way, except once an item is inserted or erased, the color must be fixed.  The difference between the binary search tree and red black tree node_insert is shown below.
+The red-black tree functions in many ways are similar to the binary search tree.  Iterating and finding are the same.  Erasing and inserting are done in virtually the same way, except once an item is inserted or erased, the color must be fixed.  The difference between the binary search tree and red-black tree node_insert is shown below.
 
 binary_search_tree.c
 ```c
@@ -198,7 +197,7 @@ bool node_insert(node_t *node_to_insert, node_t **root) {
 }
 ```
 
-The difference is..
+The difference is:
 
 red_black_tree.c
 ```c
@@ -259,7 +258,7 @@ void red_black_insert(node_t *node, node_t **root) {
 }
 ```
 
-It is assumed that node is linked into its proper parent and that the node is a leaf node with left and right pointers set to NULL.  The red black tree always initially paints the given node red.
+It is assumed that node is linked into its proper parent and that the node is a leaf node with left and right pointers set to NULL.  The red-black tree always initially paints the given node red.
 ```c
 void red_black_insert(node_t *node, node_t **root) {
   node->color = RED;
@@ -270,14 +269,14 @@ The insert operation will need to look at the parent, the grandparent, and the u
   node_t *parent, *grandparent, *uncle;
 ```
 
-The red black tree insert may need to recurse.  Many recursion problems (this one included) can be written as a loop.  The loop will continue forever until a break is called.  
+The red-black tree insert may need to recurse.  Many recursion problems (this one included) can be written as a loop.  The loop will continue forever until a break is called.  
 ```c
 while (true) {
   parent = node->parent;
 ```
 At this point in the code, the node is always red.
 
-The first check is to see if the given node is the root node.  If the node doesn't have a parent, it is a root node.  Root nodes are colored black and then we are done (break out of the while loop).    
+The first check is to see if the given node is the root node.  If the node doesn't have a parent, it is a root node.  Root nodes are colored black, and then we are done (break out of the while loop).    
 ```c
   if(!parent) {
     node->parent = NULL;
@@ -286,18 +285,18 @@ The first check is to see if the given node is the root node.  If the node doesn
   }
 ```
 
-If the parent is black we are done as having a red leaf following a black parent is always valid.
+If the parent is black, we are done as having a red leaf following a black parent is always valid.
 ```c
   if(parent->color == BLACK)
     break;
 ```
 
-The parent is valid and it must be red (as it must be red or black and it was determined to not be black in the last block of code).  It is a violation of the red black tree to have two red nodes in a row.  Get the grandparent (the parent's parent).
+The parent is valid, and it must be red (as it must be red or black, and it was determined to not be black in the last block of code).  It is a violation of the red-black tree to have two red nodes in a row.  Get the grandparent (the parent's parent).
 ```c
   grandparent = parent->parent;
 ```
 
-The red black tree insert operation consider's the node's uncle's color.  The uncle would be the grandparent's other child.  If the grandparent->left == parent, then the uncle is the right node.  Otherwise, the uncle is the left node.  The else block is a mirror of the if block, switching every instance of left with right.
+The red-black tree insert operation considers the node's uncle's color.  The uncle would be the grandparent's other child.  If the grandparent->left == parent, then the uncle is the right node.  Otherwise, the uncle is the left node.  The else block is a mirror of the if block, switching every instance of left with right.
 ```c
   if(grandparent->left == parent) {
     uncle = grandparent->right;
@@ -309,7 +308,7 @@ The red black tree insert operation consider's the node's uncle's color.  The un
   }
 ```
 
-The next case to test is if the uncle exists and the uncle's color is red.  At this point the parent and the uncle are both red.  The red black tree needs to maintain a constant black height.
+The next case to test is if the uncle exists and the uncle's color is red.  At this point, the parent and the uncle are both red.  The red-black tree needs to maintain a constant black height.
 
 ```
 $ $stla/bin/tree_operations FDGBE
@@ -343,9 +342,9 @@ D2
 (i)nsert, (e)rase, (r)ight_rotate, (l)eft_rotate, (R)ed, (b)lack, re(c)olor, (h)elp, (q)uit
 ```
 
-Prior to inserting node (A2), notice that the leaf nodes (B2), (E2), and G2 all have a black height of 2 meaning that there are only 2 black nodes in the path from the root to each of the leaf nodes.  If you recolor (B2) and (E2) black and change D2 to be red, it doesn't change the black height of any of the leaf nodes.
+Before inserting node (A2), notice that the leaf nodes (B2), (E2), and G2 all have a black height of 2, meaning that there are only 2 black nodes in the path from the root to each of the leaf nodes.  If you recolor (B2) and (E2) black and change D2 to be red, it doesn't change the black height of any of the leaf nodes.
 
-In the tool you can type
+In the tool, you can type:
 ```
 c D
 ```
@@ -362,9 +361,9 @@ B2   E2
 (A2)
 ```
 
-Notice that in this case, the recoloring created a valid red black tree.  The black height is 2 to every leaf node.  The root is black.  There are not two red nodes in a row.  In the one case (A2) where a node only has a single child, the child is red.
+Notice that in this case, the recoloring created a valid red-black tree.  The black height is 2 to every leaf node.  The root is black.  There are not two red nodes in a row.  In the one case (A2) where a node only has a single child, the child is red.
 
-To recap, if the parent and uncle are red, paint the parent and uncle black and the grandparent red.  It's possible that the grandparent's parent was also red.  To handle this case, we can repeat all of the tests recursively (since the recursion is simple, continuing in a while loop works by changing the node to the grandparent - which was painted red to maintain the rule that the loop always starts with a red node).  The code is below...
+To recap, if the parent and uncle are red, paint the parent and uncle black and the grandparent red.  However, the grandparent's parent possibly was also red.  To handle this case, we can repeat all of the tests recursively. Since the recursion is simple, continuing in a while loop works by changing the node to the grandparent. The grandparent which painted red to maintain the rule that the loop always starts with a red node.  The code is below:
 ```c
   if(grandparent->left == parent) {
     uncle = grandparent->right;
@@ -376,7 +375,7 @@ To recap, if the parent and uncle are red, paint the parent and uncle black and 
     }
 ```
 
-The following example adds the letter 0 (zero) to the left of (A2).  This creates the same case as above, but when recoloring happens (c B), (B1) and (D1) are both red. D becomes the new node. It is an example where recoloring creates a parent and child which are both red.
+The following example adds the letter 0 (zero) to the left of (A2).  This creates the same case as above, but when recoloring happens (c B), (B1) and (D1) are both red. D becomes the new node. It is an example where recoloring creates a parent and child, which are both red.
 
 This is illustrated by the tool below.
 ```bash
@@ -446,7 +445,7 @@ A2   C2
 
 The next case is if the uncle is black or NULL, then rotate to the right around the grandparent.  
 
-The code is below...
+The code is below:
 ```c
   if(parent->right == node)
     rotate_left(parent, NULL);
@@ -454,8 +453,7 @@ The code is below...
   break;
 ```
 
-If the node being inserted is to the right of the parent, it needs rotated to the left to keep
-one child to either side after the rotation.  If the left rotate isn't done first, the following will happen
+If the node being inserted is to the right of the parent, it needs to be rotated to the left to keep one child to either side after the rotation.  If the left rotate isn't done first, the following will happen:
 
 ```bash
 $ $stla/bin/tree_operations FDGB
@@ -494,7 +492,7 @@ B2
 (D2) has a red left child and is red
 ```
 
-This just created the inverse problem (D is to right and C is to the left of D).  
+This just created the inverse problem (D is to the right and C is to the left of D).  
 
 Notice that while swapping colors during the rotate, that the placement of the black node doesn't change. This maintains the proper black height.
 
@@ -582,7 +580,7 @@ C2
 (B2)
 ```
 
-As stated before the else block is where the parent is the right child and the uncle is the left child.  All of the logic is reversed (left is swapped for right).
+As stated before, the else block is where the parent is the right child, and the uncle is the left child.  All of the logic is reversed (left is swapped for right).
 
 To recap
 
@@ -600,14 +598,14 @@ To recap
 
 ## Erase
 
-Erasing nodes in a red black tree is more complex than insertion.  In writing this and trying to visualize what is happening, I needed to keep reminding myself of the importance of maintaining black height and to a lesser extent the other rules (particularly that a node with only one child must have a red child).  Like insertion, node_erase calls a function to fix the balance of the tree once the node is removed.  A key difference is that the color doesn't have to always fixed.  Another difference is that what needs fixed are either the parent or the successor.
+Erasing nodes in a red black tree is more complex than insertion.  In writing this and trying to visualize what is happening, I needed to keep reminding myself of the importance of maintaining black height and to a lesser extent, the other rules (particularly that a node with only one child must have a red child).  Like insertion, node_erase calls a function to fix the balance of the tree once the node is removed.  A key difference is that the color doesn't always have to be fixed.  Another difference is that what fixed is either the parent or the successor.
 
 The function replace_node_with_child sets the child color to the node that it is replacing's color.
 ```c
 child->color = node->color;
 ```
 
-If there is one child or if the node is the last node in the tree, the color doesn't need fixed.  The only case in the block below where a node needs fixed is if you erase a black node without any children that isn't the root.
+If there is one child or if the node is the last in the tree, the color doesn't need to be fixed.  The only case in the block below where a node needs fixed is if you erase a black node without any children, that isn't the root.
 
 ```c
 static void fix_color_for_erase(node_t *parent, node_t *node, node_t **root);
@@ -636,7 +634,7 @@ bool node_erase(node_t *node, node_t **root) {
 
 If you consider the following examples, it should be clear why erasing a red leaf is never a problem or a node with one child.
 
-The tree_operations has a -q feature which is less verbose (you don't get the menu or the list of operations that lead to a successful red black tree structure).
+The tree_operations has a -q feature which is less verbose (you don't get the menu or the list of operations that lead to a successful red-black tree structure).
 
 ```bash
 $ $stla/bin/tree_operations -q ABC
@@ -651,7 +649,7 @@ B1
   \
    (C1)
 
-The above tree is a valid red black tree
+The above tree is a valid red black tree.
 
 e C
 B1
@@ -672,7 +670,7 @@ B1
   \
    (C1)
 
-The above tree is a valid red black tree
+The above tree is a valid red black tree.
 
 e B
 C1
@@ -696,7 +694,7 @@ B1
      \
       (D2)
 
-B1 has one right child and it isn't red
+B1 has one right child, and it isn't red
 ```
 
 The rest of the erase method is to consider cases where the node being erased has two children.  If the successor is to the right (it doesn't have any left children), it will replace the node to erase as usual.  If the successor has a right child, then its child color will change to black (from red).  We can be assured that the successor's right child is red because it is an only child.
@@ -718,7 +716,7 @@ else {
   }
 ```
 
-An example where the successor has a right node.  Erasing F, G becomes successor, G has right child H.  
+<b>An example where the successor has a right node:</b>  erasing F, G becomes successor, G has right child H.  
 
 - Move G into F's spot.
 - color G's right (H) black
@@ -764,7 +762,7 @@ A2   C2
 The above tree is a valid red black tree
 ```
 
-An example where the successor is black.  In this case, B is erased, C is the successor and is black.  C is colored the color of B.  The tree becomes invalid because C has a single black child (single children must be red).  The color must be fixed.
+<b>An example where the successor is black:</b> In this case, B is erased, C is the successor and is black.  C is colored the color of B.  The tree becomes invalid because C has a single black child (single children must be red).  The color must be fixed.
 
 ```bash
 $ $stla/bin/tree_operations -q ABCDEFGH
@@ -809,7 +807,7 @@ C1
 The above tree is a valid red black tree
 ```
 
-If the successor is to the left of the node to the right of the node to erase, then the normal erasing happens.  If the successor has a child, it would be right and red (because it would be the only child).  In this case, we replace the node to erase with the successor and the successor with the right child of the successor (in both cases, exchanging colors).  The node to the right of the successor will change to black because the successor started as black (because it only had one red child).
+If the successor is to the left of the node to the right of the node to erase, then the normal erasing happens.  If the successor has a child, it would be right and red (because it would be the only child).  In this case, we replace the node that is going to be erased with both the successor and the successor that has the right child of the successor (in both cases, exchanging colors).  The node to the right of the successor will change to black because the successor started as black (because it only had one red child).
 
 ```c
 
@@ -890,7 +888,7 @@ A3 C3      (O3)
 The above tree is a valid red black tree
 ```
 
-In the example below, H is erased (which is black) and replaced with I which doesn't have a child.  The color must be fixed.
+In the example below, H is erased (which is black) and replaced with I, which doesn't have a child.  The color must be fixed.
 
 ```bash
 $ $stla/bin/tree_operations -q ACBFHEGPNION
@@ -922,7 +920,7 @@ A3 C3      (O3)
 (N2) has one right child and it isn't red
 ```
 
-In the example below, N is erased (which is red) and replaced with O which doesn't have a right child.  Because N is red, O will be red and the overall tree height will be maintained.  The red black tree properties remain valid.
+In the example below, N is erased (which is red) and replaced with O, which doesn't have a right child.  Because N is red, O will be red, and the overall tree height will be maintained.  The red black tree properties remain valid.
 ```bash
 $ $stla/bin/tree_operations -q ACBFHEGPNION
 F1
@@ -955,9 +953,9 @@ The above tree is a valid red black tree
 
 ## Quick recap of when tree becomes invalid
 - The node to erase has no children, is black, and has a parent.  The node's parent is invalid.
-- The node to erase has two children, the successor was originally black, and the successor did not have a right child.  The successor's original parent is invalid (this is the successor itself when the successor is to the right of the node_to_erase, since it replaced its parent).
+- The node to erase has two children, the successor was originally black, and the successor did not have a right child.  The successor's original parent is invalid (this is the successor itself when the successor is to the right of the node_to_erase since it replaced its parent).
 
-It's worth noting that when you erase a node and use a successor, that you are really erasing the successor and putting it in place of the node to erase.  That's why in the first case, the parent of the node to erase is used and in the second case, the parent of the successor is used.
+It's worth noting that when you erase a node and use a successor, that you are erasing the successor and putting it in place of the node to erase.  That's why in the first case, the parent of the node to erase is used, and in the second case, the parent of the successor is used.
 
 ## fix_color_for_erase
 
@@ -1053,7 +1051,7 @@ static void fix_color_for_erase(node_t *parent, node_t *node, node_t **root) {
 }
 ```
 
-The fix_color_for_erase function is a large function but can be split into sections which largely mirror each other.
+The fix_color_for_erase function is large but can split into sections that largely mirror each other.
 
 ```c
 static void fix_color_for_erase(node_t *parent, node_t *node, node_t **root) {
@@ -1069,7 +1067,7 @@ static void fix_color_for_erase(node_t *parent, node_t *node, node_t **root) {
 }
 ```
 
-The only difference between the if and the else statement is that every left and right are swapped.  The rest of the explanation will focus where the sibling is on the right.
+The only difference between the if and the else statement is that every left and right are swapped.  The rest of the explanation will focus on where the sibling is on the right.
 
 The insert color fixing method of the red black tree uses the uncle's color to help decide actions.  The erase color fixing method uses the sibling.  If the sibling is red, we can rotate away from the sibling around the parent and set the sibling to be the parent's right node.
 
@@ -1081,7 +1079,7 @@ if(sibling->color == RED) {
 ```
 
 
-In the example below, erase A, the sibling is O which is red, the parent is E.
+In the example below, erase A, the sibling is O (which is red), and the parent is E:
 ```bash
 $ $stla/bin/tree_operations -q AEIOUY
 E1
@@ -1118,9 +1116,9 @@ O1
 (E1) has one right child and it isn't red
 ```
 
-After the rotation, E becomes red and I becomes the sibling which is black.  
+After the rotation, E becomes red, and I becomes the sibling that is black.  
 
-To recap - If the sibling is red, rotate away from the sibling and set the sibling to be equal to what is on the same side of the parent again.  The sibling will be black and we can proceed with the cases which expect the sibling to be black.
+To recap: if the sibling is red, rotate away from the sibling and set the sibling to be equal to what is on the same side of the parent again.  The sibling will be black, and we can proceed with the cases which expect the sibling to be black.
 
 ```c
 if(sibling->right && sibling->right == RED) {
@@ -1141,9 +1139,9 @@ else {
 }
 ```
 
-If the sibling is to the right and is black.
+<b>If the sibling is to the right and is black:</b>
 
-First check to see if the sibling's right child is red.  If it is, color it black and rotate left around the parent.
+First, check to see if the sibling's right child is red.  If it is, color it black and rotate left around the parent.
 
 ```bash
 EXAMPLE
@@ -1181,7 +1179,7 @@ struct node_s {
 };
 ```
 
-This requires 8 bytes (on a 64 bit machine) for the color and 8 bytes for the parent.  Since pointers to structures are typically aligned, we can use the 0 bit of the parent for the color and save 8 bytes per node structure.  Our new structure will look like.
+This requires 8 bytes (on a 64-bit machine) for the color and 8 bytes for the parent.  Since pointers to structures are typically aligned, we can use the 0 bit of the parent for the color and save 8 bytes per node structure.  Our new structure will look like.
 
 ```c
 struct node_s {
@@ -1207,7 +1205,7 @@ We can then use the following #define macros to access and set the parent node a
 #define rb_clear_black(n) (n)->parent_color = 1
 ```
 
-The rest of the change involves converting code which accesses the parent pointer or the color to one of these macros.  You can run the following command to find all of the diffs.  I'll show a few.
+The rest of the change involves converting code, which accesses the parent pointer or the color to one of these macros.  You can run the following command to find all of the diffs.  I'll show a few.
 
 ```bash
 diff red_black_tree.c ../1_red_black_tree/red_black_tree.c | less

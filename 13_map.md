@@ -1,7 +1,7 @@
 # The Map Object
 - Turning the red black tree into a map
 
-*This and the src/stla_map.h/c files were started on Monday 9/23/19 and is still a work in progress.*
+*This and the src/stla_map.h/c files were started on Monday 9/23/19 and are still a work in progress.*
 
 The code for this section is found in <i>illustrations/13_map/1_map</i>
 ```bash
@@ -88,7 +88,7 @@ D-3
     2-5
 ```
 
-The third parameter to test_data_structure is 10000, which means to build the tree 10,000 times randomly inserting and deleting the values in the second argument.
+The third parameter to test_data_structure is 10000, which means to build the tree 10,000 times, randomly, inserting and deleting the values in the second argument.
 
 A good first step in designing any object is to understand the requirements.
 1. find, insert, update, remove
@@ -242,7 +242,7 @@ void print_using_iteration(stla_map_node_t *root) {
 }
 ```
 
-Both approaches are equivalent assuming that the map is the first member of the node_t structure.
+Both approaches are equivalent, assuming that the map is the first member of the node_t structure.
 
 The node_first_to_erase and node_next_to_erase have been renamed.
 ```c
@@ -250,7 +250,7 @@ stla_map_node_t * stla_map_postorder_first( stla_map_node_t *n );
 stla_map_node_t * stla_map_postorder_next( stla_map_node_t *n );
 ```
 
-stla_map_copy_node_f is a callback meant to be used with stla_map_copy to copy one map to another given a root node.  The tag will typically be an allocator such as the pool.  stla_map_copy will make a complete copy of a map (or red black tree) and return a pointer to it.  I like to suffix function typedefs with a *_f*.
+stla_map_copy_node_f is a callback meant to be used with stla_map_copy to copy one map to another given a root node.  The tag will typically be an allocator, such as the pool.  stla_map_copy will make a complete copy of a map (or red-black tree) and return a pointer to it.  I like to suffix function typedefs with a *_f*.
 ```c
 typedef stla_map_node_t * (*stla_map_copy_node_f)( stla_map_node_t *n, void *tag );
 
@@ -276,7 +276,7 @@ print_node_to_string_f is a callback meant to print the value of the node n.  Th
 typedef char * (*print_node_to_string_f)(stla_pool_t *pool, stla_map_node_t *n);
 ```
 
-For debugging, it is often nice to be able to just print something to the terminal.  Sometimes, it is also nice to print to a buffer and then have the output directed to some other location.  I provide both mechanisms below.  The first prints errors in the map (red black violations) to a buffer and returns false if there are any errors.  The second function is like the first, except it outputs directly to the screen.  Both of these functions require the root of the tree and a pointer to a print_node_to_string_f function.
+For debugging, it is often nice to be able just to print something to the terminal.  Sometimes, it is also nice to print to a buffer and then have the output directed to some other location.  I provide both mechanisms below.  The first prints errors in the map (red-black violations) to a buffer and returns false if there are any errors.  The second function is like the first, except it outputs directly to the screen.  Both of these functions require the root of the tree and a pointer to a print_node_to_string_f function.
 ```c
 bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
                               stla_map_node_t *root, print_node_to_string_f print_node );
@@ -286,7 +286,7 @@ bool stla_map_valid(stla_pool_t *pool,
                     print_node_to_string_f print_node);
 ```
 
-stla_map_valid checks if the map is valid.  stla_map_print dumps the contents of a map in a tree like manner.  It takes an additional parameter flags which would typically be zero unless you with to not print red nodes in the color red and/or you don't want the black height of a node suffixed in the print.  The flags are bit oriented and can be or'ed together.
+stla_map_valid checks if the map is valid.  stla_map_print dumps the contents of a map in a tree-like manner.  It takes additional parameter flags, which would typically be zero unless you with to not print red nodes in the color red and/or you don't want the black height of a node suffixed in the print.  The flags are bit-oriented and can be or'ed together.
 ```c
 #define STLA_MAP_DONT_PRINT_RED 1
 #define STLA_MAP_DONT_PRINT_BLACK_HEIGHT 2
@@ -306,7 +306,7 @@ stla_map_erase unlinks node from the given map.  The node is expected to be a va
 bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root);
 ```
 
-The find and insert methods were left to the end for a reason.  These are the only two groups of functions which need to understand the value of a node.  These functions end up being custom.  To aid in writing these functions, I've created the following macros.
+The find and insert methods were left to the end for a reason.  These are the only two groups of functions that need to understand the value of a node.  These functions end up being custom.  To aid in writing these functions, I've created the following macros.
 
 ```c
 stla_map_find_m(name, keytype, datatype, compare)
