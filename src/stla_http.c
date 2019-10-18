@@ -184,8 +184,8 @@ static void on_data(stla_async_buffer_t *br) {
       }
       p->state ^= http_state_reading_headers;
       p->group->on_headers(p);
-      uint64_t content_length = stla_conv_uint64_t(
-          stla_http_param(p, header, "Content-Length", NULL), 0);
+      uint64_t content_length =
+          stla_uint64_t(stla_http_param(p, header, "Content-Length", NULL), 0);
       char const *encoding =
           stla_http_param(p, header, "Transfer-Encoding", NULL);
       if (content_length) {

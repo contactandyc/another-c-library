@@ -101,7 +101,8 @@ static inline void *stla_pool_calloc(stla_pool_t *h, size_t len) {
   /* calloc will simply call the pool_alloc function and then zero the memory.
    */
   void *dest = stla_pool_alloc(h, len);
-  memset(dest, 0, len);
+  if (len)
+    memset(dest, 0, len);
   return dest;
 }
 
@@ -112,7 +113,8 @@ static inline void *stla_pool_udup(stla_pool_t *h, const void *data,
     of data. Because the data could need aligned, we will use stla_pool_alloc
     instead of stla_pool_ualloc */
   char *dest = (char *)stla_pool_ualloc(h, len);
-  memcpy(dest, data, len);
+  if (len)
+    memcpy(dest, data, len);
   return dest;
 }
 
@@ -140,7 +142,8 @@ static inline void *stla_pool_dup(stla_pool_t *h, const void *data,
     of data. Because the data could need aligned, we will use stla_pool_alloc
     instead of stla_pool_ualloc */
   char *dest = (char *)stla_pool_alloc(h, len);
-  memcpy(dest, data, len);
+  if (len)
+    memcpy(dest, data, len);
   return dest;
 }
 

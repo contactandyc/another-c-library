@@ -17,6 +17,14 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 
+#define stla_sort_print_def(name, datatype)                                    \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            void (*print_element)(datatype * el));
+
+#define stla_sort_print_arg_def(name, datatype)                                \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            void (*print_element)(datatype * el, void *arg), void *arg);
+
 #define stla_sort_print_m(name, datatype)                                      \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
             void (*print_element)(datatype * el)) {                            \
@@ -44,6 +52,24 @@ limitations under the License.
     }                                                                          \
     printf("\n");                                                              \
   }
+
+#define stla_sort_test_def(name, datatype)                                     \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            void (*print_element)(datatype * el));
+
+#define stla_sort_test_arg_def(name, datatype)                                 \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            void (*print_element)(datatype * el, void *arg), void *arg);
+
+#define stla_sort_test_less_def(name, datatype)                                \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            bool (*less)(datatype * a, datatype * b),                          \
+            void (*print_element)(datatype * el));
+
+#define stla_sort_test_less_arg_def(name, datatype)                            \
+  void name(char *func_line, datatype *base, ssize_t num_elements,             \
+            bool (*less)(datatype * a, datatype * b, void *arg),               \
+            void (*print_element)(datatype * el, void *arg), void *arg);
 
 #define stla_sort_test_m(name, less, datatype)                                 \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
@@ -141,6 +167,19 @@ typedef struct {
   ssize_t num_elements;
 } sort_stack_t;
 
+#define stla_sort_def(name, type) void name(type *base, size_t num_elements);
+
+#define stla_sort_arg_def(name, type)                                          \
+  void name(type *base, size_t num_elements, void *arg);
+
+#define stla_sort_less_def(name, type)                                         \
+  void name(type *base, size_t num_elements,                                   \
+            bool (*less)(datatype * a, datatype * b));
+
+#define stla_sort_less_arg_def(name, type)                                     \
+  void name(type *base, size_t num_elements,                                   \
+            bool (*less)(datatype * a, datatype * b, void *arg), void *arg);
+
 #define stla_sort_m(name, type, less)                                          \
   void name(type *base, size_t num_elements) {                                 \
     type *a;                                                                   \
@@ -158,7 +197,7 @@ typedef struct {
     top++;                                                                     \
     if (num_elements > 12) {                                                   \
       a = base;                                                                \
-      e = base + num_elements - 1;                                             \
+      high = e = base + num_elements - 1;                                      \
       pivot = num_elements >> 1;                                               \
       c = a + pivot;                                                           \
       if (less(e, a)) {                                                        \
@@ -213,7 +252,6 @@ typedef struct {
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
-                                                                               \
       if (!pivot || less(b, a) || less(c, b) || less(d, c) || less(e, a)) {    \
         if (e < a) {                                                           \
           mid = a;                                                             \
@@ -224,11 +262,11 @@ typedef struct {
           d = mid;                                                             \
           sort_swap(a, e);                                                     \
           sort_swap(b, d);                                                     \
-          sort_swap(b, a + 1);                                                 \
-          sort_swap(d, e - 1);                                                 \
-          b = a + 2;                                                           \
-          d = e - 2;                                                           \
         }                                                                      \
+        sort_swap(b, a + 1);                                                   \
+        sort_swap(d, e - 1);                                                   \
+        b = a + 2;                                                             \
+        d = e - 2;                                                             \
       } else {                                                                 \
         if (pivot == 1) {                                                      \
           mid = a + 1;                                                         \
@@ -285,6 +323,7 @@ typedef struct {
             sort_swap(d, e - 1);                                               \
             b = a + 2;                                                         \
             d = e - 2;                                                         \
+            high = e;                                                          \
           }                                                                    \
         }                                                                      \
       }                                                                        \
@@ -462,7 +501,6 @@ typedef struct {
           }                                                                    \
           sort_swap(b, high);                                                  \
           pivot = b - base;                                                    \
-                                                                               \
           if ((pivot << 1) < num_elements) {                                   \
             if (pivot == 0 && !(less(base, base + 1))) {                       \
               a = base + 2;                                                    \
@@ -486,7 +524,7 @@ typedef struct {
         }                                                                      \
       } else {                                                                 \
         a = base;                                                              \
-        e = base + num_elements - 1;                                           \
+        high = e = base + num_elements - 1;                                    \
         pivot = num_elements >> 1;                                             \
         c = a + pivot;                                                         \
         if (less(c, a)) {                                                      \
@@ -637,11 +675,11 @@ typedef struct {
           d = mid;                                                             \
           sort_swap(a, e);                                                     \
           sort_swap(b, d);                                                     \
-          sort_swap(b, a + 1);                                                 \
-          sort_swap(d, e - 1);                                                 \
-          b = a + 2;                                                           \
-          d = e - 2;                                                           \
         }                                                                      \
+        sort_swap(b, a + 1);                                                   \
+        sort_swap(d, e - 1);                                                   \
+        b = a + 2;                                                             \
+        d = e - 2;                                                             \
       } else {                                                                 \
         if (pivot == 1) {                                                      \
           mid = a + 1;                                                         \
@@ -1050,11 +1088,11 @@ typedef struct {
           d = mid;                                                             \
           sort_swap(a, e);                                                     \
           sort_swap(b, d);                                                     \
-          sort_swap(b, a + 1);                                                 \
-          sort_swap(d, e - 1);                                                 \
-          b = a + 2;                                                           \
-          d = e - 2;                                                           \
         }                                                                      \
+        sort_swap(b, a + 1);                                                   \
+        sort_swap(d, e - 1);                                                   \
+        b = a + 2;                                                             \
+        d = e - 2;                                                             \
       } else {                                                                 \
         if (pivot == 1) {                                                      \
           mid = a + 1;                                                         \
@@ -1464,11 +1502,11 @@ typedef struct {
           d = mid;                                                             \
           sort_swap(a, e);                                                     \
           sort_swap(b, d);                                                     \
-          sort_swap(b, a + 1);                                                 \
-          sort_swap(d, e - 1);                                                 \
-          b = a + 2;                                                           \
-          d = e - 2;                                                           \
         }                                                                      \
+        sort_swap(b, a + 1);                                                   \
+        sort_swap(d, e - 1);                                                   \
+        b = a + 2;                                                             \
+        d = e - 2;                                                             \
       } else {                                                                 \
         if (pivot == 1) {                                                      \
           mid = a + 1;                                                         \

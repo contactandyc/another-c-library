@@ -152,7 +152,7 @@ const char *stla_cgi_str(stla_cgi_t *h, const char *key,
   if (!n || !n->head)
     return default_value;
 
-  return stla_conv_str(n->head->decoded, default_value);
+  return stla_str(n->head->decoded, default_value);
 }
 
 bool stla_cgi_bool(stla_cgi_t *h, const char *key, bool default_value) {
@@ -160,7 +160,7 @@ bool stla_cgi_bool(stla_cgi_t *h, const char *key, bool default_value) {
   if (!n || !n->head)
     return default_value;
 
-  return stla_conv_bool(n->head->decoded, default_value);
+  return stla_bool(n->head->decoded, default_value);
 }
 
 int stla_cgi_int(stla_cgi_t *h, const char *key, int default_value) {
@@ -168,7 +168,7 @@ int stla_cgi_int(stla_cgi_t *h, const char *key, int default_value) {
   if (!n || !n->head)
     return default_value;
 
-  return stla_conv_int(n->head->decoded, default_value);
+  return stla_int(n->head->decoded, default_value);
 }
 
 long stla_cgi_long(stla_cgi_t *h, const char *key, long default_value) {
@@ -176,7 +176,7 @@ long stla_cgi_long(stla_cgi_t *h, const char *key, long default_value) {
   if (!n || !n->head)
     return default_value;
 
-  return stla_conv_long(n->head->decoded, default_value);
+  return stla_long(n->head->decoded, default_value);
 }
 
 double stla_cgi_double(stla_cgi_t *h, const char *key, double default_value) {
@@ -184,7 +184,7 @@ double stla_cgi_double(stla_cgi_t *h, const char *key, double default_value) {
   if (!n || !n->head)
     return default_value;
 
-  return stla_conv_double(n->head->decoded, default_value);
+  return stla_double(n->head->decoded, default_value);
 }
 
 int32_t stla_cgi_int32_t(stla_cgi_t *h, const char *key,
@@ -193,7 +193,7 @@ int32_t stla_cgi_int32_t(stla_cgi_t *h, const char *key,
   if (!n || !n->head)
     return default_value;
 
-  return stla_conv_int32_t(n->head->decoded, default_value);
+  return stla_int32_t(n->head->decoded, default_value);
 }
 
 uint32_t stla_cgi_uint32_t(stla_cgi_t *h, const char *key,
@@ -202,7 +202,7 @@ uint32_t stla_cgi_uint32_t(stla_cgi_t *h, const char *key,
   if (!n || !n->head)
     return default_value;
 
-  return stla_conv_uint32_t(n->head->decoded, default_value);
+  return stla_uint32_t(n->head->decoded, default_value);
 }
 
 int64_t stla_cgi_int64_t(stla_cgi_t *h, const char *key,
@@ -211,7 +211,7 @@ int64_t stla_cgi_int64_t(stla_cgi_t *h, const char *key,
   if (!n || !n->head)
     return default_value;
 
-  return stla_conv_int64_t(n->head->decoded, default_value);
+  return stla_int64_t(n->head->decoded, default_value);
 }
 
 uint64_t stla_cgi_uint64_t(stla_cgi_t *h, const char *key,
@@ -220,7 +220,7 @@ uint64_t stla_cgi_uint64_t(stla_cgi_t *h, const char *key,
   if (!n || !n->head)
     return default_value;
 
-  return stla_conv_uint64_t(n->head->decoded, default_value);
+  return stla_uint64_t(n->head->decoded, default_value);
 }
 
 static void add_key_value(stla_cgi_t *h, char *kv) {

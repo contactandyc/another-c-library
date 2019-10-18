@@ -1,5 +1,5 @@
-OBJECTS=$(ROOT)/src/stla_timer.c $(ROOT)/src/stla_allocator.c $(ROOT)/src/stla_buffer.c $(ROOT)/src/stla_pool.c $(ROOT)/src/stla_map.c $(ROOT)/src/stla_threaded_pipe.c $(ROOT)/src/stla_async_buffer.c $(ROOT)/src/stla_cgi.c $(ROOT)/src/stla_conv.c $(ROOT)/src/stla_http.c
-HEADER_FILES=$(ROOT)/src/stla_common.h $(ROOT)/src/stla_timer.h $(ROOT)/src/stla_allocator.h $(ROOT)/src/stla_buffer.h $(ROOT)/src/stla_pool.h $(ROOT)/src/stla_map.h $(ROOT)/src/stla_object_pipe.h $(ROOT)/src/stla_threaded_pipe.h $(ROOT)/src/stla_async_buffer.h $(ROOT)/src/stla_cgi.h $(ROOT)/src/stla_conv.h $(ROOT)/src/stla_http.h
+OBJECTS=$(ROOT)/src/stla_timer.c $(ROOT)/src/stla_allocator.c $(ROOT)/src/stla_buffer.c $(ROOT)/src/stla_pool.c $(ROOT)/src/stla_map.c $(ROOT)/src/stla_threaded_pipe.c $(ROOT)/src/stla_async_buffer.c $(ROOT)/src/stla_cgi.c $(ROOT)/src/stla_conv.c $(ROOT)/src/stla_http.c $(ROOT)/src/stla_io.c $(ROOT)/src/stla_json.c
+HEADER_FILES=$(ROOT)/src/stla_common.h $(ROOT)/src/stla_timer.h $(ROOT)/src/stla_allocator.h $(ROOT)/src/stla_buffer.h $(ROOT)/src/stla_pool.h $(ROOT)/src/stla_map.h $(ROOT)/src/stla_object_pipe.h $(ROOT)/src/stla_threaded_pipe.h $(ROOT)/src/stla_async_buffer.h $(ROOT)/src/stla_cgi.h $(ROOT)/src/stla_conv.h $(ROOT)/src/stla_http.h $(ROOT)/src/stla_io.h $(ROOT)/src/stla_json.h
 FLAGS=-O3 -I$(ROOT)/src
 UV_OBJECTS=$(ROOT)/src/stla_object_pipe.c
 UV_HEADER_FILES=$(ROOT)/src/stla_object_pipe.h

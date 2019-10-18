@@ -14,6 +14,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#define stla_map_find_def(name, keytype, datatype)                             \
+  datatype *name(const keytype *p, const stla_map_t *root);
+
+#define stla_map_find_arg_def(name, keytype, datatype)                         \
+  datatype *name(const keytype *p, const stla_map_t *root, void *arg);
+
+#define stla_map_find_compare_def(name, keytype, datatype)                     \
+  datatype *name(const keytype *p, const stla_map_t *root,                     \
+                 int compare(const keytype *key, const datatype *value));
+
+#define stla_map_find_compare_arg_def(name, keytype, datatype)                 \
+  datatype *name(                                                              \
+      const keytype *p, const stla_map_t *root,                                \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg);
+
+#define stla_map_insert_def(name, datatype, compare)                           \
+  bool name(datatype *node, stla_map_t **root);
+
+#define stla_map_insert_arg_def(name, datatype, compare)                       \
+  bool name(datatype *node, stla_map_t **root, void *arg);
+
+#define stla_map_insert_compare_def(name, datatype)                            \
+  bool name(datatype *node, stla_map_t **root,                                 \
+            int compare(datatype *key, datatype *value));
+
+#define stla_map_insert_compare_arg_def(name, datatype)                        \
+  bool name(datatype *node, stla_map_t **root,                                 \
+            int compare(datatype *key, datatype *value, void *arg),            \
+            void *arg);
+
 #define stla_map_find_m(name, keytype, datatype, compare)                      \
   datatype *name(const keytype *p, const stla_map_t *root) {                   \
     while (root) {                                                             \

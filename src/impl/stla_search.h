@@ -18,6 +18,21 @@ limitations under the License.
 
 #include <stdio.h>
 
+#define stla_search_def(name, keytype, datatype)                               \
+  datatype *name(keytype *p, datatype *base, size_t num_elements);
+
+#define stla_search_compare_def(name, keytype, datatype)                       \
+  datatype *name(keytype *p, datatype *base, size_t num_elements,              \
+                 int compare(keytype *key, datatype *value));
+
+#define stla_search_arg_def(name, keytype, datatype, compare)                  \
+  datatype *name(keytype *p, datatype *base, size_t num_elements, void *arg);
+
+#define stla_search_compare_arg_def(name, keytype, datatype)                   \
+  datatype *name(keytype *p, datatype *base, size_t num_elements,              \
+                 int compare(keytype *key, datatype *value, void *arg),        \
+                 void *arg);
+
 #define stla_search_m(name, keytype, datatype, compare)                        \
   datatype *name(keytype *p, datatype *base, size_t num_elements) {            \
     datatype *low = base;                                                      \
@@ -38,6 +53,8 @@ limitations under the License.
 
 #define stla_search_least_m(name, keytype, datatype, compare)                  \
   datatype *name(keytype *p, datatype *base, size_t num_elements) {            \
+    if (!num_elements)                                                         \
+      return NULL;                                                             \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -56,6 +73,8 @@ limitations under the License.
 
 #define stla_search_greatest_m(name, keytype, datatype, compare)               \
   datatype *name(keytype *p, datatype *base, size_t num_elements) {            \
+    if (!num_elements)                                                         \
+      return NULL;                                                             \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -129,6 +148,8 @@ limitations under the License.
 #define stla_search_least_compare_m(name, keytype, datatype)                   \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value)) {                 \
+    if (!num_elements)                                                         \
+      return NULL;                                                             \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -148,6 +169,8 @@ limitations under the License.
 #define stla_search_greatest_compare_m(name, keytype, datatype)                \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value)) {                 \
+    if (!num_elements)                                                         \
+      return NULL;                                                             \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -221,6 +244,8 @@ limitations under the License.
 
 #define stla_search_least_arg_m(name, keytype, datatype, compare)              \
   datatype *name(keytype *p, datatype *base, size_t num_elements, void *arg) { \
+    if (!num_elements)                                                         \
+      return NULL;                                                             \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -239,6 +264,8 @@ limitations under the License.
 
 #define stla_search_greatest_arg_m(name, keytype, datatype, compare)           \
   datatype *name(keytype *p, datatype *base, size_t num_elements, void *arg) { \
+    if (!num_elements)                                                         \
+      return NULL;                                                             \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -314,6 +341,8 @@ limitations under the License.
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value, void *arg),        \
                  void *arg) {                                                  \
+    if (!num_elements)                                                         \
+      return NULL;                                                             \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -334,6 +363,8 @@ limitations under the License.
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value, void *arg),        \
                  void *arg) {                                                  \
+    if (!num_elements)                                                         \
+      return NULL;                                                             \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
