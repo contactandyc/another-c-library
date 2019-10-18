@@ -1,7 +1,7 @@
 ROOT=../../..
 include $(ROOT)/src/Makefile.include
 
-FLAGS += -D_STLA_DEBUG_MEMORY_=\"memory.log\"
+FLAGS += -D_ACDEBUG_MEMORY_=\"memory.log\"
 
 all: test_timer examples
 

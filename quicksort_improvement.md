@@ -142,11 +142,11 @@ The second optimization is to consider the first and the last point.  If the fir
 
 If items are not sorted, the simplest option is to order the 5 points in the correct order, choose the midpoint, and continue with the normal sort.  Obviously, 5 points is somewhat arbitrary.  The more points that are initially chosen, the less likely the data will be falsely assumed to be in order.  However, even the cost of the check is largely mitigated in that a new pivot can be chosen.  A more complex solution might consider where the out of order element was found and continue with that pivot.
 
-I've been writing an open source book (which is very much in its infancy) to explore algorithms and C found at https://github.com/contactandyc/standard-template-library-alternative-in-c  Part of the demo, illustrates the timing as it relates to this improvement.  In general, this algorithm only takes steps forward with very little extra cost.  The timings from the demo are shown below.
+I've been writing an open source book (which is very much in its infancy) to explore algorithms and C found at https://github.com/contactandyc/another-c-library  Part of the demo, illustrates the timing as it relates to this improvement.  In general, this algorithm only takes steps forward with very little extra cost.  The timings from the demo are shown below.
 
-My sort is called stla_sort (standard template library alternative sort).  It uses a combination of algorithms internally (particularly for sets of items which are 5 or less, the sort is hard-coded).  The core of the sorting algorithm is based upon works by Roger Sedgewick with the improvement mentioned above.
+My sort is called acsort (ac stands for another c library).  It uses a combination of algorithms internally (particularly for sets of items which are 5 or less, the sort is hard-coded).  The core of the sorting algorithm is based upon works by Roger Sedgewick with the improvement mentioned above.
 
-stla_sort
+acsort
 * random - 312,257 nanoseconds
 * already sorted - 17,007 nanoseconds
 * reversed - 17,722 nanoseconds
@@ -162,29 +162,29 @@ The demo directory has a tool called quicksort_demo which shows the following re
 ./quicksort_demo A 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 Manual test...
 system qsort: 120.657ns
-stla_sort: 16.636ns
+acsort: 16.636ns
 
 ./quicksort_demo A 1000
 Ordered test...
 system qsort: 4055.900ns
-stla_sort: 561.300ns
+acsort: 561.300ns
 Equal test...
 system qsort: 2545.000ns
-stla_sort: 488.800ns
+acsort: 488.800ns
 Reverse test...
 system qsort: 21440.100ns
-stla_sort: 719.900ns
+acsort: 719.900ns
 Slightly out of ordered test1...
 system qsort: 3945.300ns
-stla_sort: 4836.600ns
+acsort: 4836.600ns
 Slightly out of ordered test2...
 system qsort: 4023.900ns
-stla_sort: 4843.000ns
+acsort: 4843.000ns
 Random test...
 system qsort: 55226.700ns
-stla_sort: 9078.500ns
+acsort: 9078.500ns
 ```
 
-I've run many different tests and compared it with various implementations of quicksort (including the C++ sort) and found that the improvement is better across the board.  In some cases, the C++ sort is more efficient than stla_sort and vice-versa for unsorted data.  I hope that this improvement can be adopted by the different implementations of quicksort!  Please share if you like this improvement to an almost 80 year old algorithm.
+I've run many different tests and compared it with various implementations of quicksort (including the C++ sort) and found that the improvement is better across the board.  In some cases, the C++ sort is more efficient than acsort and vice-versa for unsorted data.  I hope that this improvement can be adopted by the different implementations of quicksort!  Please share if you like this improvement to an almost 80 year old algorithm.
 
-I'm working on a detailed explanation of how the stla_sort algorithm works and will publish it soon!
+I'm working on a detailed explanation of how the acsort algorithm works and will publish it soon!

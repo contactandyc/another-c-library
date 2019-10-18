@@ -1,11 +1,11 @@
-#include "stla_allocator.h"
+#include "acallocator.h"
 
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
   printf("Demo to show how allocations are tracked\n");
-  char *s = stla_strdup(argv[0]);
+  char *s = acstrdup(argv[0]);
   // printf("%s\n", s);
-  // stla_free(s);
+  // acfree(s);
   return 0;
 }

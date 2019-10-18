@@ -30,7 +30,7 @@ limitations under the License.
 	 if the item can be found.  After all of the inserts are done, the root of
 	 the data structure is returned.
 */
-node_t *fill_data_structure(stla_pool_t *pool, const char *arg) {
+node_t *fill_data_structure(acpool_t *pool, const char *arg) {
   node_t *root = NULL;
   const char *s = arg;
   while (*s != 0) {
@@ -157,8 +157,8 @@ typedef struct tree_log_s {
 
 tree_log_t *head, *tail;
 
-void post_good_tree(stla_pool_t *pool, node_t *root) {
-  tree_log_t *n = (tree_log_t *)stla_pool_alloc(pool, sizeof(tree_log_t));
+void post_good_tree(acpool_t *pool, node_t *root) {
+  tree_log_t *n = (tree_log_t *)acpool_alloc(pool, sizeof(tree_log_t));
   n->tree = tree_copy(pool, root);
   n->op = (char *)"Valid Red Black Tree";
   n->next = NULL;
@@ -167,8 +167,8 @@ void post_good_tree(stla_pool_t *pool, node_t *root) {
 
 bool be_quiet = false;
 
-void do_test_red_black(stla_pool_t *pool, node_t *root, char *p) {
-  tree_log_t *n = (tree_log_t *)stla_pool_alloc(pool, sizeof(tree_log_t));
+void do_test_red_black(acpool_t *pool, node_t *root, char *p) {
+  tree_log_t *n = (tree_log_t *)acpool_alloc(pool, sizeof(tree_log_t));
   n->tree = tree_copy(pool, root);
   n->op = p;
   n->next = NULL;
@@ -197,7 +197,7 @@ void do_test_red_black(stla_pool_t *pool, node_t *root, char *p) {
   }
 }
 
-void do_paint_red(stla_pool_t *pool, node_t *root, char *p, bool replay) {
+void do_paint_red(acpool_t *pool, node_t *root, char *p, bool replay) {
   char key;
   p = get_key(p, &key);
   if(!key) {
@@ -210,7 +210,7 @@ void do_paint_red(stla_pool_t *pool, node_t *root, char *p, bool replay) {
       color_node_red(n);
       if(!replay) {
         node_print(pool, root);
-        do_test_red_black(pool, root, stla_pool_strdupf(pool, "Red %c", key));
+        do_test_red_black(pool, root, acpool_strdupf(pool, "Red %c", key));
       }
     }
     else
@@ -218,7 +218,7 @@ void do_paint_red(stla_pool_t *pool, node_t *root, char *p, bool replay) {
   }
 }
 
-void do_paint_black(stla_pool_t *pool, node_t *root, char *p, bool replay) {
+void do_paint_black(acpool_t *pool, node_t *root, char *p, bool replay) {
   char key;
   p = get_key(p, &key);
   if(!key) {
@@ -231,7 +231,7 @@ void do_paint_black(stla_pool_t *pool, node_t *root, char *p, bool replay) {
       color_node_black(n);
       if(!replay) {
         node_print(pool, root);
-        do_test_red_black(pool, root, stla_pool_strdupf(pool, "black %c", key));
+        do_test_red_black(pool, root, acpool_strdupf(pool, "black %c", key));
       }
     }
     else
@@ -239,7 +239,7 @@ void do_paint_black(stla_pool_t *pool, node_t *root, char *p, bool replay) {
   }
 }
 
-void do_recolor(stla_pool_t *pool, node_t *root, char *p, bool replay) {
+void do_recolor(acpool_t *pool, node_t *root, char *p, bool replay) {
   char key;
   p = get_key(p, &key);
   if(!key) {
@@ -253,7 +253,7 @@ void do_recolor(stla_pool_t *pool, node_t *root, char *p, bool replay) {
         recolor(n);
         if(!replay) {
           node_print(pool, root);
-          do_test_red_black(pool, root, stla_pool_strdupf(pool, "color %c", key));
+          do_test_red_black(pool, root, acpool_strdupf(pool, "color %c", key));
         }
       }
       else {
@@ -267,7 +267,7 @@ void do_recolor(stla_pool_t *pool, node_t *root, char *p, bool replay) {
 
 
 
-void do_insert(stla_pool_t *pool, node_t **root, char *p, bool replay) {
+void do_insert(acpool_t *pool, node_t **root, char *p, bool replay) {
   char key;
   p = get_key(p, &key);
   if(!key) {
@@ -282,7 +282,7 @@ void do_insert(stla_pool_t *pool, node_t **root, char *p, bool replay) {
       node_insert(n, root);
       if(!replay) {
         node_print(pool, *root);
-        do_test_red_black(pool, *root, stla_pool_strdupf(pool, "insert %c", key));
+        do_test_red_black(pool, *root, acpool_strdupf(pool, "insert %c", key));
       }
     }
     else
@@ -291,7 +291,7 @@ void do_insert(stla_pool_t *pool, node_t **root, char *p, bool replay) {
 }
 
 
-void do_erase(stla_pool_t *pool, node_t **root, char *p, bool replay) {
+void do_erase(acpool_t *pool, node_t **root, char *p, bool replay) {
   char key;
   p = get_key(p, &key);
   if(!key) {
@@ -304,7 +304,7 @@ void do_erase(stla_pool_t *pool, node_t **root, char *p, bool replay) {
       node_erase(n, root);
       if(!replay) {
         node_print(pool, *root);
-        do_test_red_black(pool, *root, stla_pool_strdupf(pool, "erase %c", key));
+        do_test_red_black(pool, *root, acpool_strdupf(pool, "erase %c", key));
       }
     }
     else
@@ -313,7 +313,7 @@ void do_erase(stla_pool_t *pool, node_t **root, char *p, bool replay) {
 }
 
 
-void do_right_rotate(stla_pool_t *pool, node_t **root, char *p, bool replay) {
+void do_right_rotate(acpool_t *pool, node_t **root, char *p, bool replay) {
   char key;
   p = get_key(p, &key);
   if(!key) {
@@ -327,7 +327,7 @@ void do_right_rotate(stla_pool_t *pool, node_t **root, char *p, bool replay) {
         rotate_right(n, root);
         if(!replay) {
           node_print(pool, *root);
-          do_test_red_black(pool, *root, stla_pool_strdupf(pool, "right_rotate %c", key));
+          do_test_red_black(pool, *root, acpool_strdupf(pool, "right_rotate %c", key));
         }
       }
       else
@@ -338,7 +338,7 @@ void do_right_rotate(stla_pool_t *pool, node_t **root, char *p, bool replay) {
   }
 }
 
-void do_left_rotate(stla_pool_t *pool, node_t **root, char *p, bool replay) {
+void do_left_rotate(acpool_t *pool, node_t **root, char *p, bool replay) {
   char key;
   p = get_key(p, &key);
   if(!key) {
@@ -352,7 +352,7 @@ void do_left_rotate(stla_pool_t *pool, node_t **root, char *p, bool replay) {
         rotate_left(n, root);
         if(!replay) {
           node_print(pool, *root);
-          do_test_red_black(pool, *root, stla_pool_strdupf(pool, "left_rotate %c", key));
+          do_test_red_black(pool, *root, acpool_strdupf(pool, "left_rotate %c", key));
         }
       }
       else
@@ -368,7 +368,7 @@ void do_tagline() {
     printf( "(i)nsert, (e)rase, (r)ight_rotate, (l)eft_rotate, (R)ed, (b)lack, re(c)olor, (h)elp, (q)uit\n");
 }
 
-void tree_operations(stla_pool_t *pool, char *args) {
+void tree_operations(acpool_t *pool, char *args) {
   node_t *root = args ? fill_data_structure(pool, args) : NULL;
   post_good_tree(pool, root);
   if(root)
@@ -445,9 +445,9 @@ int main(int argc, char *argv[]) {
     be_quiet = true;
   }
   char *arg = argc > 1 ? get_valid_characters(argv[1]) : NULL;
-  stla_pool_t *pool = stla_pool_init(1024);
+  acpool_t *pool = acpool_init(1024);
   tree_operations(pool, arg);
-  stla_pool_destroy(pool);
+  acpool_destroy(pool);
   if(arg)
     free(arg);
   return 0;

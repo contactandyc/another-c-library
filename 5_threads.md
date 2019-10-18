@@ -83,7 +83,7 @@ Notice that the number is not 10 million.  When global_number++ happens, each th
 When writing software which has resources that need protecting, one should generally assume that you must protect them (using the equivalent of the stop signs mentioned above).  Sometimes, when you run software and tests, the result will look okay.  This doesn't necessarily mean that the code is thread safe.  On my computer, when I compiled the code with the -O3 option, I got the following result:
 
 ```bash
-cd $stla/illustrations/4_threads/2_thread
+cd $ac/illustrations/4_threads/2_thread
 gcc -O3 test_code.c -o test_code -lpthread
 ./test_code
 ```
@@ -202,7 +202,7 @@ Note that the worker_t structure (w) is shared amongst all of the threads.
 Before ending this chapter, we should consider how long each task takes and the advantages and disadvantages of threads and coordination.
 
 ```bash
-cd $stla/illustrations/4_threads/1_thread
+cd $ac/illustrations/4_threads/1_thread
 make
 time ./test_code
 ```
@@ -217,7 +217,7 @@ sys	0m0.003s
 ```
 
 ```bash
-cd $stla/illustrations/4_threads/4_thread
+cd $ac/illustrations/4_threads/4_thread
 make
 time ./test_code
 ```
@@ -233,7 +233,7 @@ sys	0m4.836s
 
 Coordination takes time.  We can test this code in optimized mode
 ```bash
-cd $stla/illustrations/4_threads/5_thread
+cd $ac/illustrations/4_threads/5_thread
 make
 time ./test_code
 ```
@@ -252,7 +252,7 @@ The optimized build doesn't improve performance.
 Finally, if we look at the last example (6_single_thread), we can see that the performance is much faster.
 
 ```bash
-cd $stla/illustrations/4_threads/6_single_thread
+cd $ac/illustrations/4_threads/6_single_thread
 make
 time ./test_code
 ```

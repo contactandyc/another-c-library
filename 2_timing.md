@@ -10,7 +10,7 @@ At various points in this project, we will be timing code in an attempt to optim
 
 The following code is found in <i>illustrations/2_timing/1_timer</i>
 ```bash
-cd $stla/illustrations/2_timing/1_timer
+cd $ac/illustrations/2_timing/1_timer
 ```
 
 ```bash
@@ -2356,7 +2356,7 @@ which again reduces complexity.  It is also easy to switch from nanoseconds to a
 
 The following code is found in <i>illustrations/2_timing/11_timer</i>
 
-This timer object is done and is ready to be reused.  In C, all of your functions share the same namespace.  If another project has a function named timer_init, there will be a conflict.  Projects typically adopt a package prefix in addition to the object prefix to prevent conflicts.  For this project, we will use stla (standard template library alternative).
+This timer object is done and is ready to be reused.  In C, all of your functions share the same namespace.  If another project has a function named timer_init, there will be a conflict.  Projects typically adopt a package prefix in addition to the object prefix to prevent conflicts.  For this project, we will use ac (another c library).
 
 My rules for adding the prefix are:
 ```
@@ -2366,54 +2366,54 @@ My rules for adding the prefix are:
     referenced in the name
 ```
 
-The first thing to do is to copy timer.h to stla_timer.h and then apply the rules mentioned above.  The stla_timer header file exists in the current directory. What follows is a partial diff.
+The first thing to do is to copy timer.h to actimer.h and then apply the rules mentioned above.  The actimer header file exists in the current directory. What follows is a partial diff.
 
 ```
-$ diff timer.h stla_timer.h
+$ diff timer.h actimer.h
 1,2c1,2
 < #ifndef _timer_H
 < #define _timer_H
 ---
-> #ifndef _stla_timer_H
-> #define _stla_timer_H
+> #ifndef _actimer_H
+> #define _actimer_H
 4,5c4,5
 < struct timer_s;
 < typedef struct timer_s timer_t;
 ---
-> struct stla_timer_s;
-> typedef struct stla_timer_s stla_timer_t;
+> struct actimer_s;
+> typedef struct actimer_s actimer_t;
 12c12
 < timer_t *timer_init(int repeat);
 ---
-> stla_timer_t *stla_timer_init(int repeat);
+> actimer_t *actimer_init(int repeat);
 ...
 ```
 
-The same thing is done for timer.c (copy to stla_timer.c and apply rules).
+The same thing is done for timer.c (copy to actimer.c and apply rules).
 ```bash
-$ diff timer.c stla_timer.c
+$ diff timer.c actimer.c
 1c1
 < #include "timer.h"
 ---
-> #include "stla_timer.h"
+> #include "actimer.h"
 7c7
 < struct timer_s {
 ---
-> struct stla_timer_s {
+> struct actimer_s {
 14,15c14,15
 < timer_t *timer_init(int repeat) {
 <   timer_t *t = (timer_t *)malloc(sizeof(timer_t));
 ---
-> stla_timer_t *stla_timer_init(int repeat) {
->   stla_timer_t *t = (stla_timer_t *)malloc(sizeof(stla_timer_t));
+> actimer_t *actimer_init(int repeat) {
+>   actimer_t *t = (actimer_t *)malloc(sizeof(actimer_t));
 21c21
 ...
 ```
 
-Finally, test_timer.c needs to change to use stla_timer instead of timer.
+Finally, test_timer.c needs to change to use actimer instead of timer.
 
 ```c
-#include "stla_timer.h"
+#include "actimer.h"
 ```
 
 becomes
@@ -2427,33 +2427,33 @@ timer_t *overall_timer = timer_init(repeat_test);
 
 becomes
 ```c
-stla_timer_t *overall_timer = stla_timer_init(repeat_test);
+actimer_t *overall_timer = actimer_init(repeat_test);
 ```
 
 and so on.
 
 ## Splitting up a project into multiple directories
- - Moving stla_timer to src (and variables in Makefile)
+ - Moving actimer to src (and variables in Makefile)
 
 The following code is found in <i>illustrations/2_timing/12_timer</i>
 
-Once the object has the stla prefix, we can move it to the src directory.  This is done by executing the following command - this actually won't work as it already has been moved.
+Once the object has the ac prefix, we can move it to the src directory.  This is done by executing the following command - this actually won't work as it already has been moved.
 
 This command will not work because it was done for you.
 ```bash
-mv stla_timer.h stla_timer.c $stla/src
+mv actimer.h actimer.c $ac/src
 ```
 
 You can see that the files exist by running
 ```bash
-cd $stla/src
-ls -l stla_timer.*
+cd $ac/src
+ls -l actimer.*
 ```
 
 which will output
 ```bash
--rw-r--r--  1 ac  staff  1777 Sep 11 12:12 stla_timer.c
--rw-r--r--  1 ac  staff  1314 Sep 11 12:12 stla_timer.h
+-rw-r--r--  1 ac  staff  1777 Sep 11 12:12 actimer.c
+-rw-r--r--  1 ac  staff  1314 Sep 11 12:12 actimer.h
 ```
 
 You can change back to the previous directory (illustrations/2_timing/12_timer) by running
@@ -2463,7 +2463,7 @@ cd -
 
 or
 ```bash
-cd $stla/illustrations/2_timing/12_timer
+cd $ac/illustrations/2_timing/12_timer
 ```
 
 cd - allows you to change to the directory that you were in previously and is useful.
@@ -2474,24 +2474,24 @@ Ensuring the program builds properly requires a few changes to Makefile. The dif
 $ diff Makefile ../11_timer/Makefile
 1,5d0
 < ROOT=../../..
-< OBJECTS=$(ROOT)/src/stla_timer.c
-< HEADER_FILES=$(ROOT)/src/stla_timer.h
+< OBJECTS=$(ROOT)/src/actimer.c
+< HEADER_FILES=$(ROOT)/src/actimer.h
 < FLAGS=-O3 -I$(ROOT)/src
 <
 8,9c3,4
 < test_timer: test_timer.c $(OBJECTS) $(HEADER_FILES)
 < 	gcc $(FLAGS) $(OBJECTS) test_timer.c -o test_timer
 ---
-> test_timer: test_timer.c stla_timer.c stla_timer.h
-> 	gcc -O3 stla_timer.c test_timer.c -o test_timer
+> test_timer: test_timer.c actimer.c actimer.h
+> 	gcc -O3 actimer.c test_timer.c -o test_timer
 ```
 A new section of variables are added at the top and the test_timer target use those variables.
 
 The Makefile for this project.
 ```Makefile
 ROOT=../../..
-OBJECTS=$(ROOT)/src/stla_timer.c
-HEADER_FILES=$(ROOT)/src/stla_timer.h
+OBJECTS=$(ROOT)/src/actimer.c
+HEADER_FILES=$(ROOT)/src/actimer.h
 FLAGS=-O3 -I$(ROOT)/src
 
 all: test_timer examples
@@ -2506,7 +2506,7 @@ clean:
 	rm -f test_timer *~
 ```
 
-make allows you to create variables using the <name>=<value> syntax outside of sections.  You can then reference the value of those variables by enclosing the name in $(<name>).  One variable can reference another variable (see OBJECTS and ROOT above).  For gcc to find the stla_timer.h file, the src path needs to be added to gcc's include path.  That is done by using the -I<directory> option.  If you have multiple include paths, you can specify -I<directory> multiple times.  
+make allows you to create variables using the <name>=<value> syntax outside of sections.  You can then reference the value of those variables by enclosing the name in $(<name>).  One variable can reference another variable (see OBJECTS and ROOT above).  For gcc to find the actimer.h file, the src path needs to be added to gcc's include path.  That is done by using the -I<directory> option.  If you have multiple include paths, you can specify -I<directory> multiple times.  
 
 ## Splitting up the Makefile
 
@@ -2516,8 +2516,8 @@ Ideally, the objects in src could be defined by a Makefile in src, and that Make
 
 Makefile.include in src
 ```Makefile
-OBJECTS=$(ROOT)/src/stla_timer.c $(ROOT)/src/stla_buffer.c $(ROOT)/src/stla_pool.c
-HEADER_FILES=$(ROOT)/src/stla_timer.h $(ROOT)/src/stla_buffer.h $(ROOT)/src/stla_pool.h
+OBJECTS=$(ROOT)/src/actimer.c $(ROOT)/src/acbuffer.c $(ROOT)/src/acpool.c
+HEADER_FILES=$(ROOT)/src/actimer.h $(ROOT)/src/acbuffer.h $(ROOT)/src/acpool.h
 FLAGS=-O3 -I$(ROOT)/src
 ```
 

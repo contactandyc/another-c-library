@@ -1,7 +1,7 @@
 ROOT=..
 include $(ROOT)/src/Makefile.include
 
-FLAGS += -D_STLA_DEBUG_MEMORY_=NULL
+FLAGS += -D_ACDEBUG_MEMORY_=NULL
 PROGRAMS=uvdemo1
 
 all: $(PROGRAMS) examples

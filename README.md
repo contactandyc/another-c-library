@@ -1,5 +1,5 @@
-# Standard Template Library in C Table of Contents
-- Copyright 2019 Andy Curtis
+# Another C Library Table of Contents
+- Copyright 2019 Andy Curtis and Daniel Curtis
 
 This software and documentation contains code and ideas derived from works published by Robert Sedgewick relating to the Red-Black Tree and the Quicksort algorithm.  Many other works (both code and explanations) were studied.  I've spent years studying many open source implementations including the details of the linux kernel, so I'm sure you will see their influence in how the code is written.  I have tried to write the code without borrowing any code or explanations from other projects, but I'm sure that approaches, variable names, etc will look similar.  I've worked with brilliant engineers over the years and certainly borrowed approaches from their work.  I will try and call out where I have learned things when it is relevant (and I remember).  I'm sure that there are better ways to do things and welcome help!  
 
@@ -15,15 +15,15 @@ My hope is that others will contribute!
 One of my favorite books is the Introduction to Algorithms by MIT Press.  I've often wondered if there was a follow up book (as the implication in the title is that it is for beginners).  I believe that the author wanted to convey that one should understand known algorithms to build better algorithms.  To that end, I found an improvement to quicksort.  I have no idea if my improvement to quicksort is new.  I could not find it in any existing open source implementation.  Read about it on [Medium](https://medium.com/@contactandyc/improving-quicksorts-worst-case-ef48f756bd4e) or [LinkedIn](https://www.linkedin.com/pulse/improving-60-year-old-algorithm-andy-curtis/)
 
 ```bash
-git clone https://github.com/contactandyc/standard-template-library-alternative-in-c.git
-cd standard-template-library-alternative-in-c/demo
+git clone https://github.com/contactandyc/another-c-library.git
+cd another-c-library/demo
 make
 ```
 
 The package depends on libuv in the uvdemo directory.  On a mac, use the following command to install libuv.
 ```bash
 brew install libuv
-cd standard-template-library-alternative-in-c/uvdemo
+cd another-c-library/uvdemo
 make
 ```
 

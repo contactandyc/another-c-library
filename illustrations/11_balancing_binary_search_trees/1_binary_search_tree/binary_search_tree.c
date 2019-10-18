@@ -27,14 +27,14 @@ struct node_s {
 };
 
 node_t *node_init(char key) {
-  node_t *n = (node_t *)stla_malloc(sizeof(node_t));
+  node_t *n = (node_t *)acmalloc(sizeof(node_t));
   n->left = n->right = n->parent = NULL;
   n->key = key;
   return n;
 }
 
 void node_destroy(node_t *n) {
-  stla_free(n);
+  acfree(n);
 }
 
 char node_key(node_t *n) { return n->key; }
@@ -89,13 +89,13 @@ static int get_depth(node_t *n) {
   return depth;
 }
 
-static char *get_printed_key(stla_pool_t *pool, node_t *n ) {
-  return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
+static char *get_printed_key(acpool_t *pool, node_t *n ) {
+  return acpool_strdupf(pool, "%c%d", n->key, get_depth(n));
 }
 
-static void copy_tree(stla_pool_t *pool, node_t *node,
+static void copy_tree(acpool_t *pool, node_t *node,
                       node_print_item_t **res, node_print_item_t *parent ) {
-  node_print_item_t *copy = (node_print_item_t *)stla_pool_alloc(pool, sizeof(node_print_item_t));
+  node_print_item_t *copy = (node_print_item_t *)acpool_alloc(pool, sizeof(node_print_item_t));
   *res = copy;
 
   copy->printed_key = get_printed_key(pool, node);
@@ -164,7 +164,7 @@ static int get_node_depth( node_print_item_t *item ) {
 }
 
 
-void node_print(stla_pool_t *pool, node_t *root) {
+void node_print(acpool_t *pool, node_t *root) {
   if (!root)
     return;
 

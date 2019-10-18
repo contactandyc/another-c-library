@@ -1,6 +1,6 @@
 ROOT=../../..
-OBJECTS=$(ROOT)/src/stla_timer.c
-HEADER_FILES=$(ROOT)/src/stla_timer.h
+OBJECTS=$(ROOT)/src/actimer.c
+HEADER_FILES=$(ROOT)/src/actimer.h
 FLAGS=-O3 -I$(ROOT)/src
 
 all: test_timer examples

@@ -1,5 +1,5 @@
-OBJECTS=$(ROOT)/src/stla_timer.c $(ROOT)/src/stla_allocator.c $(ROOT)/src/stla_buffer.c $(ROOT)/src/stla_pool.c $(ROOT)/src/stla_map.c $(ROOT)/src/stla_threaded_pipe.c $(ROOT)/src/stla_async_buffer.c $(ROOT)/src/stla_cgi.c $(ROOT)/src/stla_conv.c $(ROOT)/src/stla_http.c
-HEADER_FILES=$(ROOT)/src/stla_common.h $(ROOT)/src/stla_timer.h $(ROOT)/src/stla_allocator.h $(ROOT)/src/stla_buffer.h $(ROOT)/src/stla_pool.h $(ROOT)/src/stla_map.h $(ROOT)/src/stla_object_pipe.h $(ROOT)/src/stla_threaded_pipe.h $(ROOT)/src/stla_async_buffer.h $(ROOT)/src/stla_cgi.h $(ROOT)/src/stla_conv.h $(ROOT)/src/stla_http.h
+OBJECTS=$(ROOT)/src/actimer.c $(ROOT)/src/acallocator.c $(ROOT)/src/acbuffer.c $(ROOT)/src/acpool.c $(ROOT)/src/acmap.c $(ROOT)/src/acthreaded_pipe.c $(ROOT)/src/acasync_buffer.c $(ROOT)/src/accgi.c $(ROOT)/src/acconv.c $(ROOT)/src/achttp.c
+HEADER_FILES=$(ROOT)/src/accommon.h $(ROOT)/src/actimer.h $(ROOT)/src/acallocator.h $(ROOT)/src/acbuffer.h $(ROOT)/src/acpool.h $(ROOT)/src/acmap.h $(ROOT)/src/acobject_pipe.h $(ROOT)/src/acthreaded_pipe.h $(ROOT)/src/acasync_buffer.h $(ROOT)/src/accgi.h $(ROOT)/src/acconv.h $(ROOT)/src/achttp.h
 FLAGS=-O3 -I$(ROOT)/src
-UV_OBJECTS=$(ROOT)/src/stla_object_pipe.c
-UV_HEADER_FILES=$(ROOT)/src/stla_object_pipe.h
+UV_OBJECTS=$(ROOT)/src/acobject_pipe.c
+UV_HEADER_FILES=$(ROOT)/src/acobject_pipe.h

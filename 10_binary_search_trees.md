@@ -599,32 +599,32 @@ node_t *node_next_to_erase(node_t *n) {
 
 ## Printing a binary tree
 
-The last function to build is a method to print the tree.  It presented a different kind of challenge that programmers often face and so I'm separating it.  To print the binary search tree, I've implemented an approach that requires copying the tree into a different structure. Because we have built the stla_allocator and the stla_pool, I've decided to use them.  To demonstrate how they can be useful, I've commented out the free and stla_pool_destroy calls.  Before getting into how to print, let's review the changes to test_data_structure.c and data_structure.h.
+The last function to build is a method to print the tree.  It presented a different kind of challenge that programmers often face and so I'm separating it.  To print the binary search tree, I've implemented an approach that requires copying the tree into a different structure. Because we have built the acallocator and the acpool, I've decided to use them.  To demonstrate how they can be useful, I've commented out the free and acpool_destroy calls.  Before getting into how to print, let's review the changes to test_data_structure.c and data_structure.h.
 
-data_structure.h includes "stla_pool.h"
+data_structure.h includes "acpool.h"
 ```c
-#include "stla_pool.h"
+#include "acpool.h"
 ```
 
-and node_print takes a pointer to stla_pool_t *pool
+and node_print takes a pointer to acpool_t *pool
 ```c
 void node_print(node_t *root);
 ```
 
 becomes
 ```c
-void node_print(stla_pool_t *pool, node_t *root);
+void node_print(acpool_t *pool, node_t *root);
 ```
 
 The test_data_structure.c needs to incorporate the pool.
 
-In the main function, the pool needs initialized and destroyed.  Also, the free call gets changed to stla_free.  I've commented the free and destroy call on purpose.
+In the main function, the pool needs initialized and destroyed.  Also, the free call gets changed to acfree.  I've commented the free and destroy call on purpose.
 ```c
-stla_pool_t *pool = stla_pool_init(1024);
+acpool_t *pool = acpool_init(1024);
 char *arg = get_valid_characters(argv[1]);
 test_data_structure(pool, arg, repeat);
-// stla_free(arg);
-// stla_pool_destroy(pool);
+// acfree(arg);
+// acpool_destroy(pool);
 ```
 
 get_valid_characters has a call to strdup which changes from
@@ -634,7 +634,7 @@ char *res = strdup(p);
 
 to
 ```c
-char *res = stla_strdup(p);
+char *res = acstrdup(p);
 ```
 
 The test_data_structure definition changes from
@@ -644,7 +644,7 @@ void test_data_structure(const char *arg, int repeat) {
 
 to
 ```c
-void test_data_structure(stla_pool_t *pool, const char *arg, int repeat) {
+void test_data_structure(acpool_t *pool, const char *arg, int repeat) {
 ```
 
 All of the calls to node_print now take the pool parameter.
@@ -657,16 +657,16 @@ becomes
 node_print(pool, root);
 ```
 
-The Makefile also includes the src library to incorporate the stla_pool object.
+The Makefile also includes the src library to incorporate the acpool object.
 
 The following code is found in <i>illustrations/10_binary_search_trees/1_binary_search_tree</i>
 ```bash
-cd $stla/illustrations/10_binary_search_trees/1_binary_search_tree
+cd $ac/illustrations/10_binary_search_trees/1_binary_search_tree
 ```
 
 ```bash
 $ make
-gcc -g -O3 -I../../../src -D_STLA_DEBUG_MEMORY_=NULL ../../../src/stla_timer.c ../../../src/stla_allocator.c ../../../src/stla_buffer.c ../../../src/stla_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
+gcc -g -O3 -I../../../src -D_ACDEBUG_MEMORY_=NULL ../../../src/actimer.c ../../../src/acallocator.c ../../../src/acbuffer.c ../../../src/acpool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
 Creating binary_search_tree for PDCBAEMLOQTRYZ
 P1
 | \
@@ -686,7 +686,7 @@ print_using_iteration: ABCDELMOPQRTYZ
 print_using_reverse_iteration: ZYTRQPOMLEDCBA
 
 2527 byte(s) allocated in 17 allocations (680 byte(s) overhead)
-test_data_structure.c:244 [stla_pool] size: 1050, max_size: 1050, initial_size: 1024 used: 2152
+test_data_structure.c:244 [acpool] size: 1050, max_size: 1050, initial_size: 1024 used: 2152
 test_data_structure.c:204: 15
 binary_search_tree.c:14: 32
 binary_search_tree.c:14: 32
@@ -702,29 +702,29 @@ binary_search_tree.c:14: 32
 binary_search_tree.c:14: 32
 binary_search_tree.c:14: 32
 binary_search_tree.c:14: 32
-../../../src/stla_pool.c:121: 1040
+../../../src/acpool.c:121: 1040
 ```
 
 Notice that just before the program ended, that it printed 17 lines where allocations happened.  These are allocations that were not properly freed.  Let's check out the lines around 14 of binary_search_tree.c.
 
 ```c
 node_t *node_init(char key) {
-  node_t *n = (node_t *)stla_malloc(sizeof(node_t));
+  node_t *n = (node_t *)acmalloc(sizeof(node_t));
   n->left = n->right = n->parent = NULL;
   n->key = key;
   return n;
 }
 
 void node_destroy(node_t *n) {
-  // stla_free(n);
+  // acfree(n);
 }
 ```
 
-Notice that the stla_free is commented out.  Let's uncomment it and run make again.
+Notice that the acfree is commented out.  Let's uncomment it and run make again.
 
 ```bash
 $ make
-gcc -g -O3 -I../../../src -D_STLA_DEBUG_MEMORY_=NULL ../../../src/stla_timer.c ../../../src/stla_allocator.c ../../../src/stla_buffer.c ../../../src/stla_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
+gcc -g -O3 -I../../../src -D_ACDEBUG_MEMORY_=NULL ../../../src/actimer.c ../../../src/acallocator.c ../../../src/acbuffer.c ../../../src/acpool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
 Creating binary_search_tree for PDCBAEMLOQTRYZ
 P1
 | \
@@ -744,33 +744,33 @@ print_using_iteration: ABCDELMOPQRTYZ
 print_using_reverse_iteration: ZYTRQPOMLEDCBA
 
 2079 byte(s) allocated in 3 allocations (120 byte(s) overhead)
-test_data_structure.c:244 [stla_pool] size: 1050, max_size: 1050, initial_size: 1024 used: 2152
+test_data_structure.c:244 [acpool] size: 1050, max_size: 1050, initial_size: 1024 used: 2152
 test_data_structure.c:204: 15
-../../../src/stla_pool.c:121: 1040
+../../../src/acpool.c:121: 1040
 ```
 
 There are three lines left.  Let's consider the second one (test_data_structure.c:204).  The lines around 204 of test_data_structure.c are below.
 ```c
 char *get_valid_characters(const char *p) {
-	char *res = stla_strdup(p);
+	char *res = acstrdup(p);
 	char *wp = res;
 ```
 
-Line 204 is a stla_strdup call that ultimately gets returned from get_valid_characters.  If we look for the get_valid_characters call, we find it in the main function.  The arg is not freed (stla_free is commented out).  
+Line 204 is a acstrdup call that ultimately gets returned from get_valid_characters.  If we look for the get_valid_characters call, we find it in the main function.  The arg is not freed (acfree is commented out).  
 
 ```c
-stla_pool_t *pool = stla_pool_init(1024);
+acpool_t *pool = acpool_init(1024);
 char *arg = get_valid_characters(argv[1]);
 test_data_structure(pool, arg, repeat);
-// stla_free(arg);
-// stla_pool_destroy(pool);
+// acfree(arg);
+// acpool_destroy(pool);
 return 0;
 ```
 
-Let's uncomment the stla_free(arg); line and run again.
+Let's uncomment the acfree(arg); line and run again.
 ```bash
 $ make
-gcc -g -O3 -I../../../src -D_STLA_DEBUG_MEMORY_=NULL ../../../src/stla_timer.c ../../../src/stla_allocator.c ../../../src/stla_buffer.c ../../../src/stla_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
+gcc -g -O3 -I../../../src -D_ACDEBUG_MEMORY_=NULL ../../../src/actimer.c ../../../src/acallocator.c ../../../src/acbuffer.c ../../../src/acpool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
 Creating binary_search_tree for PDCBAEMLOQTRYZ
 P1
 | \
@@ -790,8 +790,8 @@ print_using_iteration: ABCDELMOPQRTYZ
 print_using_reverse_iteration: ZYTRQPOMLEDCBA
 
 2064 byte(s) allocated in 2 allocations (80 byte(s) overhead)
-test_data_structure.c:244 [stla_pool] size: 1050, max_size: 1050, initial_size: 1024 used: 2152
-../../../src/stla_pool.c:121: 1040
+test_data_structure.c:244 [acpool] size: 1050, max_size: 1050, initial_size: 1024 used: 2152
+../../../src/acpool.c:121: 1040
 ```
 
 The test_data_structure program allows us to print multiple binary search trees if we pass a third argument, which is the number of random trees to print (in addition to the one that is in order at the end).
@@ -855,26 +855,26 @@ print_using_iteration: ABCDELMOPQRTYZ
 print_using_reverse_iteration: ZYTRQPOMLEDCBA
 
 4144 byte(s) allocated in 4 allocations (160 byte(s) overhead)
-test_data_structure.c:244 [stla_pool] size: 3150, max_size: 3150, initial_size: 1024 used: 4232
-../../../src/stla_pool.c:121: 1040
-../../../src/stla_pool.c:121: 1040
-../../../src/stla_pool.c:121: 1040
+test_data_structure.c:244 [acpool] size: 3150, max_size: 3150, initial_size: 1024 used: 4232
+../../../src/acpool.c:121: 1040
+../../../src/acpool.c:121: 1040
+../../../src/acpool.c:121: 1040
 ```
 
 Notice that since we printed 3 trees, the total bytes allocated increased to 4140 bytes.  Let's review the test_data_structure function for a moment.
 
 ```bash
-void test_data_structure(stla_pool_t *pool, const char *arg, int repeat) {
+void test_data_structure(acpool_t *pool, const char *arg, int repeat) {
   printf("Creating %s for %s\n", DATA_STRUCTURE, arg);
   node_t *root;
   for( int i=0; i<repeat; i++ ) {
-    // stla_pool_clear(pool);
+    // acpool_clear(pool);
     root = fill_data_structure_randomly(arg);
     node_print(pool, root);
     find_everything(arg, root);
     find_and_erase_everything(arg, root);
   }
-  // stla_pool_clear(pool);
+  // acpool_clear(pool);
   root = fill_data_structure(arg);
   node_print(pool, root);
   print_using_iteration(root);
@@ -885,7 +885,7 @@ void test_data_structure(stla_pool_t *pool, const char *arg, int repeat) {
 }
 ```
 
-For each call of node_print, the pool uses more memory.  However, we can clear the pool just after each print since the pool is only used for allocation within the node_print call.  More specifically, we can clear the pool at the beginning of the for loop to repeat building, printing, and destroying the tree, and just before we recreate the tree one last time.  If you uncomment the stla_pool_clear calls, you can go ahead and rebuild.
+For each call of node_print, the pool uses more memory.  However, we can clear the pool just after each print since the pool is only used for allocation within the node_print call.  More specifically, we can clear the pool at the beginning of the for loop to repeat building, printing, and destroying the tree, and just before we recreate the tree one last time.  If you uncomment the acpool_clear calls, you can go ahead and rebuild.
 
 Rebuild
 ```bash
@@ -899,15 +899,15 @@ $ ./test_data_structure PDCBAEMLOQTRYZ 2
 .
 .
 2064 byte(s) allocated in 2 allocations (80 byte(s) overhead)
-test_data_structure.c:246 [stla_pool] size: 1050, max_size: 1050, initial_size: 1024 used: 2064
-../../../src/stla_pool.c:121: 1040
+test_data_structure.c:246 [acpool] size: 1050, max_size: 1050, initial_size: 1024 used: 2064
+../../../src/acpool.c:121: 1040
 ```
 
-You should see that the memory usage didn't grow this time.  If we uncomment the stla_pool_destroy call in the main function, we will see the following output.
+You should see that the memory usage didn't grow this time.  If we uncomment the acpool_destroy call in the main function, we will see the following output.
 
 ```bash
 $ make
-gcc -g -O3 -I../../../src -D_STLA_DEBUG_MEMORY_=NULL ../../../src/stla_timer.c ../../../src/stla_allocator.c ../../../src/stla_buffer.c ../../../src/stla_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
+gcc -g -O3 -I../../../src -D_ACDEBUG_MEMORY_=NULL ../../../src/actimer.c ../../../src/acallocator.c ../../../src/acbuffer.c ../../../src/acpool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
 Creating binary_search_tree for PDCBAEMLOQTRYZ
 P1
 | \
@@ -984,12 +984,12 @@ To understand how to print a binary search tree, I've made a slight modification
 The code that follows can be found in illustrations/10_binary_search_trees/2_binary_search_tree
 
 ```bash
-cd $stla/illustrations/10_binary_search_trees/2_binary_search_tree
+cd $ac/illustrations/10_binary_search_trees/2_binary_search_tree
 ```
 
 ```bash
 $ make
-gcc -g -O3 -I../../../src -D_STLA_DEBUG_MEMORY_=NULL ../../../src/stla_timer.c ../../../src/stla_allocator.c ../../../src/stla_buffer.c ../../../src/stla_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
+gcc -g -O3 -I../../../src -D_ACDEBUG_MEMORY_=NULL ../../../src/actimer.c ../../../src/acallocator.c ../../../src/acbuffer.c ../../../src/acpool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
 Creating binary_search_tree for PDCBAEMLOQTRYZ
 PPPPPPPP1
 |        \
@@ -1036,9 +1036,9 @@ typedef struct node_print_item_s {
 
 The copy_tree function looks like
 ```c
-static void copy_tree(stla_pool_t *pool, node_t *node,
+static void copy_tree(acpool_t *pool, node_t *node,
                       node_print_item_t **res, node_print_item_t *parent ) {
-  node_print_item_t *copy = (node_print_item_t *)stla_pool_alloc(pool, sizeof(node_print_item_t));
+  node_print_item_t *copy = (node_print_item_t *)acpool_alloc(pool, sizeof(node_print_item_t));
   *res = copy;
 
   copy->printed_key = get_printed_key(pool, node);
@@ -1058,11 +1058,11 @@ static void copy_tree(stla_pool_t *pool, node_t *node,
 
 I'm using the pool to allocate each node.  copy_tree is a recursive function that allocates nodes and puts them into the 3rd parameter.  The printed_key is printed using the following function.
 ```c
-static char *get_printed_key(stla_pool_t *pool, node_t *n ) {
-  // return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
+static char *get_printed_key(acpool_t *pool, node_t *n ) {
+  // return acpool_strdupf(pool, "%c%d", n->key, get_depth(n));
 
   int r=rand() % 15;
-  char *res = (char *)stla_pool_ualloc(pool, r+4);
+  char *res = (char *)acpool_ualloc(pool, r+4);
   for( int i=0; i<=r; i++ )
     res[i] = n->key;
   sprintf(res+r+1, "%d", get_depth(n));
@@ -1070,7 +1070,7 @@ static char *get_printed_key(stla_pool_t *pool, node_t *n ) {
 }
 ```
 
-The normal get_printed_key function would just use the stla_pool_strdupf function and print the character, followed by the depth.  The depth is calculated using the following function.
+The normal get_printed_key function would just use the acpool_strdupf function and print the character, followed by the depth.  The depth is calculated using the following function.
 ```c
 static int get_depth(node_t *n) {
   int depth = 0;
@@ -1085,7 +1085,7 @@ static int get_depth(node_t *n) {
 All that the depth function does is count how many parents a node has.  The rest of the get_printed_key method is below.  It prints the key from 1 to 15 times and then appends the depth to the key.
 ```c
 int r=rand() % 15;
-char *res = (char *)stla_pool_ualloc(pool, r+4);
+char *res = (char *)acpool_ualloc(pool, r+4);
 for( int i=0; i<=r; i++ )
   res[i] = n->key;
 sprintf(res+r+1, "%d", get_depth(n));
@@ -1210,7 +1210,7 @@ static int get_node_depth( node_print_item_t *item ) {
 
 Now we are ready to print the binary search tree.  Below is the node_print method, which will be followed by it being broken down.
 ```c
-void node_print(stla_pool_t *pool, node_t *root) {
+void node_print(acpool_t *pool, node_t *root) {
   if (!root)
     return;
 
@@ -1286,7 +1286,7 @@ void node_print(stla_pool_t *pool, node_t *root) {
 
 If the root is NULL, there is nothing to print
 ```c
-void node_print(stla_pool_t *pool, node_t *root) {
+void node_print(acpool_t *pool, node_t *root) {
   if (!root)
     return;
 ```
@@ -1393,11 +1393,11 @@ printf( "\n");
 To finalize the work, we will remove the random number of prints in the get_printed_key function.
 
 ```c
-char *get_printed_key(stla_pool_t *pool, node_t *n ) {
-  // return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
+char *get_printed_key(acpool_t *pool, node_t *n ) {
+  // return acpool_strdupf(pool, "%c%d", n->key, get_depth(n));
 
   int r=rand() % 15;
-  char *res = (char *)stla_pool_ualloc(pool, r+4);
+  char *res = (char *)acpool_ualloc(pool, r+4);
   for( int i=0; i<=r; i++ )
     res[i] = n->key;
   sprintf(res+r+1, "%d", get_depth(n));
@@ -1408,12 +1408,12 @@ char *get_printed_key(stla_pool_t *pool, node_t *n ) {
 becomes
 
 ```c
-char *get_printed_key(stla_pool_t *pool, node_t *n ) {
-  return stla_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
+char *get_printed_key(acpool_t *pool, node_t *n ) {
+  return acpool_strdupf(pool, "%c%d", n->key, get_depth(n));
 }
 ```
 
-<b>A quick note on how the stla_pool was useful:</b> The copy of the tree was constructed and never had to free any of the nodes associated with it.  Both nodes and the printed keys were allocated.  If we didn't have the pool (or something like it), we would have needed to free each node in the tree.  The node_init and node_destroy methods use stla_malloc and stla_free.  If we weren't concerned with destroying the tree or erasing nodes, we could have used the pool for the allocation and never had to erase the tree at all.  A call to stla_pool_clear would make the memory reusable for another purpose (such as building another tree).  Technically, it takes as long to construct a binary search tree as it does to destroy one.  If you use the pool, you can avoid all of the destruction time.  This will be explored further once the red-black tree (a balanced binary search tree is complete).
+<b>A quick note on how the acpool was useful:</b> The copy of the tree was constructed and never had to free any of the nodes associated with it.  Both nodes and the printed keys were allocated.  If we didn't have the pool (or something like it), we would have needed to free each node in the tree.  The node_init and node_destroy methods use acmalloc and acfree.  If we weren't concerned with destroying the tree or erasing nodes, we could have used the pool for the allocation and never had to erase the tree at all.  A call to acpool_clear would make the memory reusable for another purpose (such as building another tree).  Technically, it takes as long to construct a binary search tree as it does to destroy one.  If you use the pool, you can avoid all of the destruction time.  This will be explored further once the red-black tree (a balanced binary search tree is complete).
 
 ## Quick Recap
 

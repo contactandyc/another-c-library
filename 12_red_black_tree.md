@@ -25,13 +25,13 @@ My additional rules for clarification which are based upon the first 5 rules.
 The red-black tree is balanced through rotations and changing colors, which were discussed in [Balancing Binary Search Trees](11_balancing_binary_search_trees.md).  Make sure the tree_operations tool is built from the last section if you want to follow along.
 
 ```bash
-cd $stla/illustrations/11_balancing_binary_search_trees/2_tree_operations
+cd $ac/illustrations/11_balancing_binary_search_trees/2_tree_operations
 make
 ```
 
 Then run
 ```bash
-$ $stla/bin/tree_operations ABC
+$ $ac/bin/tree_operations ABC
 B1
 | \
 |  (C1)
@@ -46,7 +46,7 @@ To make sure that it is working.
 
 The code for this section is found in <i>illustrations/12_red_black_tree/1_red_black_tree</i>
 ```bash
-cd $stla/illustrations/12_red_black_tree/1_red_black_tree
+cd $ac/illustrations/12_red_black_tree/1_red_black_tree
 make
 ```
 
@@ -57,7 +57,7 @@ Most of the code is in red_black_tree.c
 When an algorithm can be tested through a function, it is often a good idea to write such a function.  Functions like the one to follow should be pretty straight-forward, given the rules above.
 
 ```c
-bool test_red_black_rules(stla_pool_t *pool, node_t *root) {
+bool test_red_black_rules(acpool_t *pool, node_t *root) {
   /* an empty tree is valid */
   if(!root)
     return true;
@@ -311,7 +311,7 @@ The red-black tree insert operation considers the node's uncle's color.  The unc
 The next case to test is if the uncle exists and the uncle's color is red.  At this point, the parent and the uncle are both red.  The red-black tree needs to maintain a constant black height.
 
 ```
-$ $stla/bin/tree_operations FDGBE
+$ $ac/bin/tree_operations FDGBE
 F1
 | \
 |  G2
@@ -379,7 +379,7 @@ The following example adds the letter 0 (zero) to the left of (A2).  This create
 
 This is illustrated by the tool below.
 ```bash
-$ $stla/bin/tree_operations FDGBEABCDEFGHI
+$ $ac/bin/tree_operations FDGBEABCDEFGHI
 F1
 | \
 |  H2
@@ -456,7 +456,7 @@ The code is below:
 If the node being inserted is to the right of the parent, it needs to be rotated to the left to keep one child to either side after the rotation.  If the left rotate isn't done first, the following will happen:
 
 ```bash
-$ $stla/bin/tree_operations FDGB
+$ $ac/bin/tree_operations FDGB
 F1
 | \
 D2 G2
@@ -499,7 +499,7 @@ Notice that while swapping colors during the rotate, that the placement of the b
 After inserting A, do a right rotation on its grandparent D because its uncle is NULL (NULL is black).
 
 ```bash
-$ $stla/bin/tree_operations FDGB
+$ $ac/bin/tree_operations FDGB
 F1
 | \
 D2 G2
@@ -637,7 +637,7 @@ If you consider the following examples, it should be clear why erasing a red lea
 The tree_operations has a -q feature which is less verbose (you don't get the menu or the list of operations that lead to a successful red-black tree structure).
 
 ```bash
-$ $stla/bin/tree_operations -q ABC
+$ $ac/bin/tree_operations -q ABC
 B1
 | \
 |  (C1)
@@ -658,7 +658,7 @@ The above tree is a valid red black tree
 ```
 
 ```bash
-$ $stla/bin/tree_operations -q ABC
+$ $ac/bin/tree_operations -q ABC
 B1
 | \
 |  (C1)
@@ -680,7 +680,7 @@ The above tree is a valid red black tree
 
 The case where fixing the color is important is shown below.  A has no children and is black.
 ```bash
-$ $stla/bin/tree_operations -q ABCD
+$ $ac/bin/tree_operations -q ABCD
 B1
 | \
 A2 C2
@@ -722,7 +722,7 @@ else {
 - color G's right (H) black
 
 ```bash
-$ $stla/bin/tree_operations -q ABCDEFGH
+$ $ac/bin/tree_operations -q ABCDEFGH
 D1
 | \
 |  (F1)
@@ -765,7 +765,7 @@ The above tree is a valid red black tree
 <b>An example where the successor is black:</b> In this case, B is erased, C is the successor and is black.  C is colored the color of B.  The tree becomes invalid because C has a single black child (single children must be red).  The color must be fixed.
 
 ```bash
-$ $stla/bin/tree_operations -q ABCDEFGH
+$ $ac/bin/tree_operations -q ABCDEFGH
 D1
 | \
 |  (F1)
@@ -792,7 +792,7 @@ A2
 
 Finally, an example where the successor is red.
 ```bash
-$ $stla/bin/tree_operations -q ABC
+$ $ac/bin/tree_operations -q ABC
 B1
 | \
 |  (C1)
@@ -840,7 +840,7 @@ If the successor is to the left of the node to the right of the node to erase, t
 In the example below H is erased and replaced with its successor (I).  I has a right child M which becomes a child of N and is colored black.
 
 ```bash
-$ $stla/bin/tree_operations -q ACBFHEGPNIONM
+$ $ac/bin/tree_operations -q ACBFHEGPNIONM
 F1
 | \
 |  H2
@@ -891,7 +891,7 @@ The above tree is a valid red black tree
 In the example below, H is erased (which is black) and replaced with I, which doesn't have a child.  The color must be fixed.
 
 ```bash
-$ $stla/bin/tree_operations -q ACBFHEGPNION
+$ $ac/bin/tree_operations -q ACBFHEGPNION
 F1
 | \
 |  H2
@@ -922,7 +922,7 @@ A3 C3      (O3)
 
 In the example below, N is erased (which is red) and replaced with O, which doesn't have a right child.  Because N is red, O will be red, and the overall tree height will be maintained.  The red black tree properties remain valid.
 ```bash
-$ $stla/bin/tree_operations -q ACBFHEGPNION
+$ $ac/bin/tree_operations -q ACBFHEGPNION
 F1
 | \
 |  H2
@@ -1081,7 +1081,7 @@ if(sibling->color == RED) {
 
 In the example below, erase A, the sibling is O (which is red), and the parent is E:
 ```bash
-$ $stla/bin/tree_operations -q AEIOUY
+$ $ac/bin/tree_operations -q AEIOUY
 E1
 | \
 A2 (O1)
@@ -1163,7 +1163,7 @@ EXAMPLE
 
 The code for this section is found in <i>illustrations/12_red_black_tree/2_red_black_tree</i>
 ```bash
-cd $stla/illustrations/12_red_black_tree/2_red_black_tree
+cd $ac/illustrations/12_red_black_tree/2_red_black_tree
 make
 ```
 
