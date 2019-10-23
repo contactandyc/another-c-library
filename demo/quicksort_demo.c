@@ -1,6 +1,6 @@
-#include "stla_common.h"
-#include "stla_sort.h"
-#include "stla_timer.h"
+#include "ac_common.h"
+#include "ac_sort.h"
+#include "ac_timer.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -11,9 +11,9 @@
 static inline bool less(const sort_t *a, const sort_t *b) { return *a < *b; }
 static void print_sort_t(sort_t *el) { printf("%ld ", *el); }
 
-stla_sort_print_m(quicksort_print, sort_t);
-stla_sort_m(quicksort, sort_t, less);
-stla_sort_test_m(quicksort_test, less, sort_t);
+ac_sort_print_m(quicksort_print, sort_t);
+ac_sort_m(quicksort, sort_t, less);
+ac_sort_test_m(quicksort_test, less, sort_t);
 
 static inline int compare_size(const void *p1, const void *p2) {
   const sort_t *a = (const sort_t *)p1;
@@ -29,43 +29,43 @@ void run_test(const char *test_name, sort_t *base, size_t num_elements,
               char *type) {
   // REPEAT_TEST=1;
   printf("%s\n", test_name);
-  stla_timer_t *copy_timer = stla_timer_init(REPEAT_TEST);
-  stla_timer_start(copy_timer);
+  ac_timer_t *copy_timer = ac_timer_init(REPEAT_TEST);
+  ac_timer_start(copy_timer);
   for (int i = 0; i < REPEAT_TEST; i++) {
     memcpy(base + num_elements, base, num_elements * sizeof(sort_t));
   }
-  stla_timer_stop(copy_timer);
+  ac_timer_stop(copy_timer);
 
-  stla_timer_t *base_timer = stla_timer_init(REPEAT_TEST);
-  stla_timer_subtract(base_timer, copy_timer);
-  stla_timer_start(base_timer);
+  ac_timer_t *base_timer = ac_timer_init(REPEAT_TEST);
+  ac_timer_subtract(base_timer, copy_timer);
+  ac_timer_start(base_timer);
   for (int i = 0; i < REPEAT_TEST; i++) {
     memcpy(base + num_elements, base, num_elements * sizeof(sort_t));
     qsort(base + num_elements, num_elements, sizeof(sort_t), compare_size);
   }
-  stla_timer_stop(base_timer);
+  ac_timer_stop(base_timer);
 
-  stla_timer_t *test_timer = stla_timer_init(REPEAT_TEST);
-  stla_timer_subtract(test_timer, copy_timer);
-  stla_timer_start(test_timer);
+  ac_timer_t *test_timer = ac_timer_init(REPEAT_TEST);
+  ac_timer_subtract(test_timer, copy_timer);
+  ac_timer_start(test_timer);
   for (int i = 0; i < REPEAT_TEST; i++) {
     memcpy(base + num_elements, base, num_elements * sizeof(sort_t));
     quicksort(base + num_elements, num_elements);
   }
-  stla_timer_stop(test_timer);
+  ac_timer_stop(test_timer);
 
   if (strchr(type, 'P'))
-    quicksort_print(__STLA_FILE_LINE__, base + num_elements, num_elements,
+    quicksort_print(__AC_FILE_LINE__, base + num_elements, num_elements,
                     print_sort_t);
-  quicksort_test(__STLA_FILE_LINE__, base + num_elements, num_elements,
+  quicksort_test(__AC_FILE_LINE__, base + num_elements, num_elements,
                  print_sort_t);
 
-  printf("system qsort: %0.3fns\n", stla_timer_ns(base_timer));
-  printf("stla_sort: %0.3fns\n", stla_timer_ns(test_timer));
+  printf("system qsort: %0.3fns\n", ac_timer_ns(base_timer));
+  printf("ac_sort: %0.3fns\n", ac_timer_ns(test_timer));
 
-  stla_timer_destroy(base_timer);
-  stla_timer_destroy(test_timer);
-  stla_timer_destroy(copy_timer);
+  ac_timer_destroy(base_timer);
+  ac_timer_destroy(test_timer);
+  ac_timer_destroy(copy_timer);
 }
 
 int main(int argc, char *argv[]) {

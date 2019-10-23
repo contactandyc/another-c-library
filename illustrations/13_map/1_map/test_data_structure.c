@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "stla_map.h"
+#include "ac_map.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -22,7 +22,7 @@ limitations under the License.
 #include <string.h>
 
 typedef struct {
-  stla_map_node_t map;
+  ac_map_node_t map;
   char key;
 } node_t;
 
@@ -38,14 +38,14 @@ static inline int compare_node_for_find(char key, node_t *v) {
   return 0;
 }
 
-char * print_node(stla_pool_t *pool, stla_map_node_t *n) {
+char * print_node(ac_pool_t *pool, ac_map_node_t *n) {
   node_t *node = (node_t *)n;
-  return stla_pool_strdupf(pool, "%c", node->key );
+  return ac_pool_strdupf(pool, "%c", node->key );
 }
 
 
-stla_map_insert_m(node_insert, node_t, compare_node);
-stla_map_find_m(node_find, char, node_t, compare_node_for_find);
+ac_map_insert_m(node_insert, node_t, compare_node);
+ac_map_find_m(node_find, char, node_t, compare_node_for_find);
 
 /*
 	 arg contains a number of characters (or letters).  Each letter is inserted
@@ -56,19 +56,19 @@ stla_map_find_m(node_find, char, node_t, compare_node_for_find);
 	 if the item can be found.  After all of the inserts are done, the root of
 	 the data structure is returned.
 */
-stla_map_node_t *fill_data_structure(stla_pool_t *pool, const char *arg) {
-  stla_map_node_t *root = NULL;
+ac_map_node_t *fill_data_structure(ac_pool_t *pool, const char *arg) {
+  ac_map_node_t *root = NULL;
   const char *s = arg;
   while (*s != 0) {
     if (!node_find(*s, root)) {
-      node_t *n = (node_t *)stla_pool_alloc(pool, sizeof(*n));
+      node_t *n = (node_t *)ac_pool_alloc(pool, sizeof(*n));
       n->key = *s;
       if (!node_insert(n, &root)) {
         printf("Find failed for %c and insert failed as well!\n", *s);
         abort();
       }
-      if(!stla_map_valid(pool, root, print_node)) {
-        stla_map_print(pool, root, print_node, 0);
+      if(!ac_map_valid(pool, root, print_node)) {
+        ac_map_print(pool, root, print_node, 0);
         abort();
       }
       if (!node_find(*s, root)) {
@@ -85,8 +85,8 @@ stla_map_node_t *fill_data_structure(stla_pool_t *pool, const char *arg) {
 	This function is similar to fill_data_structure, except that the characters
 	are inserted in random order.
 */
-stla_map_node_t *fill_data_structure_randomly(stla_pool_t *pool, const char *arg) {
-  stla_map_node_t *root = NULL;
+ac_map_node_t *fill_data_structure_randomly(ac_pool_t *pool, const char *arg) {
+  ac_map_node_t *root = NULL;
   const char *p = arg;
   int len = strlen(p);
   int num_inserted = 0;
@@ -94,14 +94,14 @@ stla_map_node_t *fill_data_structure_randomly(stla_pool_t *pool, const char *arg
     int pos = rand() % len;
     const char *s = p+pos;
     if (!node_find(*s, root)) {
-      node_t *n = (node_t *)stla_pool_alloc(pool, sizeof(*n));
+      node_t *n = (node_t *)ac_pool_alloc(pool, sizeof(*n));
       n->key = *s;
       if (!node_insert(n, &root)) {
         printf("Find failed for %c and insert failed as well!\n", *s);
         abort();
       }
-      if(!stla_map_valid(pool, root, print_node)) {
-        stla_map_print(pool, root, print_node, 0);
+      if(!ac_map_valid(pool, root, print_node)) {
+        ac_map_print(pool, root, print_node, 0);
         abort();
       }
       if (!node_find(*s, root)) {
@@ -118,7 +118,7 @@ stla_map_node_t *fill_data_structure_randomly(stla_pool_t *pool, const char *arg
 	find_everything checks that every character in arg is properly inserted in
 	the data structure.
 */
-void find_everything(const char *arg, stla_map_node_t *root) {
+void find_everything(const char *arg, ac_map_node_t *root) {
   const char *s = arg; // check that everything can still be found
   while (*s != 0) {
     if (!node_find(*s, root)) {
@@ -134,9 +134,9 @@ void find_everything(const char *arg, stla_map_node_t *root) {
 	random order and erases them.  erase should succeed if find succeeds.  If it
 	doesn't an error is printed.
 */
-void find_and_erase_everything(stla_pool_t *pool,
+void find_and_erase_everything(ac_pool_t *pool,
                                const char *arg,
-                               stla_map_node_t *root) {
+                               ac_map_node_t *root) {
   const char *p = arg; // find and erase all of the nodes
   int len = strlen(p);
   int num_destroyed = 0;
@@ -145,14 +145,14 @@ void find_and_erase_everything(stla_pool_t *pool,
     const char *s = p+pos;
     node_t *node_to_erase = node_find(*s, root);
     // printf( "erasing %c\n", *s );
-    // stla_map_print(pool, root, print_node, 0);
+    // ac_map_print(pool, root, print_node, 0);
     if (node_to_erase) {
-      if (!stla_map_erase((stla_map_node_t *)node_to_erase, &root)) {
+      if (!ac_map_erase((ac_map_node_t *)node_to_erase, &root)) {
         printf("Erase failed for %c after find succeeded!\n", *s);
         abort();
       }
-      if(!stla_map_valid(pool, root, print_node)) {
-        stla_map_print(pool, root, print_node, 0);
+      if(!ac_map_valid(pool, root, print_node)) {
+        ac_map_print(pool, root, print_node, 0);
         abort();
       }
       num_destroyed++;
@@ -163,12 +163,12 @@ void find_and_erase_everything(stla_pool_t *pool,
 /*
 	print the datastructure iterating over the keys using first/next
 */
-void print_using_iteration(stla_map_node_t *root) {
+void print_using_iteration(ac_map_node_t *root) {
   printf("print_using_iteration: ");
-  stla_map_node_t *n = stla_map_first(root);
+  ac_map_node_t *n = ac_map_first(root);
   while (n) {
     printf("%c", ((node_t *)n)->key);
-    n = stla_map_next(n);
+    n = ac_map_next(n);
   }
   printf("\n");
 }
@@ -176,12 +176,12 @@ void print_using_iteration(stla_map_node_t *root) {
 /*
 	print the datastructure backwards iterating over the keys using last/previous
 */
-void print_using_reverse_iteration(stla_map_node_t *root) {
+void print_using_reverse_iteration(ac_map_node_t *root) {
   printf("print_using_reverse_iteration: ");
-  stla_map_node_t *n = stla_map_last(root);
+  ac_map_node_t *n = ac_map_last(root);
   while (n) {
     printf("%c", ((node_t *)n)->key);
-    n = stla_map_previous(n);
+    n = ac_map_previous(n);
   }
   printf("\n");
 }
@@ -190,10 +190,10 @@ void print_using_reverse_iteration(stla_map_node_t *root) {
 	destroy the data structure by iterating over the keys using the
 	first_to_erase/next_to_erase methods
 */
-void destroy_using_iteration(stla_map_node_t *root) {
-  stla_map_node_t *n = stla_map_postorder_first(root);
+void destroy_using_iteration(ac_map_node_t *root) {
+  ac_map_node_t *n = ac_map_postorder_first(root);
   while (n) {
-    stla_map_node_t *next = stla_map_postorder_next(n);
+    ac_map_node_t *next = ac_map_postorder_next(n);
     // nothing really to do since we used the pool!
     n = next;
   }
@@ -209,17 +209,17 @@ void destroy_using_iteration(stla_map_node_t *root) {
     node_next_to_erase methods (which may be defined to be the same as
 		first/next)
 */
-void test_data_structure(stla_pool_t *pool, const char *arg, int repeat) {
+void test_data_structure(ac_pool_t *pool, const char *arg, int repeat) {
   printf("Creating %s using map\n", arg);
-  stla_map_node_t *root;
+  ac_map_node_t *root;
   for( int i=0; i<repeat; i++ ) {
     root = fill_data_structure_randomly(pool, arg);
-    // stla_map_print(pool, root, print_node, 0);
+    // ac_map_print(pool, root, print_node, 0);
     find_everything(arg, root);
     find_and_erase_everything(pool, arg, root);
   }
   root = fill_data_structure(pool, arg);
-  stla_map_print(pool, root, print_node, 0);
+  ac_map_print(pool, root, print_node, 0);
   // print_using_iteration(root);
   //if (node_previous_supported())
   //  print_using_reverse_iteration(root);
@@ -265,7 +265,7 @@ char *get_valid_characters(const char *p) {
 }
 
 
-stla_pool_t *gpool = NULL;
+ac_pool_t *gpool = NULL;
 /*
   The main function expects to have 2 or more command line arguments and calls
 	the function test_data_structure with each argument (after extracting valid
@@ -286,11 +286,11 @@ int main(int argc, char *argv[]) {
   if(argc < 3 || sscanf(argv[2], "%d", &repeat) != 1)
     repeat = 0;
 
-  stla_pool_t *pool = stla_pool_init(1024);
+  ac_pool_t *pool = ac_pool_init(1024);
   gpool = pool;
 	char *arg = get_valid_characters(argv[1]);
   test_data_structure(pool, arg, repeat);
 	free(arg);
-  stla_pool_destroy(pool);
+  ac_pool_destroy(pool);
   return 0;
 }

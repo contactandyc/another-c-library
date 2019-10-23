@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "stla_buffer.h"
+#include "ac_buffer.h"
 
 int main( int argc, char *argv[] ) {
-  stla_buffer_t *bh = stla_buffer_init(10);
-  stla_buffer_setf(bh, "%s %s!", "Hello", "Buffer"); // setf
+  ac_buffer_t *bh = ac_buffer_init(10);
+  ac_buffer_setf(bh, "%s %s!", "Hello", "Buffer"); // setf
   /* print Hello Buffer! followed with a newline */
-  printf( "%s\n", stla_buffer_data(bh) );
-  stla_buffer_destroy(bh);
+  printf( "%s\n", ac_buffer_data(bh) );
+  ac_buffer_destroy(bh);
   return 0;
 }

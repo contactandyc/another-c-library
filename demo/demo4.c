@@ -1,14 +1,14 @@
-#include "stla_buffer.h"
-#include "stla_common.h"
-#include "stla_map.h"
-#include "stla_pool.h"
-#include "stla_sort.h"
-#include "stla_timer.h"
+#include "ac_buffer.h"
+#include "ac_common.h"
+#include "ac_map.h"
+#include "ac_pool.h"
+#include "ac_sort.h"
+#include "ac_timer.h"
 
 #include <stdio.h>
 
 typedef struct {
-  stla_map_t map;
+  ac_map_t map;
   int born;
   int died;
   char *about;
@@ -22,14 +22,14 @@ static inline int compare_name(const name_t *a, const name_t *b) {
   return strcmp(get_name(a), get_name(b));
 }
 
-stla_multimap_insert_m(name_insert, name_t, compare_name);
+ac_multimap_insert_m(name_insert, name_t, compare_name);
 
-char *print_name_to_string(stla_pool_t *pool, stla_map_t *n) {
+char *print_name_to_string(ac_pool_t *pool, ac_map_t *n) {
   name_t *el = (name_t *)n;
-  return stla_pool_strdupf(pool, "%s", get_name(el));
+  return ac_pool_strdupf(pool, "%s", get_name(el));
 }
 
-name_t *parse_line(stla_pool_t *pool, char *s) {
+name_t *parse_line(ac_pool_t *pool, char *s) {
   char *name = s;
   while (*s && *s != '\t')
     s++;
@@ -61,9 +61,9 @@ name_t *parse_line(stla_pool_t *pool, char *s) {
       sscanf(died, "%d", &died_year) != 1)
     return NULL;
   name_t *r =
-      (name_t *)stla_pool_alloc(pool, sizeof(name_t) + strlen(name) + 1);
+      (name_t *)ac_pool_alloc(pool, sizeof(name_t) + strlen(name) + 1);
   strcpy((char *)(r + 1), name);
-  r->about = stla_pool_strdup(pool, about);
+  r->about = ac_pool_strdup(pool, about);
   r->born = born_year;
   r->died = died_year;
   return r;
@@ -71,8 +71,8 @@ name_t *parse_line(stla_pool_t *pool, char *s) {
 
 int main(int argc, char *argv[]) {
   printf("Demo printing red black tree\n");
-  stla_pool_t *pool = stla_pool_init(1024);
-  stla_map_t *root = NULL;
+  ac_pool_t *pool = ac_pool_init(1024);
+  ac_map_t *root = NULL;
 
   int num = 0;
   char str[1000];
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
   }
   fclose(in);
 
-  stla_map_print(pool, root, print_name_to_string, 0);
-  stla_pool_destroy(pool);
+  ac_map_print(pool, root, print_name_to_string, 0);
+  ac_pool_destroy(pool);
   return 0;
 }

@@ -30,7 +30,7 @@ limitations under the License.
 	 if the item can be found.  After all of the inserts are done, the root of
 	 the data structure is returned.
 */
-node_t *fill_data_structure(stla_pool_t *pool, const char *arg) {
+node_t *fill_data_structure(ac_pool_t *pool, const char *arg) {
   node_t *root = NULL;
   const char *s = arg;
   while (*s != 0) {
@@ -58,7 +58,7 @@ node_t *fill_data_structure(stla_pool_t *pool, const char *arg) {
 	This function is similar to fill_data_structure, except that the characters
 	are inserted in random order.
 */
-node_t *fill_data_structure_randomly(stla_pool_t *pool, const char *arg) {
+node_t *fill_data_structure_randomly(ac_pool_t *pool, const char *arg) {
   node_t *root = NULL;
   const char *p = arg;
   int len = strlen(p);
@@ -107,7 +107,7 @@ void find_everything(const char *arg, node_t *root) {
 	random order and erases them.  erase should succeed if find succeeds.  If it
 	doesn't an error is printed.
 */
-void find_and_erase_everything(stla_pool_t *pool, const char *arg, node_t *root) {
+void find_and_erase_everything(ac_pool_t *pool, const char *arg, node_t *root) {
   const char *p = arg; // find and erase all of the nodes
   int len = strlen(p);
   int num_destroyed = 0;
@@ -181,7 +181,7 @@ void destroy_using_iteration(node_t *root) {
     node_next_to_erase methods (which may be defined to be the same as
 		first/next)
 */
-void test_data_structure(stla_pool_t *pool, const char *arg, int repeat) {
+void test_data_structure(ac_pool_t *pool, const char *arg, int repeat) {
   printf("Creating %s for %s\n", DATA_STRUCTURE, arg);
   node_t *root;
   for( int i=0; i<repeat; i++ ) {
@@ -237,7 +237,7 @@ char *get_valid_characters(const char *p) {
 }
 
 
-stla_pool_t *gpool = NULL;
+ac_pool_t *gpool = NULL;
 /*
   The main function expects to have 2 or more command line arguments and calls
 	the function test_data_structure with each argument (after extracting valid
@@ -258,11 +258,11 @@ int main(int argc, char *argv[]) {
   if(argc < 3 || sscanf(argv[2], "%d", &repeat) != 1)
     repeat = 0;
 
-  stla_pool_t *pool = stla_pool_init(1024);
+  ac_pool_t *pool = ac_pool_init(1024);
   gpool = pool;
 	char *arg = get_valid_characters(argv[1]);
   test_data_structure(pool, arg, repeat);
 	free(arg);
-  stla_pool_destroy(pool);
+  ac_pool_destroy(pool);
   return 0;
 }

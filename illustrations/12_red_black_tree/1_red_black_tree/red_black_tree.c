@@ -30,16 +30,16 @@ struct node_s {
   char key;
 };
 
-node_t *node_init(stla_pool_t *pool, char key) {
-  node_t *n = (node_t *)stla_pool_alloc(pool, sizeof(node_t));
+node_t *node_init(ac_pool_t *pool, char key) {
+  node_t *n = (node_t *)ac_pool_alloc(pool, sizeof(node_t));
   n->left = n->right = n->parent = NULL;
   n->key = key;
   return n;
 }
 
-static void _tree_copy(stla_pool_t *pool, node_t *node, node_t **res, node_t *parent ) {
+static void _tree_copy(ac_pool_t *pool, node_t *node, node_t **res, node_t *parent ) {
   if(node) {
-    node_t *copy = (node_t *)stla_pool_alloc(pool, sizeof(node_t));
+    node_t *copy = (node_t *)ac_pool_alloc(pool, sizeof(node_t));
     *res = copy;
     *copy = *node;
     copy->parent = parent;
@@ -50,14 +50,14 @@ static void _tree_copy(stla_pool_t *pool, node_t *node, node_t **res, node_t *pa
     *res = NULL;
 }
 
-node_t *tree_copy(stla_pool_t *pool, node_t *root) {
+node_t *tree_copy(ac_pool_t *pool, node_t *root) {
   node_t *res = NULL;
   _tree_copy(pool, root, &res, NULL );
   return res;
 }
 
 void node_destroy(node_t *n) {
-  // stla_free(n);
+  // ac_free(n);
 }
 
 char node_key(node_t *n) { return n->key; }
@@ -117,8 +117,8 @@ static int get_black_height(node_t *n) {
   return depth;
 }
 
-static char *get_printed_key(stla_pool_t *pool, node_t *n ) {
-  return stla_pool_strdupf(pool, "%s%c%d%s", n->color == BLACK ? "" : "(",
+static char *get_printed_key(ac_pool_t *pool, node_t *n ) {
+  return ac_pool_strdupf(pool, "%s%c%d%s", n->color == BLACK ? "" : "(",
                            n->key, get_black_height(n),
                            n->color == BLACK ? "" : ")");
 }
@@ -127,9 +127,9 @@ void print_node_with_color(node_t *n) {
   printf( "%s%c%d%s", n->color == BLACK ? "" : "\x1B[31m(", n->key, get_black_height(n), n->color == BLACK ? "" : ")\x1B[0m");
 }
 
-static void copy_tree(stla_pool_t *pool, node_t *node,
+static void copy_tree(ac_pool_t *pool, node_t *node,
                       node_print_item_t **res, node_print_item_t *parent ) {
-  node_print_item_t *copy = (node_print_item_t *)stla_pool_alloc(pool, sizeof(node_print_item_t));
+  node_print_item_t *copy = (node_print_item_t *)ac_pool_alloc(pool, sizeof(node_print_item_t));
   *res = copy;
 
   copy->printed_key = get_printed_key(pool, node);
@@ -199,7 +199,7 @@ static int get_node_depth( node_print_item_t *item ) {
 }
 
 
-void node_print(stla_pool_t *pool, node_t *root) {
+void node_print(ac_pool_t *pool, node_t *root) {
   if (!root)
     return;
 
@@ -578,7 +578,7 @@ int count_black_nodes(node_t *n) {
 }
 
 
-bool test_red_black_rules(stla_pool_t *pool, node_t *root) {
+bool test_red_black_rules(ac_pool_t *pool, node_t *root) {
   /* an empty tree is valid */
   if(!root)
     return true;

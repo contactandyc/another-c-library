@@ -1,7 +1,7 @@
 #ifndef _data_structure_H
 #define _data_structure_H
 
-#include "stla_pool.h"
+#include "ac_pool.h"
 
 struct node_s;
 typedef struct node_s node_t;
@@ -10,12 +10,12 @@ typedef struct node_s node_t;
   node_destroy.  My purpose in having them is to provide a uniform interface for
   test_data_structure.
 */
-node_t *node_init(stla_pool_t *pool, char key);
+node_t *node_init(ac_pool_t *pool, char key);
 void node_destroy(node_t *n);
 char node_key(node_t *n);
-void node_print(stla_pool_t *pool, node_t *root);
+void node_print(ac_pool_t *pool, node_t *root);
 
-bool test_red_black_rules(stla_pool_t *pool, node_t *root);
+bool test_red_black_rules(ac_pool_t *pool, node_t *root);
 
 node_t *node_find(char key, node_t *root);
 bool node_insert(node_t *node_to_insert, node_t **root);

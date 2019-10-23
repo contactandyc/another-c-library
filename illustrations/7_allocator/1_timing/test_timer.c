@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "stla_timer.h"
-#include "stla_allocator.h"
+#include "ac_timer.h"
+#include "ac_allocator.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,36 +34,36 @@ void reverse_string( char *s, size_t len ) {
 
 int main( int argc, char *argv[]) {
   int repeat_test = 1000000;
-  stla_timer_t *overall_timer = stla_timer_init(repeat_test);
+  ac_timer_t *overall_timer = ac_timer_init(repeat_test);
   for( int i=1; i<argc; i++ ) {
     size_t len = strlen(argv[i]);
-    char *s = (char *)stla_malloc(len+1);
+    char *s = (char *)ac_malloc(len+1);
 
-    stla_timer_t *copy_timer = stla_timer_init(stla_timer_get_repeat(overall_timer));
-    stla_timer_start(copy_timer);
+    ac_timer_t *copy_timer = ac_timer_init(ac_timer_get_repeat(overall_timer));
+    ac_timer_start(copy_timer);
     for( int j=0; j<repeat_test; j++ ) {
       strcpy(s, argv[i]);
     }
-    stla_timer_stop(copy_timer);
+    ac_timer_stop(copy_timer);
 
-    stla_timer_t *test_timer = stla_timer_init(stla_timer_get_repeat(overall_timer));
-    stla_timer_start(test_timer);
+    ac_timer_t *test_timer = ac_timer_init(ac_timer_get_repeat(overall_timer));
+    ac_timer_start(test_timer);
     for( int j=0; j<repeat_test; j++ ) {
       strcpy(s, argv[i]);
       reverse_string(s, len);
     }
-    stla_timer_stop(test_timer);
-    stla_timer_subtract(test_timer, copy_timer);
-    stla_timer_add(overall_timer, test_timer);
+    ac_timer_stop(test_timer);
+    ac_timer_subtract(test_timer, copy_timer);
+    ac_timer_add(overall_timer, test_timer);
 
     printf("%s => %s\n", argv[i], s);
-    printf( "time_spent: %0.4fns\n", stla_timer_ns(test_timer) );
+    printf( "time_spent: %0.4fns\n", ac_timer_ns(test_timer) );
 
-    stla_timer_destroy(test_timer);
-    // stla_timer_destroy(copy_timer);
-    // stla_free(s);
+    ac_timer_destroy(test_timer);
+    // ac_timer_destroy(copy_timer);
+    // ac_free(s);
   }
-  printf( "overall time_spent: %0.4fns\n", stla_timer_ns(overall_timer) );
-  stla_timer_destroy(overall_timer);
+  printf( "overall time_spent: %0.4fns\n", ac_timer_ns(overall_timer) );
+  ac_timer_destroy(overall_timer);
   return 0;
 }

@@ -42,9 +42,9 @@ Clone the examples in this book into your newly created code directory
 git clone https://github.com/contactandyc/standard-template-library-alternative-in-c.git
 ```
 
-Create an environment variable named stla (standard template library alternative) and create the variable available the next time you open the terminal
+Create an environment variable named ac (standard template library alternative) and create the variable available the next time you open the terminal
 ```bash
-echo stla=`pwd`/standard-template-library-alternative-in-c >> ~/.bashrc
+echo ac=`pwd`/standard-template-library-alternative-in-c >> ~/.bashrc
 ```
 
 Either close the terminal and reopen it or do the following to ensure the last changes take effect.
@@ -54,12 +54,12 @@ Either close the terminal and reopen it or do the following to ensure the last c
 
 Change to the directory where the project exists
 ```bash
-cd $stla
+cd $ac
 ```
 
 To test whether you have `make` and `gcc` installed (both requirements for this project).  Change the directory to the first example and then run `make`
 ```bash
-cd $stla/illustrations/1_getting_started/1_test_setup
+cd $ac/illustrations/1_getting_started/1_test_setup
 make
 ```
 
@@ -72,7 +72,7 @@ If an error occurs, use your favorite search engine and copy and paste the error
 
 If you have changed directories, then you will need to rerun this.
 ```bash
-cd $stla/illustrations/1_getting_started/1_test_setup
+cd $ac/illustrations/1_getting_started/1_test_setup
 ```
 
 Run this command, and if you get the message afterward, you will be good to go.
@@ -104,7 +104,7 @@ Therefore, you should enter `make` at the command line and hit enter and expect 
 
 If you change to the directory
 ```bash
-cd $stla/illustrations
+cd $ac/illustrations
 ```
 
 and run
@@ -144,12 +144,12 @@ The date and user will likely be different.  Each illustration is named based up
 
 In the following, you would be expected to replace "<directory>" with the given directory
 ```bash
-cd $stla/<directory>
+cd $ac/<directory>
 ```
 
 For example, if the code was in <i>illustrations/1_getting_started/1_test_setup</i>, you would run the following command to change to the given directory.
 ```bash
-cd $stla/illustrations/1_getting_started/1_test_setup
+cd $ac/illustrations/1_getting_started/1_test_setup
 ```
 
 I would highly recommend going through tutorials if you are not familiar with the command line. Understanding the terminal is essential for any programmer. I do not plan on utilizing many terminal related commands but will try to detail the used commands.

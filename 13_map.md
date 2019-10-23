@@ -1,16 +1,16 @@
 # The Map Object
 - Turning the red black tree into a map
 
-*This and the src/stla_map.h/c files were started on Monday 9/23/19 and are still a work in progress.*
+*This and the src/ac_map.h/c files were started on Monday 9/23/19 and are still a work in progress.*
 
 The code for this section is found in <i>illustrations/13_map/1_map</i>
 ```bash
-cd $stla/illustrations/13_map/1_map
+cd $ac/illustrations/13_map/1_map
 ```
 
 ```bash
 $ make
-gcc -O3 -I../../../src -D_STLA_DEBUG_MEMORY_=NULL ../../../src/stla_timer.c ../../../src/stla_allocator.c ../../../src/stla_buffer.c ../../../src/stla_pool.c ../../../src/stla_map.c test_data_structure.c -o test_data_structure
+gcc -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c ../../../src/ac_map.c test_data_structure.c -o test_data_structure
 ./test_data_structure ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 10000
 Creating ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 using map
 P-1
@@ -118,38 +118,38 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#ifndef _stla_map_H
-#define _stla_map_H
+#ifndef _ac_map_H
+#define _ac_map_H
 
-#include "stla_common.h"
-#include "stla_pool.h"
-#include "stla_buffer.h"
+#include "ac_common.h"
+#include "ac_pool.h"
+#include "ac_buffer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct stla_map_node_s {
+typedef struct ac_map_node_s {
   size_t parent_color;
-  struct stla_map_node_s *left;
-  struct stla_map_node_s *right;
-} stla_map_node_t;
+  struct ac_map_node_s *left;
+  struct ac_map_node_s *right;
+} ac_map_node_t;
 
 /* iteration */
-stla_map_node_t * stla_map_first( stla_map_node_t *n );
-stla_map_node_t * stla_map_last( stla_map_node_t *n );
-stla_map_node_t * stla_map_next( stla_map_node_t *n );
-stla_map_node_t * stla_map_previous( stla_map_node_t *n );
-stla_map_node_t * stla_map_postorder_first( stla_map_node_t *n );
-stla_map_node_t * stla_map_postorder_next( stla_map_node_t *n );
+ac_map_node_t * ac_map_first( ac_map_node_t *n );
+ac_map_node_t * ac_map_last( ac_map_node_t *n );
+ac_map_node_t * ac_map_next( ac_map_node_t *n );
+ac_map_node_t * ac_map_previous( ac_map_node_t *n );
+ac_map_node_t * ac_map_postorder_first( ac_map_node_t *n );
+ac_map_node_t * ac_map_postorder_next( ac_map_node_t *n );
 
 /*
-  stla_map_copy_node_f is a callback meant to be used with stla_map_copy to
+  ac_map_copy_node_f is a callback meant to be used with ac_map_copy to
   copy one map to another given a root node.  The tag will typically be an
   allocator such as the pool.
 */
-typedef stla_map_node_t * (*stla_map_copy_node_f)( stla_map_node_t *n, void *tag );
+typedef ac_map_node_t * (*ac_map_copy_node_f)( ac_map_node_t *n, void *tag );
 
-stla_map_node_t * stla_map_copy( stla_map_node_t *root, stla_map_copy_node_f copy, void *tag);
+ac_map_node_t * ac_map_copy( ac_map_node_t *root, ac_map_copy_node_f copy, void *tag);
 
 /*
   print_node_to_string_f is a callback meant to print the value of the node n.
@@ -157,73 +157,73 @@ stla_map_node_t * stla_map_copy( stla_map_node_t *root, stla_map_copy_node_f cop
   Printing the internal representation of the tree is largely meant for testing
   and doesn't need to be complete.
 */
-typedef char * (*print_node_to_string_f)(stla_pool_t *pool, stla_map_node_t *n);
+typedef char * (*print_node_to_string_f)(ac_pool_t *pool, ac_map_node_t *n);
 
-bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
-                              stla_map_node_t *root, print_node_to_string_f print_node );
+bool ac_map_valid_to_buffer(ac_buffer_t *bh, ac_pool_t *pool,
+                              ac_map_node_t *root, print_node_to_string_f print_node );
 
-bool stla_map_valid(stla_pool_t *pool,
-                    stla_map_node_t *root,
+bool ac_map_valid(ac_pool_t *pool,
+                    ac_map_node_t *root,
                     print_node_to_string_f print_node);
 
-#define STLA_MAP_DONT_PRINT_RED 1
-#define STLA_MAP_DONT_PRINT_BLACK_HEIGHT 2
+#define AC_MAP_DONT_PRINT_RED 1
+#define AC_MAP_DONT_PRINT_BLACK_HEIGHT 2
 
-void stla_map_print_to_buffer(stla_buffer_t *bh,
-                              stla_pool_t *pool, stla_map_node_t *node,
+void ac_map_print_to_buffer(ac_buffer_t *bh,
+                              ac_pool_t *pool, ac_map_node_t *node,
                               print_node_to_string_f print_node,
                               int flags );
 
-void stla_map_print(stla_pool_t *pool, stla_map_node_t *node,
+void ac_map_print(ac_pool_t *pool, ac_map_node_t *node,
                     print_node_to_string_f print_node,
                     int flags );
 
-bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root);
+bool ac_map_erase(ac_map_node_t *node, ac_map_node_t **root);
 
-void stla_map_fix_insert(stla_map_node_t *node,
-                         stla_map_node_t *parent,
-                         stla_map_node_t **root);
+void ac_map_fix_insert(ac_map_node_t *node,
+                         ac_map_node_t *parent,
+                         ac_map_node_t **root);
 
 /* find and insert macros */
 
 #endif
 ```
 
-The code in stla_map.c is largely not new.  The functions have been prefixed with stla_map_.  The node_t structure has been renamed to stla_map_node_t.  The internal knowledge of the value type (char key) has been eliminated from the code.  Finally, the stla_map_node_t structure is exposed in the header file.
+The code in ac_map.c is largely not new.  The functions have been prefixed with ac_map_.  The node_t structure has been renamed to ac_map_node_t.  The internal knowledge of the value type (char key) has been eliminated from the code.  Finally, the ac_map_node_t structure is exposed in the header file.
 
 ```c
-typedef struct stla_map_node_s {
+typedef struct ac_map_node_s {
   size_t parent_color;
-  struct stla_map_node_s *left;
-  struct stla_map_node_s *right;
-} stla_map_node_t;
+  struct ac_map_node_s *left;
+  struct ac_map_node_s *right;
+} ac_map_node_t;
 ```
 
 is similar to the node_t structure before, except it doesn't have *char key*.
 
-To use the stla_map, this structure will be added to the custom structure.  test_data_structure.c defines the node_t structure as it was defined before (with a char key).  Most of the time, you will be able to make the *stla_map_node_t map* be the first member of your structure.  This makes it easy to cast between your structure and the stla_map_node_t structure since they both have the same memory address.  Having the map not be the first member will be explored later (including having multiple map members in a single structure).
+To use the ac_map, this structure will be added to the custom structure.  test_data_structure.c defines the node_t structure as it was defined before (with a char key).  Most of the time, you will be able to make the *ac_map_node_t map* be the first member of your structure.  This makes it easy to cast between your structure and the ac_map_node_t structure since they both have the same memory address.  Having the map not be the first member will be explored later (including having multiple map members in a single structure).
 ```c
 typedef struct {
-  stla_map_node_t map;
+  ac_map_node_t map;
   char key;
 } node_t;
 ```
 
 The iteration methods still exist (first, last, next, previous).  They have just been renamed.
 ```c
-stla_map_node_t * stla_map_first( stla_map_node_t *n );
-stla_map_node_t * stla_map_last( stla_map_node_t *n );
-stla_map_node_t * stla_map_next( stla_map_node_t *n );
-stla_map_node_t * stla_map_previous( stla_map_node_t *n );
+ac_map_node_t * ac_map_first( ac_map_node_t *n );
+ac_map_node_t * ac_map_last( ac_map_node_t *n );
+ac_map_node_t * ac_map_next( ac_map_node_t *n );
+ac_map_node_t * ac_map_previous( ac_map_node_t *n );
 ```
 
 If your structure is called node_t, you can call these functions as
 ```c
-void print_using_iteration(stla_map_node_t *root) {
-  node_t *n = (node_t *)stla_map_first(root);
+void print_using_iteration(ac_map_node_t *root) {
+  node_t *n = (node_t *)ac_map_first(root);
   while(n) {
     printf( "%c", n->key );
-    n = (node_t *)stla_map_next((node_t *)n);
+    n = (node_t *)ac_map_next((node_t *)n);
   }
   printf( "\n" );
 }
@@ -232,11 +232,11 @@ void print_using_iteration(stla_map_node_t *root) {
 or
 
 ```c
-void print_using_iteration(stla_map_node_t *root) {
-  stla_map_node_t *n = stla_map_first(root);
+void print_using_iteration(ac_map_node_t *root) {
+  ac_map_node_t *n = ac_map_first(root);
   while(n) {
     printf( "%c", ((node_t *)n)->key );
-    n = stla_map_next(n);
+    n = ac_map_next(n);
   }
   printf( "\n" );
 }
@@ -246,196 +246,196 @@ Both approaches are equivalent, assuming that the map is the first member of the
 
 The node_first_to_erase and node_next_to_erase have been renamed.
 ```c
-stla_map_node_t * stla_map_postorder_first( stla_map_node_t *n );
-stla_map_node_t * stla_map_postorder_next( stla_map_node_t *n );
+ac_map_node_t * ac_map_postorder_first( ac_map_node_t *n );
+ac_map_node_t * ac_map_postorder_next( ac_map_node_t *n );
 ```
 
-stla_map_copy_node_f is a callback meant to be used with stla_map_copy to copy one map to another given a root node.  The tag will typically be an allocator, such as the pool.  stla_map_copy will make a complete copy of a map (or red-black tree) and return a pointer to it.  I like to suffix function typedefs with a *_f*.
+ac_map_copy_node_f is a callback meant to be used with ac_map_copy to copy one map to another given a root node.  The tag will typically be an allocator, such as the pool.  ac_map_copy will make a complete copy of a map (or red-black tree) and return a pointer to it.  I like to suffix function typedefs with a *_f*.
 ```c
-typedef stla_map_node_t * (*stla_map_copy_node_f)( stla_map_node_t *n, void *tag );
+typedef ac_map_node_t * (*ac_map_copy_node_f)( ac_map_node_t *n, void *tag );
 
-stla_map_node_t * stla_map_copy( stla_map_node_t *root, stla_map_copy_node_f copy, void *tag);
+ac_map_node_t * ac_map_copy( ac_map_node_t *root, ac_map_copy_node_f copy, void *tag);
 ```
 
-stla_map_copy could be used in the following way...
+ac_map_copy could be used in the following way...
 ```c
-stla_map_node_t * copy_node( stla_map_node_t *n, void *tag ) {
-  stla_pool_t *pool = (stla_pool_t *)tag;
-  node_t *res = (node_t *)stla_pool_alloc(pool, sizeof(node_t));
+ac_map_node_t * copy_node( ac_map_node_t *n, void *tag ) {
+  ac_pool_t *pool = (ac_pool_t *)tag;
+  node_t *res = (node_t *)ac_pool_alloc(pool, sizeof(node_t));
   res->key = n->key;
   return res;
 }
 
-stla_map_node_t *root = /* a valid map with zero or more entries */;
-stla_map_node_t *copy_of_root = stla_map_copy(root, copy_node, pool);
+ac_map_node_t *root = /* a valid map with zero or more entries */;
+ac_map_node_t *copy_of_root = ac_map_copy(root, copy_node, pool);
 ```
 
 print_node_to_string_f is a callback meant to print the value of the node n.  There is an expectation that the value will be printed on a single line.  Printing the internal representation of the tree is used for testing and printing the tree and doesn't need to be complete.  It generally doesn't have practical use within applications.
 
 ```c
-typedef char * (*print_node_to_string_f)(stla_pool_t *pool, stla_map_node_t *n);
+typedef char * (*print_node_to_string_f)(ac_pool_t *pool, ac_map_node_t *n);
 ```
 
 For debugging, it is often nice to be able just to print something to the terminal.  Sometimes, it is also nice to print to a buffer and then have the output directed to some other location.  I provide both mechanisms below.  The first prints errors in the map (red-black violations) to a buffer and returns false if there are any errors.  The second function is like the first, except it outputs directly to the screen.  Both of these functions require the root of the tree and a pointer to a print_node_to_string_f function.
 ```c
-bool stla_map_valid_to_buffer(stla_buffer_t *bh, stla_pool_t *pool,
-                              stla_map_node_t *root, print_node_to_string_f print_node );
+bool ac_map_valid_to_buffer(ac_buffer_t *bh, ac_pool_t *pool,
+                              ac_map_node_t *root, print_node_to_string_f print_node );
 
-bool stla_map_valid(stla_pool_t *pool,
-                    stla_map_node_t *root,
+bool ac_map_valid(ac_pool_t *pool,
+                    ac_map_node_t *root,
                     print_node_to_string_f print_node);
 ```
 
-stla_map_valid checks if the map is valid.  stla_map_print dumps the contents of a map in a tree-like manner.  It takes additional parameter flags, which would typically be zero unless you with to not print red nodes in the color red and/or you don't want the black height of a node suffixed in the print.  The flags are bit-oriented and can be or'ed together.
+ac_map_valid checks if the map is valid.  ac_map_print dumps the contents of a map in a tree-like manner.  It takes additional parameter flags, which would typically be zero unless you with to not print red nodes in the color red and/or you don't want the black height of a node suffixed in the print.  The flags are bit-oriented and can be or'ed together.
 ```c
-#define STLA_MAP_DONT_PRINT_RED 1
-#define STLA_MAP_DONT_PRINT_BLACK_HEIGHT 2
+#define AC_MAP_DONT_PRINT_RED 1
+#define AC_MAP_DONT_PRINT_BLACK_HEIGHT 2
 
-void stla_map_print_to_buffer(stla_buffer_t *bh,
-                              stla_pool_t *pool, stla_map_node_t *node,
+void ac_map_print_to_buffer(ac_buffer_t *bh,
+                              ac_pool_t *pool, ac_map_node_t *node,
                               print_node_to_string_f print_node,
                               int flags );
 
-void stla_map_print(stla_pool_t *pool, stla_map_node_t *node,
+void ac_map_print(ac_pool_t *pool, ac_map_node_t *node,
                     print_node_to_string_f print_node,
                     int flags );
 ```
 
-stla_map_erase unlinks node from the given map.  The node is expected to be a valid node within the tree (typically found via a find method).  stla_map_erase does not destroy the node (it simply unlinks it from the map).
+ac_map_erase unlinks node from the given map.  The node is expected to be a valid node within the tree (typically found via a find method).  ac_map_erase does not destroy the node (it simply unlinks it from the map).
 ```c
-bool stla_map_erase(stla_map_node_t *node, stla_map_node_t **root);
+bool ac_map_erase(ac_map_node_t *node, ac_map_node_t **root);
 ```
 
 The find and insert methods were left to the end for a reason.  These are the only two groups of functions that need to understand the value of a node.  These functions end up being custom.  To aid in writing these functions, I've created the following macros.
 
 ```c
-stla_map_find_m(name, keytype, datatype, compare)
+ac_map_find_m(name, keytype, datatype, compare)
   expects: int compare(const keytype *key, const datatype *value);
-  returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+  returns: datatype *name(const keytype *key, const ac_map_node_t *root);
 
-stla_map_find2_m(name, keytype, datatype, mapname, compare)
+ac_map_find2_m(name, keytype, datatype, mapname, compare)
   expects: int compare(const keytype *key, const datatype *value);
-  returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+  returns: datatype *name(const keytype *key, const ac_map_node_t *root);
 
-stla_map_find_arg_m(name, keytype, datatype, compare)
+ac_map_find_arg_m(name, keytype, datatype, compare)
   expects: int compare(const keytype *key, const datatype *value, void *arg);
   returns: datatype *name(const keytype *key,
-                          const stla_map_node_t *root,
+                          const ac_map_node_t *root,
                           void *arg);
 
-stla_map_find2_arg_m(name, keytype, datatype, mapname, compare)
+ac_map_find2_arg_m(name, keytype, datatype, mapname, compare)
   expects: int compare(const keytype *key, const datatype *value, void *arg);
   returns: datatype *name(const keytype *key,
-                          const stla_map_node_t *root,
+                          const ac_map_node_t *root,
                           void *arg);
 
-stla_map_find_least_m(name, keytype, datatype, compare)
+ac_map_find_least_m(name, keytype, datatype, compare)
   expects: int compare(const keytype *key, const datatype *value);
-  returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+  returns: datatype *name(const keytype *key, const ac_map_node_t *root);
 
-stla_map_find_least2_m(name, keytype, datatype, mapname, compare)
+ac_map_find_least2_m(name, keytype, datatype, mapname, compare)
   expects: int compare(const keytype *key, const datatype *value);
-  returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+  returns: datatype *name(const keytype *key, const ac_map_node_t *root);
 
-stla_map_find_least_arg_m(name, keytype, datatype, compare)
+ac_map_find_least_arg_m(name, keytype, datatype, compare)
   expects: int compare(const keytype *key, const datatype *value, void *arg);
   returns: datatype *name(const keytype *key,
-                          const stla_map_node_t *root,
+                          const ac_map_node_t *root,
                           void *arg);
 
-stla_map_find_least2_arg_m(name, keytype, datatype, mapname, compare)
+ac_map_find_least2_arg_m(name, keytype, datatype, mapname, compare)
   expects: int compare(const keytype *key, const datatype *value, void *arg);
   returns: datatype *name(const keytype *key,
-                          const stla_map_node_t *root,
+                          const ac_map_node_t *root,
                           void *arg);
 
-stla_map_find_least_or_next_m(name, keytype, datatype, compare)
+ac_map_find_least_or_next_m(name, keytype, datatype, compare)
   expects: int compare(const keytype *key, const datatype *value);
-  returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+  returns: datatype *name(const keytype *key, const ac_map_node_t *root);
 
-stla_map_find_least_or_next2_m(name, keytype, datatype, mapname, compare)
+ac_map_find_least_or_next2_m(name, keytype, datatype, mapname, compare)
   expects: int compare(const keytype *key, const datatype *value);
-  returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+  returns: datatype *name(const keytype *key, const ac_map_node_t *root);
 
-stla_map_find_least_or_next_arg_m(name, keytype, datatype, compare)
+ac_map_find_least_or_next_arg_m(name, keytype, datatype, compare)
   expects: int compare(const keytype *key, const datatype *value, void *arg);
   returns: datatype *name(const keytype *key,
-                          const stla_map_node_t *root,
+                          const ac_map_node_t *root,
                           void *arg);
 
-stla_map_find_least_or_next2_arg_m(name, keytype, datatype, mapname, compare)
+ac_map_find_least_or_next2_arg_m(name, keytype, datatype, mapname, compare)
   expects: int compare(const keytype *key, const datatype *value, void *arg);
   returns: datatype *name(const keytype *key,
-                          const stla_map_node_t *root,
+                          const ac_map_node_t *root,
                           void *arg);
 
-stla_map_find_greatest_m(name, keytype, datatype, compare)
+ac_map_find_greatest_m(name, keytype, datatype, compare)
   expects: int compare(const keytype *key, const datatype *value);
-  returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+  returns: datatype *name(const keytype *key, const ac_map_node_t *root);
 
-stla_map_find_greatest2_m(name, keytype, datatype, mapname, compare)
+ac_map_find_greatest2_m(name, keytype, datatype, mapname, compare)
   expects: int compare(const keytype *key, const datatype *value);
-  returns: datatype *name(const keytype *key, const stla_map_node_t *root);
+  returns: datatype *name(const keytype *key, const ac_map_node_t *root);
 
-stla_map_find_greatest_arg_m(name, keytype, datatype, compare)
+ac_map_find_greatest_arg_m(name, keytype, datatype, compare)
   expects: int compare(const keytype *key, const datatype *value, void *arg);
   returns: datatype *name(const keytype *key,
-                          const stla_map_node_t *root,
+                          const ac_map_node_t *root,
                           void *arg);
 
-stla_map_find_greatest2_arg_m(name, keytype, datatype, mapname, compare)
+ac_map_find_greatest2_arg_m(name, keytype, datatype, mapname, compare)
   expects: int compare(const keytype *key, const datatype *value, void *arg);
   returns: datatype *name(const keytype *key,
-                          const stla_map_node_t *root,
+                          const ac_map_node_t *root,
                           void *arg);
 
-The insert macros are listed below (they are defined in impl/stla_map.h)
+The insert macros are listed below (they are defined in impl/ac_map.h)
 
-stla_map_insert_m(name, datatype, compare)
+ac_map_insert_m(name, datatype, compare)
   expects: int compare(const datatype *node_to_insert, const datatype *value);
-  returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+  returns: datatype *name(datatype *node_to_insert, ac_map_node_t **root);
 
-stla_map_insert2_m(name, datatype, mapname, compare)
+ac_map_insert2_m(name, datatype, mapname, compare)
   expects: int compare(const datatype *node_to_insert, const datatype *value);
-  returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+  returns: datatype *name(datatype *node_to_insert, ac_map_node_t **root);
 
-stla_map_insert_arg_m(name, datatype, compare)
+ac_map_insert_arg_m(name, datatype, compare)
   expects: int compare(const datatype *node_to_insert,
                        const datatype *value,
                        void *arg);
   returns: datatype *name(datatype *node_to_insert,
-                          stla_map_node_t **root,
+                          ac_map_node_t **root,
                           void *arg);
 
-stla_map_insert2_arg_m(name, datatype, mapname, compare)
+ac_map_insert2_arg_m(name, datatype, mapname, compare)
   expects: int compare(const datatype *node_to_insert,
                        const datatype *value,
                        void *arg);
   returns: datatype *name(datatype *node_to_insert,
-                          stla_map_node_t **root,
+                          ac_map_node_t **root,
                           void *arg);
 
-stla_multimap_insert_m(name, datatype, compare)
+ac_multimap_insert_m(name, datatype, compare)
   expects: int compare(const datatype *node_to_insert, const datatype *value);
-  returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+  returns: datatype *name(datatype *node_to_insert, ac_map_node_t **root);
 
-stla_multimap_insert2_m(name, datatype, mapname, compare)
+ac_multimap_insert2_m(name, datatype, mapname, compare)
   expects: int compare(const datatype *node_to_insert, const datatype *value);
-  returns: datatype *name(datatype *node_to_insert, stla_map_node_t **root);
+  returns: datatype *name(datatype *node_to_insert, ac_map_node_t **root);
 
-stla_multimap_insert_arg_m(name, datatype, compare)
+ac_multimap_insert_arg_m(name, datatype, compare)
   expects: int compare(const datatype *node_to_insert,
                        const datatype *value,
                        void *arg);
   returns: datatype *name(datatype *node_to_insert,
-                          stla_map_node_t **root,
+                          ac_map_node_t **root,
                           void *arg);
 
-stla_multimap_insert2_arg_m(name, datatype, mapname, compare)
+ac_multimap_insert2_arg_m(name, datatype, mapname, compare)
   expects: int compare(const datatype *node_to_insert,
                        const datatype *value,
                        void *arg);
   returns: datatype *name(datatype *node_to_insert,
-                          stla_map_node_t **root,
+                          ac_map_node_t **root,
                           void *arg);
 ```
