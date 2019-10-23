@@ -2,7 +2,7 @@
 
 # The Global Allocator Implementation
 
-Implementing the allocator is rather involved and uses much of what you've learned in the prior chapters.  Understanding every implementation isn't necessary to use the standard template library alternative. However, it should help you to understand how to code or to improve it should you desire to.
+Implementing the allocator is rather involved and uses much of what you've learned in the prior chapters. However, it should help you to understand how to code or to improve it should you desire to.
 
 - Doubly linked lists to track allocations.
 - An object (which gets declared in the global space) to maintain and monitor the doubly linked list.
@@ -50,11 +50,11 @@ symbol  | description
 /\* \*/  | inline comment that can span zero or more lines.
 ;  |  C mostly doesn't use line breaks to separate code.  semicolons are used instead.
 
-The full source code for stla_allocator is found at <i>src/stla_allocator.c</i>
+The full source code for ac_allocator is found at <i>src/ac_allocator.c</i>
 
 The object starts by including the corresponding header file.
 ```c
-#include "stla_allocator.h"
+#include "ac_allocator.h"
 ```
 
 The other header files are included.  This object will create a thread and use mutexes and conditions, so it will need pthread.h.
@@ -65,13 +65,13 @@ The other header files are included.  This object will create a thread and use m
 
 For each block of memory that is allocated, we will use a node of a doubly-linked list.  The structure of that node will be:
 ```c
-typedef struct stla_allocator_node_s {
+typedef struct ac_allocator_node_s {
   const char *caller;
   ssize_t length;
-  struct stla_allocator_node_s *next;
-  struct stla_allocator_node_s *previous;
-  stla_allocator_t *a;
-} stla_allocator_node_t;
+  struct ac_allocator_node_s *next;
+  struct ac_allocator_node_s *previous;
+  ac_allocator_t *a;
+} ac_allocator_node_t;
 ```
 
 Notice that there isn't a pointer to the memory that the user allocated.  This memory follows just past the structure.
@@ -81,36 +81,36 @@ Caller references where the memory was allocated from.
 const char *caller;
 ```
 
-Length is the number of bytes that the user requested.  It is a signed number because if it is negative, then the object being allocated begins with the **stla_allocator_dump_t** structure.
+Length is the number of bytes that the user requested.  It is a signed number because if it is negative, then the object being allocated begins with the **ac_allocator_dump_t** structure.
 ```c
-typedef void (*stla_dump_details_f)(FILE *out, const char *caller, void *p, size_t length);
+typedef void (*ac_dump_details_f)(FILE *out, const char *caller, void *p, size_t length);
 
 typedef struct {
-  stla_dump_details_f dump;
-} stla_allocator_dump_t;
+  ac_dump_details_f dump;
+} ac_allocator_dump_t;
 ```
 
-The dump structure consists of a function pointer **dump** which is of type **stla_dump_details_f** defined in stla_allocator.h.  You might wonder why I used a struct with a single member.  I reason that it allows the allocator to potentially alter the structure in the future and create minimal work for users of it.  It also is simple to cast the memory allocated to a stla_allocator_dump_t type and then call the dump method.  This would only apply if the **bool custom** was set to true during the allocation of an object.  Sometimes, it is useful to give extra meaning to variables to save space.  Considering that every node that is to be allocated will require the overhead of the structure and that length won't exceed 2^63 bytes, it makes sense to overload the length variable name.
+The dump structure consists of a function pointer **dump** which is of type **ac_dump_details_f** defined in ac_allocator.h.  You might wonder why I used a struct with a single member.  I reason that it allows the allocator to potentially alter the structure in the future and create minimal work for users of it.  It also is simple to cast the memory allocated to a ac_allocator_dump_t type and then call the dump method.  This would only apply if the **bool custom** was set to true during the allocation of an object.  Sometimes, it is useful to give extra meaning to variables to save space.  Considering that every node that is to be allocated will require the overhead of the structure and that length won't exceed 2^63 bytes, it makes sense to overload the length variable name.
 
 The next and previous pointers are used to implement a doubly-linked list.
 ```c
-struct stla_allocator_node_s *next;
-struct stla_allocator_node_s *previous;
+struct ac_allocator_node_s *next;
+struct ac_allocator_node_s *previous;
 ```
 
-The **stla_allocator_t \*a** member is declared in stla_allocator.h but not defined.
+The **ac_allocator_t \*a** member is declared in ac_allocator.h but not defined.
 ```c
-struct stla_allocator_s;
-typedef struct stla_allocator_s stla_allocator_t;
+struct ac_allocator_s;
+typedef struct ac_allocator_s ac_allocator_t;
 ```
 
-The **stla_allocator_t \*a** member isn't strictly necessary.  It is used by stla_free and stla_realloc to double-check that the memory that is about to be freed or reallocated was previously allocated.  It serves as a magic number that must exist just before actual memory the user used.
+The **ac_allocator_t \*a** member isn't strictly necessary.  It is used by ac_free and ac_realloc to double-check that the memory that is about to be freed or reallocated was previously allocated.  It serves as a magic number that must exist just before actual memory the user used.
 
-The typedef of **struct stla_allocator_s** to **stla_allocator_t** was defined in stla_allocator.h, so all that remains is to define stla_allocator_s for use within the stla_allocator.c file.
+The typedef of **struct ac_allocator_s** to **ac_allocator_t** was defined in ac_allocator.h, so all that remains is to define ac_allocator_s for use within the ac_allocator.c file.
 ```c
-struct stla_allocator_s {
-  stla_allocator_node_t *head;
-  stla_allocator_node_t *tail;
+struct ac_allocator_s {
+  ac_allocator_node_t *head;
+  ac_allocator_node_t *tail;
   size_t total_bytes_allocated;
   size_t total_allocations;
   const char *logfile;
@@ -124,8 +124,8 @@ struct stla_allocator_s {
 
 The allocator uses a doubly-linked list.  A link to the head and tail is maintained to allow new objects to appended to the end efficiently.
 ```c
-stla_allocator_node_t *head;
-stla_allocator_node_t *tail;
+ac_allocator_node_t *head;
+ac_allocator_node_t *tail;
 ```
 
 The totals are what is currently allocated.  This is informational and reported when there are memory leaks.

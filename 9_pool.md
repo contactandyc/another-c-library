@@ -124,197 +124,197 @@ Using the simple structure above, our allocations can be tracked and cleared by 
 
 The above implementation does save us from needing to free memory, but it doesn't do much more.  The pool object that exists in the src directory is listed below:
 
-src/stla_pool.h
+src/ac_pool.h
 ```c
-#ifndef _stla_pool_H
-#define _stla_pool_H
+#ifndef _ac_pool_H
+#define _ac_pool_H
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "stla_allocator.h"
+#include "ac_allocator.h"
 
-struct stla_pool_s;
-typedef struct stla_pool_s stla_pool_t;
+struct ac_pool_s;
+typedef struct ac_pool_s ac_pool_t;
 
-/* stla_pool_init will create a working space of size bytes */
-#ifdef _STLA_DEBUG_MEMORY_
-#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
-stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+/* ac_pool_init will create a working space of size bytes */
+#ifdef _AC_DEBUG_MEMORY_
+#define ac_pool_init(size) _ac_pool_init(size, AC_FILE_LINE_MACRO("ac_pool"))
+ac_pool_t *_ac_pool_init(size_t size, const char *caller);
 #else
-#define stla_pool_init(size) _stla_pool_init(size)
-stla_pool_t *_stla_pool_init(size_t size);
+#define ac_pool_init(size) _ac_pool_init(size)
+ac_pool_t *_ac_pool_init(size_t size);
 #endif
 
-/* stla_pool_clear will make all of the pool's memory reusable.  If the
+/* ac_pool_clear will make all of the pool's memory reusable.  If the
   initial block was exceeded and additional blocks were added, those blocks
   will be freed. */
-void stla_pool_clear(stla_pool_t *h);
+void ac_pool_clear(ac_pool_t *h);
 
-/* stla_pool_destroy frees up all memory associated with the pool object */
-void stla_pool_destroy(stla_pool_t *h);
+/* ac_pool_destroy frees up all memory associated with the pool object */
+void ac_pool_destroy(ac_pool_t *h);
 
-/* stla_pool_set_minimum_growth_size alters the minimum size of growth blocks.
+/* ac_pool_set_minimum_growth_size alters the minimum size of growth blocks.
    This is particularly useful if you don't expect the pool's block size to be
    exceeded by much, and you don't want the default, which would be to use the
    original block size for the new block (effectively doubling memory usage). */
-void stla_pool_set_minimum_growth_size(stla_pool_t *h, size_t size);
+void ac_pool_set_minimum_growth_size(ac_pool_t *h, size_t size);
 
-/* stla_pool_alloc allocates len uninitialized bytes which are aligned. */
-static inline void *stla_pool_alloc(stla_pool_t *h, size_t len);
+/* ac_pool_alloc allocates len uninitialized bytes which are aligned. */
+static inline void *ac_pool_alloc(ac_pool_t *h, size_t len);
 
-/* stla_pool_alloc allocates len uninitialized bytes which are unaligned. */
-static inline void *stla_pool_ualloc(stla_pool_t *h, size_t len);
+/* ac_pool_alloc allocates len uninitialized bytes which are unaligned. */
+static inline void *ac_pool_ualloc(ac_pool_t *h, size_t len);
 
-/* stla_pool_alloc allocates len zero'd bytes which are aligned. */
-static inline void *stla_pool_calloc(stla_pool_t *h, size_t len);
+/* ac_pool_alloc allocates len zero'd bytes which are aligned. */
+static inline void *ac_pool_calloc(ac_pool_t *h, size_t len);
 
-/* stla_pool_strdup allocates a copy of the string p.  The memory will be
-  unaligned.  If you need the memory to be aligned, consider using stla_pool_dup
-  like char *s = stla_pool_dup(pool, p, strlen(p)+1); */
-static inline char *stla_pool_strdup(stla_pool_t *h, const char *p);
+/* ac_pool_strdup allocates a copy of the string p.  The memory will be
+  unaligned.  If you need the memory to be aligned, consider using ac_pool_dup
+  like char *s = ac_pool_dup(pool, p, strlen(p)+1); */
+static inline char *ac_pool_strdup(ac_pool_t *h, const char *p);
 
-/* stla_pool_dup allocates a copy of the data.  The memory will be aligned. */
-static inline void *stla_pool_dup(stla_pool_t *h, const void *data, size_t len);
+/* ac_pool_dup allocates a copy of the data.  The memory will be aligned. */
+static inline void *ac_pool_dup(ac_pool_t *h, const void *data, size_t len);
 
-/* stla_pool_dup allocates a copy of the data.  The memory will be unaligned. */
-static inline void *stla_pool_udup(stla_pool_t *h, const void *data, size_t len);
+/* ac_pool_dup allocates a copy of the data.  The memory will be unaligned. */
+static inline void *ac_pool_udup(ac_pool_t *h, const void *data, size_t len);
 
-/* stla_pool_strdupf allocates a copy of the formatted string p. */
-static inline char *stla_pool_strdupf(stla_pool_t *h, const char *p, ...);
+/* ac_pool_strdupf allocates a copy of the formatted string p. */
+static inline char *ac_pool_strdupf(ac_pool_t *h, const char *p, ...);
 
-/* stla_pool_strdupvf allocates a copy of the formatted string p. This is
+/* ac_pool_strdupvf allocates a copy of the formatted string p. This is
   particularly useful if you wish to extend another object which uses pool as
   its base.  */
-char *stla_pool_strdupvf(stla_pool_t *h, const char *p, va_list args);
+char *ac_pool_strdupvf(ac_pool_t *h, const char *p, va_list args);
 
-/* stla_pool_size returns the number of bytes that have been allocated from any
+/* ac_pool_size returns the number of bytes that have been allocated from any
   of the alloc calls above.  */
-size_t stla_pool_size(stla_pool_t *h);
+size_t ac_pool_size(ac_pool_t *h);
 
-/* stla_pool_used returns the number of bytes that have been allocated by the
-  pool itself.  This will always be greater than stla_pool_size as there is
+/* ac_pool_used returns the number of bytes that have been allocated by the
+  pool itself.  This will always be greater than ac_pool_size as there is
   overhead for the structures, and this is independent of any allocating calls.
 */
-size_t stla_pool_used(stla_pool_t *h);
+size_t ac_pool_used(ac_pool_t *h);
 
-#include "impl/stla_pool.h"
+#include "impl/ac_pool.h"
 
 #endif
 ```
 
 A few significant changes are added to the interface.
 
-- Everything uses the stla_ prefix.
-- The stla_allocator object is used for allocation.
-- stla_pool_init is changed to a macro to support memory debugging.
-- stla_pool_init takes in a size (to support allocating in larger chunks)
-- stla_pool_malloc is changed to stla_pool_alloc.
-- stla_pool_ualloc supports unaligned allocation.
-- stla_pool_dup and sla_pool_udup copy binary data.
-- stla_pool_strdupf/stla_pool_strdupvf support working with format strings.
-- stla_pool_size gets the overall number of bytes that have been allocated.
-- stla_pool_used gets the overall number of bytes that have been allocated internally.
-- impl/stla_pool.h is used to inline a number of the functions for performance.
-- some of the functions are declared as static inline because they are implemented in the impl/stla_pool.h header file.
+- Everything uses the ac_ prefix.
+- The ac_allocator object is used for allocation.
+- ac_pool_init is changed to a macro to support memory debugging.
+- ac_pool_init takes in a size (to support allocating in larger chunks)
+- ac_pool_malloc is changed to ac_pool_alloc.
+- ac_pool_ualloc supports unaligned allocation.
+- ac_pool_dup and sla_pool_udup copy binary data.
+- ac_pool_strdupf/ac_pool_strdupvf support working with format strings.
+- ac_pool_size gets the overall number of bytes that have been allocated.
+- ac_pool_used gets the overall number of bytes that have been allocated internally.
+- impl/ac_pool.h is used to inline a number of the functions for performance.
+- some of the functions are declared as static inline because they are implemented in the impl/ac_pool.h header file.
 
-By this point, the code below should look pretty familiar.  Files are included, stla_pool_t is defined, and the _stla_pool_H is defined to prevent the contents of this file from being included more than once.
+By this point, the code below should look pretty familiar.  Files are included, ac_pool_t is defined, and the _ac_pool_H is defined to prevent the contents of this file from being included more than once.
 ```c
-#ifndef _stla_pool_H
-#define _stla_pool_H
+#ifndef _ac_pool_H
+#define _ac_pool_H
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "stla_allocator.h"
+#include "ac_allocator.h"
 
-struct stla_pool_s;
-typedef struct stla_pool_s stla_pool_t;
+struct ac_pool_s;
+typedef struct ac_pool_s ac_pool_t;
 ```
 
-Because this object will use the stla_allocator for debugging memory, the following is needed to define the init function.
+Because this object will use the ac_allocator for debugging memory, the following is needed to define the init function.
 ```c
-/* stla_pool_init will create a working space of size bytes */
-#ifdef _STLA_DEBUG_MEMORY_
-#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
-stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+/* ac_pool_init will create a working space of size bytes */
+#ifdef _AC_DEBUG_MEMORY_
+#define ac_pool_init(size) _ac_pool_init(size, AC_FILE_LINE_MACRO("ac_pool"))
+ac_pool_t *_ac_pool_init(size_t size, const char *caller);
 #else
-#define stla_pool_init(size) _stla_pool_init(size)
-stla_pool_t *_stla_pool_init(size_t size);
+#define ac_pool_init(size) _ac_pool_init(size)
+ac_pool_t *_ac_pool_init(size_t size);
 #endif
 ```
 
-If we weren't using the stla_allocator, our init call would look like this:
+If we weren't using the ac_allocator, our init call would look like this:
 ```c
-stla_pool_t *_stla_pool_init(size_t size);
+ac_pool_t *_ac_pool_init(size_t size);
 ```
 
 If you refer back to the end of the [allocator](7_allocator.md) code, there is an explanation of similar code for the timer object conversion.
 
 Replace
 ```c
-stla_pool_t *stla_pool_init(size_t size);
+ac_pool_t *ac_pool_init(size_t size);
 ```
 
 with
 ```c
-#ifdef _STLA_DEBUG_MEMORY_
-#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
-stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+#ifdef _AC_DEBUG_MEMORY_
+#define ac_pool_init(size) _ac_pool_init(size, AC_FILE_LINE_MACRO("ac_pool"))
+ac_pool_t *_ac_pool_init(size_t size, const char *caller);
 #else
-#define stla_pool_init(size) _stla_pool_init(size)
-stla_pool_t *_stla_pool_init(size_t size);
+#define ac_pool_init(size) _ac_pool_init(size)
+ac_pool_t *_ac_pool_init(size_t size);
 #endif
 ```
 
-The above code has two basic cases:  one where _STLA_DEBUG_MEMORY_ is defined, and the other where it is not (#else).  It may be easier to break this into a couple of steps.
+The above code has two basic cases:  one where _AC_DEBUG_MEMORY_ is defined, and the other where it is not (#else).  It may be easier to break this into a couple of steps.
 
 1.  convert the init function to be prefixed with an underscore
 
 ```c
-stla_pool_t *stla_pool_init(size_t size);
+ac_pool_t *ac_pool_init(size_t size);
 ```
 
 becomes
 ```c
-stla_pool_t *_stla_pool_init(size_t size);
+ac_pool_t *_ac_pool_init(size_t size);
 ```
 
-2.  create a macro which defines stla_pool_init as _stla_pool_init
+2.  create a macro which defines ac_pool_init as _ac_pool_init
 ```c
-#define stla_pool_init(size) _stla_pool_init(size)
-stla_pool_t *_stla_pool_init(size_t size);
+#define ac_pool_init(size) _ac_pool_init(size)
+ac_pool_t *_ac_pool_init(size_t size);
 ```
 
 3.  define the macro if logic with the else part filled in.
 ```c
-#ifdef _STLA_DEBUG_MEMORY_
+#ifdef _AC_DEBUG_MEMORY_
 #else
-#define stla_pool_init(size) _stla_pool_init(size)
-stla_pool_t *_stla_pool_init(size_t size);
+#define ac_pool_init(size) _ac_pool_init(size)
+ac_pool_t *_ac_pool_init(size_t size);
 #endif
 ```
 
-4.  Add const char *caller to the debug version of _stla_pool_init
+4.  Add const char *caller to the debug version of _ac_pool_init
 ```c
-stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+ac_pool_t *_ac_pool_init(size_t size, const char *caller);
 ```
 
 5.  define the macro to call the init function.
 ```c
-#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
+#define ac_pool_init(size) _ac_pool_init(size, AC_FILE_LINE_MACRO("ac_pool"))
 ```
 
-6.  put the two calls in the #ifdef _STLA_DEBUG_MEMORY_ section.
+6.  put the two calls in the #ifdef _AC_DEBUG_MEMORY_ section.
 ```c
-#ifdef _STLA_DEBUG_MEMORY_
-#define stla_pool_init(size) _stla_pool_init(size, STLA_FILE_LINE_MACRO("stla_pool"))
-stla_pool_t *_stla_pool_init(size_t size, const char *caller);
+#ifdef _AC_DEBUG_MEMORY_
+#define ac_pool_init(size) _ac_pool_init(size, AC_FILE_LINE_MACRO("ac_pool"))
+ac_pool_t *_ac_pool_init(size_t size, const char *caller);
 #else
-#define stla_pool_init(size) _stla_pool_init(size)
-stla_pool_t *_stla_pool_init(size_t size);
+#define ac_pool_init(size) _ac_pool_init(size)
+ac_pool_t *_ac_pool_init(size_t size);
 #endif
 ```
 

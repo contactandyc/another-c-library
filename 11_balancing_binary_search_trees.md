@@ -6,7 +6,7 @@ This builds significantly on the last section about [binary search trees](10_bin
 
 The following code is found in <i>illustrations/11_balancing_binary_search_trees/1_binary_search_tree</i>
 ```bash
-cd $stla/illustrations/11_balancing_binary_search_trees/1_binary_search_tree
+cd $ac/illustrations/11_balancing_binary_search_trees/1_binary_search_tree
 ```
 
 ```bash
@@ -262,7 +262,7 @@ I've written a tool to help you to understand how colors and rotations work.
 
 The following code is found in <i>illustrations/11_balancing_binary_search_trees/2_tree_operations</i>
 ```bash
-cd $stla/illustrations/11_balancing_binary_search_trees/2_tree_operations
+cd $ac/illustrations/11_balancing_binary_search_trees/2_tree_operations
 ```
 
 ```bash

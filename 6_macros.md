@@ -327,12 +327,12 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-In stla_common.h, I also defined STLA_FILE_LINE_MACRO, which is a macro meant for objects such as the stla_timer object.  This will become more evident as we work through the allocator object.  As usual, it's a good idea to define macros using stla or STLA as a prefix to ensure that your code doesn't conflict with other codebases.  I've chosen STLA for two reasons.  STLA is an acronym for standard template library alternative, and it is generally a short unique string of characters that can be changed if needed.
+In ac_common.h, I also defined AC_FILE_LINE_MACRO, which is a macro meant for objects such as the ac_timer object.  This will become more evident as we work through the allocator object.  As usual, it's a good idea to define macros using ac or AC as a prefix to ensure that your code doesn't conflict with other codebases.  
 
-$stla/src/stla_common.h
+$ac/src/ac_common.h
 ```c
-#ifndef _stla_common_H
-#define _stla_common_H
+#ifndef _ac_common_H
+#define _ac_common_H
 
 /* defines NULL, size_t, offsetof */
 #include <stddef.h>
@@ -340,39 +340,39 @@ $stla/src/stla_common.h
 #include <stdbool.h>
 
 /*
-Defining _STLA_DEBUG_MEMORY_ will check that memory is properly
+Defining _AC_DEBUG_MEMORY_ will check that memory is properly
 freed (and try some rudimentary double-free checks).  If memory
 doesn't seem to be previously allocated, there is a scan to find
-the closest block.  _STLA_DEBUG_MEMORY_ can be defined as NULL or
+the closest block.  _AC_DEBUG_MEMORY_ can be defined as NULL or
 a valid string.  If it is defined as a string, then a file will be
-written with the given name every _STLA_DEBUG_MEMORY_SPEED_ seconds.
+written with the given name every _AC_DEBUG_MEMORY_SPEED_ seconds.
 Snapshots are saved in increasing intervals.
 */
-// #define _STLA_DEBUG_MEMORY_ "memory.log"
+// #define _AC_DEBUG_MEMORY_ "memory.log"
 
 /* How often should the memory be checked? It is always checked in the
-   beginning and every _STLA_DEBUG_MEMORY_SPEED_ seconds assuming
-   _STLA_DEBUG_MEMORY_ is defined as a string (and not NULL). */
-#define _STLA_DEBUG_MEMORY_SPEED_ 60
+   beginning and every _AC_DEBUG_MEMORY_SPEED_ seconds assuming
+   _AC_DEBUG_MEMORY_ is defined as a string (and not NULL). */
+#define _AC_DEBUG_MEMORY_SPEED_ 60
 
 /*
   Given an address of a member of a structure, the base object type, and the field name,
   return the address of the base structure.
 */
-#define stla_parent_object(addr, base_type, field) (base_type *)((char *)addr-offsetof(base_type,field))
+#define ac_parent_object(addr, base_type, field) (base_type *)((char *)addr-offsetof(base_type,field))
 
-#define STLA_STRINGIZE2(x) #x
-#define STLA_STRINGIZE(x) STLA_STRINGIZE2(x)
-#define __STLA_FILE_LINE__ __FILE__ ":" STLA_STRINGIZE(__LINE__)
-#define STLA_FILE_LINE_MACRO(a) __STLA_FILE_LINE__ " [" a "]"
+#define AC_STRINGIZE2(x) #x
+#define AC_STRINGIZE(x) AC_STRINGIZE2(x)
+#define __AC_FILE_LINE__ __FILE__ ":" AC_STRINGIZE(__LINE__)
+#define AC_FILE_LINE_MACRO(a) __AC_FILE_LINE__ " [" a "]"
 
 #endif
 ```
 
-The stla_parent_object macro is useful for finding the address of a structure when given a pointer to a member of the structure.
+The ac_parent_object macro is useful for finding the address of a structure when given a pointer to a member of the structure.
 
 ```c
-#include "stla_common.h"
+#include "ac_common.h"
 
 #include <stdio.h>
 
@@ -385,7 +385,7 @@ int main( int argc, char *argv[] ) {
   point_t point;
   point.x = 1;
   point.y = 2;
-  point_t *p = stla_parent_object(&point.y, point_t, y);
+  point_t *p = ac_parent_object(&point.y, point_t, y);
   printf( "point is found at %p, p is %s\n", &point, &point == p ? "equal" : "not equal" );
   return 0;
 }

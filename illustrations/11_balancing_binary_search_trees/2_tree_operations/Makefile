@@ -1,7 +1,7 @@
 ROOT=../../..
 include $(ROOT)/src/Makefile.include
 
-FLAGS += -D_STLA_DEBUG_MEMORY_=NULL
+FLAGS += -D_AC_DEBUG_MEMORY_=NULL
 DATA_STRUCTURE=binary_search_tree
 
 all: tree_operations

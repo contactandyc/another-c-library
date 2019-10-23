@@ -17,8 +17,8 @@ limitations under the License.
 #ifndef _data_structure_H
 #define _data_structure_H
 
-#include "stla_pool.h"
-#include "stla_common.h"
+#include "ac_pool.h"
+#include "ac_common.h"
 
 struct node_s;
 typedef struct node_s node_t;
@@ -31,7 +31,7 @@ typedef struct node_s node_t;
 node_t *node_init(char key);
 void node_destroy(node_t *n);
 char node_key(node_t *n);
-void node_print(stla_pool_t *pool, node_t *root);
+void node_print(ac_pool_t *pool, node_t *root);
 
 /*
   Given a data structure, find a node given a pointer to the root node and the

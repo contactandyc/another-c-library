@@ -166,17 +166,17 @@ void destroy_using_iteration(node_t *root) {
     node_next_to_erase methods (which may be defined to be the same as
 		first/next)
 */
-void test_data_structure(stla_pool_t *pool, const char *arg, int repeat) {
+void test_data_structure(ac_pool_t *pool, const char *arg, int repeat) {
   printf("Creating %s for %s\n", DATA_STRUCTURE, arg);
   node_t *root;
   for( int i=0; i<repeat; i++ ) {
-    stla_pool_clear(pool);
+    ac_pool_clear(pool);
     root = fill_data_structure_randomly(arg);
     node_print(pool, root);
     find_everything(arg, root);
     find_and_erase_everything(arg, root);
   }
-  stla_pool_clear(pool);
+  ac_pool_clear(pool);
   root = fill_data_structure(arg);
   node_print(pool, root);
   print_using_iteration(root);
@@ -203,7 +203,7 @@ bool valid_char(int ch) {
 	 valid
 */
 char *get_valid_characters(const char *p) {
-	char *res = stla_strdup(p);
+	char *res = ac_strdup(p);
 	char *wp = res;
 	char *s;
 	while(*p != 0) {
@@ -243,10 +243,10 @@ int main(int argc, char *argv[]) {
   if(argc < 3 || sscanf(argv[2], "%d", &repeat) != 1)
     repeat = 0;
 
-  stla_pool_t *pool = stla_pool_init(1024);
+  ac_pool_t *pool = ac_pool_init(1024);
 	char *arg = get_valid_characters(argv[1]);
   test_data_structure(pool, arg, repeat);
-	stla_free(arg);
-  stla_pool_destroy(pool);
+	ac_free(arg);
+  ac_pool_destroy(pool);
   return 0;
 }
