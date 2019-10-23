@@ -17,6 +17,10 @@ limitations under the License.
 #ifndef _ac_sort_H
 #define _ac_sort_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
   In general, you will only need to use the sort macros.  The print and test
   macros are meant for testing.
@@ -95,5 +99,9 @@ limitations under the License.
 */
 
 #include "impl/ac_sort.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

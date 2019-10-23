@@ -21,6 +21,10 @@ limitations under the License.
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* returns value if value is not NULL, otherwise default_value */
 const char *ac_str(const char *value, const char *default_value);
 
@@ -47,5 +51,9 @@ int64_t ac_int64_t(const char *value, int64_t default_value);
 
 /* returns uint64_t if value is not NULL and valid, otherwise default_value */
 uint64_t ac_uint64_t(const char *value, uint64_t default_value);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

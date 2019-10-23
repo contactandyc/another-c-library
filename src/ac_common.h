@@ -22,6 +22,10 @@ limitations under the License.
 /* because I like to use true, false, and bool */
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 Defining _AC_DEBUG_MEMORY_ will check that memory is properly
 freed (and try some rudimentary double free checks).  If memory
@@ -42,12 +46,16 @@ Snapshots are saved in increasing intervals.
   Given an address of a member of a structure, the base object type, and the
   field name, return the address of the base structure.
 */
-#define ac_parent_object(addr, base_type, field)                             \
+#define ac_parent_object(addr, base_type, field)                               \
   (base_type *)((char *)addr - offsetof(base_type, field))
 
 #define AC_STRINGIZE2(x) #x
 #define AC_STRINGIZE(x) AC_STRINGIZE2(x)
 #define __AC_FILE_LINE__ __FILE__ ":" AC_STRINGIZE(__LINE__)
 #define AC_FILE_LINE_MACRO(a) __AC_FILE_LINE__ " [" a "]"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

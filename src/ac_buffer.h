@@ -24,12 +24,16 @@ limitations under the License.
 #include <stdbool.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct ac_buffer_s;
 typedef struct ac_buffer_s ac_buffer_t;
 
 /* set the buffer to an initial size, buffer will grow as needed */
 #ifdef _AC_DEBUG_MEMORY_
-#define ac_buffer_init(size)                                                 \
+#define ac_buffer_init(size)                                                   \
   _ac_buffer_init(size, AC_FILE_LINE_MACRO("ac_buffer"));
 ac_buffer_t *_ac_buffer_init(size_t size, const char *caller);
 #else
@@ -39,7 +43,7 @@ ac_buffer_t *_ac_buffer_init(size_t size);
 
 /* like above, except allocated with a pool (no need to destroy) */
 static inline ac_buffer_t *ac_buffer_pool_init(ac_pool_t *pool,
-                                                   size_t initial_size);
+                                               size_t initial_size);
 
 /* clear the buffer */
 static inline void ac_buffer_clear(ac_buffer_t *h);
@@ -52,7 +56,7 @@ static inline size_t ac_buffer_length(ac_buffer_t *h);
 /* Functions to append contents into a buffer (vs set). */
 /* append bytes to the current buffer */
 static inline void ac_buffer_append(ac_buffer_t *h, const void *data,
-                                      size_t length);
+                                    size_t length);
 
 /* append a string to the current buffer */
 static inline void ac_buffer_appends(ac_buffer_t *h, const char *s);
@@ -72,7 +76,7 @@ static inline void ac_buffer_appendf(ac_buffer_t *h, const char *fmt, ...);
 /* Functions to set the contents into a buffer (vs append). */
 /* set bytes to the current buffer */
 static inline void ac_buffer_set(ac_buffer_t *h, const void *data,
-                                   size_t length);
+                                 size_t length);
 
 /* set a string to the current buffer */
 static inline void ac_buffer_sets(ac_buffer_t *h, const char *s);
@@ -85,7 +89,7 @@ static inline void ac_buffer_setn(ac_buffer_t *h, char ch, ssize_t n);
 
 /* set bytes in current buffer using va_args and formatted string */
 static inline void ac_buffer_setvf(ac_buffer_t *h, const char *fmt,
-                                     va_list args);
+                                   va_list args);
 
 /* set bytes in current buffer using a formatted string -similar to printf */
 static inline void ac_buffer_setf(ac_buffer_t *h, const char *fmt, ...);
@@ -110,5 +114,9 @@ static inline void *ac_buffer_alloc(ac_buffer_t *h, size_t length);
 void ac_buffer_destroy(ac_buffer_t *h);
 
 #include "impl/ac_buffer.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

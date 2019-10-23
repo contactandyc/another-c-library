@@ -83,8 +83,7 @@ static int advance_char_delimiter(ac_async_buffer_t *p) {
                                      p->data_end - p->data_start))) {
     if (ac_buffer_length(p->buffer)) {
       // partial data previously stored in buffer
-      ac_buffer_append(p->buffer, p->data_start,
-                         p->chunk_end - p->data_start);
+      ac_buffer_append(p->buffer, p->data_start, p->chunk_end - p->data_start);
       p->chunk_start = ac_buffer_data(p->buffer);
       p->chunk_end = p->chunk_start + ac_buffer_length(p->buffer);
       p->clear_buffer = 1;
@@ -105,7 +104,8 @@ static int advance_char_delimiter(ac_async_buffer_t *p) {
 
 static char *find_mem_delimiter(ac_async_buffer_t *p, char *mem,
                                 char *end_mem) {
-  return memmem(mem, end_mem - mem, p->mem_delimiter, p->mem_delimiter_length);
+  return (char *)memmem(mem, end_mem - mem, p->mem_delimiter,
+                        p->mem_delimiter_length);
 }
 
 static int advance_mem_delimiter(ac_async_buffer_t *p) {
@@ -142,14 +142,13 @@ static int advance_mem_delimiter(ac_async_buffer_t *p) {
       if ((delimiter_start =
                find_mem_delimiter(p, p->data_start, p->data_end))) {
         ac_buffer_append(p->buffer, p->data_start,
-                           delimiter_start - p->data_start);
+                         delimiter_start - p->data_start);
         p->chunk_start = ac_buffer_data(p->buffer);
         p->chunk_end = p->chunk_start + ac_buffer_length(p->buffer);
         p->clear_buffer = 1;
         p->data_start = delimiter_start + p->mem_delimiter_length;
       } else {
-        ac_buffer_append(p->buffer, p->data_start,
-                           p->data_end - p->data_start);
+        ac_buffer_append(p->buffer, p->data_start, p->data_end - p->data_start);
       }
     }
   } else {
@@ -202,7 +201,7 @@ void ac_async_buffer_clear(ac_async_buffer_t *p) {
 }
 
 int ac_async_buffer_advance_to_char(ac_async_buffer_t *p, char delimiter,
-                                      ac_async_buffer_f cb) {
+                                    ac_async_buffer_f cb) {
   int res = 0;
   if (p && cb) {
     clear_buffer(p);
@@ -216,9 +215,8 @@ int ac_async_buffer_advance_to_char(ac_async_buffer_t *p, char delimiter,
   return res;
 }
 
-int ac_async_buffer_advance_to_mem(ac_async_buffer_t *p,
-                                     void *mem_delimiter, size_t len,
-                                     ac_async_buffer_f cb) {
+int ac_async_buffer_advance_to_mem(ac_async_buffer_t *p, void *mem_delimiter,
+                                   size_t len, ac_async_buffer_f cb) {
   int res = 0;
   if (p && mem_delimiter && len && cb) {
     clear_buffer(p);
@@ -238,18 +236,18 @@ int ac_async_buffer_advance_to_mem(ac_async_buffer_t *p,
 }
 
 int ac_async_buffer_advance_to_string(ac_async_buffer_t *p,
-                                        char const *string_delimiter,
-                                        ac_async_buffer_f cb) {
+                                      char const *string_delimiter,
+                                      ac_async_buffer_f cb) {
   int res = 0;
   if (p && string_delimiter && string_delimiter[0] && cb) {
     res = ac_async_buffer_advance_to_mem(p, (void *)string_delimiter,
-                                           strlen(string_delimiter), cb);
+                                         strlen(string_delimiter), cb);
   }
   return res;
 }
 
 int ac_async_buffer_advance_bytes(ac_async_buffer_t *p, size_t len,
-                                    ac_async_buffer_f cb) {
+                                  ac_async_buffer_f cb) {
   int res = 0;
   if (p && cb) {
     clear_buffer(p);
@@ -275,15 +273,14 @@ size_t ac_async_buffer_data_length(ac_async_buffer_t *p) {
   return (p) ? (p->chunk_end - p->chunk_start) : 0;
 }
 
-void ac_async_buffer_parse(ac_async_buffer_t *p, void const *data,
-                             size_t len) {
+void ac_async_buffer_parse(ac_async_buffer_t *p, void const *data, size_t len) {
   if (p && data && len) {
     if (!p->delayed_advance) {
       fprintf(stderr, "You must advance BufferedReader until it returns false "
                       "before adding input.\n");
       abort();
     }
-    p->data_start = (void *)data;
+    p->data_start = (char *)data;
     p->data_end = p->data_start + len;
     if (p->delayed_advance(p)) {
       if (p->delayed_advance == advance_mem_delimiter && p->mem_delimiter) {

@@ -25,6 +25,10 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct ac_map_s {
   size_t parent_color;
   struct ac_map_s *left;
@@ -47,8 +51,7 @@ ac_map_t *ac_map_postorder_next(ac_map_t *n);
 */
 typedef ac_map_t *(*ac_map_copy_node_f)(ac_map_t *n, void *tag);
 
-ac_map_t *ac_map_copy(ac_map_t *root, ac_map_copy_node_f copy,
-                          void *tag);
+ac_map_t *ac_map_copy(ac_map_t *root, ac_map_copy_node_f copy, void *tag);
 
 /*
   print_node_to_string_f is a callback meant to print the value of the node n.
@@ -58,27 +61,24 @@ ac_map_t *ac_map_copy(ac_map_t *root, ac_map_copy_node_f copy,
 */
 typedef char *(*print_node_to_string_f)(ac_pool_t *pool, ac_map_t *n);
 
-bool ac_map_valid_to_buffer(ac_buffer_t *bh, ac_pool_t *pool,
-                              ac_map_t *root,
-                              print_node_to_string_f print_node);
+bool ac_map_valid_to_buffer(ac_buffer_t *bh, ac_pool_t *pool, ac_map_t *root,
+                            print_node_to_string_f print_node);
 
 bool ac_map_valid(ac_pool_t *pool, ac_map_t *root,
-                    print_node_to_string_f print_node);
+                  print_node_to_string_f print_node);
 
 #define AC_MAP_DONT_PRINT_RED 1
 #define AC_MAP_DONT_PRINT_BLACK_HEIGHT 2
 
-void ac_map_print_to_buffer(ac_buffer_t *bh, ac_pool_t *pool,
-                              ac_map_t *node,
-                              print_node_to_string_f print_node, int flags);
+void ac_map_print_to_buffer(ac_buffer_t *bh, ac_pool_t *pool, ac_map_t *node,
+                            print_node_to_string_f print_node, int flags);
 
 void ac_map_print(ac_pool_t *pool, ac_map_t *node,
-                    print_node_to_string_f print_node, int flags);
+                  print_node_to_string_f print_node, int flags);
 
 bool ac_map_erase(ac_map_t *node, ac_map_t **root);
 
-void ac_map_fix_insert(ac_map_t *node, ac_map_t *parent,
-                         ac_map_t **root);
+void ac_map_fix_insert(ac_map_t *node, ac_map_t *parent, ac_map_t **root);
 
 /*
   Finding and insertion cannot be made easily generic due to the need to access
@@ -270,5 +270,9 @@ void ac_map_fix_insert(ac_map_t *node, ac_map_t *parent,
 */
 
 #include "impl/ac_map.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

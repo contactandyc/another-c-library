@@ -19,6 +19,11 @@ limitations under the License.
 
 #include "ac_pool.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 struct ac_cgi_s;
 typedef struct ac_cgi_s ac_cgi_t;
 
@@ -63,5 +68,9 @@ uint64_t ac_cgi_uint64_t(ac_cgi_t *h, const char *key,
 
 /* decode cgi text */
 char *ac_cgi_decode(ac_pool_t *pool, char *s);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

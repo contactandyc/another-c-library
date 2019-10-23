@@ -23,11 +23,14 @@ limitations under the License.
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef _AC_DEBUG_MEMORY_
 #define ac_malloc(len) _ac_malloc_d(NULL, __AC_FILE_LINE__, len, false)
 #define ac_calloc(len) _ac_calloc_d(NULL, __AC_FILE_LINE__, len, false)
-#define ac_realloc(p, len)                                                   \
-  _ac_realloc_d(NULL, __AC_FILE_LINE__, p, len, false)
+#define ac_realloc(p, len) _ac_realloc_d(NULL, __AC_FILE_LINE__, p, len, false)
 #define ac_strdup(p) _ac_strdup_d(NULL, __AC_FILE_LINE__, p)
 #define ac_free(p) _ac_free_d(NULL, __AC_FILE_LINE__, p)
 #else
@@ -39,7 +42,7 @@ limitations under the License.
 #endif
 
 typedef void (*ac_dump_details_f)(FILE *out, const char *caller, void *p,
-                                    size_t length);
+                                  size_t length);
 
 typedef struct {
   ac_dump_details_f dump;
@@ -54,16 +57,20 @@ void ac_allocator_destroy(ac_allocator_t *a);
 void ac_dump_global_allocations(ac_allocator_t *a, FILE *out);
 
 void *_ac_malloc_d(ac_allocator_t *a, const char *caller, size_t len,
-                     bool custom);
+                   bool custom);
 
 void *_ac_calloc_d(ac_allocator_t *a, const char *caller, size_t len,
-                     bool custom);
+                   bool custom);
 
-void *_ac_realloc_d(ac_allocator_t *a, const char *caller, void *p,
-                      size_t len, bool custom);
+void *_ac_realloc_d(ac_allocator_t *a, const char *caller, void *p, size_t len,
+                    bool custom);
 
 char *_ac_strdup_d(ac_allocator_t *a, const char *caller, const char *p);
 
 void _ac_free_d(ac_allocator_t *a, const char *caller, void *p);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

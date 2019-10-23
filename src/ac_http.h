@@ -19,18 +19,20 @@ limitations under the License.
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct ac_http_group_s ac_http_group_t;
 typedef struct ac_http_s ac_http_t;
 
 typedef void (*ac_http_f)(ac_http_t *);
 typedef void (*ac_http_data_f)(ac_http_t *, char const *data,
-                                 size_t data_length);
+                               size_t data_length);
 
 /*  Init/destroy group container for parsers  */
-ac_http_group_t *ac_http_group_init(ac_http_f headers,
-                                        ac_http_data_f chunk,
-                                        ac_http_data_f end,
-                                        ac_http_f error);
+ac_http_group_t *ac_http_group_init(ac_http_f headers, ac_http_data_f chunk,
+                                    ac_http_data_f end, ac_http_f error);
 void ac_http_group_destroy(ac_http_group_t *);
 
 /*  Initialize/release an http parser  */
@@ -56,11 +58,14 @@ typedef enum { header, query, body } ac_http_param_location_t;
 
 /*  Getters for parameters  */
 char const *ac_http_param(ac_http_t *, ac_http_param_location_t,
-                            char const *key, char const *default_value /*=""*/);
+                          char const *key, char const *default_value /*=""*/);
 
 /*  Get multiple params for a single key.  Returned value array is
     NULL terminated and valid for the life of the request  */
-char **ac_http_params(ac_http_t *, ac_http_param_location_t,
-                        char const *key);
+char **ac_http_params(ac_http_t *, ac_http_param_location_t, char const *key);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

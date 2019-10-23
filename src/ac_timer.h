@@ -19,6 +19,10 @@ limitations under the License.
 
 #include "ac_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct ac_timer_s;
 typedef struct ac_timer_s ac_timer_t;
 
@@ -28,7 +32,7 @@ typedef struct ac_timer_s ac_timer_t;
    only being timed with a single repetition, then use a value of 1.
 */
 #ifdef _AC_DEBUG_MEMORY_
-#define ac_timer_init(repeat)                                                \
+#define ac_timer_init(repeat)                                                  \
   _ac_timer_init(repeat, AC_FILE_LINE_MACRO("ac_timer"))
 ac_timer_t *_ac_timer_init(int repeat, const char *caller);
 #else
@@ -64,5 +68,9 @@ double ac_timer_ns(ac_timer_t *t);
 double ac_timer_us(ac_timer_t *t);
 double ac_timer_ms(ac_timer_t *t);
 double ac_timer_sec(ac_timer_t *t);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

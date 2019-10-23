@@ -47,7 +47,7 @@ struct ac_http_s {
   char *uri;
   char *method;
   char *protocol;
-  void *post_data;
+  char *post_data;
   size_t post_size;
   char **headers;
   uint32_t num_headers;
@@ -70,10 +70,10 @@ struct ac_http_group_s {
 };
 
 ac_http_group_t *ac_http_group_init(ac_http_f on_headers,
-                                        ac_http_data_f on_body_chunk,
-                                        ac_http_data_f on_request_end,
-                                        ac_http_f on_parsing_error) {
-  ac_http_group_t *g = ac_calloc(sizeof(*g));
+                                    ac_http_data_f on_body_chunk,
+                                    ac_http_data_f on_request_end,
+                                    ac_http_f on_parsing_error) {
+  ac_http_group_t *g = (ac_http_group_t *)ac_calloc(sizeof(*g));
   pthread_mutex_init(&g->lock, NULL);
   if (!(g->on_headers = on_headers) || !(g->on_request_end = on_request_end) ||
       !(g->on_parsing_error = on_parsing_error)) {
@@ -111,16 +111,16 @@ static int parse_request_and_headers(ac_http_t *parser, char *headers,
   char *end_headers = headers + headers_length;
   char *req_line = headers;
   char *end_req_line;
-  if ((headers = memmem(headers, headers_length, "\r\n", 2))) {
+  if ((headers = (char *)memmem(headers, headers_length, "\r\n", 2))) {
     end_req_line = headers;
     headers += 2;
     parser->num_headers = 2;
-    char *p = memmem(headers, headers_length, "\r\n", 2);
-    for (; p; p = memmem(p + 2, (end_headers - p) - 2, "\r\n", 2),
+    char *p = (char *)memmem(headers, headers_length, "\r\n", 2);
+    for (; p; p = (char *)memmem(p + 2, (end_headers - p) - 2, "\r\n", 2),
               parser->num_headers++)
       ;
-    parser->headers =
-        ac_pool_calloc(parser->pool, sizeof(char *) * parser->num_headers);
+    parser->headers = (char **)ac_pool_calloc(
+        parser->pool, sizeof(char *) * parser->num_headers);
     parser->num_headers = 0;
     p = headers;
     char *ep;
@@ -169,7 +169,7 @@ static int parse_request_and_headers(ac_http_t *parser, char *headers,
 }
 
 static void on_data(ac_async_buffer_t *br) {
-  ac_http_t *p = ac_async_buffer_get_arg(br);
+  ac_http_t *p = (ac_http_t *)ac_async_buffer_get_arg(br);
   char *data;
   size_t data_length;
   while (1) {
@@ -193,7 +193,7 @@ static void on_data(ac_async_buffer_t *br) {
         // We know the length of the body.
         p->state |= http_state_reading_whole_body;
         if (!ac_async_buffer_advance_bytes(p->async_buffer, content_length,
-                                             on_data)) {
+                                           on_data)) {
           return;
         }
         data = ac_async_buffer_data(br);
@@ -202,7 +202,7 @@ static void on_data(ac_async_buffer_t *br) {
         // We need to start reading chunked encoding
         p->state |= http_state_reading_chunk_size;
         if (!ac_async_buffer_advance_to_string(p->async_buffer, "\r\n",
-                                                 on_data)) {
+                                               on_data)) {
           return;
         }
         data = ac_async_buffer_data(br);
@@ -243,7 +243,7 @@ static void on_data(ac_async_buffer_t *br) {
           p->state ^=
               (http_state_reading_chunk_size | http_state_reading_chunk_data);
           if (!ac_async_buffer_advance_bytes(p->async_buffer, chunk_size,
-                                               on_data)) {
+                                             on_data)) {
             return;
           }
           data = ac_async_buffer_data(br);
@@ -253,7 +253,7 @@ static void on_data(ac_async_buffer_t *br) {
           p->state ^=
               (http_state_reading_chunk_size | http_state_reading_footers);
           if (!ac_async_buffer_advance_to_string(p->async_buffer, "\r\n",
-                                                   on_data)) {
+                                                 on_data)) {
             return;
           }
           data = ac_async_buffer_data(br);
@@ -276,7 +276,7 @@ static void on_data(ac_async_buffer_t *br) {
       p->state ^=
           (http_state_reading_chunk_data | http_state_reading_chunk_size);
       if (!ac_async_buffer_advance_to_string(p->async_buffer, "\r\n",
-                                               on_data)) {
+                                             on_data)) {
         return;
       }
       data = ac_async_buffer_data(br);
@@ -286,7 +286,7 @@ static void on_data(ac_async_buffer_t *br) {
       if (data_length > 0) {
         // Footer received.
         if (!ac_async_buffer_advance_to_string(p->async_buffer, "\r\n",
-                                                 on_data)) {
+                                               on_data)) {
           return;
         }
         data = ac_async_buffer_data(br);
@@ -331,7 +331,7 @@ ac_http_t *ac_http_init(ac_http_group_t *g) {
     }
     pthread_mutex_unlock(&g->lock);
     if (!res) {
-      res = ac_malloc(sizeof(*res));
+      res = (ac_http_t *)ac_malloc(sizeof(*res));
       res->group = g;
       res->pool_member = pool_member;
       res->pool = ac_pool_init(1024);
@@ -421,7 +421,7 @@ static ac_cgi_t *get_body_cgi(ac_http_t *p) {
 }
 
 char const *ac_http_param(ac_http_t *p, ac_http_param_location_t loc,
-                            char const *key, char const *default_value) {
+                          char const *key, char const *default_value) {
   char const *res = default_value;
   if (p && key && key[0]) {
     switch (loc) {
@@ -440,7 +440,7 @@ char const *ac_http_param(ac_http_t *p, ac_http_param_location_t loc,
 }
 
 char **ac_http_params(ac_http_t *p, ac_http_param_location_t loc,
-                        char const *key) {
+                      char const *key) {
 
   static char *empty[1] = {NULL};
   char **res = empty;

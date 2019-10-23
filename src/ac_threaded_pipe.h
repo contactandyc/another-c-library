@@ -19,27 +19,28 @@ limitations under the License.
 
 #include "ac_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void (*ac_threaded_pipe_close_f)(void *d);
 
 struct ac_threaded_pipe_s;
 typedef struct ac_threaded_pipe_s ac_threaded_pipe_t;
 
 #ifdef _AC_DEBUG_MEMORY_
-#define ac_threaded_pipe_init(num_threads)                                   \
-  _ac_threaded_pipe_init(num_threads,                                        \
-                           AC_FILE_LINE_MACRO("ac_threaded_pipe"))
-ac_threaded_pipe_t *_ac_threaded_pipe_init(int num_threads,
-                                               const char *caller);
+#define ac_threaded_pipe_init(num_threads)                                     \
+  _ac_threaded_pipe_init(num_threads, AC_FILE_LINE_MACRO("ac_threaded_pipe"))
+ac_threaded_pipe_t *_ac_threaded_pipe_init(int num_threads, const char *caller);
 #else
-#define ac_threaded_pipe_init(num_threads)                                   \
-  _ac_threaded_pipe_init(num_threads)
+#define ac_threaded_pipe_init(num_threads) _ac_threaded_pipe_init(num_threads)
 ac_threaded_pipe_t *_ac_threaded_pipe_init(int num_threads);
 #endif
 
 typedef void *(*ac_threaded_pipe_create_global_arg_f)(void *update_arg,
-                                                        void *old_global_arg);
+                                                      void *old_global_arg);
 typedef void (*ac_threaded_pipe_destroy_global_arg_f)(void *update_arg,
-                                                        void *global_arg);
+                                                      void *global_arg);
 
 void ac_threaded_pipe_set_global_arg(
     ac_threaded_pipe_t *s, void *arg,
@@ -53,7 +54,7 @@ void ac_threaded_pipe_set_global_methods(
 typedef void *(*ac_threaded_pipe_create_thread_arg_f)(void *global_arg);
 typedef void (*ac_threaded_pipe_clear_thread_arg_f)(void *thread_arg);
 typedef void (*ac_threaded_pipe_destroy_thread_arg_f)(void *global_arg,
-                                                        void *thread_arg);
+                                                      void *thread_arg);
 
 void ac_threaded_pipe_set_thread_methods(
     ac_threaded_pipe_t *s, ac_threaded_pipe_create_thread_arg_f create,
@@ -61,16 +62,20 @@ void ac_threaded_pipe_set_thread_methods(
     ac_threaded_pipe_destroy_thread_arg_f destroy);
 
 void ac_threaded_pipe_set_close_cb(ac_threaded_pipe_t *h,
-                                     ac_threaded_pipe_close_f cb, void *arg);
+                                   ac_threaded_pipe_close_f cb, void *arg);
 
 void ac_threaded_pipe_open(ac_threaded_pipe_t *h);
 
 typedef void (*ac_threaded_pipe_f)(void *global_arg, void *thread_arg,
-                                     void *object, void *arg);
+                                   void *object, void *arg);
 
 bool ac_threaded_pipe_write(ac_threaded_pipe_t *h, ac_threaded_pipe_f cb,
-                              void *object, void *arg);
+                            void *object, void *arg);
 
 void ac_threaded_pipe_close(ac_threaded_pipe_t *h);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
