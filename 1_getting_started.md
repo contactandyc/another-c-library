@@ -39,12 +39,12 @@ cd code
 
 Clone the examples in this book into your newly created code directory
 ```bash
-git clone https://github.com/contactandyc/standard-template-library-alternative-in-c.git
+git clone https://github.com/contactandyc/another-c-library.git
 ```
 
-Create an environment variable named ac (standard template library alternative) and create the variable available the next time you open the terminal
+Create an environment variable named ac (another c library) and create the variable available the next time you open the terminal
 ```bash
-echo ac=`pwd`/standard-template-library-alternative-in-c >> ~/.bashrc
+echo ac=`pwd`/another-c-library >> ~/.bashrc
 ```
 
 Either close the terminal and reopen it or do the following to ensure the last changes take effect.

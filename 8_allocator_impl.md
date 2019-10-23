@@ -2,7 +2,7 @@
 
 # The Global Allocator Implementation
 
-Implementing the allocator is rather involved and uses much of what you've learned in the prior chapters.  Understanding every implementation isn't necessary to use the standard template library alternative. However, it should help you to understand how to code or to improve it should you desire to.
+Implementing the allocator is rather involved and uses much of what you've learned in the prior chapters. However, it should help you to understand how to code or to improve it should you desire to.
 
 - Doubly linked lists to track allocations.
 - An object (which gets declared in the global space) to maintain and monitor the doubly linked list.

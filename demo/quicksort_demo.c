@@ -8,12 +8,14 @@
 
 #define sort_t size_t
 
-static inline bool less(const sort_t *a, const sort_t *b) { return *a < *b; }
+static inline int compare(const sort_t *a, const sort_t *b) {
+  return (*a != *b) ? *a < *b ? -1 : 1 : 0;
+}
 static void print_sort_t(sort_t *el) { printf("%ld ", *el); }
 
 ac_sort_print_m(quicksort_print, sort_t);
-ac_sort_m(quicksort, sort_t, less);
-ac_sort_test_m(quicksort_test, less, sort_t);
+ac_sort_m(quicksort, sort_t, compare);
+ac_sort_test_m(quicksort_test, compare, sort_t);
 
 static inline int compare_size(const void *p1, const void *p2) {
   const sort_t *a = (const sort_t *)p1;

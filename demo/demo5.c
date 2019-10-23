@@ -46,23 +46,23 @@ static inline int compare_name_partial(const char *a, const name_t *b) {
 ac_map_lower_bound_m(name_lower_bound, char, name_t, compare_name_partial);
 ac_map_upper_bound_m(name_upper_bound, char, name_t, compare_name_partial);
 
-static inline bool less_name(name_t **a, name_t **b) {
-  return strcmp(get_name(*a), get_name(*b)) < 0 ? true : false;
+static inline int compare_name_for_sort(name_t **a, name_t **b) {
+  return strcmp(get_name(*a), get_name(*b));
 }
 
-ac_sort_m(name_sort, name_t *, less_name);
+ac_sort_m(name_sort, name_t *, compare_name_for_sort);
 /*
 You can alternatively use a macro for ac_sort_m if needed
-#define less_name_defined(a, b) (strcmp(get_name(*a), get_name(*b)) < 0)
+#define compare_name_defined(a, b) (strcmp(get_name(*a), get_name(*b)))
 
-ac_sort_m(name_sort, name_t *, less_name_defined);
+ac_sort_m(name_sort, name_t *, compare_name_defined);
 */
 
-static inline bool reverse_less_name(name_t **a, name_t **b) {
-  return strcmp(get_name(*a), get_name(*b)) > 0 ? true : false;
+static inline int reverse_compare_name_for_sort(name_t **a, name_t **b) {
+  return -strcmp(get_name(*a), get_name(*b));
 }
 
-ac_sort_m(name_reverse, name_t *, reverse_less_name);
+ac_sort_m(name_reverse, name_t *, reverse_compare_name_for_sort);
 
 static inline int compare_name_for_search(char *a, name_t **b) {
   return strcmp(a, get_name(*b));
@@ -75,11 +75,11 @@ static inline int compare_partial_name_for_search(char *a, name_t **b) {
 ac_search_m(name_search, char, name_t *, compare_name_for_search);
 ac_search_least_m(name_search_least, char, name_t *, compare_name_for_search);
 ac_search_greatest_m(name_search_greatest, char, name_t *,
-                       compare_name_for_search);
+                     compare_name_for_search);
 ac_search_lower_bound_m(name_search_lower_bound, char, name_t *,
-                          compare_partial_name_for_search);
+                        compare_partial_name_for_search);
 ac_search_upper_bound_m(name_search_upper_bound, char, name_t *,
-                          compare_partial_name_for_search);
+                        compare_partial_name_for_search);
 
 int compare_name_for_qsort(const void *p1, const void *p2) {
   name_t **a = (name_t **)p1;
@@ -124,8 +124,7 @@ name_t *parse_line(ac_pool_t *pool, char *s) {
   if (sscanf(born, "%d", &born_year) != 1 ||
       sscanf(died, "%d", &died_year) != 1)
     return NULL;
-  name_t *r =
-      (name_t *)ac_pool_alloc(pool, sizeof(name_t) + strlen(name) + 1);
+  name_t *r = (name_t *)ac_pool_alloc(pool, sizeof(name_t) + strlen(name) + 1);
   strcpy((char *)(r + 1), name);
   r->about = ac_pool_strdup(pool, about);
   r->born = born_year;
@@ -251,8 +250,7 @@ int main(int argc, char *argv[]) {
     name_reverse(names, num_names);
   }
   ac_timer_stop(t);
-  printf("sort (reversed) for ac sort = %0.5f nanoseconds\n",
-         ac_timer_ns(t));
+  printf("sort (reversed) for ac sort = %0.5f nanoseconds\n", ac_timer_ns(t));
   ac_timer_destroy(t);
 
   t = ac_timer_init(repeat);

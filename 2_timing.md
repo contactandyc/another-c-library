@@ -2356,7 +2356,7 @@ which again reduces complexity.  It is also easy to switch from nanoseconds to a
 
 The following code is found in <i>illustrations/2_timing/11_timer</i>
 
-This timer object is done and is ready to be reused.  In C, all of your functions share the same namespace.  If another project has a function named timer_init, there will be a conflict.  Projects typically adopt a package prefix in addition to the object prefix to prevent conflicts.  For this project, we will use ac (standard template library alternative).
+This timer object is done and is ready to be reused.  In C, all of your functions share the same namespace.  If another project has a function named timer_init, there will be a conflict.  Projects typically adopt a package prefix in addition to the object prefix to prevent conflicts.  For this project, we will use ac (another c library).
 
 My rules for adding the prefix are:
 ```

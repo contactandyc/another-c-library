@@ -2,7 +2,6 @@
 #include "ac_common.h"
 #include "ac_map.h"
 #include "ac_pool.h"
-#include "ac_sort.h"
 #include "ac_timer.h"
 
 #include <stdio.h>
@@ -60,8 +59,7 @@ name_t *parse_line(ac_pool_t *pool, char *s) {
   if (sscanf(born, "%d", &born_year) != 1 ||
       sscanf(died, "%d", &died_year) != 1)
     return NULL;
-  name_t *r =
-      (name_t *)ac_pool_alloc(pool, sizeof(name_t) + strlen(name) + 1);
+  name_t *r = (name_t *)ac_pool_alloc(pool, sizeof(name_t) + strlen(name) + 1);
   strcpy((char *)(r + 1), name);
   r->about = ac_pool_strdup(pool, about);
   r->born = born_year;

@@ -142,9 +142,9 @@ The second optimization is to consider the first and the last point.  If the fir
 
 If items are not sorted, the simplest option is to order the 5 points in the correct order, choose the midpoint, and continue with the normal sort.  Obviously, 5 points is somewhat arbitrary.  The more points that are initially chosen, the less likely the data will be falsely assumed to be in order.  However, even the cost of the check is largely mitigated in that a new pivot can be chosen.  A more complex solution might consider where the out of order element was found and continue with that pivot.
 
-I've been writing an open source book (which is very much in its infancy) to explore algorithms and C found at https://github.com/contactandyc/standard-template-library-alternative-in-c  Part of the demo, illustrates the timing as it relates to this improvement.  In general, this algorithm only takes steps forward with very little extra cost.  The timings from the demo are shown below.
+I've been writing an open source book (which is very much in its infancy) to explore algorithms and C found at https://github.com/contactandyc/another-c-library  Part of the demo, illustrates the timing as it relates to this improvement.  In general, this algorithm only takes steps forward with very little extra cost.  The timings from the demo are shown below.
 
-My sort is called ac_sort (standard template library alternative sort).  It uses a combination of algorithms internally (particularly for sets of items which are 5 or less, the sort is hard-coded).  The core of the sorting algorithm is based upon works by Roger Sedgewick with the improvement mentioned above.
+My sort is called ac_sort (another c sort).  It uses a combination of algorithms internally (particularly for sets of items which are 5 or less, the sort is hard-coded).  The core of the sorting algorithm is based upon works by Roger Sedgewick with the improvement mentioned above.
 
 ac_sort
 * random - 312,257 nanoseconds

@@ -17,15 +17,15 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 
-#define ac_sort_print_def(name, datatype)                                      \
+#define ac_sortl_print_def(name, datatype)                                     \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
             void (*print_element)(datatype * el));
 
-#define ac_sort_print_arg_def(name, datatype)                                  \
+#define ac_sortl_print_arg_def(name, datatype)                                 \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
             void (*print_element)(datatype * el, void *arg), void *arg);
 
-#define ac_sort_print_m(name, datatype)                                        \
+#define ac_sortl_print_m(name, datatype)                                       \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
             void (*print_element)(datatype * el)) {                            \
     if (func_line)                                                             \
@@ -39,7 +39,7 @@ limitations under the License.
     printf("\n");                                                              \
   }
 
-#define ac_sort_print_arg_m(name, datatype)                                    \
+#define ac_sortl_print_arg_m(name, datatype)                                   \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
             void (*print_element)(datatype * el, void *arg), void *arg) {      \
     if (func_line)                                                             \
@@ -53,106 +53,106 @@ limitations under the License.
     printf("\n");                                                              \
   }
 
-#define ac_sort_test_def(name, datatype)                                       \
+#define ac_sortl_test_def(name, datatype)                                      \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
             void (*print_element)(datatype * el));
 
-#define ac_sort_test_arg_def(name, datatype)                                   \
+#define ac_sortl_test_arg_def(name, datatype)                                  \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
             void (*print_element)(datatype * el, void *arg), void *arg);
 
-#define ac_sort_test_compare_def(name, datatype)                               \
+#define ac_sortl_test_less_def(name, datatype)                                 \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            int (*compare)(datatype * a, datatype * b),                        \
+            bool (*less)(datatype * a, datatype * b),                          \
             void (*print_element)(datatype * el));
 
-#define ac_sort_test_compare_arg_def(name, datatype)                           \
+#define ac_sortl_test_less_arg_def(name, datatype)                             \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            int (*compare)(datatype * a, datatype * b, void *arg),             \
+            bool (*less)(datatype * a, datatype * b, void *arg),               \
             void (*print_element)(datatype * el, void *arg), void *arg);
 
-#define ac_sort_test_m(name, compare, datatype)                                \
+#define ac_sortl_test_m(name, less, datatype)                                  \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
             void (*print_element)(datatype * el)) {                            \
     datatype *ep = base + num_elements;                                        \
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
-      n = compare(base - 1, base);                                             \
-      if (n > 0) {                                                             \
-        if (func_line)                                                         \
-          printf("%s ", func_line);                                            \
-        print_element(base - 1);                                               \
-        printf(" is greater than ");                                           \
-        print_element(base);                                                   \
-        printf("\n");                                                          \
-        abort();                                                               \
-      }                                                                        \
+      if (less(base - 1, base))                                                \
+        if (n > 0) {                                                           \
+          if (func_line)                                                       \
+            printf("%s ", func_line);                                          \
+          print_element(base - 1);                                             \
+          printf(" is greater than ");                                         \
+          print_element(base);                                                 \
+          printf("\n");                                                        \
+          abort();                                                             \
+        }                                                                      \
       base++;                                                                  \
     }                                                                          \
   }
 
-#define ac_sort_test_arg_m(name, compare, datatype)                            \
+#define ac_sortl_test_arg_m(name, less, datatype)                              \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
             void (*print_element)(datatype * el, void *arg), void *arg) {      \
     datatype *ep = base + num_elements;                                        \
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
-      n = compare(base - 1, base, arg);                                        \
-      if (n > 0) {                                                             \
-        if (func_line)                                                         \
-          printf("%s ", func_line);                                            \
-        print_element(base - 1, arg);                                          \
-        printf(" is greater than ");                                           \
-        print_element(base, arg);                                              \
-        printf("\n");                                                          \
-        abort();                                                               \
-      }                                                                        \
+      if (less(base - 1, base, arg))                                           \
+        if (n > 0) {                                                           \
+          if (func_line)                                                       \
+            printf("%s ", func_line);                                          \
+          print_element(base - 1, arg);                                        \
+          printf(" is greater than ");                                         \
+          print_element(base, arg);                                            \
+          printf("\n");                                                        \
+          abort();                                                             \
+        }                                                                      \
       base++;                                                                  \
     }                                                                          \
   }
 
-#define ac_sort_test_compare_m(name, datatype)                                 \
+#define ac_sortl_test_less_m(name, datatype)                                   \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            int (*compare)(datatype * a, datatype * b),                        \
+            bool (*less)(datatype * a, datatype * b),                          \
             void (*print_element)(datatype * el)) {                            \
     datatype *ep = base + num_elements;                                        \
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
-      n = compare(base - 1, base);                                             \
-      if (n > 0) {                                                             \
-        if (func_line)                                                         \
-          printf("%s ", func_line);                                            \
-        print_element(base - 1);                                               \
-        printf(" is greater than ");                                           \
-        print_element(base);                                                   \
-        printf("\n");                                                          \
-        abort();                                                               \
-      }                                                                        \
+      if (less(base - 1, base))                                                \
+        if (n > 0) {                                                           \
+          if (func_line)                                                       \
+            printf("%s ", func_line);                                          \
+          print_element(base - 1);                                             \
+          printf(" is greater than ");                                         \
+          print_element(base);                                                 \
+          printf("\n");                                                        \
+          abort();                                                             \
+        }                                                                      \
       base++;                                                                  \
     }                                                                          \
   }
 
-#define ac_sort_test_compare_arg_m(name, datatype)                             \
+#define ac_sortl_test_less_arg_m(name, datatype)                               \
   void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            int (*compare)(datatype * a, datatype * b, void *arg),             \
+            bool (*less)(datatype * a, datatype * b, void *arg),               \
             void (*print_element)(datatype * el, void *arg), void *arg) {      \
     datatype *ep = base + num_elements;                                        \
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
-      n = compare(base - 1, base, arg);                                        \
-      if (n > 0) {                                                             \
-        if (func_line)                                                         \
-          printf("%s ", func_line);                                            \
-        print_element(base - 1, arg);                                          \
-        printf(" is greater than ");                                           \
-        print_element(base, arg);                                              \
-        printf("\n");                                                          \
-        abort();                                                               \
-      }                                                                        \
+      if (less(base - 1, base, arg))                                           \
+        if (n > 0) {                                                           \
+          if (func_line)                                                       \
+            printf("%s ", func_line);                                          \
+          print_element(base - 1, arg);                                        \
+          printf(" is greater than ");                                         \
+          print_element(base, arg);                                            \
+          printf("\n");                                                        \
+          abort();                                                             \
+        }                                                                      \
       base++;                                                                  \
     }                                                                          \
   }
@@ -167,20 +167,20 @@ typedef struct {
   ssize_t num_elements;
 } sort_stack_t;
 
-#define ac_sort_def(name, type) void name(type *base, size_t num_elements);
+#define ac_sortl_def(name, type) void name(type *base, size_t num_elements);
 
-#define ac_sort_arg_def(name, type)                                            \
+#define ac_sortl_arg_def(name, type)                                           \
   void name(type *base, size_t num_elements, void *arg);
 
-#define ac_sort_compare_def(name, type)                                        \
+#define ac_sortl_less_def(name, type)                                          \
   void name(type *base, size_t num_elements,                                   \
-            int (*compare)(datatype * a, datatype * b));
+            bool (*less)(datatype * a, datatype * b));
 
-#define ac_sort_compare_arg_def(name, type)                                    \
+#define ac_sortl_less_arg_def(name, type)                                      \
   void name(type *base, size_t num_elements,                                   \
-            int (*compare)(datatype * a, datatype * b, void *arg), void *arg);
+            bool (*less)(datatype * a, datatype * b, void *arg), void *arg);
 
-#define ac_sort_m(name, type, compare)                                         \
+#define ac_sortl_m(name, type, less)                                           \
   void name(type *base, size_t num_elements) {                                 \
     type *a;                                                                   \
     type *b;                                                                   \
@@ -200,7 +200,7 @@ typedef struct {
       high = e = base + num_elements - 1;                                      \
       pivot = num_elements >> 1;                                               \
       c = a + pivot;                                                           \
-      if (compare(e, a) < 0) {                                                 \
+      if (less(e, a)) {                                                        \
         b = a;                                                                 \
         a = e;                                                                 \
         e = b;                                                                 \
@@ -215,45 +215,44 @@ typedef struct {
         pivot = 1;                                                             \
       }                                                                        \
                                                                                \
-      if (compare(d, c) < 0) {                                                 \
+      if (less(d, c)) {                                                        \
         pivot = 0;                                                             \
-        if (compare(e, d) < 0) {                                               \
+        if (less(e, d)) {                                                      \
           sort_swap(c, e);                                                     \
         } else {                                                               \
           sort_swap(c, d);                                                     \
         }                                                                      \
-      } else if (compare(e, c) < 0) {                                          \
+      } else if (less(e, c)) {                                                 \
         pivot = 0;                                                             \
         sort_swap(c, e);                                                       \
       }                                                                        \
-      if (compare(c, a) < 0) {                                                 \
+      if (less(c, a)) {                                                        \
         pivot = 0;                                                             \
         sort_swap(a, c);                                                       \
-        if (compare(d, c) < 0) {                                               \
-          if (compare(e, d) < 0) {                                             \
+        if (less(d, c)) {                                                      \
+          if (less(e, d)) {                                                    \
             sort_swap(c, e);                                                   \
           } else {                                                             \
             sort_swap(c, d);                                                   \
           }                                                                    \
-        } else if (compare(e, c) < 0) {                                        \
+        } else if (less(e, c)) {                                               \
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
-      if (compare(c, b) < 0) {                                                 \
+      if (less(c, b)) {                                                        \
         pivot = 0;                                                             \
         sort_swap(b, c);                                                       \
-        if (compare(d, c) < 0) {                                               \
-          if (compare(e, d) < 0) {                                             \
+        if (less(d, c)) {                                                      \
+          if (less(e, d)) {                                                    \
             sort_swap(c, e);                                                   \
           } else {                                                             \
             sort_swap(c, d);                                                   \
           }                                                                    \
-        } else if (compare(e, c) < 0) {                                        \
+        } else if (less(e, c)) {                                               \
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
-      if (!pivot || compare(b, a) < 0 || compare(c, b) < 0 ||                  \
-          compare(d, c) < 0 || compare(e, a) < 0) {                            \
+      if (!pivot || less(b, a) || less(c, b) || less(d, c) || less(e, a)) {    \
         if (e < a) {                                                           \
           mid = a;                                                             \
           a = e;                                                               \
@@ -272,7 +271,7 @@ typedef struct {
         if (pivot == 1) {                                                      \
           mid = a + 1;                                                         \
           while (a < e) {                                                      \
-            if (compare(mid, a) < 0)                                           \
+            if (less(mid, a))                                                  \
               break;                                                           \
             a++;                                                               \
             mid++;                                                             \
@@ -281,7 +280,7 @@ typedef struct {
             return;                                                            \
           sort_swap(a, mid);                                                   \
           if (a < c) {                                                         \
-            if (compare(c, a) < 0) {                                           \
+            if (less(c, a)) {                                                  \
               sort_swap(c, a);                                                 \
             }                                                                  \
             sort_swap(d, e - 1);                                               \
@@ -305,7 +304,7 @@ typedef struct {
           mid = e - 1;                                                         \
           high = e;                                                            \
           while (mid > a) {                                                    \
-            if (compare(mid, high) < 0)                                        \
+            if (less(mid, high))                                               \
               break;                                                           \
             high--;                                                            \
             mid--;                                                             \
@@ -331,9 +330,9 @@ typedef struct {
                                                                                \
       e = c;                                                                   \
       while (1) {                                                              \
-        while (compare(b, c) < 0)                                              \
+        while (less(b, c))                                                     \
           b++;                                                                 \
-        while (compare(c, d) < 0)                                              \
+        while (less(c, d))                                                     \
           d--;                                                                 \
         if (b < d) {                                                           \
           sort_swap(b, d);                                                     \
@@ -358,9 +357,9 @@ typedef struct {
         pivot = c - a;                                                         \
       }                                                                        \
       if ((pivot << 1) < num_elements) {                                       \
-        if (pivot == 0 && !(compare(base, base + 1))) {                        \
+        if (pivot == 0 && !(less(base, base + 1))) {                           \
           a = base + 2;                                                        \
-          while (a <= high && !(compare(base, a)))                             \
+          while (a <= high && !(less(base, a)))                                \
             a++;                                                               \
           num_elements -= (a - base);                                          \
           base = a;                                                            \
@@ -383,41 +382,41 @@ typedef struct {
       if (num_elements < 40) {                                                 \
         if (num_elements < 6) {                                                \
           if (num_elements == 2) {                                             \
-            if (compare(base + 1, base) < 0) {                                 \
+            if (less(base + 1, base)) {                                        \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
           } else if (num_elements == 3) {                                      \
-            if (compare(base + 1, base) < 0) {                                 \
+            if (less(base + 1, base)) {                                        \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
-            if (compare(base + 2, base + 1) < 0) {                             \
+            if (less(base + 2, base + 1)) {                                    \
               sort_swap(base + 1, base + 2);                                   \
-              if (compare(base + 1, base) < 0) {                               \
+              if (less(base + 1, base)) {                                      \
                 sort_swap(base, base + 1);                                     \
               }                                                                \
             }                                                                  \
           } else if (num_elements == 4) {                                      \
-            if (compare(base + 1, base) < 0) {                                 \
+            if (less(base + 1, base)) {                                        \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
-            if (compare(base + 3, base + 2) < 0) {                             \
+            if (less(base + 3, base + 2)) {                                    \
               sort_swap(base + 2, base + 3);                                   \
             }                                                                  \
-            if (compare(base + 2, base) < 0) {                                 \
-              if (compare(base + 3, base) < 0) {                               \
+            if (less(base + 2, base)) {                                        \
+              if (less(base + 3, base)) {                                      \
                 sort_swap(base, base + 2);                                     \
                 sort_swap(base + 1, base + 3);                                 \
               } else {                                                         \
                 sort_swap(base, base + 1);                                     \
                 sort_swap(base + 0, base + 2);                                 \
-                if (compare(base + 3, base + 2) < 0) {                         \
+                if (less(base + 3, base + 2)) {                                \
                   sort_swap(base + 2, base + 3);                               \
                 }                                                              \
               }                                                                \
             } else {                                                           \
-              if (compare(base + 2, base + 1) < 0) {                           \
+              if (less(base + 2, base + 1)) {                                  \
                 sort_swap(base + 1, base + 2);                                 \
-                if (compare(base + 3, base + 2) < 0) {                         \
+                if (less(base + 3, base + 2)) {                                \
                   sort_swap(base + 2, base + 3);                               \
                 }                                                              \
               }                                                                \
@@ -429,48 +428,48 @@ typedef struct {
             d = c + 1;                                                         \
             e = d + 1;                                                         \
                                                                                \
-            if (compare(d, c) < 0) {                                           \
+            if (less(d, c)) {                                                  \
               pivot = 0;                                                       \
-              if (compare(e, d) < 0) {                                         \
+              if (less(e, d)) {                                                \
                 sort_swap(c, e);                                               \
               } else {                                                         \
                 sort_swap(c, d);                                               \
               }                                                                \
-            } else if (compare(e, c) < 0) {                                    \
+            } else if (less(e, c)) {                                           \
               pivot = 0;                                                       \
               sort_swap(c, e);                                                 \
             }                                                                  \
-            if (compare(c, a) < 0) {                                           \
+            if (less(c, a)) {                                                  \
               pivot = 0;                                                       \
               sort_swap(a, c);                                                 \
-              if (compare(d, c) < 0) {                                         \
-                if (compare(e, d) < 0) {                                       \
+              if (less(d, c)) {                                                \
+                if (less(e, d)) {                                              \
                   sort_swap(c, e);                                             \
                 } else {                                                       \
                   sort_swap(c, d);                                             \
                 }                                                              \
-              } else if (compare(e, c) < 0) {                                  \
+              } else if (less(e, c)) {                                         \
                 sort_swap(c, e);                                               \
               }                                                                \
             }                                                                  \
-            if (compare(c, b) < 0) {                                           \
+            if (less(c, b)) {                                                  \
               pivot = 0;                                                       \
               sort_swap(b, c);                                                 \
-              if (compare(d, c) < 0) {                                         \
-                if (compare(e, d) < 0) {                                       \
+              if (less(d, c)) {                                                \
+                if (less(e, d)) {                                              \
                   sort_swap(c, e);                                             \
                 } else {                                                       \
                   sort_swap(c, d);                                             \
                 }                                                              \
-              } else if (compare(e, c) < 0) {                                  \
+              } else if (less(e, c)) {                                         \
                 sort_swap(c, e);                                               \
               }                                                                \
             }                                                                  \
                                                                                \
-            if (compare(b, a) < 0) {                                           \
+            if (less(b, a)) {                                                  \
               sort_swap(a, b);                                                 \
             }                                                                  \
-            if (compare(e, d) < 0) {                                           \
+            if (less(e, d)) {                                                  \
               sort_swap(d, e);                                                 \
             }                                                                  \
           }                                                                    \
@@ -482,11 +481,11 @@ typedef struct {
         } else {                                                               \
           mid = base + (num_elements >> 1);                                    \
           high = base + (num_elements - 1);                                    \
-          if (compare(mid, base) < 0) {                                        \
+          if (less(mid, base)) {                                               \
             sort_swap(base, mid);                                              \
           }                                                                    \
-          if (compare(high, mid) < 0) {                                        \
-            if (compare(high, base) < 0) {                                     \
+          if (less(high, mid)) {                                               \
+            if (less(high, base)) {                                            \
               sort_swap(base, high);                                           \
             }                                                                  \
           } else {                                                             \
@@ -494,7 +493,7 @@ typedef struct {
           }                                                                    \
           a = b = base;                                                        \
           while (a < high) {                                                   \
-            if (compare(a, high) < 0) {                                        \
+            if (less(a, high)) {                                               \
               sort_swap(a, b);                                                 \
               b++;                                                             \
             }                                                                  \
@@ -503,9 +502,9 @@ typedef struct {
           sort_swap(b, high);                                                  \
           pivot = b - base;                                                    \
           if ((pivot << 1) < num_elements) {                                   \
-            if (pivot == 0 && !(compare(base, base + 1))) {                    \
+            if (pivot == 0 && !(less(base, base + 1))) {                       \
               a = base + 2;                                                    \
-              while (a <= high && !(compare(base, a)))                         \
+              while (a <= high && !(less(base, a)))                            \
                 a++;                                                           \
               num_elements -= (a - base);                                      \
               base = a;                                                        \
@@ -528,12 +527,12 @@ typedef struct {
         high = e = base + num_elements - 1;                                    \
         pivot = num_elements >> 1;                                             \
         c = a + pivot;                                                         \
-        if (compare(c, a) < 0) {                                               \
+        if (less(c, a)) {                                                      \
           sort_swap(c, a);                                                     \
         }                                                                      \
-        if (compare(e, c) < 0) {                                               \
+        if (less(e, c)) {                                                      \
           sort_swap(e, c);                                                     \
-          if (compare(c, a) < 0) {                                             \
+          if (less(c, a)) {                                                    \
             sort_swap(c, a);                                                   \
           }                                                                    \
         }                                                                      \
@@ -542,9 +541,9 @@ typedef struct {
         d = e - 1;                                                             \
         e = c;                                                                 \
         while (1) {                                                            \
-          while (compare(b, c) < 0)                                            \
+          while (less(b, c))                                                   \
             b++;                                                               \
-          while (compare(c, d) < 0)                                            \
+          while (less(c, d))                                                   \
             d--;                                                               \
           if (b < d) {                                                         \
             sort_swap(b, d);                                                   \
@@ -569,9 +568,9 @@ typedef struct {
           pivot = c - a;                                                       \
         }                                                                      \
         if ((pivot << 1) < num_elements) {                                     \
-          if (pivot == 0 && !(compare(base, base + 1))) {                      \
+          if (pivot == 0 && !(less(base, base + 1))) {                         \
             a = base + 2;                                                      \
-            while (a <= high && !(compare(base, a)))                           \
+            while (a <= high && !(less(base, a)))                              \
               a++;                                                             \
             num_elements -= (a - base);                                        \
             base = a;                                                          \
@@ -592,7 +591,7 @@ typedef struct {
     }                                                                          \
   }
 
-#define ac_sort_arg_m(name, type, compare)                                     \
+#define ac_sortl_arg_m(name, type, less)                                       \
   void name(type *base, size_t num_elements, void *arg) {                      \
     type *a;                                                                   \
     type *b;                                                                   \
@@ -612,7 +611,7 @@ typedef struct {
       e = base + num_elements - 1;                                             \
       pivot = num_elements >> 1;                                               \
       c = a + pivot;                                                           \
-      if (compare(e, a, arg) < 0) {                                            \
+      if (less(e, a, arg)) {                                                   \
         b = a;                                                                 \
         a = e;                                                                 \
         e = b;                                                                 \
@@ -627,46 +626,46 @@ typedef struct {
         pivot = 1;                                                             \
       }                                                                        \
                                                                                \
-      if (compare(d, c, arg) < 0) {                                            \
+      if (less(d, c, arg)) {                                                   \
         pivot = 0;                                                             \
-        if (compare(e, d, arg) < 0) {                                          \
+        if (less(e, d, arg)) {                                                 \
           sort_swap(c, e);                                                     \
         } else {                                                               \
           sort_swap(c, d);                                                     \
         }                                                                      \
-      } else if (compare(e, c, arg) < 0) {                                     \
+      } else if (less(e, c, arg)) {                                            \
         pivot = 0;                                                             \
         sort_swap(c, e);                                                       \
       }                                                                        \
-      if (compare(c, a, arg) < 0) {                                            \
+      if (less(c, a, arg)) {                                                   \
         pivot = 0;                                                             \
         sort_swap(a, c);                                                       \
-        if (compare(d, c, arg) < 0) {                                          \
-          if (compare(e, d, arg) < 0) {                                        \
+        if (less(d, c, arg)) {                                                 \
+          if (less(e, d, arg)) {                                               \
             sort_swap(c, e);                                                   \
           } else {                                                             \
             sort_swap(c, d);                                                   \
           }                                                                    \
-        } else if (compare(e, c, arg) < 0) {                                   \
+        } else if (less(e, c, arg)) {                                          \
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
-      if (compare(c, b, arg) < 0) {                                            \
+      if (less(c, b, arg)) {                                                   \
         pivot = 0;                                                             \
         sort_swap(b, c);                                                       \
-        if (compare(d, c, arg) < 0) {                                          \
-          if (compare(e, d, arg) < 0) {                                        \
+        if (less(d, c, arg)) {                                                 \
+          if (less(e, d, arg)) {                                               \
             sort_swap(c, e);                                                   \
           } else {                                                             \
             sort_swap(c, d);                                                   \
           }                                                                    \
-        } else if (compare(e, c, arg) < 0) {                                   \
+        } else if (less(e, c, arg)) {                                          \
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
                                                                                \
-      if (!pivot || compare(b, a, arg) < 0 || compare(c, b, arg) < 0 ||        \
-          compare(d, c, arg) < 0 || compare(e, a, arg) < 0) {                  \
+      if (!pivot || less(b, a, arg) || less(c, b, arg) || less(d, c, arg) ||   \
+          less(e, a, arg)) {                                                   \
         if (e < a) {                                                           \
           mid = a;                                                             \
           a = e;                                                               \
@@ -685,7 +684,7 @@ typedef struct {
         if (pivot == 1) {                                                      \
           mid = a + 1;                                                         \
           while (a < e) {                                                      \
-            if (compare(mid, a, arg) < 0)                                      \
+            if (less(mid, a, arg))                                             \
               break;                                                           \
             a++;                                                               \
             mid++;                                                             \
@@ -694,7 +693,7 @@ typedef struct {
             return;                                                            \
           sort_swap(a, mid);                                                   \
           if (a < c) {                                                         \
-            if (compare(c, a, arg) < 0) {                                      \
+            if (less(c, a, arg)) {                                             \
               sort_swap(c, a);                                                 \
             }                                                                  \
             sort_swap(d, e - 1);                                               \
@@ -718,7 +717,7 @@ typedef struct {
           mid = e - 1;                                                         \
           high = e;                                                            \
           while (mid > a) {                                                    \
-            if (compare(mid, high, arg) < 0)                                   \
+            if (less(mid, high, arg))                                          \
               break;                                                           \
             high--;                                                            \
             mid--;                                                             \
@@ -743,9 +742,9 @@ typedef struct {
                                                                                \
       e = c;                                                                   \
       while (1) {                                                              \
-        while (compare(b, c, arg) < 0)                                         \
+        while (less(b, c, arg))                                                \
           b++;                                                                 \
-        while (compare(c, d, arg) < 0)                                         \
+        while (less(c, d, arg))                                                \
           d--;                                                                 \
         if (b < d) {                                                           \
           sort_swap(b, d);                                                     \
@@ -770,9 +769,9 @@ typedef struct {
         pivot = c - a;                                                         \
       }                                                                        \
       if ((pivot << 1) < num_elements) {                                       \
-        if (pivot == 0 && !(compare(base, base + 1, arg))) {                   \
+        if (pivot == 0 && !(less(base, base + 1, arg))) {                      \
           a = base + 2;                                                        \
-          while (a <= high && !(compare(base, a, arg)))                        \
+          while (a <= high && !(less(base, a, arg)))                           \
             a++;                                                               \
           num_elements -= (a - base);                                          \
           base = a;                                                            \
@@ -795,41 +794,41 @@ typedef struct {
       if (num_elements < 40) {                                                 \
         if (num_elements < 6) {                                                \
           if (num_elements == 2) {                                             \
-            if (compare(base + 1, base, arg) < 0) {                            \
+            if (less(base + 1, base, arg)) {                                   \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
           } else if (num_elements == 3) {                                      \
-            if (compare(base + 1, base, arg) < 0) {                            \
+            if (less(base + 1, base, arg)) {                                   \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
-            if (compare(base + 2, base + 1, arg) < 0) {                        \
+            if (less(base + 2, base + 1, arg)) {                               \
               sort_swap(base + 1, base + 2);                                   \
-              if (compare(base + 1, base, arg) < 0) {                          \
+              if (less(base + 1, base, arg)) {                                 \
                 sort_swap(base, base + 1);                                     \
               }                                                                \
             }                                                                  \
           } else if (num_elements == 4) {                                      \
-            if (compare(base + 1, base, arg) < 0) {                            \
+            if (less(base + 1, base, arg)) {                                   \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
-            if (compare(base + 3, base + 2, arg) < 0) {                        \
+            if (less(base + 3, base + 2, arg)) {                               \
               sort_swap(base + 2, base + 3);                                   \
             }                                                                  \
-            if (compare(base + 2, base, arg) < 0) {                            \
-              if (compare(base + 3, base, arg) < 0) {                          \
+            if (less(base + 2, base, arg)) {                                   \
+              if (less(base + 3, base, arg)) {                                 \
                 sort_swap(base, base + 2);                                     \
                 sort_swap(base + 1, base + 3);                                 \
               } else {                                                         \
                 sort_swap(base, base + 1);                                     \
                 sort_swap(base + 0, base + 2);                                 \
-                if (compare(base + 3, base + 2, arg) < 0) {                    \
+                if (less(base + 3, base + 2, arg)) {                           \
                   sort_swap(base + 2, base + 3);                               \
                 }                                                              \
               }                                                                \
             } else {                                                           \
-              if (compare(base + 2, base + 1, arg) < 0) {                      \
+              if (less(base + 2, base + 1, arg)) {                             \
                 sort_swap(base + 1, base + 2);                                 \
-                if (compare(base + 3, base + 2, arg) < 0) {                    \
+                if (less(base + 3, base + 2, arg)) {                           \
                   sort_swap(base + 2, base + 3);                               \
                 }                                                              \
               }                                                                \
@@ -841,48 +840,48 @@ typedef struct {
             d = c + 1;                                                         \
             e = d + 1;                                                         \
                                                                                \
-            if (compare(d, c, arg) < 0) {                                      \
+            if (less(d, c, arg)) {                                             \
               pivot = 0;                                                       \
-              if (compare(e, d, arg) < 0) {                                    \
+              if (less(e, d, arg)) {                                           \
                 sort_swap(c, e);                                               \
               } else {                                                         \
                 sort_swap(c, d);                                               \
               }                                                                \
-            } else if (compare(e, c, arg) < 0) {                               \
+            } else if (less(e, c, arg)) {                                      \
               pivot = 0;                                                       \
               sort_swap(c, e);                                                 \
             }                                                                  \
-            if (compare(c, a, arg) < 0) {                                      \
+            if (less(c, a, arg)) {                                             \
               pivot = 0;                                                       \
               sort_swap(a, c);                                                 \
-              if (compare(d, c, arg) < 0) {                                    \
-                if (compare(e, d, arg) < 0) {                                  \
+              if (less(d, c, arg)) {                                           \
+                if (less(e, d, arg)) {                                         \
                   sort_swap(c, e);                                             \
                 } else {                                                       \
                   sort_swap(c, d);                                             \
                 }                                                              \
-              } else if (compare(e, c, arg) < 0) {                             \
+              } else if (less(e, c, arg)) {                                    \
                 sort_swap(c, e);                                               \
               }                                                                \
             }                                                                  \
-            if (compare(c, b, arg) < 0) {                                      \
+            if (less(c, b, arg)) {                                             \
               pivot = 0;                                                       \
               sort_swap(b, c);                                                 \
-              if (compare(d, c, arg) < 0) {                                    \
-                if (compare(e, d, arg) < 0) {                                  \
+              if (less(d, c, arg)) {                                           \
+                if (less(e, d, arg)) {                                         \
                   sort_swap(c, e);                                             \
                 } else {                                                       \
                   sort_swap(c, d);                                             \
                 }                                                              \
-              } else if (compare(e, c, arg) < 0) {                             \
+              } else if (less(e, c, arg)) {                                    \
                 sort_swap(c, e);                                               \
               }                                                                \
             }                                                                  \
                                                                                \
-            if (compare(b, a, arg) < 0) {                                      \
+            if (less(b, a, arg)) {                                             \
               sort_swap(a, b);                                                 \
             }                                                                  \
-            if (compare(e, d, arg) < 0) {                                      \
+            if (less(e, d, arg)) {                                             \
               sort_swap(d, e);                                                 \
             }                                                                  \
           }                                                                    \
@@ -894,11 +893,11 @@ typedef struct {
         } else {                                                               \
           mid = base + (num_elements >> 1);                                    \
           high = base + (num_elements - 1);                                    \
-          if (compare(mid, base, arg) < 0) {                                   \
+          if (less(mid, base, arg)) {                                          \
             sort_swap(base, mid);                                              \
           }                                                                    \
-          if (compare(high, mid, arg) < 0) {                                   \
-            if (compare(high, base, arg) < 0) {                                \
+          if (less(high, mid, arg)) {                                          \
+            if (less(high, base, arg)) {                                       \
               sort_swap(base, high);                                           \
             }                                                                  \
           } else {                                                             \
@@ -906,7 +905,7 @@ typedef struct {
           }                                                                    \
           a = b = base;                                                        \
           while (a < high) {                                                   \
-            if (compare(a, high, arg) < 0) {                                   \
+            if (less(a, high, arg)) {                                          \
               sort_swap(a, b);                                                 \
               b++;                                                             \
             }                                                                  \
@@ -916,9 +915,9 @@ typedef struct {
           pivot = b - base;                                                    \
                                                                                \
           if ((pivot << 1) < num_elements) {                                   \
-            if (pivot == 0 && !(compare(base, base + 1, arg))) {               \
+            if (pivot == 0 && !(less(base, base + 1, arg))) {                  \
               a = base + 2;                                                    \
-              while (a <= high && !(compare(base, a, arg)))                    \
+              while (a <= high && !(less(base, a, arg)))                       \
                 a++;                                                           \
               num_elements -= (a - base);                                      \
               base = a;                                                        \
@@ -941,12 +940,12 @@ typedef struct {
         e = base + num_elements - 1;                                           \
         pivot = num_elements >> 1;                                             \
         c = a + pivot;                                                         \
-        if (compare(c, a, arg) < 0) {                                          \
+        if (less(c, a, arg)) {                                                 \
           sort_swap(c, a);                                                     \
         }                                                                      \
-        if (compare(e, c, arg) < 0) {                                          \
+        if (less(e, c, arg)) {                                                 \
           sort_swap(e, c);                                                     \
-          if (compare(c, a, arg) < 0) {                                        \
+          if (less(c, a, arg)) {                                               \
             sort_swap(c, a);                                                   \
           }                                                                    \
         }                                                                      \
@@ -955,9 +954,9 @@ typedef struct {
         d = e - 1;                                                             \
         e = c;                                                                 \
         while (1) {                                                            \
-          while (compare(b, c, arg) < 0)                                       \
+          while (less(b, c, arg))                                              \
             b++;                                                               \
-          while (compare(c, d, arg) < 0)                                       \
+          while (less(c, d, arg))                                              \
             d--;                                                               \
           if (b < d) {                                                         \
             sort_swap(b, d);                                                   \
@@ -982,9 +981,9 @@ typedef struct {
           pivot = c - a;                                                       \
         }                                                                      \
         if ((pivot << 1) < num_elements) {                                     \
-          if (pivot == 0 && !(compare(base, base + 1, arg))) {                 \
+          if (pivot == 0 && !(less(base, base + 1, arg))) {                    \
             a = base + 2;                                                      \
-            while (a <= high && !(compare(base, a, arg)))                      \
+            while (a <= high && !(less(base, a, arg)))                         \
               a++;                                                             \
             num_elements -= (a - base);                                        \
             base = a;                                                          \
@@ -1005,9 +1004,9 @@ typedef struct {
     }                                                                          \
   }
 
-#define ac_sort_compare_m(name, type)                                          \
+#define ac_sortl_less_m(name, type)                                            \
   void name(type *base, size_t num_elements,                                   \
-            int (*compare)(datatype * a, datatype * b)) {                      \
+            bool (*less)(datatype * a, datatype * b)) {                        \
     type *a;                                                                   \
     type *b;                                                                   \
     type *c;                                                                   \
@@ -1026,7 +1025,7 @@ typedef struct {
       e = base + num_elements - 1;                                             \
       pivot = num_elements >> 1;                                               \
       c = a + pivot;                                                           \
-      if (compare(e, a) < 0) {                                                 \
+      if (less(e, a)) {                                                        \
         b = a;                                                                 \
         a = e;                                                                 \
         e = b;                                                                 \
@@ -1041,46 +1040,45 @@ typedef struct {
         pivot = 1;                                                             \
       }                                                                        \
                                                                                \
-      if (compare(d, c) < 0) {                                                 \
+      if (less(d, c)) {                                                        \
         pivot = 0;                                                             \
-        if (compare(e, d) < 0) {                                               \
+        if (less(e, d)) {                                                      \
           sort_swap(c, e);                                                     \
         } else {                                                               \
           sort_swap(c, d);                                                     \
         }                                                                      \
-      } else if (compare(e, c) < 0) {                                          \
+      } else if (less(e, c)) {                                                 \
         pivot = 0;                                                             \
         sort_swap(c, e);                                                       \
       }                                                                        \
-      if (compare(c, a) < 0) {                                                 \
+      if (less(c, a)) {                                                        \
         pivot = 0;                                                             \
         sort_swap(a, c);                                                       \
-        if (compare(d, c) < 0) {                                               \
-          if (compare(e, d) < 0) {                                             \
+        if (less(d, c)) {                                                      \
+          if (less(e, d)) {                                                    \
             sort_swap(c, e);                                                   \
           } else {                                                             \
             sort_swap(c, d);                                                   \
           }                                                                    \
-        } else if (compare(e, c) < 0) {                                        \
+        } else if (less(e, c)) {                                               \
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
-      if (compare(c, b) < 0) {                                                 \
+      if (less(c, b)) {                                                        \
         pivot = 0;                                                             \
         sort_swap(b, c);                                                       \
-        if (compare(d, c) < 0) {                                               \
-          if (compare(e, d) < 0) {                                             \
+        if (less(d, c)) {                                                      \
+          if (less(e, d)) {                                                    \
             sort_swap(c, e);                                                   \
           } else {                                                             \
             sort_swap(c, d);                                                   \
           }                                                                    \
-        } else if (compare(e, c) < 0) {                                        \
+        } else if (less(e, c)) {                                               \
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
                                                                                \
-      if (!pivot || compare(b, a) < 0 || compare(c, b) < 0 ||                  \
-          compare(d, c) < 0 || compare(e, a) < 0) {                            \
+      if (!pivot || less(b, a) || less(c, b) || less(d, c) || less(e, a)) {    \
         if (e < a) {                                                           \
           mid = a;                                                             \
           a = e;                                                               \
@@ -1099,7 +1097,7 @@ typedef struct {
         if (pivot == 1) {                                                      \
           mid = a + 1;                                                         \
           while (a < e) {                                                      \
-            if (compare(mid, a) < 0)                                           \
+            if (less(mid, a))                                                  \
               break;                                                           \
             a++;                                                               \
             mid++;                                                             \
@@ -1108,7 +1106,7 @@ typedef struct {
             return;                                                            \
           sort_swap(a, mid);                                                   \
           if (a < c) {                                                         \
-            if (compare(c, a) < 0) {                                           \
+            if (less(c, a)) {                                                  \
               sort_swap(c, a);                                                 \
             }                                                                  \
             sort_swap(d, e - 1);                                               \
@@ -1132,7 +1130,7 @@ typedef struct {
           mid = e - 1;                                                         \
           high = e;                                                            \
           while (mid > a) {                                                    \
-            if (compare(mid, high) < 0)                                        \
+            if (less(mid, high))                                               \
               break;                                                           \
             high--;                                                            \
             mid--;                                                             \
@@ -1157,9 +1155,9 @@ typedef struct {
                                                                                \
       e = c;                                                                   \
       while (1) {                                                              \
-        while (compare(b, c) < 0)                                              \
+        while (less(b, c))                                                     \
           b++;                                                                 \
-        while (compare(c, d) < 0)                                              \
+        while (less(c, d))                                                     \
           d--;                                                                 \
         if (b < d) {                                                           \
           sort_swap(b, d);                                                     \
@@ -1184,9 +1182,9 @@ typedef struct {
         pivot = c - a;                                                         \
       }                                                                        \
       if ((pivot << 1) < num_elements) {                                       \
-        if (pivot == 0 && !(compare(base, base + 1))) {                        \
+        if (pivot == 0 && !(less(base, base + 1))) {                           \
           a = base + 2;                                                        \
-          while (a <= high && !(compare(base, a)))                             \
+          while (a <= high && !(less(base, a)))                                \
             a++;                                                               \
           num_elements -= (a - base);                                          \
           base = a;                                                            \
@@ -1209,41 +1207,41 @@ typedef struct {
       if (num_elements < 40) {                                                 \
         if (num_elements < 6) {                                                \
           if (num_elements == 2) {                                             \
-            if (compare(base + 1, base) < 0) {                                 \
+            if (less(base + 1, base)) {                                        \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
           } else if (num_elements == 3) {                                      \
-            if (compare(base + 1, base) < 0) {                                 \
+            if (less(base + 1, base)) {                                        \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
-            if (compare(base + 2, base + 1) < 0) {                             \
+            if (less(base + 2, base + 1)) {                                    \
               sort_swap(base + 1, base + 2);                                   \
-              if (compare(base + 1, base) < 0) {                               \
+              if (less(base + 1, base)) {                                      \
                 sort_swap(base, base + 1);                                     \
               }                                                                \
             }                                                                  \
           } else if (num_elements == 4) {                                      \
-            if (compare(base + 1, base) < 0) {                                 \
+            if (less(base + 1, base)) {                                        \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
-            if (compare(base + 3, base + 2) < 0) {                             \
+            if (less(base + 3, base + 2)) {                                    \
               sort_swap(base + 2, base + 3);                                   \
             }                                                                  \
-            if (compare(base + 2, base) < 0) {                                 \
-              if (compare(base + 3, base) < 0) {                               \
+            if (less(base + 2, base)) {                                        \
+              if (less(base + 3, base)) {                                      \
                 sort_swap(base, base + 2);                                     \
                 sort_swap(base + 1, base + 3);                                 \
               } else {                                                         \
                 sort_swap(base, base + 1);                                     \
                 sort_swap(base + 0, base + 2);                                 \
-                if (compare(base + 3, base + 2) < 0) {                         \
+                if (less(base + 3, base + 2)) {                                \
                   sort_swap(base + 2, base + 3);                               \
                 }                                                              \
               }                                                                \
             } else {                                                           \
-              if (compare(base + 2, base + 1) < 0) {                           \
+              if (less(base + 2, base + 1)) {                                  \
                 sort_swap(base + 1, base + 2);                                 \
-                if (compare(base + 3, base + 2) < 0) {                         \
+                if (less(base + 3, base + 2)) {                                \
                   sort_swap(base + 2, base + 3);                               \
                 }                                                              \
               }                                                                \
@@ -1255,48 +1253,48 @@ typedef struct {
             d = c + 1;                                                         \
             e = d + 1;                                                         \
                                                                                \
-            if (compare(d, c) < 0) {                                           \
+            if (less(d, c)) {                                                  \
               pivot = 0;                                                       \
-              if (compare(e, d) < 0) {                                         \
+              if (less(e, d)) {                                                \
                 sort_swap(c, e);                                               \
               } else {                                                         \
                 sort_swap(c, d);                                               \
               }                                                                \
-            } else if (compare(e, c) < 0) {                                    \
+            } else if (less(e, c)) {                                           \
               pivot = 0;                                                       \
               sort_swap(c, e);                                                 \
             }                                                                  \
-            if (compare(c, a) < 0) {                                           \
+            if (less(c, a)) {                                                  \
               pivot = 0;                                                       \
               sort_swap(a, c);                                                 \
-              if (compare(d, c) < 0) {                                         \
-                if (compare(e, d) < 0) {                                       \
+              if (less(d, c)) {                                                \
+                if (less(e, d)) {                                              \
                   sort_swap(c, e);                                             \
                 } else {                                                       \
                   sort_swap(c, d);                                             \
                 }                                                              \
-              } else if (compare(e, c) < 0) {                                  \
+              } else if (less(e, c)) {                                         \
                 sort_swap(c, e);                                               \
               }                                                                \
             }                                                                  \
-            if (compare(c, b) < 0) {                                           \
+            if (less(c, b)) {                                                  \
               pivot = 0;                                                       \
               sort_swap(b, c);                                                 \
-              if (compare(d, c) < 0) {                                         \
-                if (compare(e, d) < 0) {                                       \
+              if (less(d, c)) {                                                \
+                if (less(e, d)) {                                              \
                   sort_swap(c, e);                                             \
                 } else {                                                       \
                   sort_swap(c, d);                                             \
                 }                                                              \
-              } else if (compare(e, c) < 0) {                                  \
+              } else if (less(e, c)) {                                         \
                 sort_swap(c, e);                                               \
               }                                                                \
             }                                                                  \
                                                                                \
-            if (compare(b, a) < 0) {                                           \
+            if (less(b, a)) {                                                  \
               sort_swap(a, b);                                                 \
             }                                                                  \
-            if (compare(e, d) < 0) {                                           \
+            if (less(e, d)) {                                                  \
               sort_swap(d, e);                                                 \
             }                                                                  \
           }                                                                    \
@@ -1308,11 +1306,11 @@ typedef struct {
         } else {                                                               \
           mid = base + (num_elements >> 1);                                    \
           high = base + (num_elements - 1);                                    \
-          if (compare(mid, base) < 0) {                                        \
+          if (less(mid, base)) {                                               \
             sort_swap(base, mid);                                              \
           }                                                                    \
-          if (compare(high, mid) < 0) {                                        \
-            if (compare(high, base) < 0) {                                     \
+          if (less(high, mid)) {                                               \
+            if (less(high, base)) {                                            \
               sort_swap(base, high);                                           \
             }                                                                  \
           } else {                                                             \
@@ -1320,7 +1318,7 @@ typedef struct {
           }                                                                    \
           a = b = base;                                                        \
           while (a < high) {                                                   \
-            if (compare(a, high) < 0) {                                        \
+            if (less(a, high)) {                                               \
               sort_swap(a, b);                                                 \
               b++;                                                             \
             }                                                                  \
@@ -1330,9 +1328,9 @@ typedef struct {
           pivot = b - base;                                                    \
                                                                                \
           if ((pivot << 1) < num_elements) {                                   \
-            if (pivot == 0 && !(compare(base, base + 1))) {                    \
+            if (pivot == 0 && !(less(base, base + 1))) {                       \
               a = base + 2;                                                    \
-              while (a <= high && !(compare(base, a)))                         \
+              while (a <= high && !(less(base, a)))                            \
                 a++;                                                           \
               num_elements -= (a - base);                                      \
               base = a;                                                        \
@@ -1355,12 +1353,12 @@ typedef struct {
         e = base + num_elements - 1;                                           \
         pivot = num_elements >> 1;                                             \
         c = a + pivot;                                                         \
-        if (compare(c, a) < 0) {                                               \
+        if (less(c, a)) {                                                      \
           sort_swap(c, a);                                                     \
         }                                                                      \
-        if (compare(e, c) < 0) {                                               \
+        if (less(e, c)) {                                                      \
           sort_swap(e, c);                                                     \
-          if (compare(c, a) < 0) {                                             \
+          if (less(c, a)) {                                                    \
             sort_swap(c, a);                                                   \
           }                                                                    \
         }                                                                      \
@@ -1369,9 +1367,9 @@ typedef struct {
         d = e - 1;                                                             \
         e = c;                                                                 \
         while (1) {                                                            \
-          while (compare(b, c) < 0)                                            \
+          while (less(b, c))                                                   \
             b++;                                                               \
-          while (compare(c, d) < 0)                                            \
+          while (less(c, d))                                                   \
             d--;                                                               \
           if (b < d) {                                                         \
             sort_swap(b, d);                                                   \
@@ -1396,9 +1394,9 @@ typedef struct {
           pivot = c - a;                                                       \
         }                                                                      \
         if ((pivot << 1) < num_elements) {                                     \
-          if (pivot == 0 && !(compare(base, base + 1))) {                      \
+          if (pivot == 0 && !(less(base, base + 1))) {                         \
             a = base + 2;                                                      \
-            while (a <= high && !(compare(base, a)))                           \
+            while (a <= high && !(less(base, a)))                              \
               a++;                                                             \
             num_elements -= (a - base);                                        \
             base = a;                                                          \
@@ -1419,10 +1417,9 @@ typedef struct {
     }                                                                          \
   }
 
-#define ac_sort_compare_arg_m(name, type)                                      \
+#define ac_sortl_less_arg_m(name, type)                                        \
   void name(type *base, size_t num_elements,                                   \
-            int (*compare)(datatype * a, datatype * b, void *arg),             \
-            void *arg) {                                                       \
+            bool (*less)(datatype * a, datatype * b, void *arg), void *arg) {  \
     type *a;                                                                   \
     type *b;                                                                   \
     type *c;                                                                   \
@@ -1441,7 +1438,7 @@ typedef struct {
       e = base + num_elements - 1;                                             \
       pivot = num_elements >> 1;                                               \
       c = a + pivot;                                                           \
-      if (compare(e, a, arg) < 0) {                                            \
+      if (less(e, a, arg)) {                                                   \
         b = a;                                                                 \
         a = e;                                                                 \
         e = b;                                                                 \
@@ -1456,46 +1453,46 @@ typedef struct {
         pivot = 1;                                                             \
       }                                                                        \
                                                                                \
-      if (compare(d, c, arg) < 0) {                                            \
+      if (less(d, c, arg)) {                                                   \
         pivot = 0;                                                             \
-        if (compare(e, d, arg) < 0) {                                          \
+        if (less(e, d, arg)) {                                                 \
           sort_swap(c, e);                                                     \
         } else {                                                               \
           sort_swap(c, d);                                                     \
         }                                                                      \
-      } else if (compare(e, c, arg) < 0) {                                     \
+      } else if (less(e, c, arg)) {                                            \
         pivot = 0;                                                             \
         sort_swap(c, e);                                                       \
       }                                                                        \
-      if (compare(c, a, arg) < 0) {                                            \
+      if (less(c, a, arg)) {                                                   \
         pivot = 0;                                                             \
         sort_swap(a, c);                                                       \
-        if (compare(d, c, arg) < 0) {                                          \
-          if (compare(e, d, arg) < 0) {                                        \
+        if (less(d, c, arg)) {                                                 \
+          if (less(e, d, arg)) {                                               \
             sort_swap(c, e);                                                   \
           } else {                                                             \
             sort_swap(c, d);                                                   \
           }                                                                    \
-        } else if (compare(e, c, arg) < 0) {                                   \
+        } else if (less(e, c, arg)) {                                          \
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
-      if (compare(c, b, arg) < 0) {                                            \
+      if (less(c, b, arg)) {                                                   \
         pivot = 0;                                                             \
         sort_swap(b, c);                                                       \
-        if (compare(d, c, arg) < 0) {                                          \
-          if (compare(e, d, arg) < 0) {                                        \
+        if (less(d, c, arg)) {                                                 \
+          if (less(e, d, arg)) {                                               \
             sort_swap(c, e);                                                   \
           } else {                                                             \
             sort_swap(c, d);                                                   \
           }                                                                    \
-        } else if (compare(e, c, arg) < 0) {                                   \
+        } else if (less(e, c, arg)) {                                          \
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
                                                                                \
-      if (!pivot || compare(b, a, arg) < 0 || compare(c, b, arg) < 0 ||        \
-          compare(d, c, arg) < 0 || compare(e, a, arg) < 0) {                  \
+      if (!pivot || less(b, a, arg) || less(c, b, arg) || less(d, c, arg) ||   \
+          less(e, a, arg)) {                                                   \
         if (e < a) {                                                           \
           mid = a;                                                             \
           a = e;                                                               \
@@ -1514,7 +1511,7 @@ typedef struct {
         if (pivot == 1) {                                                      \
           mid = a + 1;                                                         \
           while (a < e) {                                                      \
-            if (compare(mid, a, arg) < 0)                                      \
+            if (less(mid, a, arg))                                             \
               break;                                                           \
             a++;                                                               \
             mid++;                                                             \
@@ -1523,7 +1520,7 @@ typedef struct {
             return;                                                            \
           sort_swap(a, mid);                                                   \
           if (a < c) {                                                         \
-            if (compare(c, a, arg) < 0) {                                      \
+            if (less(c, a, arg)) {                                             \
               sort_swap(c, a);                                                 \
             }                                                                  \
             sort_swap(d, e - 1);                                               \
@@ -1547,7 +1544,7 @@ typedef struct {
           mid = e - 1;                                                         \
           high = e;                                                            \
           while (mid > a) {                                                    \
-            if (compare(mid, high, arg) < 0)                                   \
+            if (less(mid, high, arg))                                          \
               break;                                                           \
             high--;                                                            \
             mid--;                                                             \
@@ -1572,9 +1569,9 @@ typedef struct {
                                                                                \
       e = c;                                                                   \
       while (1) {                                                              \
-        while (compare(b, c, arg) < 0)                                         \
+        while (less(b, c, arg))                                                \
           b++;                                                                 \
-        while (compare(c, d, arg) < 0)                                         \
+        while (less(c, d, arg))                                                \
           d--;                                                                 \
         if (b < d) {                                                           \
           sort_swap(b, d);                                                     \
@@ -1599,9 +1596,9 @@ typedef struct {
         pivot = c - a;                                                         \
       }                                                                        \
       if ((pivot << 1) < num_elements) {                                       \
-        if (pivot == 0 && !(compare(base, base + 1, arg))) {                   \
+        if (pivot == 0 && !(less(base, base + 1, arg))) {                      \
           a = base + 2;                                                        \
-          while (a <= high && !(compare(base, a, arg)))                        \
+          while (a <= high && !(less(base, a, arg)))                           \
             a++;                                                               \
           num_elements -= (a - base);                                          \
           base = a;                                                            \
@@ -1624,41 +1621,41 @@ typedef struct {
       if (num_elements < 40) {                                                 \
         if (num_elements < 6) {                                                \
           if (num_elements == 2) {                                             \
-            if (compare(base + 1, base, arg) < 0) {                            \
+            if (less(base + 1, base, arg)) {                                   \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
           } else if (num_elements == 3) {                                      \
-            if (compare(base + 1, base, arg) < 0) {                            \
+            if (less(base + 1, base, arg)) {                                   \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
-            if (compare(base + 2, base + 1, arg) < 0) {                        \
+            if (less(base + 2, base + 1, arg)) {                               \
               sort_swap(base + 1, base + 2);                                   \
-              if (compare(base + 1, base, arg) < 0) {                          \
+              if (less(base + 1, base, arg)) {                                 \
                 sort_swap(base, base + 1);                                     \
               }                                                                \
             }                                                                  \
           } else if (num_elements == 4) {                                      \
-            if (compare(base + 1, base, arg) < 0) {                            \
+            if (less(base + 1, base, arg)) {                                   \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
-            if (compare(base + 3, base + 2, arg) < 0) {                        \
+            if (less(base + 3, base + 2, arg)) {                               \
               sort_swap(base + 2, base + 3);                                   \
             }                                                                  \
-            if (compare(base + 2, base, arg) < 0) {                            \
-              if (compare(base + 3, base, arg) < 0) {                          \
+            if (less(base + 2, base, arg)) {                                   \
+              if (less(base + 3, base, arg)) {                                 \
                 sort_swap(base, base + 2);                                     \
                 sort_swap(base + 1, base + 3);                                 \
               } else {                                                         \
                 sort_swap(base, base + 1);                                     \
                 sort_swap(base + 0, base + 2);                                 \
-                if (compare(base + 3, base + 2, arg) < 0) {                    \
+                if (less(base + 3, base + 2, arg)) {                           \
                   sort_swap(base + 2, base + 3);                               \
                 }                                                              \
               }                                                                \
             } else {                                                           \
-              if (compare(base + 2, base + 1, arg) < 0) {                      \
+              if (less(base + 2, base + 1, arg)) {                             \
                 sort_swap(base + 1, base + 2);                                 \
-                if (compare(base + 3, base + 2, arg) < 0) {                    \
+                if (less(base + 3, base + 2, arg)) {                           \
                   sort_swap(base + 2, base + 3);                               \
                 }                                                              \
               }                                                                \
@@ -1670,48 +1667,48 @@ typedef struct {
             d = c + 1;                                                         \
             e = d + 1;                                                         \
                                                                                \
-            if (compare(d, c, arg) < 0) {                                      \
+            if (less(d, c, arg)) {                                             \
               pivot = 0;                                                       \
-              if (compare(e, d, arg) < 0) {                                    \
+              if (less(e, d, arg)) {                                           \
                 sort_swap(c, e);                                               \
               } else {                                                         \
                 sort_swap(c, d);                                               \
               }                                                                \
-            } else if (compare(e, c, arg) < 0) {                               \
+            } else if (less(e, c, arg)) {                                      \
               pivot = 0;                                                       \
               sort_swap(c, e);                                                 \
             }                                                                  \
-            if (compare(c, a, arg) < 0) {                                      \
+            if (less(c, a, arg)) {                                             \
               pivot = 0;                                                       \
               sort_swap(a, c);                                                 \
-              if (compare(d, c, arg) < 0) {                                    \
-                if (compare(e, d, arg) < 0) {                                  \
+              if (less(d, c, arg)) {                                           \
+                if (less(e, d, arg)) {                                         \
                   sort_swap(c, e);                                             \
                 } else {                                                       \
                   sort_swap(c, d);                                             \
                 }                                                              \
-              } else if (compare(e, c, arg) < 0) {                             \
+              } else if (less(e, c, arg)) {                                    \
                 sort_swap(c, e);                                               \
               }                                                                \
             }                                                                  \
-            if (compare(c, b, arg) < 0) {                                      \
+            if (less(c, b, arg)) {                                             \
               pivot = 0;                                                       \
               sort_swap(b, c);                                                 \
-              if (compare(d, c, arg) < 0) {                                    \
-                if (compare(e, d, arg) < 0) {                                  \
+              if (less(d, c, arg)) {                                           \
+                if (less(e, d, arg)) {                                         \
                   sort_swap(c, e);                                             \
                 } else {                                                       \
                   sort_swap(c, d);                                             \
                 }                                                              \
-              } else if (compare(e, c, arg) < 0) {                             \
+              } else if (less(e, c, arg)) {                                    \
                 sort_swap(c, e);                                               \
               }                                                                \
             }                                                                  \
                                                                                \
-            if (compare(b, a, arg) < 0) {                                      \
+            if (less(b, a, arg)) {                                             \
               sort_swap(a, b);                                                 \
             }                                                                  \
-            if (compare(e, d, arg) < 0) {                                      \
+            if (less(e, d, arg)) {                                             \
               sort_swap(d, e);                                                 \
             }                                                                  \
           }                                                                    \
@@ -1723,11 +1720,11 @@ typedef struct {
         } else {                                                               \
           mid = base + (num_elements >> 1);                                    \
           high = base + (num_elements - 1);                                    \
-          if (compare(mid, base, arg) < 0) {                                   \
+          if (less(mid, base, arg)) {                                          \
             sort_swap(base, mid);                                              \
           }                                                                    \
-          if (compare(high, mid, arg) < 0) {                                   \
-            if (compare(high, base, arg) < 0) {                                \
+          if (less(high, mid, arg)) {                                          \
+            if (less(high, base, arg)) {                                       \
               sort_swap(base, high);                                           \
             }                                                                  \
           } else {                                                             \
@@ -1735,7 +1732,7 @@ typedef struct {
           }                                                                    \
           a = b = base;                                                        \
           while (a < high) {                                                   \
-            if (compare(a, high, arg) < 0) {                                   \
+            if (less(a, high, arg)) {                                          \
               sort_swap(a, b);                                                 \
               b++;                                                             \
             }                                                                  \
@@ -1745,9 +1742,9 @@ typedef struct {
           pivot = b - base;                                                    \
                                                                                \
           if ((pivot << 1) < num_elements) {                                   \
-            if (pivot == 0 && !(compare(base, base + 1, arg))) {               \
+            if (pivot == 0 && !(less(base, base + 1, arg))) {                  \
               a = base + 2;                                                    \
-              while (a <= high && !(compare(base, a, arg)))                    \
+              while (a <= high && !(less(base, a, arg)))                       \
                 a++;                                                           \
               num_elements -= (a - base);                                      \
               base = a;                                                        \
@@ -1770,12 +1767,12 @@ typedef struct {
         e = base + num_elements - 1;                                           \
         pivot = num_elements >> 1;                                             \
         c = a + pivot;                                                         \
-        if (compare(c, a, arg) < 0) {                                          \
+        if (less(c, a, arg)) {                                                 \
           sort_swap(c, a);                                                     \
         }                                                                      \
-        if (compare(e, c, arg) < 0) {                                          \
+        if (less(e, c, arg)) {                                                 \
           sort_swap(e, c);                                                     \
-          if (compare(c, a, arg) < 0) {                                        \
+          if (less(c, a, arg)) {                                               \
             sort_swap(c, a);                                                   \
           }                                                                    \
         }                                                                      \
@@ -1784,9 +1781,9 @@ typedef struct {
         d = e - 1;                                                             \
         e = c;                                                                 \
         while (1) {                                                            \
-          while (compare(b, c, arg) < 0)                                       \
+          while (less(b, c, arg))                                              \
             b++;                                                               \
-          while (compare(c, d, arg) < 0)                                       \
+          while (less(c, d, arg))                                              \
             d--;                                                               \
           if (b < d) {                                                         \
             sort_swap(b, d);                                                   \
@@ -1811,9 +1808,9 @@ typedef struct {
           pivot = c - a;                                                       \
         }                                                                      \
         if ((pivot << 1) < num_elements) {                                     \
-          if (pivot == 0 && !(compare(base, base + 1, arg))) {                 \
+          if (pivot == 0 && !(less(base, base + 1, arg))) {                    \
             a = base + 2;                                                      \
-            while (a <= high && !(compare(base, a, arg)))                      \
+            while (a <= high && !(less(base, a, arg)))                         \
               a++;                                                             \
             num_elements -= (a - base);                                        \
             base = a;                                                          \

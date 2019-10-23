@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 
 and so on.
 
-buffer.h is part of this project (it'll later be changed to ac_buffer.h).  ac stands for standard template library alternative.  C doesn't have a built-in mechanism to handle growing strings or arrays.  Anyone who has done C will have created an object like buffer or reused someone else's code.  I'm just attempting to create standardized objects which others can use.
+buffer.h is part of this project (it'll later be changed to ac_buffer.h).  ac stands for another c library.  C doesn't have a built-in mechanism to handle growing strings or arrays.  Anyone who has done C will have created an object like buffer or reused someone else's code.  I'm just attempting to create standardized objects which others can use.
 
 ## A bit of history and setup
 
