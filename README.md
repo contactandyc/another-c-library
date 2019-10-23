@@ -1,6 +1,8 @@
 # Another C Library Table of Contents
 - Copyright 2019 Andy Curtis and Daniel Curtis
 
+The book/code started in August 2019, so it's a work in progress.  This is not a usage book.  I'm working on a book that simply explains usage.  I'm following patterns used by https://nikhilm.github.io/uvbook/index.html.  I think you create velocity by slowing down and making sure that you always have understanding of what you are doing (or at a minimum make sure you have an understanding of what you don't understand).   Developers get better when they can explain what they know (and this is independent of language or technology).  Becoming a great developer takes practice.  This book may take several reads before you fully get it.  The examples intentionally build upon each other, but may build too quickly for some.  Feel free to send me an email at contactandyc@gmail.com if you have questions.
+
 This software and documentation contains code and ideas derived from works published by Robert Sedgewick relating to the Red-Black Tree and the Quicksort algorithm.  Many other works (both code and explanations) were studied.  I've spent years studying many open source implementations including the details of the linux kernel, so I'm sure you will see their influence in how the code is written.  I have tried to write the code without borrowing any code or explanations from other projects, but I'm sure that approaches, variable names, etc will look similar.  I've worked with brilliant engineers over the years and certainly borrowed approaches from their work.  I will try and call out where I have learned things when it is relevant (and I remember).  I'm sure that there are better ways to do things and welcome help!  
 
 Goals of this project...
