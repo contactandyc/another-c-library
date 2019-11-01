@@ -81,6 +81,36 @@ static inline void *ac_pool_ualloc(ac_pool_t *h, size_t len) {
   return _ac_pool_alloc_grow(h, len);
 }
 
+static inline void *ac_pool_min_max_alloc(ac_pool_t *h, size_t *rlen,
+                                          size_t min_len, size_t len) {
+  char *r =
+      h->curp + ((sizeof(size_t) - ((size_t)(h->curp) & (sizeof(size_t) - 1))) &
+                 (sizeof(size_t) - 1));
+  if (r + len < h->current->endp) {
+    h->curp = r + len;
+#ifdef _AC_DEBUG_MEMORY_
+    h->cur_size += len;
+    if (h->cur_size > h->max_size)
+      h->max_size = h->cur_size;
+#endif
+    *rlen = len;
+    return r;
+  }
+  if (r + min_len < h->current->endp) {
+    len = (h->current->endp - r) - 1;
+    h->curp = r + len;
+#ifdef _AC_DEBUG_MEMORY_
+    h->cur_size += len;
+    if (h->cur_size > h->max_size)
+      h->max_size = h->cur_size;
+#endif
+    *rlen = len;
+    return r;
+  }
+  *rlen = len;
+  return _ac_pool_alloc_grow(h, len);
+}
+
 static inline void *ac_pool_alloc(ac_pool_t *h, size_t len) {
   char *r =
       h->curp + ((sizeof(size_t) - ((size_t)(h->curp) & (sizeof(size_t) - 1))) &
@@ -106,8 +136,7 @@ static inline void *ac_pool_calloc(ac_pool_t *h, size_t len) {
   return dest;
 }
 
-static inline void *ac_pool_udup(ac_pool_t *h, const void *data,
-                                   size_t len) {
+static inline void *ac_pool_udup(ac_pool_t *h, const void *data, size_t len) {
   /* dup will simply allocate enough bytes to hold the duplicated data,
     copy the data, and return the newly allocated memory which contains a copy
     of data. Because the data could need aligned, we will use ac_pool_alloc
@@ -126,7 +155,7 @@ static inline char *ac_pool_strdup(ac_pool_t *h, const char *p) {
 }
 
 static inline char *ac_pool_strndup(ac_pool_t *h, const char *p,
-                                      size_t length) {
+                                    size_t length) {
   /* strdup will simply allocate enough bytes to hold the duplicated string,
     copy the string, and return the newly allocated string. */
   size_t len = strlen(p);
@@ -135,8 +164,7 @@ static inline char *ac_pool_strndup(ac_pool_t *h, const char *p,
   return (char *)ac_pool_udup(h, p, len + 1);
 }
 
-static inline void *ac_pool_dup(ac_pool_t *h, const void *data,
-                                  size_t len) {
+static inline void *ac_pool_dup(ac_pool_t *h, const void *data, size_t len) {
   /* dup will simply allocate enough bytes to hold the duplicated data,
     copy the data, and return the newly allocated memory which contains a copy
     of data. Because the data could need aligned, we will use ac_pool_alloc
@@ -153,4 +181,43 @@ static inline char *ac_pool_strdupf(ac_pool_t *pool, const char *fmt, ...) {
   char *r = ac_pool_strdupvf(pool, fmt, args);
   va_end(args);
   return r;
+}
+
+struct ac_pool_checkpoint_s {
+  ac_pool_node_t *prev;
+  char *curp;
+  size_t size;
+  size_t used;
+#ifdef _AC_DEBUG_MEMORY_
+  size_t cur_size;
+#endif
+};
+
+static inline void ac_pool_checkpoint(ac_pool_t *h, ac_pool_checkpoint_t *cp) {
+  cp->prev = h->current->prev;
+  cp->curp = h->curp;
+  cp->size = h->size;
+  cp->used = h->used;
+#ifdef _AC_DEBUG_MEMORY_
+  cp->cur_size = h->cur_size;
+#endif
+}
+
+static inline void ac_pool_reset(ac_pool_t *h, ac_pool_checkpoint_t *cp) {
+  /* remove the extra blocks (the ones where prev != NULL) */
+  ac_pool_node_t *prev = h->current->prev;
+  while (prev != cp->prev) {
+    ac_free(h->current);
+    h->current = prev;
+    prev = prev->prev;
+  }
+
+  /* reset to checkpoint */
+  h->curp = cp->curp;
+  h->size = cp->size;
+
+#ifdef _AC_DEBUG_MEMORY_
+  h->cur_size = cp->cur_size;
+#endif
+  h->used = cp->used;
 }

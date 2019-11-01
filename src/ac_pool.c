@@ -71,7 +71,7 @@ ac_pool_t *_ac_pool_init(size_t initial_size) {
   h->max_size = 0;
 #else
   h = (ac_pool_t *)ac_malloc(block_size + sizeof(ac_pool_t) +
-                                 sizeof(ac_pool_node_t));
+                             sizeof(ac_pool_node_t));
 #endif
   if (!h) /* what else might we do? */
     abort();
@@ -103,8 +103,8 @@ void ac_pool_clear(ac_pool_t *h) {
 #ifdef _AC_DEBUG_MEMORY_
   h->cur_size = 0;
 #endif
-  h->used = (h->current->endp - h->curp) + sizeof(ac_pool_t) +
-            sizeof(ac_pool_node_t);
+  h->used =
+      (h->current->endp - h->curp) + sizeof(ac_pool_t) + sizeof(ac_pool_node_t);
 }
 
 void ac_pool_destroy(ac_pool_t *h) {

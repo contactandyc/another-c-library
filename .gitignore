@@ -1,0 +1,9 @@
+config.guess
+autom4te.cache
+aclocal.m4
+config.sub
+configure
+depcomp
+install-sh
+missing
+ltmain.sh

@@ -44,11 +44,11 @@ ac_pool_t *_ac_pool_init(size_t size);
   will be freed. */
 void ac_pool_clear(ac_pool_t *h);
 
-/*
-ac_pool_checkpoint_t *ac_get_checkpoint(ac_pool_t *pool);
+struct ac_pool_checkpoint_s;
+typedef struct ac_pool_checkpoint_s ac_pool_checkpoint_t;
 
-void ac_pool_clear_to(ac_pool_t *h, ac_pool_checkpoint_t *cp);
-*/
+static inline void ac_pool_checkpoint(ac_pool_t *h, ac_pool_checkpoint_t *cp);
+static inline void ac_pool_reset(ac_pool_t *h, ac_pool_checkpoint_t *cp);
 
 /* ac_pool_destroy frees up all memory associated with the pool object */
 void ac_pool_destroy(ac_pool_t *h);
@@ -61,6 +61,11 @@ void ac_pool_set_minimum_growth_size(ac_pool_t *h, size_t size);
 
 /* ac_pool_alloc allocates len uninitialized bytes which are aligned. */
 static inline void *ac_pool_alloc(ac_pool_t *h, size_t len);
+
+/* ac_pool_min_max_alloc allocates at least min_len bytes and up to len bytes.
+   If the */
+static inline void *ac_pool_min_max_alloc(ac_pool_t *h, size_t *rlen,
+                                          size_t min_len, size_t len);
 
 /* ac_pool_alloc allocates len uninitialized bytes which are unaligned. */
 static inline void *ac_pool_ualloc(ac_pool_t *h, size_t len);
