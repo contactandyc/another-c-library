@@ -141,16 +141,17 @@ static inline void *ac_pool_udup(ac_pool_t *h, const void *data, size_t len) {
     copy the data, and return the newly allocated memory which contains a copy
     of data. Because the data could need aligned, we will use ac_pool_alloc
     instead of ac_pool_ualloc */
-  char *dest = (char *)ac_pool_ualloc(h, len);
+  char *dest = (char *)ac_pool_ualloc(h, len + 1);
   if (len)
     memcpy(dest, data, len);
+  dest[len] = 0;
   return dest;
 }
 
 static inline char *ac_pool_strdup(ac_pool_t *h, const char *p) {
   /* strdup will simply allocate enough bytes to hold the duplicated string,
     copy the string, and return the newly allocated string. */
-  size_t len = strlen(p) + 1;
+  size_t len = strlen(p);
   return (char *)ac_pool_udup(h, p, len);
 }
 
@@ -161,7 +162,7 @@ static inline char *ac_pool_strndup(ac_pool_t *h, const char *p,
   size_t len = strlen(p);
   if (len > length)
     len = length;
-  return (char *)ac_pool_udup(h, p, len + 1);
+  return (char *)ac_pool_udup(h, p, len);
 }
 
 static inline void *ac_pool_dup(ac_pool_t *h, const void *data, size_t len) {
