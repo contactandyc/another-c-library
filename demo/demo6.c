@@ -91,7 +91,7 @@ static char *_parse_string(ac_pool_t *pool, char *inp, size_t start,
   while (ep > p && ep[-1] == ' ')
     ep--;
   *ep = 0;
-  return p;
+  return ac_json_encode(pool, p, ep - p);
 }
 
 /*
