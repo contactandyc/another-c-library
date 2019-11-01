@@ -26,9 +26,6 @@ typedef struct ac_allocator_node_s {
   ac_allocator_t *a;
 } ac_allocator_node_t;
 
-struct ac_allocator_s;
-typedef struct ac_allocator_s ac_allocator_t;
-
 struct ac_allocator_s {
   ac_allocator_node_t *head;
   ac_allocator_node_t *tail;
@@ -177,7 +174,7 @@ void myStartupFun(void) {
 void myCleanupFun(void) { ac_allocator_destroy(global_allocator); }
 
 void *_ac_malloc_d(ac_allocator_t *a, const char *caller, size_t len,
-                     bool custom) {
+                   bool custom) {
   if (!len)
     return NULL;
 
@@ -220,7 +217,7 @@ void *_ac_malloc_d(ac_allocator_t *a, const char *caller, size_t len,
 }
 
 void *_ac_calloc_d(ac_allocator_t *a, const char *caller, size_t len,
-                     bool custom) {
+                   bool custom) {
   void *m = _ac_malloc_d(a, caller, len, custom);
   if (m)
     memset(m, 0, len);
@@ -234,9 +231,8 @@ char *_ac_strdup_d(ac_allocator_t *a, const char *caller, const char *p) {
   return m;
 }
 
-static ac_allocator_node_t *get_ac_node(ac_allocator_t *a,
-                                            const char *caller, void *p,
-                                            const char *message) {
+static ac_allocator_node_t *get_ac_node(ac_allocator_t *a, const char *caller,
+                                        void *p, const char *message) {
   ac_allocator_node_t *n = (ac_allocator_node_t *)p;
   n--;
   if (n->a == a)
@@ -273,15 +269,15 @@ static ac_allocator_node_t *get_ac_node(ac_allocator_t *a,
   abort();
 }
 
-void *_ac_realloc_d(ac_allocator_t *a, const char *caller, void *p,
-                      size_t len, bool custom) {
+void *_ac_realloc_d(ac_allocator_t *a, const char *caller, void *p, size_t len,
+                    bool custom) {
   if (!a)
     a = global_allocator;
   if (!p)
     return _ac_malloc_d(a, caller, len, custom);
 
-  ac_allocator_node_t *n = get_ac_node(
-      a, caller, p, "ac_realloc is invalid (p is not allocated?)");
+  ac_allocator_node_t *n =
+      get_ac_node(a, caller, p, "ac_realloc is invalid (p is not allocated?)");
 
   void *m = _ac_malloc_d(a, caller, len, custom);
   size_t len2;

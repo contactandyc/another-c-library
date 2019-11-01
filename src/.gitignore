@@ -1,2 +1,6 @@
 *~
 *.o
+*.lo
+.deps
+.libs
+.dirstamp
