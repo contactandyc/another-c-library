@@ -1,9 +1,14 @@
 AC_INIT([libac], [0.1.0], [contactandyc@gmail.com], [anotherclibrary])
+AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([foreign])
-LT_INIT
-AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_CC
 AC_PROG_CXX
+
+AC_LANG([C])
+AC_LANG([C++])
+
+LT_INIT([disable-shared])
+AC_CONFIG_MACRO_DIR([m4])
 
 test -z "$SED" && SED=sed
 
@@ -46,4 +51,12 @@ AC_SEARCH_LIBS([uv_loop_init], [uv], [], [AC_MSG_ERROR([unable to find libuv])])
 AC_CHECK_HEADER(uv.h, , [AC_MSG_ERROR([Unable to find uv.h; Install libuv dev package])])
 CFLAGS="$CFLAGS -std=gnu99 -Wall"
 AM_PATH_CHECK
-AC_OUTPUT([Makefile])
+
+AC_SUBST([AM_CFLAGS])
+AC_SUBST([AM_CXXFLAGS])
+AC_SUBST([AM_LDFLAGS])
+
+AC_CONFIG_FILES([src/Makefile])
+AC_CONFIG_FILES([demo/Makefile])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
