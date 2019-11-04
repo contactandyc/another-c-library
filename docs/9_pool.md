@@ -1,4 +1,4 @@
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
 
 # The Pool Object
 
@@ -324,4 +324,4 @@ A common use case for the pool is to allocate a bunch of times and then clear an
 
 # [Binary Search Trees](10_binary_search_trees.md)
 
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis

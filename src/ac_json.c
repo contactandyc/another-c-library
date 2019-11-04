@@ -548,9 +548,6 @@ ac_json_t *ac_json_parse(ac_pool_t *pool, char *p, char *ep) {
   char ch;
   char *key = NULL;
   char *stringp = NULL;
-  ac_json_t **awp;
-  ac_json_object_node_t **nwp;
-  ac_json_object_node_t *node;
   ac_json_array_node_t *anode;
   ac_json_object_t *obj;
   ac_json_array_t *arr = NULL, *arr2;
@@ -615,8 +612,6 @@ get_end_of_key:;
     *p = 0;
   }
   p++;
-
-find_colon:;
   while (p < ep && *p != ':')
     p++;
   p++;
@@ -790,8 +785,6 @@ keyed_start_string:;
     p++;
     goto keyed_start_string;
   }
-
-keyed_finished_string:;
   *p = 0;
   string_length = p - stringp;
   p++;
@@ -1088,8 +1081,6 @@ start_string:;
     p++;
     goto start_string;
   }
-
-finished_string:;
   *p = 0;
   string_length = p - stringp;
   p++;

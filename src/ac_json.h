@@ -80,8 +80,9 @@ static inline ac_json_t *ac_json_array(ac_pool_t *pool);
 
 static inline ac_json_t *ac_json_binary(ac_pool_t *pool, char *s,
                                         size_t length);
-static inline ac_json_t *ac_json_string(ac_pool_t *pool, char *s,
+static inline ac_json_t *ac_json_string(ac_pool_t *pool, const char *s,
                                         size_t length);
+static inline ac_json_t *ac_json_str(ac_pool_t *pool, const char *s);
 static inline ac_json_t *ac_json_true(ac_pool_t *pool);
 static inline ac_json_t *ac_json_false(ac_pool_t *pool);
 static inline ac_json_t *ac_json_null(ac_pool_t *pool);
@@ -139,6 +140,8 @@ static inline ac_json_object_node_t *ac_json_object_scan(ac_json_t *j,
 */
 static inline ac_json_object_node_t *ac_json_object_get(ac_json_t *j,
                                                         const char *key);
+static inline ac_json_t *ac_json_object_get_value(ac_json_t *j,
+                                                  const char *key);
 
 /* in this case, don't use _get (only _find) */
 static inline void ac_json_object_erase(ac_json_object_node_t *n);

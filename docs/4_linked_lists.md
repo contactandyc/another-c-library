@@ -1,4 +1,4 @@
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
 
 # Linked Lists
 
@@ -803,4 +803,4 @@ Next up is a brief explanation of threads, and then we will use what we've learn
 
 # [Threads](5_threads.md)
 
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis

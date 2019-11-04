@@ -1,4 +1,4 @@
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
 
 # A quick word about licensing
 
@@ -157,4 +157,4 @@ I would highly recommend going through tutorials if you are not familiar with th
 
 # [Timing Your Code (the first project)](2_timing.md)
 
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis

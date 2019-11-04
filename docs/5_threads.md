@@ -1,4 +1,4 @@
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
 
 ## Introducing threads
 
@@ -274,4 +274,4 @@ Pthreads also support conditions that are like the pagers above.  They will be d
 
 # [Macros](6_macros.md)
 
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis

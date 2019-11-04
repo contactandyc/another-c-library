@@ -1,4 +1,4 @@
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
 
 # Macros
 
@@ -401,4 +401,4 @@ int main( int argc, char *argv[] ) {
 
 # [The Global Allocator Object](7_allocator.md)
 
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis

@@ -1,4 +1,4 @@
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
 
 # The Buffer Object
 
@@ -780,4 +780,4 @@ If you followed everything in this, that is great.  Otherwise, it might make mor
 
 # [Linked Lists](4_linked_lists.md)
 
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis

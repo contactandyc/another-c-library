@@ -1,4 +1,4 @@
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
 
 # Balancing Binary Search Trees
 
@@ -711,4 +711,4 @@ Once the tool is loaded, you can insert or erase nodes and try and figure out ho
 
 # [The Red Black Tree](12_red_black_tree.md)
 
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis

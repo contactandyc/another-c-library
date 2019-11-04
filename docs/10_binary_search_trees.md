@@ -1,4 +1,4 @@
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
 
 # Binary Search Trees
 ## The basic structure
@@ -1429,4 +1429,4 @@ char *get_printed_key(ac_pool_t *pool, node_t *n ) {
 
 # [Balancing Binary Search Trees](11_balancing_binary_search_trees.md)
 
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis

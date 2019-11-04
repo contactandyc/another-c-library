@@ -1,4 +1,4 @@
-AC_INIT([libac], [0.1.0], [contactandyc@gmail.com], [])
+AC_INIT([libac], [0.1.0], [contactandyc@gmail.com], [anotherclibrary])
 AM_INIT_AUTOMAKE([foreign])
 LT_INIT
 AC_CONFIG_MACRO_DIR([m4])

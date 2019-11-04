@@ -1,4 +1,4 @@
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
 
 # The set and multimap
 
@@ -12,4 +12,4 @@ This is much like the set.  The insert method needs to make sure that comparison
 
 This is by far my favorite chapter to write :-)  *NOTE TO SELF* update this with some examples.
 
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis

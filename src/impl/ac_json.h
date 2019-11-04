@@ -40,13 +40,24 @@ static inline ac_json_t *ac_json_binary(ac_pool_t *pool, char *s,
   return j;
 }
 
-static inline ac_json_t *ac_json_string(ac_pool_t *pool, char *s,
+static inline ac_json_t *ac_json_string(ac_pool_t *pool, const char *s,
                                         size_t length) {
   ac_json_t *j = (ac_json_t *)ac_pool_alloc(pool, sizeof(ac_json_t));
   j->parent = NULL;
   j->type = AC_JSON_STRING;
-  j->value = s;
+  j->value = (char *)s;
   j->length = length;
+  return j;
+}
+
+static inline ac_json_t *ac_json_str(ac_pool_t *pool, const char *s) {
+  if (!s)
+    return NULL;
+  ac_json_t *j = (ac_json_t *)ac_pool_alloc(pool, sizeof(ac_json_t));
+  j->parent = NULL;
+  j->type = AC_JSON_STRING;
+  j->value = (char *)s;
+  j->length = strlen(s);
   return j;
 }
 
@@ -121,7 +132,9 @@ static inline ac_json_t *ac_json_decimal_string(ac_pool_t *pool, char *s) {
 }
 
 static inline char *ac_json_decoded(ac_pool_t *pool, ac_json_t *j) {
-  if (j->type == AC_JSON_STRING)
+  if (!j)
+    return NULL;
+  else if (j->type == AC_JSON_STRING)
     return ac_json_decode(pool, j->value, j->length);
   else if (j->type > AC_JSON_STRING)
     return j->value;
@@ -130,7 +143,7 @@ static inline char *ac_json_decoded(ac_pool_t *pool, ac_json_t *j) {
 }
 
 static inline char *ac_json_value(ac_json_t *j) {
-  if (j->type >= AC_JSON_STRING)
+  if (j && j->type >= AC_JSON_STRING)
     return j->value;
   else
     return NULL;
@@ -267,6 +280,9 @@ static inline ac_json_t *ac_json_array_scan(ac_json_t *j, int nth) {
 }
 
 static inline void ac_json_array_append(ac_json_t *j, ac_json_t *item) {
+  if (!item)
+    return;
+
   ac_json_array_t *arr = (ac_json_array_t *)j;
   ac_json_array_node_t *n =
       (ac_json_array_node_t *)ac_pool_alloc(arr->pool, sizeof(*n));
@@ -391,6 +407,25 @@ static inline ac_json_object_node_t *ac_json_object_get(ac_json_t *j,
   return *res;
 }
 
+static inline ac_json_t *ac_json_object_get_value(ac_json_t *j,
+                                                  const char *key) {
+  ac_json_object_t *o = (ac_json_object_t *)j;
+  if (!o->root) {
+    if (o->head)
+      _ac_json_object_fill(o);
+    else
+      return NULL;
+  }
+  ac_json_object_node_t **res = __ac_json_search(
+      (char *)key, (ac_json_object_node_t **)o->root, o->num_entries);
+  if (res) {
+    ac_json_object_node_t *r = *res;
+    if (r)
+      return r->value;
+  }
+  return NULL;
+}
+
 static inline ac_json_object_node_t *ac_json_object_scan(ac_json_t *j,
                                                          const char *key) {
   ac_json_object_t *o = (ac_json_object_t *)j;
@@ -427,6 +462,8 @@ static inline ac_json_object_node_t *ac_json_object_insert(ac_json_t *j,
                                                            const char *key,
                                                            ac_json_t *item,
                                                            bool copy_key) {
+  if (!item)
+    return NULL;
   ac_json_object_node_t *res = ac_json_object_find(j, key);
   if (res) {
     item->parent = j;
@@ -441,6 +478,9 @@ static inline ac_json_object_node_t *ac_json_object_insert(ac_json_t *j,
 
 static inline void ac_json_object_append(ac_json_t *j, const char *key,
                                          ac_json_t *item, bool copy_key) {
+  if (!item)
+    return;
+
   ac_json_object_t *o = (ac_json_object_t *)j;
   ac_json_object_node_t *on;
   if (copy_key) {

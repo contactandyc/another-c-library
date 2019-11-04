@@ -29,76 +29,76 @@ cd another-c-library/uvdemo
 make
 ```
 
-1. [Getting Started](1_getting_started.md)
-2. [Timing Your Code (the first project)](2_timing.md)<br/>
-   a. [A brief introduction to C](2_timing.md#a-brief-introduction-to-c)<br/>
-   b. [What happens during compilation](2_timing.md#what-happens-during-compilation)<br/>
-   c. [How to time code](2_timing.md#how-to-time-code)<br/>
-   d. [Reversing a string](2_timing.md#reversing-a-string)<br/>
-   e. [The basic Makefile](2_timing.md#the-basic-makefile)<br/>
-   f. [More accurately timing code](2_timing.md#more-accurately-timing-code)<br/>
-   g. [Compiler optimizations](2_timing.md#compiler-optimizations)<br/>
-   h. [Splitting up code into multiple files](2_timing.md#splitting-up-code-into-multiple-files)<br/>
-   i. [Separating the implementation from the interface](2_timing.md#separating-the-implementation-from-the-interface)<br/>
-   j. [Defining an object](2_timing.md#defining-an-object)<br/>
-   k. [The timer interface](2_timing.md#the-timer-interface)<br/>
-   l. [Making the timer object reusable](2_timing.md#making-the-timer-object-reusable)<br/>
-   m. [Splitting up a project into multiple directories](2_timing.md#splitting-up-a-project-into-multiple-directories)<br/>
-   n. [Splitting up the Makefile](2_timing.md#splitting-up-the-makefile)<br/>
-3. [The Buffer Object](3_buffer.md)<br/>
-   a. [How it compares to other languages](3_buffer.md#how-it-compares-to-other-languages)<br/>
-   b. [A bit of history and setup](3_buffer.md#a-bit-of-history-and-setup)<br/>
-   c. [The buffer interface](3_buffer.md#the-buffer-interface)<br/>
-   d. [The implementation](3_buffer.md#the-implementation)<br/>
-4. [Linked Lists](4_linked_lists.md)<br/>
-   a. [A data structure interface](4_linked_lists.md#a-data-structure-interface)<br/>
-   b. [The data structure interface test driver](4_linked_lists.md#the-data-structure-interface-test-driver)<br/>
-   c. [The singly linked list](4_linked_lists.md#the-singly-linked-list)<br/>
-   d. [The doubly linked list](4_linked_lists.md#the-doubly-linked-list)<br/>
-5. [Threads](5_threads.md)<br/>
-   a. [Introducing threads](5_threads.md#introducing-threads)<br/>
-   b. [Creating threads](5_threads.md#creating-threads)<br/>
-   c. [Threads and optimizing code](5_threads.md#threads-and-optimizing-code)<br/>
-   d. [Avoid global variables when you can](5_threads.md#avoid-global-variables-when-you-can)<br/>
-   e. [Mutexes](5_threads.md#mutexes)<br/>
-   f. [Timing considerations](5_threads.md#timing-considerations)<br/>
-6. [Macros](6_macros.md)
-7. [The Global Allocator Object](7_allocator.md)
-8. [The Global Allocator Implementation](8_allocator_impl.md)
-9. [The Pool Object](9_pool.md)
-10. [Binary Search Trees](10_binary_search_trees.md)<br/>
-   a. [The basic structure](10_binary_search_trees.md#the-basic-structure)<br/>
-   b. [Find](10_binary_search_trees.md#find)<br/>
-   c. [Insert](10_binary_search_trees.md#insert)<br/>
-   d. [First, Last, Next, Previous](10_binary_search_trees.md#first-last-next-previous)<br/>
-   e. [Erase](10_binary_search_trees.md#erase)<br/>
-   f. [Postorder iteration](10_binary_search_trees.md#postorder_iteration)<br/>
-   g. [Printing a binary tree](10_binary_search_trees.md#printing-a-binary-tree)<br/>
-11. [Balancing Binary Search Trees](11_balancing_binary_search_trees.md)<br/>
-   a. [Why balancing is important](11_balancing_binary_search_trees.md#why-balancing-is-important)<br/>
-   b. [Properties of a red black tree](11_balancing_binary_search_trees.md#properties-of-a-red-black-tree)<br/>
-   c. [Coloring](11_balancing_binary_search_trees.md#coloring)<br/>
-   d. [Rotations](11_balancing_binary_search_trees.md#rotations)<br/>
-12. [The Red Black Tree](12_red_black_tree.md)<br/>
-   a. [Testing the red black tree properties](12_red_black_tree.md#testing-the-red-black-tree-properties)<br/>
-   b. [Insert](12_red_black_tree.md#insert)<br/>
-   c. [Erase](12_red_black_tree.md#erase)<br/>
-   d. [Packing color into the parent node](12_red_black_tree.md#packing-color-into-the-parent-node)<br/>
-13. (Started 9/23/19) [Turning the Red Black Tree into a map](13_map.md)
-14. [The set and multimap](14_set_and_multimap.md)
+1. [Getting Started](docs/1_getting_started.md)
+2. [Timing Your Code (the first project)](docs/2_timing.md)<br/>
+   a. [A brief introduction to C](docs/2_timing.md#a-brief-introduction-to-c)<br/>
+   b. [What happens during compilation](docs/2_timing.md#what-happens-during-compilation)<br/>
+   c. [How to time code](docs/2_timing.md#how-to-time-code)<br/>
+   d. [Reversing a string](docs/2_timing.md#reversing-a-string)<br/>
+   e. [The basic Makefile](docs/2_timing.md#the-basic-makefile)<br/>
+   f. [More accurately timing code](docs/2_timing.md#more-accurately-timing-code)<br/>
+   g. [Compiler optimizations](docs/2_timing.md#compiler-optimizations)<br/>
+   h. [Splitting up code into multiple files](docs/2_timing.md#splitting-up-code-into-multiple-files)<br/>
+   i. [Separating the implementation from the interface](docs/2_timing.md#separating-the-implementation-from-the-interface)<br/>
+   j. [Defining an object](docs/2_timing.md#defining-an-object)<br/>
+   k. [The timer interface](docs/2_timing.md#the-timer-interface)<br/>
+   l. [Making the timer object reusable](docs/2_timing.md#making-the-timer-object-reusable)<br/>
+   m. [Splitting up a project into multiple directories](docs/2_timing.md#splitting-up-a-project-into-multiple-directories)<br/>
+   n. [Splitting up the Makefile](docs/2_timing.md#splitting-up-the-makefile)<br/>
+3. [The Buffer Object](docs/3_buffer.md)<br/>
+   a. [How it compares to other languages](docs/3_buffer.md#how-it-compares-to-other-languages)<br/>
+   b. [A bit of history and setup](docs/3_buffer.md#a-bit-of-history-and-setup)<br/>
+   c. [The buffer interface](docs/3_buffer.md#the-buffer-interface)<br/>
+   d. [The implementation](docs/3_buffer.md#the-implementation)<br/>
+4. [Linked Lists](docs/4_linked_lists.md)<br/>
+   a. [A data structure interface](docs/4_linked_lists.md#a-data-structure-interface)<br/>
+   b. [The data structure interface test driver](docs/4_linked_lists.md#the-data-structure-interface-test-driver)<br/>
+   c. [The singly linked list](docs/4_linked_lists.md#the-singly-linked-list)<br/>
+   d. [The doubly linked list](docs/4_linked_lists.md#the-doubly-linked-list)<br/>
+5. [Threads](docs/5_threads.md)<br/>
+   a. [Introducing threads](docs/5_threads.md#introducing-threads)<br/>
+   b. [Creating threads](docs/5_threads.md#creating-threads)<br/>
+   c. [Threads and optimizing code](docs/5_threads.md#threads-and-optimizing-code)<br/>
+   d. [Avoid global variables when you can](docs/5_threads.md#avoid-global-variables-when-you-can)<br/>
+   e. [Mutexes](docs/5_threads.md#mutexes)<br/>
+   f. [Timing considerations](docs/5_threads.md#timing-considerations)<br/>
+6. [Macros](docs/6_macros.md)
+7. [The Global Allocator Object](docs/7_allocator.md)
+8. [The Global Allocator Implementation](docs/8_allocator_impl.md)
+9. [The Pool Object](docs/9_pool.md)
+10. [Binary Search Trees](docs/10_binary_search_trees.md)<br/>
+   a. [The basic structure](docs/10_binary_search_trees.md#the-basic-structure)<br/>
+   b. [Find](docs/10_binary_search_trees.md#find)<br/>
+   c. [Insert](docs/10_binary_search_trees.md#insert)<br/>
+   d. [First, Last, Next, Previous](docs/10_binary_search_trees.md#first-last-next-previous)<br/>
+   e. [Erase](docs/10_binary_search_trees.md#erase)<br/>
+   f. [Postorder iteration](docs/10_binary_search_trees.md#postorder_iteration)<br/>
+   g. [Printing a binary tree](docs/10_binary_search_trees.md#printing-a-binary-tree)<br/>
+11. [Balancing Binary Search Trees](docs/11_balancing_binary_search_trees.md)<br/>
+   a. [Why balancing is important](docs/11_balancing_binary_search_trees.md#why-balancing-is-important)<br/>
+   b. [Properties of a red black tree](docs/11_balancing_binary_search_trees.md#properties-of-a-red-black-tree)<br/>
+   c. [Coloring](docs/11_balancing_binary_search_trees.md#coloring)<br/>
+   d. [Rotations](docs/11_balancing_binary_search_trees.md#rotations)<br/>
+12. [The Red Black Tree](docs/12_red_black_tree.md)<br/>
+   a. [Testing the red black tree properties](docs/12_red_black_tree.md#testing-the-red-black-tree-properties)<br/>
+   b. [Insert](docs/12_red_black_tree.md#insert)<br/>
+   c. [Erase](docs/12_red_black_tree.md#erase)<br/>
+   d. [Packing color into the parent node](docs/12_red_black_tree.md#packing-color-into-the-parent-node)<br/>
+13. (Started 9/23/19) [Turning the Red Black Tree into a map](docs/13_map.md)
+14. [The set and multimap](docs/14_set_and_multimap.md)
 15. (Coming soon!) Building a generic least recently used cache
 16. (Coming soon!) Binary search
 17. (Coming soon!) Heaps and priority queues
 18. (Coming soon!) Quicksort
 19. (Coming soon!) Building web services in C
 
-# [Things that have been helpful to me](tips.md)
-1. [Line spacing in markdown](tips.md#line-spacing-in-markdown)
-2. [Escape characters in markdown](tips.md#escape-characters-in-markdown)
-3. [Create multiline macro in C](tips.md#create-multiline-macro-in-c)
-4. [Static inline vs inline](tips.md#static-inline-vs-inline)
-5. [Regex find replace](tips.md#regex-find-replace)
-6. [Atom-beautify problems](tips.md#atom-beautify-problems)
+# [Things that have been helpful to me](docs/tips.md)
+1. [Line spacing in markdown](docs/tips.md#line-spacing-in-markdown)
+2. [Escape characters in markdown](docs/tips.md#escape-characters-in-markdown)
+3. [Create multiline macro in C](docs/tips.md#create-multiline-macro-in-c)
+4. [Static inline vs inline](docs/tips.md#static-inline-vs-inline)
+5. [Regex find replace](docs/tips.md#regex-find-replace)
+6. [Atom-beautify problems](docs/tips.md#atom-beautify-problems)
 
 
 # Some useful reading...
@@ -122,4 +122,4 @@ alt="C Programming for Beginners" width="480" height="360" border="10" /></a>
 ## Understanding the machine
 [Why software developers should care about CPU caches](https://medium.com/software-design/why-software-developers-should-care-about-cpu-caches-8da04355bb8a)<br/>
 
-# Let's [get started](1_getting_started.md)!
+# Let's [get started](docs/1_getting_started.md)!

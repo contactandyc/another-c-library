@@ -1,4 +1,4 @@
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
 
 # Timing Your Code (the first project)
 
@@ -2542,4 +2542,4 @@ The difference is that instead of the OBJECTS, HEADER_FILES, and FLAGS variables
 
 # [The Buffer Object](3_buffer.md)
 
-[Table of Contents](README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis

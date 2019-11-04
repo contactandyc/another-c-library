@@ -2,12 +2,15 @@ AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
 lib_LTLIBRARIES = libac.la
 
+AM_CPPFLAGS = -I$(top_srcdir)/src
+
 libac_la_SOURCES =	src/ac_allocator.c\
 			src/ac_async_buffer.c\
 			src/ac_buffer.c\
 			src/ac_cgi.c\
 			src/ac_conv.c\
 			src/llhttp/llhttp.c\
+			src/ac_json.c\
 			src/ac_map.c\
 			src/ac_object_pipe.c\
 			src/ac_pool.c\
@@ -22,6 +25,7 @@ include_HEADERS = src/ac_allocator.h\
 			src/ac_cgi.h\
 			src/ac_common.h\
 			src/ac_conv.h\
+			src/ac_json.h\
 			src/ac_map.h\
 			src/ac_object_pipe.h\
 			src/ac_pool.h\
@@ -32,6 +36,7 @@ include_HEADERS = src/ac_allocator.h\
 			src/ac_timer.h\
 			src/llhttp/llhttp.h\
 			src/impl/ac_buffer.h\
+			src/impl/ac_json.h\
 			src/impl/ac_map.h\
 			src/impl/ac_pool.h\
 			src/impl/ac_search.h\
