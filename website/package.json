@@ -1,6 +1,6 @@
 {
   "name": "ac-docs",
-  "private": true,
+  "private": false,
   "description": "A documentation site for Another C Library.",
   "version": "0.1.0",
   "author": "Daniel Curtis",
