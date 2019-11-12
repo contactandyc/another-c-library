@@ -1,0 +1,592 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style id="typography.js">html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block}audio:not([controls]){display:none;height:0}progress{vertical-align:baseline}[hidden],template{display:none}a{background-color:transparent;-webkit-text-decoration-skip:objects}a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:inherit;font-weight:bolder}dfn{font-style:italic}h1{font-size:2em;margin:.67em 0}mark{background-color:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}svg:not(:root){overflow:hidden}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}figure{margin:1em 40px}hr{box-sizing:content-box;height:0;overflow:visible}button,input,optgroup,select,textarea{font:inherit;margin:0}optgroup{font-weight:700}button,input{overflow:visible}button,select{text-transform:none}[type=reset],[type=submit],button,html [type=button]{-webkit-appearance:button}[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{border-style:none;padding:0}[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring,button:-moz-focusring{outline:1px dotted ButtonText}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}textarea{overflow:auto}[type=checkbox],[type=radio]{box-sizing:border-box;padding:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-cancel-button,[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-input-placeholder{color:inherit;opacity:.54}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}html{font:100%/1.45 'georgia',serif;box-sizing:border-box;overflow-y:scroll;}*{box-sizing:inherit;}*:before{box-sizing:inherit;}*:after{box-sizing:inherit;}body{color:hsla(0,0%,0%,0.8);font-family:'georgia',serif;font-weight:normal;word-wrap:break-word;font-kerning:normal;-moz-font-feature-settings:"kern", "liga", "clig", "calt";-ms-font-feature-settings:"kern", "liga", "clig", "calt";-webkit-font-feature-settings:"kern", "liga", "clig", "calt";font-feature-settings:"kern", "liga", "clig", "calt";}img{max-width:100%;margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}h1{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:2rem;line-height:1.1;}h2{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:1.51572rem;line-height:1.1;}h3{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:1.31951rem;line-height:1.1;}h4{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:1rem;line-height:1.1;}h5{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:0.87055rem;line-height:1.1;}h6{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:0.81225rem;line-height:1.1;}hgroup{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}ul{margin-left:1.45rem;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;list-style-position:outside;list-style-image:none;}ol{margin-left:1.45rem;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;list-style-position:outside;list-style-image:none;}dl{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}dd{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}p{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}figure{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}pre{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;font-size:0.85rem;line-height:1.45rem;}table{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;font-size:1rem;line-height:1.45rem;border-collapse:collapse;width:100%;}fieldset{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}blockquote{margin-left:1.45rem;margin-right:1.45rem;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}form{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}noscript{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}iframe{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}hr{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:calc(1.45rem - 1px);background:hsla(0,0%,0%,0.2);border:none;height:1px;}address{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.45rem;}b{font-weight:bold;}strong{font-weight:bold;}dt{font-weight:bold;}th{font-weight:bold;}li{margin-bottom:calc(1.45rem / 2);}ol li{padding-left:0;}ul li{padding-left:0;}li > ol{margin-left:1.45rem;margin-bottom:calc(1.45rem / 2);margin-top:calc(1.45rem / 2);}li > ul{margin-left:1.45rem;margin-bottom:calc(1.45rem / 2);margin-top:calc(1.45rem / 2);}blockquote *:last-child{margin-bottom:0;}li *:last-child{margin-bottom:0;}p *:last-child{margin-bottom:0;}li > p{margin-bottom:calc(1.45rem / 2);}code{font-size:0.85rem;line-height:1.45rem;}kbd{font-size:0.85rem;line-height:1.45rem;}samp{font-size:0.85rem;line-height:1.45rem;}abbr{border-bottom:1px dotted hsla(0,0%,0%,0.5);cursor:help;}acronym{border-bottom:1px dotted hsla(0,0%,0%,0.5);cursor:help;}abbr[title]{border-bottom:1px dotted hsla(0,0%,0%,0.5);cursor:help;text-decoration:none;}thead{text-align:left;}td,th{text-align:left;border-bottom:1px solid hsla(0,0%,0%,0.12);font-feature-settings:"tnum";-moz-font-feature-settings:"tnum";-ms-font-feature-settings:"tnum";-webkit-font-feature-settings:"tnum";padding-left:0.96667rem;padding-right:0.96667rem;padding-top:0.725rem;padding-bottom:calc(0.725rem - 1px);}th:first-child,td:first-child{padding-left:0;}th:last-child,td:last-child{padding-right:0;}</style><link rel="apple-touch-icon" sizes="48x48" href="/icons/icon-48x48.png?v=b48ffc73e97be239d297f69a5b2c56e5"/><title data-react-helmet="true">11. Balancing Binary Search Trees | Another C Library</title><meta data-react-helmet="true" name="description" content="A documentation site for Another C Library."/><meta data-react-helmet="true" property="og:title" content="11. Balancing Binary Search Trees"/><meta data-react-helmet="true" property="og:description" content="A documentation site for Another C Library."/><meta data-react-helmet="true" property="og:type" content="website"/><meta data-react-helmet="true" name="twitter:card" content="summary"/><meta data-react-helmet="true" name="twitter:creator" content="Daniel Curtis"/><meta data-react-helmet="true" name="twitter:title" content="11. Balancing Binary Search Trees"/><meta data-react-helmet="true" name="twitter:description" content="A documentation site for Another C Library."/><style type="text/css">
+    .anchor {
+      float: left;
+      padding-right: 4px;
+      margin-left: -20px;
+    }
+    h1 .anchor svg,
+    h2 .anchor svg,
+    h3 .anchor svg,
+    h4 .anchor svg,
+    h5 .anchor svg,
+    h6 .anchor svg {
+      visibility: hidden;
+    }
+    h1:hover .anchor svg,
+    h2:hover .anchor svg,
+    h3:hover .anchor svg,
+    h4:hover .anchor svg,
+    h5:hover .anchor svg,
+    h6:hover .anchor svg,
+    h1 .anchor:focus svg,
+    h2 .anchor:focus svg,
+    h3 .anchor:focus svg,
+    h4 .anchor:focus svg,
+    h5 .anchor:focus svg,
+    h6 .anchor:focus svg {
+      visibility: visible;
+    }
+  </style><script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+      var hash = window.decodeURI(location.hash.replace('#', ''))
+      if (hash !== '') {
+        var element = document.getElementById(hash)
+        if (element) {
+          var offset = element.offsetTop
+          // Wait for the browser to finish rendering before scrolling.
+          setTimeout((function() {
+            window.scrollTo(0, offset - 0)
+          }), 0)
+        }
+      }
+    })
+  </script><link rel="shortcut icon" href="/icons/icon-48x48.png?v=b48ffc73e97be239d297f69a5b2c56e5"/><link rel="manifest" href="/manifest.webmanifest"/><meta name="generator" content="Gatsby 2.16.1"/><link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.png?v=b48ffc73e97be239d297f69a5b2c56e5"/><link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.png?v=b48ffc73e97be239d297f69a5b2c56e5"/><link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png?v=b48ffc73e97be239d297f69a5b2c56e5"/><link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png?v=b48ffc73e97be239d297f69a5b2c56e5"/><link rel="apple-touch-icon" sizes="256x256" href="/icons/icon-256x256.png?v=b48ffc73e97be239d297f69a5b2c56e5"/><link rel="apple-touch-icon" sizes="384x384" href="/icons/icon-384x384.png?v=b48ffc73e97be239d297f69a5b2c56e5"/><link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png?v=b48ffc73e97be239d297f69a5b2c56e5"/><style data-href="/styles.1fda8d1dee77beeb7dae.css">code[class*=language-],pre[class*=language-]{color:#f8f8f2;background:none;text-shadow:0 1px rgba(0,0,0,.3);font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}:not(pre)>code[class*=language-],pre[class*=language-]{background:#272822}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#708090}.token.punctuation{color:#f8f8f2}.namespace{opacity:.7}.token.constant,.token.deleted,.token.property,.token.symbol,.token.tag{color:#f92672}.token.boolean,.token.number{color:#ae81ff}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string{color:#a6e22e}.language-css .token.string,.style .token.string,.token.entity,.token.operator,.token.url,.token.variable{color:#f8f8f2}.token.atrule,.token.attr-value,.token.class-name,.token.function{color:#e6db74}.token.keyword{color:#66d9ef}.token.important,.token.regex{color:#fd971f}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}a{text-decoration:none;cursor:pointer;color:#3182ce}a:hover{text-decoration:underline}button:hover{-webkit-transition:.6s;transition:.6s;-webkit-filter:brightness(115%);filter:brightness(115%)}nav{display:flex;align-items:center}pre[class*=language-]{background:#1a202c;overflow-x:scroll}:not(pre)>code[class*=language-],pre[class*=language-]{border-radius:0;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;text-shadow:none}:not(pre)>code[class*=language-]{background:#edf2f7;color:#000;padding:3px}.Footer{max-width:1200px;margin:30px auto;display:flex;justify-content:space-between}.Flex{display:grid;grid-template-columns:auto auto;grid-column-gap:50px}.Content{max-width:950px;width:72vw}@media only screen and (max-width:600px){.Footer,nav{flex-direction:column}.Flex{grid-template-columns:auto}.Sidebar{display:none}.Content{width:100%}}</style><link as="script" rel="preload" href="/component---src-templates-ebook-page-js-fe8bc0f2c932eda75c4a.js"/><link as="script" rel="preload" href="/commons-0ae7f027867ef630b05a.js"/><link as="script" rel="preload" href="/app-95ebc95ba4fb3bc2dd23.js"/><link as="script" rel="preload" href="/styles-8648ad68e26f3992ff5c.js"/><link as="script" rel="preload" href="/webpack-runtime-3090066330befb922a07.js"/><link as="fetch" rel="preload" href="/page-data/ebook/11-balancing-binary-search-trees/page-data.json" crossorigin="anonymous"/></head><body><noscript id="gatsby-noscript">This app works best with JavaScript enabled.</noscript><div id="___gatsby"><div style="outline:none" tabindex="-1" role="group" id="gatsby-focus-wrapper"><div style="background-color:white"><header style="position:sticky;top:0;background-color:#1A202C;z-index:1"><nav style="margin:auto;max-width:1200px"><a style="color:white;font-size:1.25rem;padding:1rem 1.5rem;font-family:-apple-system,&#x27;BlinkMacSystemFont&#x27;,&#x27;Segoe UI&#x27;,&#x27;Roboto&#x27;,&#x27;Oxygen&#x27;,&#x27;Ubuntu&#x27;,&#x27;Cantarell&#x27;,&#x27;Fira Sans&#x27;,&#x27;Droid Sans&#x27;,&#x27;Helvetica Neue&#x27;,sans-serif" href="/"><span style="font-weight:700">Another C Library</span></a><a style="color:white;font-size:1.25rem;padding:1rem 1.5rem;font-family:-apple-system,&#x27;BlinkMacSystemFont&#x27;,&#x27;Segoe UI&#x27;,&#x27;Roboto&#x27;,&#x27;Oxygen&#x27;,&#x27;Ubuntu&#x27;,&#x27;Cantarell&#x27;,&#x27;Fira Sans&#x27;,&#x27;Droid Sans&#x27;,&#x27;Helvetica Neue&#x27;,sans-serif" href="/docs/">Documentation</a><a style="color:#38A169;font-size:1.25rem;padding:1rem 1.5rem;font-family:-apple-system,&#x27;BlinkMacSystemFont&#x27;,&#x27;Segoe UI&#x27;,&#x27;Roboto&#x27;,&#x27;Oxygen&#x27;,&#x27;Ubuntu&#x27;,&#x27;Cantarell&#x27;,&#x27;Fira Sans&#x27;,&#x27;Droid Sans&#x27;,&#x27;Helvetica Neue&#x27;,sans-serif;border-bottom:solid 4px #2F855A;background-color:#2D3748" class="" href="/ebook/">A C eBook</a><a style="color:white;font-size:1.25rem;padding:1rem 1.5rem;font-family:-apple-system,&#x27;BlinkMacSystemFont&#x27;,&#x27;Segoe UI&#x27;,&#x27;Roboto&#x27;,&#x27;Oxygen&#x27;,&#x27;Ubuntu&#x27;,&#x27;Cantarell&#x27;,&#x27;Fira Sans&#x27;,&#x27;Droid Sans&#x27;,&#x27;Helvetica Neue&#x27;,sans-serif" target="_blank" rel="noopener noreferrer" href="https://github.com/contactandyc/another-c-library">Github <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 576 512" style="padding-top:5px" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M576 24v127.984c0 21.461-25.96 31.98-40.971 16.971l-35.707-35.709-243.523 243.523c-9.373 9.373-24.568 9.373-33.941 0l-22.627-22.627c-9.373-9.373-9.373-24.569 0-33.941L442.756 76.676l-35.703-35.705C391.982 25.9 402.656 0 424.024 0H552c13.255 0 24 10.745 24 24zM407.029 270.794l-16 16A23.999 23.999 0 0 0 384 303.765V448H64V128h264a24.003 24.003 0 0 0 16.97-7.029l16-16C376.089 89.851 365.381 64 344 64H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V287.764c0-21.382-25.852-32.09-40.971-16.97z"></path></svg></a></nav></header><main><div style="margin:0 auto;max-width:1200px;display:flex"><div style="color:black;margin:0;padding:20px" class="Content"><h1>11. Balancing Binary Search Trees</h1><div><p>Copyright 2019 Andy Curtis &#x26; Daniel Curtis</p>
+<h1 id="balancing-binary-search-trees"><a href="#balancing-binary-search-trees" aria-label="balancing binary search trees permalink" class="anchor"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Balancing Binary Search Trees</h1>
+<p>This builds significantly on the last section about <a href="10_binary_search_trees.md">binary search trees</a>.  To start, let's explore why balancing a binary search tree is important.</p>
+<p>The following code is found in <i>illustrations/11<em>balancing</em>binary<em>search</em>trees/1<em>binary</em>search_tree</i></p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">cd</span> <span class="token variable">$ac</span>/illustrations/11_balancing_binary_search_trees/1_binary_search_tree</code></pre></div>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash"><span class="token function">make</span></code></pre></div>
+<p>In this case, I've not included examples in the Makefile.  I've also commented out printing the data structure using iteration and reverse iteration as it isn't relevant to understanding how the red-black tree works.</p>
+<h2 id="why-balancing-is-important"><a href="#why-balancing-is-important" aria-label="why balancing is important permalink" class="anchor"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Why balancing is important</h2>
+<p>To understand why balancing a binary search tree is important, let's look at some worst-case and bad scenarios.</p>
+<p>One worst case scenario</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">$ ./test_data_structure ABCDEFGHI
+Creating binary_search_tree <span class="token keyword">for</span> ABCDEFGHI
+A1
+  <span class="token punctuation">\</span>
+   B2
+     <span class="token punctuation">\</span>
+      C3
+        <span class="token punctuation">\</span>
+         D4
+           <span class="token punctuation">\</span>
+            E5
+              <span class="token punctuation">\</span>
+               F6
+                 <span class="token punctuation">\</span>
+                  G7
+                    <span class="token punctuation">\</span>
+                     H8
+                       <span class="token punctuation">\</span>
+                        I9</code></pre></div>
+<p>Another worst-case scenario</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">$ ./test_data_structure IHGFEDCBA
+Creating binary_search_tree <span class="token keyword">for</span> IHGFEDCBA
+I1
+<span class="token operator">|</span>
+H2
+<span class="token operator">|</span>
+G3
+<span class="token operator">|</span>
+F4
+<span class="token operator">|</span>
+E5
+<span class="token operator">|</span>
+D6
+<span class="token operator">|</span>
+C7
+<span class="token operator">|</span>
+B8
+<span class="token operator">|</span>
+A9</code></pre></div>
+<p>A mixed case where the tree isn't balanced</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">$ ./test_data_structure IHGFEDCBAabcdef
+Creating binary_search_tree <span class="token keyword">for</span> IHGFEDCBAabcdef
+I1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+H2 a2
+<span class="token operator">|</span>    <span class="token punctuation">\</span>
+G3    b3
+<span class="token operator">|</span>       <span class="token punctuation">\</span>
+F4       c4
+<span class="token operator">|</span>          <span class="token punctuation">\</span>
+E5          d5
+<span class="token operator">|</span>             <span class="token punctuation">\</span>
+D6             e6
+<span class="token operator">|</span>                <span class="token punctuation">\</span>
+C7                f7
+<span class="token operator">|</span>                   
+B8
+<span class="token operator">|</span>
+A9</code></pre></div>
+<p>Yet another worst-case scenario.</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">$ ./test_data_structure Izpagkml
+Creating binary_search_tree <span class="token keyword">for</span> Izpagkml
+I1
+  <span class="token punctuation">\</span>
+   z2
+   <span class="token operator">|</span>
+   p3
+   <span class="token operator">|</span>
+   a4
+     <span class="token punctuation">\</span>
+      g5
+        <span class="token punctuation">\</span>
+         k6
+           <span class="token punctuation">\</span>
+            m7
+            <span class="token operator">|</span>
+            l8</code></pre></div>
+<p>The example above could be said to be balanced if it looked like the following.</p>
+<div class="gatsby-highlight" data-language="text"><pre class="language-text"><code class="language-text">k1
+| \
+|  p2
+|  | \
+|  m3 z3
+|  |    
+|  l4
+|    
+a2
+| \
+I3 g3</code></pre></div>
+<p>The leaf nodes are the nodes that don't have children.  In the example above, all of the leaves have a depth of 3, except l, which has a depth of 4.  At the first level of a binary search tree, a fully balanced tree can have at most 1 node (the root node).  At the second level, 2 nodes (+1 for the first level).  At the third level, 4 nodes (+3 for the first and second), and so on.  The example above has 8 nodes, and the entire first, second, and third levels are full.  This tree is balanced.</p>
+<p>A balanced binary search tree is useful in that you are guaranteed that finding a node will take O(logN) time where N is the number of elements in the tree.  A binary search tree that isn't balanced has a worst case of O(N) time.  This isn't a big deal if you have 5-10 nodes, but if you have 1 million nodes, a balanced binary search tree will take at most 21 operations.  If the tree is not balanced, it might take 1 million operations!  You will often see logN used in describing how long an algorithm takes.  The base of log, in this case, is 2 (since computers think in terms of 0s and 1s or powers of 2).</p>
+<p>The red-black tree is a mostly balanced binary search tree that was invented by Leonidas J. Guibas and Robert Sedgewick.  Certain properties make a red-black tree valid.  </p>
+<h2 id="properties-of-a-red-black-tree"><a href="#properties-of-a-red-black-tree" aria-label="properties of a red black tree permalink" class="anchor"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Properties of a red-black tree</h2>
+<p>Red–black tree Properties (<a href="https://en.wikipedia.org/wiki/Red%E2%80%93black_tree">https://en.wikipedia.org/wiki/Red–black_tree</a>)</p>
+<ol>
+<li>Each node is either red or black.</li>
+<li>The root is black.</li>
+<li>All leaves (NIL) are black.</li>
+<li>If a node is red, then both its children are black.</li>
+<li>Every path from a given node to any of its descendant NIL nodes contains the same number of black nodes.</li>
+</ol>
+<p>My additional rules for clarification which are based upon the first 5 rules.</p>
+<ul>
+<li>If a node has one child, the child must be red</li>
+<li>If a node has two children, one or both of the children can be red if the parent is black</li>
+<li>If a node is red, it must have either two children who are black or no children at all.</li>
+<li>The parent of a red node must be black</li>
+<li>The black height of any leaf node must be the same (another way of stating 5)</li>
+<li>A red-black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.  It is possible to have more red nodes than black nodes, but it isn't typical.</li>
+<li>A red-black tree has a worst case of a 2logN depth but is likely to maintain a logN depth or be very close to it.</li>
+</ul>
+<p>The red-black tree uses coloring and tree rotations to balance the binary search tree.  </p>
+<h2 id="coloring"><a href="#coloring" aria-label="coloring permalink" class="anchor"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Coloring</h2>
+<p>In a red-black tree, the red and black colors are introduced.  Typically, this is represented as a single bit with 0 meaning black and 1, meaning red.  </p>
+<p>To color a node red, set the color to RED (RED is defined as 1).</p>
+<div class="gatsby-highlight" data-language="c"><pre class="language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">color_node_red</span><span class="token punctuation">(</span> node_t <span class="token operator">*</span>node <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  node<span class="token operator">-></span>color <span class="token operator">=</span> RED<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div>
+<p>Likewise, to color a node black, set the color to BLACK (BLACK is defined as 0).</p>
+<div class="gatsby-highlight" data-language="c"><pre class="language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">color_node_black</span><span class="token punctuation">(</span> node_t <span class="token operator">*</span>node <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  node<span class="token operator">-></span>color <span class="token operator">=</span> BLACK<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div>
+<p>Recoloring a node involves painting a node RED and its children (which both must exist) BLACK.</p>
+<div class="gatsby-highlight" data-language="c"><pre class="language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">recolor</span><span class="token punctuation">(</span> node_t <span class="token operator">*</span>n <span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  n<span class="token operator">-></span>color <span class="token operator">=</span> RED<span class="token punctuation">;</span>
+  n<span class="token operator">-></span>left<span class="token operator">-></span>color <span class="token operator">=</span> n<span class="token operator">-></span>right<span class="token operator">-></span>color <span class="token operator">=</span> BLACK<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div>
+<h2 id="rotations"><a href="#rotations" aria-label="rotations permalink" class="anchor"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Rotations</h2>
+<p>Rotations are used to balance binary search trees when using the red-black tree algorithm.  The following examples will not include colors and are just made up.  A right rotation around R</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">G
+<span class="token operator">|</span><span class="token punctuation">\</span>
+E R
+  <span class="token operator">|</span>
+  N</code></pre></div>
+<p>would result in</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">G
+<span class="token operator">|</span><span class="token punctuation">\</span>
+E N
+   <span class="token punctuation">\</span>
+    R</code></pre></div>
+<p>A left rotation around G would result in</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">N
+<span class="token operator">|</span><span class="token punctuation">\</span>
+G R
+<span class="token operator">|</span>
+E</code></pre></div>
+<p>A right rotation around G would result in</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">N
+<span class="token operator">|</span><span class="token punctuation">\</span>
+E R
+ <span class="token punctuation">\</span>
+  G</code></pre></div>
+<p>In all cases, after a rotation, the tree is still a valid binary search tree.  To do a right rotation around a node, that node must reference a left node.  The left node and itself will exchange colors.  When doing a left rotation around a node, that node must reference a right node.  The right node and itself will exchange colors.</p>
+<p>rotate_left does the following.</p>
+<ul>
+<li>assign new_root to A->right.</li>
+<li>swap the color between A and new_root.</li>
+<li>if A has a parent, link the parent to new<em>root; otherwise, link root to new</em>root.</li>
+<li>put A to the left of new<em>root and what was previously to the right of new</em>root to the left of A.</li>
+</ul>
+<div class="gatsby-highlight" data-language="c"><pre class="language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">rotate_left</span><span class="token punctuation">(</span>node_t <span class="token operator">*</span>A<span class="token punctuation">,</span> node_t <span class="token operator">*</span><span class="token operator">*</span>root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  node_t <span class="token operator">*</span>new_root <span class="token operator">=</span> A<span class="token operator">-></span>right<span class="token punctuation">;</span>
+  size_t tmp_color <span class="token operator">=</span> A<span class="token operator">-></span>color<span class="token punctuation">;</span>
+  A<span class="token operator">-></span>color <span class="token operator">=</span> new_root<span class="token operator">-></span>color<span class="token punctuation">;</span>
+  new_root<span class="token operator">-></span>color <span class="token operator">=</span> tmp_color<span class="token punctuation">;</span>
+  node_t <span class="token operator">*</span>parent <span class="token operator">=</span> A<span class="token operator">-></span>parent<span class="token punctuation">;</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>parent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>parent<span class="token operator">-></span>left <span class="token operator">==</span> A<span class="token punctuation">)</span>
+      parent<span class="token operator">-></span>left <span class="token operator">=</span> new_root<span class="token punctuation">;</span>
+    <span class="token keyword">else</span>
+      parent<span class="token operator">-></span>right <span class="token operator">=</span> new_root<span class="token punctuation">;</span>
+    new_root<span class="token operator">-></span>parent <span class="token operator">=</span> parent<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    new_root<span class="token operator">-></span>parent <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>root <span class="token operator">=</span> new_root<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  node_t <span class="token operator">*</span>tmp <span class="token operator">=</span> new_root<span class="token operator">-></span>left<span class="token punctuation">;</span>
+  new_root<span class="token operator">-></span>left <span class="token operator">=</span> A<span class="token punctuation">;</span>
+  A<span class="token operator">-></span>parent <span class="token operator">=</span> new_root<span class="token punctuation">;</span>
+
+  A<span class="token operator">-></span>right <span class="token operator">=</span> tmp<span class="token punctuation">;</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>tmp<span class="token punctuation">)</span>
+    tmp<span class="token operator">-></span>parent <span class="token operator">=</span> A<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div>
+<p>Rotating to the right is similar to rotating to the left (except you need to swap left and right).</p>
+<p>I've written a tool to help you to understand how colors and rotations work.</p>
+<p>The following code is found in <i>illustrations/11<em>balancing</em>binary<em>search</em>trees/2<em>tree</em>operations</i></p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash"><span class="token builtin class-name">cd</span> <span class="token variable">$ac</span>/illustrations/11_balancing_binary_search_trees/2_tree_operations</code></pre></div>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash"><span class="token function">make</span></code></pre></div>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">./tree_operations</code></pre></div>
+<p>You will be prompted with the following...</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash"><span class="token punctuation">(</span>i<span class="token punctuation">)</span>nsert, <span class="token punctuation">(</span>e<span class="token punctuation">)</span>rase, <span class="token punctuation">(</span>r<span class="token punctuation">)</span>ight_rotate, <span class="token punctuation">(</span>l<span class="token punctuation">)</span>eft_rotate, <span class="token punctuation">(</span>R<span class="token punctuation">)</span>ed, <span class="token punctuation">(</span>b<span class="token punctuation">)</span>lack, re<span class="token punctuation">(</span>c<span class="token punctuation">)</span>olor, <span class="token punctuation">(</span>h<span class="token punctuation">)</span>elp, <span class="token punctuation">(</span>q<span class="token punctuation">)</span>uit</code></pre></div>
+<p>type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">i a</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash"><span class="token punctuation">(</span>a0<span class="token punctuation">)</span>
+
+The root is not black<span class="token operator">!</span>
+
+<span class="token punctuation">(</span>i<span class="token punctuation">)</span>nsert, <span class="token punctuation">(</span>e<span class="token punctuation">)</span>rase, <span class="token punctuation">(</span>r<span class="token punctuation">)</span>ight_rotate, <span class="token punctuation">(</span>l<span class="token punctuation">)</span>eft_rotate, <span class="token punctuation">(</span>R<span class="token punctuation">)</span>ed, <span class="token punctuation">(</span>b<span class="token punctuation">)</span>lack, re<span class="token punctuation">(</span>c<span class="token punctuation">)</span>olor, <span class="token punctuation">(</span>h<span class="token punctuation">)</span>elp, <span class="token punctuation">(</span>q<span class="token punctuation">)</span>uit</code></pre></div>
+<p>If the node is in parenthesis, it is red.  On your terminal, it should print in the red color, as well.  Whenever you insert a node, it is painted red.  You can use the tool to try and turn this into a proper red-black tree.  In the red-black tree, the root is always black.  We can paint a black by typing the following.</p>
+<p>type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">b a</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">a1
+
+Starting with a valid red black tree
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span>
+
+Operation: insert a
+<span class="token punctuation">(</span>a0<span class="token punctuation">)</span>
+
+The root is not black<span class="token operator">!</span>
+
+Operation: black a
+a1
+
+The above tree is a valid red-black tree</code></pre></div>
+<p>The first operation was <strong>insert a</strong> broke the red-black tree rules.  It was fixed by painting the root node black.</p>
+<p>type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">i b</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="text"><pre class="language-text"><code class="language-text">a1
+  \
+   (b1)
+
+Starting with a valid red black tree
+====================================
+a1
+
+
+Operation: insert b
+a1
+  \
+   (b1)
+
+
+The above tree is a valid red-black tree</code></pre></div>
+<p>In this case, nothing needed to be done because b's parent was black.</p>
+<p>type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">i c</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">a1
+  <span class="token punctuation">\</span>
+   <span class="token punctuation">(</span>b1<span class="token punctuation">)</span>
+       <span class="token punctuation">\</span>
+        <span class="token punctuation">(</span>c1<span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span>b1<span class="token punctuation">)</span> has a red right child and is red
+<span class="token punctuation">(</span>c1<span class="token punctuation">)</span> has a red parent and is red</code></pre></div>
+<p>In this case, c's parent b is red.  If we rotate around a to the left, it should fix it.</p>
+<p>type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">l a</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="text"><pre class="language-text"><code class="language-text">b1
+| \
+|  (c1)
+|      
+(a1)
+
+Starting with a valid red black tree
+====================================
+a1
+  \
+   (b1)
+
+
+Operation: insert c
+a1
+  \
+   (b1)
+       \
+        (c1)
+
+(b1) has a red right child and is red
+(c1) has a red parent and is red
+
+Operation: left_rotate a
+b1
+| \
+|  (c1)
+|      
+(a1)
+
+The above tree is a valid red-black tree</code></pre></div>
+<p>type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">i d</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token punctuation">(</span>c1<span class="token punctuation">)</span>
+<span class="token operator">|</span>      <span class="token punctuation">\</span>
+<span class="token punctuation">(</span>a1<span class="token punctuation">)</span>    <span class="token punctuation">(</span>d1<span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span>c1<span class="token punctuation">)</span> has a red right child and is red
+<span class="token punctuation">(</span>d1<span class="token punctuation">)</span> has a red parent and is red</code></pre></div>
+<p>Since the parent (c) and the uncle (a) are both red, we can try recoloring around the grandparent (b).</p>
+<p>type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">c b</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash"><span class="token punctuation">(</span>b0<span class="token punctuation">)</span>
+<span class="token operator">|</span>   <span class="token punctuation">\</span>
+a1   c1
+       <span class="token punctuation">\</span>
+        <span class="token punctuation">(</span>d1<span class="token punctuation">)</span>
+
+The root is not black<span class="token operator">!</span></code></pre></div>
+<p>If the tree is balanced, we can always just paint the root node black.</p>
+<p>type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">b b</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+a2 c2
+     <span class="token punctuation">\</span>
+      <span class="token punctuation">(</span>d2<span class="token punctuation">)</span>
+
+Starting with a valid red black tree
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span>
+b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token punctuation">(</span>c1<span class="token punctuation">)</span>
+<span class="token operator">|</span>      
+<span class="token punctuation">(</span>a1<span class="token punctuation">)</span>
+
+Operation: insert d
+b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token punctuation">(</span>c1<span class="token punctuation">)</span>
+<span class="token operator">|</span>      <span class="token punctuation">\</span>
+<span class="token punctuation">(</span>a1<span class="token punctuation">)</span>    <span class="token punctuation">(</span>d1<span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span>c1<span class="token punctuation">)</span> has a red right child and is red
+<span class="token punctuation">(</span>d1<span class="token punctuation">)</span> has a red parent and is red
+
+Operation: color b
+<span class="token punctuation">(</span>b0<span class="token punctuation">)</span>
+<span class="token operator">|</span>   <span class="token punctuation">\</span>
+a1   c1
+       <span class="token punctuation">\</span>
+        <span class="token punctuation">(</span>d1<span class="token punctuation">)</span>
+
+The root is not black<span class="token operator">!</span>
+
+Operation: black b
+b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+a2 c2
+     <span class="token punctuation">\</span>
+      <span class="token punctuation">(</span>d2<span class="token punctuation">)</span>      
+
+The above tree is a valid red-black tree</code></pre></div>
+<p>type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">i e</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+a2 c2
+     <span class="token punctuation">\</span>
+      <span class="token punctuation">(</span>d2<span class="token punctuation">)</span>
+          <span class="token punctuation">\</span>
+           <span class="token punctuation">(</span>e2<span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span>d2<span class="token punctuation">)</span> has a red right child and is red
+<span class="token punctuation">(</span>e2<span class="token punctuation">)</span> has a red parent and is red</code></pre></div>
+<p>This can be resolved through a left rotation.
+type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">l c</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+a2 d2
+   <span class="token operator">|</span> <span class="token punctuation">\</span>
+   <span class="token operator">|</span>  <span class="token punctuation">(</span>e2<span class="token punctuation">)</span>
+   <span class="token operator">|</span>      
+   <span class="token punctuation">(</span>c2<span class="token punctuation">)</span>
+
+Starting with a valid red black tree
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span>
+b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+a2 c2
+     <span class="token punctuation">\</span>
+      <span class="token punctuation">(</span>d2<span class="token punctuation">)</span>
+
+
+Operation: insert e
+b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+a2 c2
+     <span class="token punctuation">\</span>
+      <span class="token punctuation">(</span>d2<span class="token punctuation">)</span>
+          <span class="token punctuation">\</span>
+           <span class="token punctuation">(</span>e2<span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span>d2<span class="token punctuation">)</span> has a red right child and is red
+<span class="token punctuation">(</span>e2<span class="token punctuation">)</span> has a red parent and is red
+
+Operation: left_rotate c
+b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+a2 d2
+   <span class="token operator">|</span> <span class="token punctuation">\</span>
+   <span class="token operator">|</span>  <span class="token punctuation">(</span>e2<span class="token punctuation">)</span>
+   <span class="token operator">|</span>      
+   <span class="token punctuation">(</span>c2<span class="token punctuation">)</span>
+
+
+The above tree is a valid red-black tree</code></pre></div>
+<p>The tool will also allow you to erase nodes.  Let's erase a to start.
+type</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">e a</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">b1
+  <span class="token punctuation">\</span>
+   d2
+   <span class="token operator">|</span> <span class="token punctuation">\</span>
+   <span class="token operator">|</span>  <span class="token punctuation">(</span>e2<span class="token punctuation">)</span>
+   <span class="token operator">|</span>      
+   <span class="token punctuation">(</span>c2<span class="token punctuation">)</span>
+
+b1 has one right child, and it isn't red</code></pre></div>
+<p>We can try a left rotation around b</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">l b</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">d1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token punctuation">(</span>e1<span class="token punctuation">)</span>
+<span class="token operator">|</span>      
+b2
+  <span class="token punctuation">\</span>
+   <span class="token punctuation">(</span>c2<span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span>e1<span class="token punctuation">)</span> has a different black height than <span class="token punctuation">(</span>c2<span class="token punctuation">)</span></code></pre></div>
+<p>If we color e black, the tree will be a proper red-black tree.</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">b e</code></pre></div>
+<p>outputs</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">d1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  e2
+<span class="token operator">|</span>    
+b2
+  <span class="token punctuation">\</span>
+   <span class="token punctuation">(</span>c2<span class="token punctuation">)</span>
+
+Starting with a valid red black tree
+<span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span>
+b1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+a2 d2
+   <span class="token operator">|</span> <span class="token punctuation">\</span>
+   <span class="token operator">|</span>  <span class="token punctuation">(</span>e2<span class="token punctuation">)</span>
+   <span class="token operator">|</span>      
+   <span class="token punctuation">(</span>c2<span class="token punctuation">)</span>
+
+Operation: erase a
+b1
+  <span class="token punctuation">\</span>
+   d2
+   <span class="token operator">|</span> <span class="token punctuation">\</span>
+   <span class="token operator">|</span>  <span class="token punctuation">(</span>e2<span class="token punctuation">)</span>
+   <span class="token operator">|</span>      
+   <span class="token punctuation">(</span>c2<span class="token punctuation">)</span>
+
+b1 has one right child, and it isn't red
+
+Operation: left_rotate b
+d1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token punctuation">(</span>e1<span class="token punctuation">)</span>
+<span class="token operator">|</span>      
+b2
+  <span class="token punctuation">\</span>
+   <span class="token punctuation">(</span>c2<span class="token punctuation">)</span>
+
+<span class="token punctuation">(</span>e1<span class="token punctuation">)</span> has a different black height than <span class="token punctuation">(</span>c2<span class="token punctuation">)</span>
+
+Operation: black e
+d1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  e2
+<span class="token operator">|</span>    
+b2
+  <span class="token punctuation">\</span>
+   <span class="token punctuation">(</span>c2<span class="token punctuation">)</span>
+
+The above tree is a valid red-black tree</code></pre></div>
+<p>I'll reference this tool in the explanation of the red-black tree that comes next.  Hopefully, the red-black tree will make more sense as we've already seen how much of it works.</p>
+<p>The tool (tree_operations) can also start with a valid red-black tree, which you can modify by specifying a sequence of characters in the order in which you wish the characters to be inserted.</p>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">$ ./tree_operations ABC
+B1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token punctuation">(</span>C1<span class="token punctuation">)</span>
+<span class="token operator">|</span>      
+<span class="token punctuation">(</span>A1<span class="token punctuation">)</span></code></pre></div>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">$ ./tree_operations ABCD
+B1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+A2 C2
+     <span class="token punctuation">\</span>
+      <span class="token punctuation">(</span>D2<span class="token punctuation">)</span></code></pre></div>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">$ ./tree_operations BADC
+B1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+A2 D2
+   <span class="token operator">|</span>
+   <span class="token punctuation">(</span>C2<span class="token punctuation">)</span></code></pre></div>
+<div class="gatsby-highlight" data-language="bash"><pre class="language-bash"><code class="language-bash">$ ./tree_operations ABCDEFGHIJKLMNOPQRSTUVWXYZ
+H1
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  P2
+<span class="token operator">|</span>  <span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>  <span class="token punctuation">(</span>T2<span class="token punctuation">)</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>  <span class="token operator">|</span>   <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>  R3   V3
+<span class="token operator">|</span>  <span class="token operator">|</span>  <span class="token operator">|</span> <span class="token punctuation">\</span>  <span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>  Q4 <span class="token operator">|</span> U4 <span class="token punctuation">(</span>X3<span class="token punctuation">)</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>     <span class="token operator">|</span>    <span class="token operator">|</span>   <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>     S4   W4   Y4
+<span class="token operator">|</span>  <span class="token operator">|</span>                 <span class="token punctuation">\</span>
+<span class="token operator">|</span>  <span class="token punctuation">(</span>L2<span class="token punctuation">)</span>               <span class="token punctuation">(</span>Z4<span class="token punctuation">)</span>
+<span class="token operator">|</span>  <span class="token operator">|</span>   <span class="token punctuation">\</span>                  
+<span class="token operator">|</span>  J3   N3
+<span class="token operator">|</span>  <span class="token operator">|</span> <span class="token punctuation">\</span>  <span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  I4 <span class="token operator">|</span> M4 O4
+<span class="token operator">|</span>     <span class="token operator">|</span>      
+D2    K4
+<span class="token operator">|</span> <span class="token punctuation">\</span>     
+<span class="token operator">|</span>  F3
+<span class="token operator">|</span>  <span class="token operator">|</span> <span class="token punctuation">\</span>
+<span class="token operator">|</span>  E4 G4
+<span class="token operator">|</span>       
+B3
+<span class="token operator">|</span> <span class="token punctuation">\</span>
+A4 C4</code></pre></div>
+<p>Once the tool is loaded, you can insert or erase nodes and try and figure out how to make it work as a red-black tree again.</p>
+<h1 id="the-red-black-tree"><a href="#the-red-black-tree" aria-label="the red black tree permalink" class="anchor"><svg aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><a href="12_red_black_tree.md">The Red Black Tree</a></h1>
+<p><a href="../README.md">Table of Contents</a>  - Copyright 2019 Andy Curtis</p></div></div><div style="font-family:-apple-system,&#x27;BlinkMacSystemFont&#x27;,&#x27;Segoe UI&#x27;,&#x27;Roboto&#x27;,&#x27;Oxygen&#x27;,&#x27;Ubuntu&#x27;,&#x27;Cantarell&#x27;,&#x27;Fira Sans&#x27;,&#x27;Droid Sans&#x27;,&#x27;Helvetica Neue&#x27;,sans-serif;width:400px;height:100vh;padding:15px;color:#1E4E8C;position:sticky;top:62px;border-left:solid 1px #EDF2F7" class="Sidebar"><div><div><a href="/ebook/1-getting-started">1. Getting Started</a></div><div><a href="/ebook/10-binary-search-trees">10. Binary Search Trees</a></div><div><a href="/ebook/11-balancing-binary-search-trees">11. Balancing Binary Search Trees</a></div><div><a href="/ebook/12-red-black-tree">12. The Red-Black Tree</a></div><div><a href="/ebook/13-map">13. The Map Object</a></div><div><a href="/ebook/14-set-and-multimap">14. The Set and Multimap</a></div><div><a href="/ebook/2-timing">2. Timing Your Code</a></div><div><a href="/ebook/3-buffer">3. The Buffer Object</a></div><div><a href="/ebook/4-linked-lists">4. Linked Lists</a></div><div><a href="/ebook/5-threads">5. Introducing Threads</a></div><div><a href="/ebook/6-macros">6. Macros</a></div><div><a href="/ebook/7-allocator">7. The Global Allocator Object</a></div><div><a href="/ebook/8-allocator-implementation">8. The Global Allocator Implementation</a></div><div><a href="/ebook/9-pool">9. The Pool Object</a></div></div></div></div></main><footer style="background-color:#1A202C;padding:10px;color:white;font-family:-apple-system,&#x27;BlinkMacSystemFont&#x27;,&#x27;Segoe UI&#x27;,&#x27;Roboto&#x27;,&#x27;Oxygen&#x27;,&#x27;Ubuntu&#x27;,&#x27;Cantarell&#x27;,&#x27;Fira Sans&#x27;,&#x27;Droid Sans&#x27;,&#x27;Helvetica Neue&#x27;,sans-serif"><div class="Footer"><div><h1 style="margin-bottom:5px">Another C Library</h1><p style="margin-bottom:15px">© <!-- -->2019<!-- --> Andy Curtis &amp; Daniel Curtis</p><ul style="list-style:none;margin-left:0"><li><a style="color:#3182CE" href="/contact">Contact</a></li><li><a style="color:#3182CE" href="/contributing">Contributing</a></li><li><a style="color:#3182CE" href="/license">License</a></li></ul></div><div><h2 style="margin:10px auto">A C eBook</h2><ul style="list-style:none;margin-left:0"><li><a href="/ebook/1-getting-started">1. Getting Started</a></li><li><a href="/ebook/10-binary-search-trees">10. Binary Search Trees</a></li><li><a href="/ebook/11-balancing-binary-search-trees">11. Balancing Binary Search Trees</a></li><li><a href="/ebook/12-red-black-tree">12. The Red-Black Tree</a></li><li><a href="/ebook/13-map">13. The Map Object</a></li><li><a href="/ebook/14-set-and-multimap">14. The Set and Multimap</a></li><li><a href="/ebook/2-timing">2. Timing Your Code</a></li><li><a href="/ebook/3-buffer">3. The Buffer Object</a></li><li><a href="/ebook/4-linked-lists">4. Linked Lists</a></li><li><a href="/ebook/5-threads">5. Introducing Threads</a></li><li><a href="/ebook/6-macros">6. Macros</a></li><li><a href="/ebook/7-allocator">7. The Global Allocator Object</a></li><li><a href="/ebook/8-allocator-implementation">8. The Global Allocator Implementation</a></li><li><a href="/ebook/9-pool">9. The Pool Object</a></li></ul></div><div><h2 style="margin:10px auto">Resources</h2><ul style="list-style:none;margin-left:0"><li><a href="https://medium.com/software-design/why-software-developers-should-care-about-cpu-caches-8da04355bb8a" target="_blank" rel="noopener noreferrer" style="color:#3182CE">Why software developers should care about CPU caches <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 576 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M576 24v127.984c0 21.461-25.96 31.98-40.971 16.971l-35.707-35.709-243.523 243.523c-9.373 9.373-24.568 9.373-33.941 0l-22.627-22.627c-9.373-9.373-9.373-24.569 0-33.941L442.756 76.676l-35.703-35.705C391.982 25.9 402.656 0 424.024 0H552c13.255 0 24 10.745 24 24zM407.029 270.794l-16 16A23.999 23.999 0 0 0 384 303.765V448H64V128h264a24.003 24.003 0 0 0 16.97-7.029l16-16C376.089 89.851 365.381 64 344 64H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V287.764c0-21.382-25.852-32.09-40.971-16.97z"></path></svg></a></li><li><a href="https://github.com/contactandyc/another-c-library/blob/master/docs/tips.md#create-multiline-macro-in-c" target="_blank" rel="noopener noreferrer" style="color:#3182CE">Helpful Tips for Formatting <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 576 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M576 24v127.984c0 21.461-25.96 31.98-40.971 16.971l-35.707-35.709-243.523 243.523c-9.373 9.373-24.568 9.373-33.941 0l-22.627-22.627c-9.373-9.373-9.373-24.569 0-33.941L442.756 76.676l-35.703-35.705C391.982 25.9 402.656 0 424.024 0H552c13.255 0 24 10.745 24 24zM407.029 270.794l-16 16A23.999 23.999 0 0 0 384 303.765V448H64V128h264a24.003 24.003 0 0 0 16.97-7.029l16-16C376.089 89.851 365.381 64 344 64H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V287.764c0-21.382-25.852-32.09-40.971-16.97z"></path></svg></a></li><li><a href="https://mitpress.mit.edu/books/introduction-algorithms-third-edition" target="_blank" rel="noopener noreferrer" style="color:#3182CE">Introduction to Alogorithms <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 576 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M576 24v127.984c0 21.461-25.96 31.98-40.971 16.971l-35.707-35.709-243.523 243.523c-9.373 9.373-24.568 9.373-33.941 0l-22.627-22.627c-9.373-9.373-9.373-24.569 0-33.941L442.756 76.676l-35.703-35.705C391.982 25.9 402.656 0 424.024 0H552c13.255 0 24 10.745 24 24zM407.029 270.794l-16 16A23.999 23.999 0 0 0 384 303.765V448H64V128h264a24.003 24.003 0 0 0 16.97-7.029l16-16C376.089 89.851 365.381 64 344 64H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V287.764c0-21.382-25.852-32.09-40.971-16.97z"></path></svg></a></li></ul></div></div></footer></div></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/ebook/11-balancing-binary-search-trees/";window.webpackCompilationHash="8913fc5500708dd393f4";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-95ebc95ba4fb3bc2dd23.js"],"component---node-modules-gatsby-plugin-offline-app-shell-js":["/component---node-modules-gatsby-plugin-offline-app-shell-js-2089f767561e6aa92a7f.js"],"component---src-templates-ebook-page-js":["/component---src-templates-ebook-page-js-fe8bc0f2c932eda75c4a.js"],"component---src-pages-404-js":["/component---src-pages-404-js-a5fd40ab0bd43785175c.js"],"component---src-pages-contact-js":["/component---src-pages-contact-js-fb76d9a5164a1f2eede1.js"],"component---src-pages-contributing-js":["/component---src-pages-contributing-js-80166a10b44da213f86c.js"],"component---src-pages-docs-js":["/component---src-pages-docs-js-5f1ad25153678f862f92.js"],"component---src-pages-ebook-js":["/component---src-pages-ebook-js-62ae33890356a1602f60.js"],"component---src-pages-index-js":["/component---src-pages-index-js-d1c647469039ae7263dc.js"],"component---src-pages-license-js":["/component---src-pages-license-js-5dac97904724019f2a51.js"]};/*]]>*/</script><script src="/webpack-runtime-3090066330befb922a07.js" async=""></script><script src="/styles-8648ad68e26f3992ff5c.js" async=""></script><script src="/app-95ebc95ba4fb3bc2dd23.js" async=""></script><script src="/commons-0ae7f027867ef630b05a.js" async=""></script><script src="/component---src-templates-ebook-page-js-fe8bc0f2c932eda75c4a.js" async=""></script></body></html>
