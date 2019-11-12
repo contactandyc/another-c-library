@@ -3,6 +3,7 @@ import { graphql, useStaticQuery, Link } from "gatsby"
 import { FaExternalLinkAlt } from "react-icons/fa"
 
 function Footer() {
+  // posttype under path
   const data = useStaticQuery(graphql`
     query SitePages {
       allMarkdownRemark(sort: {order: ASC, fields: [frontmatter___title]}) {
@@ -12,7 +13,6 @@ function Footer() {
             frontmatter {
               title
               path
-              posttype
             }
           }
         }
@@ -56,7 +56,7 @@ function Footer() {
           <h2 style={{ margin: `10px auto` }}>A C eBook</h2>
           <ul style={styles.ul}>
             {data.allMarkdownRemark.edges
-              .filter(i => i.node.frontmatter.posttype === "ebook")
+              /*.filter(i => i.node.frontmatter.posttype === "ebook")*/
               .map(({ node: i }) => {
                 return (
                   <li key={i.id}>

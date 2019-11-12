@@ -55,7 +55,7 @@ function EbookPage({ data }) {
 }
 
 export default EbookPage
-
+// filter: { frontmatter: { posttype: { eq: "ebook" }}} below sort in allMarkdownRemark
 export const pageQuery = graphql`
   query EbookPostBySlug($slug: String!) {
     site {
@@ -68,12 +68,10 @@ export const pageQuery = graphql`
       html
       frontmatter {
         title
-        posttype
       }
     }
     allMarkdownRemark(
       sort: { order: ASC, fields: [frontmatter___title] }
-      filter: { frontmatter: { posttype: { eq: "ebook" }}}
     ) {
       edges {
         node {

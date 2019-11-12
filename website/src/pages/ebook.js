@@ -54,12 +54,12 @@ export default function Ebook({ data }) {
     </Layout>
   );
 }
+// filter: { frontmatter: { posttype: { eq: "ebook" }}} below sort in allMarkdownRemark
 
 export const pageQuery = graphql`
   query EbookQuery {
     allMarkdownRemark(
       sort: { order: ASC, fields: [frontmatter___title] }
-      filter: { frontmatter: { posttype: { eq: "ebook" }}}
     ) {
       edges {
         node {

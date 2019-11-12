@@ -11,7 +11,6 @@ exports.createPages = async ({ graphql, actions }) => {
       {
         allMarkdownRemark(
           sort: { fields: [frontmatter___title], order: DESC }
-          limit: 1000
         ) {
           edges {
             node {
@@ -20,7 +19,6 @@ exports.createPages = async ({ graphql, actions }) => {
               }
               frontmatter {
                 title
-                posttype
               }
             }
           }
@@ -40,7 +38,7 @@ exports.createPages = async ({ graphql, actions }) => {
     // const previous = index === posts.length - 1 ? null : posts[index + 1].node
     // const next = index === 0 ? null : posts[index - 1].node
 
-    if (post.node.frontmatter.posttype === "ebook") {
+    //if (post.node.frontmatter.posttype === "ebook") { posttype bug
       createPage({
         path: post.node.fields.slug,
         component: ebookPage,
@@ -50,7 +48,7 @@ exports.createPages = async ({ graphql, actions }) => {
           // next,
         },
       })
-    }
+    //}
     /*else if (post.node.frontmatter.posttype === "doc") {
       createPage({
         path: post.node.fields.slug,
@@ -73,8 +71,8 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
 
     /*if (node.frontmatter.posttype === "doc")
       value = '/docs' + value*/
-    if (node.frontmatter.posttype === "ebook")
-      value = '/ebook' + value
+    //if (node.frontmatter.posttype === "ebook")
+    value = '/ebook' + value
 
     createNodeField({
       name: `slug`,

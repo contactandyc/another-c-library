@@ -65,12 +65,12 @@ function Docs({ data }) {
 }
 
 export default Docs
+// filter: { frontmatter: { posttype: { eq: "ebook" }}} below sort in allMarkdownRemark
 
 export const pageQuery = graphql`
   query DocsQuery {
     allMarkdownRemark(
       sort: { order: ASC, fields: [frontmatter___title] }
-      filter: { frontmatter: { posttype: { eq: "doc" }}}
     ) {
       edges {
         node {
