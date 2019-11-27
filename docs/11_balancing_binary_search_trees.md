@@ -144,13 +144,15 @@ Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 5. Every path from a given node to any of its descendant NIL nodes contains the same number of black nodes.
 
 My additional rules for clarification which are based upon the first 5 rules.
-- If a node has one child, the child must be red
+- If a node has one child, the child must be red (and the parent of that child must be black)
+- Children must all be red or all be black of a given node.  If the parent is red, the children must be black.  If the parent is black, the children can be red or black.
 - If a node has two children, one or both of the children can be red if the parent is black
 - If a node is red, it must have either two children who are black or no children at all.
 - The parent of a red node must be black
 - The black height of any leaf node must be the same (another way of stating 5)
 - A red-black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.  It is possible to have more red nodes than black nodes, but it isn't typical.
-- A red-black tree has a worst case of a 2logN depth but is likely to maintain a logN depth or be very close to it.
+- A red-black tree has a worst case of a 2logN depth but is likely to maintain a logN depth or be very close to it.  The red-black tree would only reach 2logN if every other node from the root (which must be black) is red.  Given that this is very unlikely, a red-black tree tends to be closer to logN depth.
+
 
 The red-black tree uses coloring and tree rotations to balance the binary search tree.  
 
