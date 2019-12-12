@@ -1,5 +1,5 @@
-OBJECTS=$(ROOT)/src/llhttp/llhttp.c $(ROOT)/src/ac_timer.c $(ROOT)/src/ac_allocator.c $(ROOT)/src/ac_buffer.c $(ROOT)/src/ac_pool.c $(ROOT)/src/ac_map.c $(ROOT)/src/ac_threaded_pipe.c $(ROOT)/src/ac_async_buffer.c $(ROOT)/src/ac_cgi.c $(ROOT)/src/ac_conv.c $(ROOT)/src/ac_json.c
-HEADER_FILES=$(ROOT)/src/llhttp/llhttp.h $(ROOT)/src/ac_common.h $(ROOT)/src/ac_timer.h $(ROOT)/src/ac_allocator.h $(ROOT)/src/ac_buffer.h $(ROOT)/src/ac_pool.h $(ROOT)/src/ac_map.h $(ROOT)/src/ac_object_pipe.h $(ROOT)/src/ac_threaded_pipe.h $(ROOT)/src/ac_async_buffer.h $(ROOT)/src/ac_cgi.h $(ROOT)/src/ac_conv.h $(ROOT)/src/ac_json.h
+OBJECTS=$(ROOT)/src/llhttp/llhttp.c $(ROOT)/src/ac_timer.c $(ROOT)/src/ac_allocator.c $(ROOT)/src/ac_buffer.c $(ROOT)/src/ac_pool.c $(ROOT)/src/ac_map.c $(ROOT)/src/ac_threaded_pipe.c $(ROOT)/src/ac_async_buffer.c $(ROOT)/src/ac_cgi.c $(ROOT)/src/ac_conv.c $(ROOT)/src/ac_json.c $(ROOT)/src/ac_io.c
+HEADER_FILES=$(ROOT)/src/llhttp/llhttp.h $(ROOT)/src/ac_common.h $(ROOT)/src/ac_timer.h $(ROOT)/src/ac_allocator.h $(ROOT)/src/ac_buffer.h $(ROOT)/src/ac_pool.h $(ROOT)/src/ac_map.h $(ROOT)/src/ac_object_pipe.h $(ROOT)/src/ac_threaded_pipe.h $(ROOT)/src/ac_async_buffer.h $(ROOT)/src/ac_cgi.h $(ROOT)/src/ac_conv.h $(ROOT)/src/ac_json.h $(ROOT)/src/ac_io.h
 FLAGS=-O3 -I$(ROOT)/src
 UV_OBJECTS=$(ROOT)/src/ac_object_pipe.c
 UV_HEADER_FILES=$(ROOT)/src/ac_object_pipe.h
