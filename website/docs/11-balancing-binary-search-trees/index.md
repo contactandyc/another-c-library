@@ -8,7 +8,7 @@ Copyright 2019 Andy Curtis & Daniel Curtis
 
 # Balancing Binary Search Trees
 
-This builds significantly on the last section about [binary search trees](10_binary_search_trees.md).  To start, let's explore why balancing a binary search tree is important.
+This builds significantly on the last section about [binary search trees](../10-binary-search-trees/index.md).  To start, let's explore why balancing a binary search tree is important.
 
 The following code is found in <i>illustrations/11_balancing_binary_search_trees/1_binary_search_tree</i>
 ```bash

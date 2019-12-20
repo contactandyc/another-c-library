@@ -28,7 +28,7 @@ My additional rules for clarification which are based upon the first 5 rules.
 - A red-black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.  It is possible to have more red nodes than black nodes, but it isn't typical.
 - A red-black tree has a worst case of a 2logN depth but is likely to maintain a logN depth or be very close to it.
 
-The red-black tree is balanced through rotations and changing colors, which were discussed in [Balancing Binary Search Trees](11_balancing_binary_search_trees.md).  Make sure the tree_operations tool is built from the last section if you want to follow along.
+The red-black tree is balanced through rotations and changing colors, which were discussed in [Balancing Binary Search Trees](../11-balancing-binary-search-trees/index.md).  Make sure the tree_operations tool is built from the last section if you want to follow along.
 
 ```bash
 cd $ac/illustrations/11_balancing_binary_search_trees/2_tree_operations

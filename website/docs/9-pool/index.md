@@ -257,7 +257,7 @@ If we weren't using the ac_allocator, our init call would look like this:
 ac_pool_t *_ac_pool_init(size_t size);
 ```
 
-If you refer back to the end of the [allocator](7_allocator.md) code, there is an explanation of similar code for the timer object conversion.
+If you refer back to the end of the [allocator](../7-allocator/index.md) code, there is an explanation of similar code for the timer object conversion.
 
 Replace
 ```c
