@@ -3,10 +3,8 @@ import { Link, graphql } from "gatsby"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import Sidebar from "../components/sidebar"
 
 function Docs({ data }) {
-  const allPages = data.allMarkdownRemark
   const styles = {
     main: {
       margin: `0 auto`,

@@ -1,33 +1,7 @@
 import React from "react"
 import { Link } from "gatsby"
 
-/* for dynamically rendering h1s
-function Subheadings(props) {
-  if (props.active) {
-    return (
-      <ul style={props.styles.ul}>
-        {props.i.headings.map(({ value: x }) => {
-          let id = x.replace(/\s+/g, '-').toLowerCase();
-
-          return (
-            <li key={id} style={props.styles.li}>
-              <Link
-              to={`/${props.type}${props.i.frontmatter.path}#${id}`}
-              activeStyle={props.styles.activeLink}>
-                {x}
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
-    )
-  }
-  else return null
-}
-*/
-
 function Sidebar(props) {
-  //const [active, setActive] = useState(null)
   const styles = {
     sidebar: {
       fontFamily: `-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif`,
@@ -52,59 +26,57 @@ function Sidebar(props) {
     }
   }
 
-  /* for dynamically rendering h1s
-  const isPartiallyActive = ({ isPartiallyCurrent }) => {
-    console.log("isPartiallyCurrent", isPartiallyCurrent)
-    if (isPartiallyCurrent)
-      setActive(true)
-    else
-      setActive(null)
-  }*/
+  const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+  let titles = [];
+  let paths = [];
 
-  console.log(props.allPages)
+  for (let i=0; i<props.allPages.edges.length; i++) {
+    if (props.allPages.edges[i].node.frontmatter.title !== "") {
+      titles.push(props.allPages.edges[i].node.frontmatter.title);
+      paths.push(props.allPages.edges[i].node.frontmatter.path);
+    }
+  }
+
+  titles.sort(collator.compare);
+  paths.sort(collator.compare);
 
   return (
     <div style={styles.sidebar} className="Sidebar">
       <div>
-        {props.allPages.edges
-          .filter(i => i.node.frontmatter.title.length > 0)
-          .map(({ node: i }) => {
-            return (
-              <div key={i.id}>
-                <Link
-                  to={`/${props.type}${i.frontmatter.path}`}
-                  activeStyle={styles.activeLink}
-                  >
-                    {i.frontmatter.title}
-                </Link>
-
-                {/* getProps={isPartiallyActive} console.log("active", active)}
-
-                <Subheadings active={active} i={i} type={props.type} styles={styles} />
-
-                <ul style={styles.ul}>
-                  {i.headings.map(({ value: x }) => {
-                    let id = x.replace(/\s+/g, '-').toLowerCase();
-
-                    return (
-                      <li key={id} style={styles.li}>
-                        <Link
-                        to={`/${props.type}${i.frontmatter.path}#${id}`}
-                        activeStyle={styles.activeLink}>
-                          {x}
-                        </Link>
-                      </li>
-                    )
-                  })}
-                </ul>*/}
-
-              </div>
-            )
-          })
-        }
+        {titles.map((val, i) => {
+          return (
+            <div key={i}>
+              <Link
+                to={`/${props.type}${paths[i]}`}
+                activeStyle={styles.activeLink}>
+                  {val}
+              </Link>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
 export default Sidebar
+
+/*
+<Subheadings active={active} i={i} type={props.type} styles={styles} />
+
+<ul style={styles.ul}>
+  {i.headings.map(({ value: x }) => {
+    let id = x.replace(/\s+/g, '-').toLowerCase();
+
+    return (
+      <li key={id} style={styles.li}>
+        <Link
+        to={`/${props.type}${i.frontmatter.path}#${id}`}
+        activeStyle={styles.activeLink}>
+          {x}
+        </Link>
+      </li>
+    )
+  })}
+</ul>}
+*/

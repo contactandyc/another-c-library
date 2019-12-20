@@ -38,12 +38,26 @@ function Footer() {
     }
   }
 
+  const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+  let titles = [];
+  let paths = [];
+
+  for (let i=0; i<data.allMarkdownRemark.edges.length; i++) {
+    if (data.allMarkdownRemark.edges[i].node.frontmatter.title !== "") {
+      titles.push(data.allMarkdownRemark.edges[i].node.frontmatter.title);
+      paths.push(data.allMarkdownRemark.edges[i].node.frontmatter.path);
+    }
+  }
+
+  titles.sort(collator.compare);
+  paths.sort(collator.compare);
+
   return (
     <footer style={styles.footer}>
       <div className="Footer">
 
         <div>
-          <h1 style={{ marginBottom: `5px` }}>Another C Library</h1>
+          <h1 style={{ margin: `10px 0` }}>Another C Library</h1>
           <p style={styles.p}>© {new Date().getFullYear()} Andy Curtis & Daniel Curtis</p>
           <ul style={styles.ul}>
             <li><Link style={styles.link} to="/contact">Contact</Link></li>
@@ -55,15 +69,15 @@ function Footer() {
         <div>
           <h2 style={{ margin: `10px auto` }}>A C eBook</h2>
           <ul style={styles.ul}>
-            {data.allMarkdownRemark.edges
+            {titles
               /*.filter(i => i.node.frontmatter.posttype === "ebook")*/
-              .map(({ node: i }) => {
+              .map((val, i) => {
                 return (
-                  <li key={i.id}>
+                  <li key={i}>
                     <Link
-                      to={`/ebook/${i.frontmatter.path}`}
+                      to={`/ebook/${paths[i]}`}
                       activeStyle={styles.activeLink}>
-                      {i.frontmatter.title}
+                      {val}
                     </Link>
                   </li>
                 )

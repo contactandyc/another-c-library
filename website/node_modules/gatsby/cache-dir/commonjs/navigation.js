@@ -123,7 +123,7 @@ const navigate = (to, options = {}) => {
         // Purge plugin-offline cache
         if (`serviceWorker` in navigator && navigator.serviceWorker.controller !== null && navigator.serviceWorker.controller.state === `activated`) {
           navigator.serviceWorker.controller.postMessage({
-            gatsbyApi: `resetWhitelist`
+            gatsbyApi: `clearPathResources`
           });
         }
 
@@ -170,7 +170,7 @@ function shouldUpdateScroll(prevRouterProps, {
     if (oldPathname === pathname) {
       // Scroll to element if it exists, if it doesn't, or no hash is provided,
       // scroll to top.
-      return hash ? hash.slice(1) : [0, 0];
+      return hash ? decodeURI(hash.slice(1)) : [0, 0];
     }
   }
 

@@ -69,7 +69,7 @@ export default function IndexPage() {
 
       <div style={styles.main} className="Flex">
         <div>
-          <h2>Goals of this Project:</h2>
+          <h3>Goals of this Project:</h3>
           <ol>
             <li>To provide an open source collection of algorithms necessary to build complex applications</li>
             <li>To help engineers understand algorithms and C better, so that they can create their own</li>
@@ -80,7 +80,14 @@ export default function IndexPage() {
         </div>
         <div>
           <h3>About this Project:</h3>
-          <p style={styles.p}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <p style={styles.p}>Another C Library rebuilds, and in some cases, improves
+          upon, some of the most useful Computer Science algorithms from the ground up.
+          The library is Open Source and was created in late 2019, so it is
+          currently still under very active development.</p>
+          <p style={styles.p}>Andy and Daniel Curtis created this library to serve
+          as a starting point for C developers. Whether you're diving into C for
+          the first time or building complex applications, Another C Library offers
+          tools for both learning and building.</p>
         </div>
       </div>
     </Layout>

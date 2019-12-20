@@ -22,17 +22,17 @@ li {
   margin-bottom: 3px;
 }
 
-pre[class*="language-"] {
+pre[class*="language"] {
   border-radius: 0;
-  background: #1A202C;
+  background: #f6f8fa; /* #1A202C */
   overflow-x: scroll;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   text-shadow: none;
 }
 
-:not(pre) > code[class*="language-"] {
+:not(pre) > code[class*="language"] {
   border-radius: 0;
-  background: #EDF2F7;
+  background: #f6f8fa; /* #EDF2F7 */
   color: black;
   padding: 3px;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
