@@ -19,7 +19,7 @@ The following code is found in <i>illustrations/2_timing/1_timer</i>
 cd $ac/illustrations/2_timing/1_timer
 ```
 
-```bash
+```
 $ make
 gcc test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
