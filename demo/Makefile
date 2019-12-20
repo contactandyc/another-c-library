@@ -9,7 +9,17 @@ all: $(PROGRAMS) examples
 $(PROGRAMS): %: %.c
 	gcc $(FLAGS) $(OBJECTS) $< -o $@
 
-examples:
+canada.json:
+	curl -s "https://raw.githubusercontent.com/serde-rs/json-benchmark/master/data/canada.json" -o canada.json
+
+twitter.json:
+	curl -s "https://raw.githubusercontent.com/serde-rs/json-benchmark/master/data/twitter.json" -o twitter.json
+
+citm_catalog.json:
+	curl -s "https://raw.githubusercontent.com/serde-rs/json-benchmark/master/data/citm_catalog.json" -o citm_catalog.json
+
+
+examples: canada.json twitter.json citm_catalog.json
 	./quicksort_demo ABCDEFGHIJKLMNOPQRSTUVWXYZ
 	@echo
 	./demo1
@@ -26,7 +36,11 @@ examples:
 	@echo
 	./quicksort_demo A 1000
 	@echo
-	./demo6 < demo6.txt
+	./demo6 canada.json 1000
+	@echo
+	./demo6 citm_catalog.json 1000
+	@echo
+	./demo6 twitter.json 1000
 
 clean:
 	rm -rf *~ *.dSYM demo1 demo2 demo3 demo4 demo5 demo6 quicksort_demo

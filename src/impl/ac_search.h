@@ -18,22 +18,22 @@ limitations under the License.
 
 #include <stdio.h>
 
-#define ac_search_def(name, keytype, datatype)                               \
+#define ac_search_def(name, keytype, datatype)                                 \
   datatype *name(keytype *p, datatype *base, size_t num_elements);
 
-#define ac_search_compare_def(name, keytype, datatype)                       \
+#define ac_search_compare_def(name, keytype, datatype)                         \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value));
 
-#define ac_search_arg_def(name, keytype, datatype, compare)                  \
+#define ac_search_arg_def(name, keytype, datatype, compare)                    \
   datatype *name(keytype *p, datatype *base, size_t num_elements, void *arg);
 
-#define ac_search_compare_arg_def(name, keytype, datatype)                   \
+#define ac_search_compare_arg_def(name, keytype, datatype)                     \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value, void *arg),        \
                  void *arg);
 
-#define ac_search_m(name, keytype, datatype, compare)                        \
+#define ac_search_m(name, keytype, datatype, compare)                          \
   datatype *name(keytype *p, datatype *base, size_t num_elements) {            \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
@@ -46,12 +46,12 @@ limitations under the License.
       else if (n < 0)                                                          \
         high = mid;                                                            \
       else                                                                     \
-        return low;                                                            \
+        return mid;                                                            \
     }                                                                          \
     return NULL;                                                               \
   }
 
-#define ac_search_least_m(name, keytype, datatype, compare)                  \
+#define ac_search_least_m(name, keytype, datatype, compare)                    \
   datatype *name(keytype *p, datatype *base, size_t num_elements) {            \
     if (!num_elements)                                                         \
       return NULL;                                                             \
@@ -71,7 +71,7 @@ limitations under the License.
     return NULL;                                                               \
   }
 
-#define ac_search_greatest_m(name, keytype, datatype, compare)               \
+#define ac_search_greatest_m(name, keytype, datatype, compare)                 \
   datatype *name(keytype *p, datatype *base, size_t num_elements) {            \
     if (!num_elements)                                                         \
       return NULL;                                                             \
@@ -94,8 +94,8 @@ limitations under the License.
     return NULL;                                                               \
   }
 
-#define ac_search_lower_bound_m(name, keytype, datatype, compare)            \
-  datatype *name(char *p, datatype *base, size_t num_elements) {               \
+#define ac_search_lower_bound_m(name, keytype, datatype, compare)              \
+  datatype *name(keytype *p, datatype *base, size_t num_elements) {            \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -110,8 +110,8 @@ limitations under the License.
     return low;                                                                \
   }
 
-#define ac_search_upper_bound_m(name, keytype, datatype, compare)            \
-  datatype *name(char *p, datatype *base, size_t num_elements) {               \
+#define ac_search_upper_bound_m(name, keytype, datatype, compare)              \
+  datatype *name(keytype *p, datatype *base, size_t num_elements) {            \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -126,7 +126,7 @@ limitations under the License.
     return low;                                                                \
   }
 
-#define ac_search_compare_m(name, keytype, datatype)                         \
+#define ac_search_compare_m(name, keytype, datatype)                           \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value)) {                 \
     datatype *low = base;                                                      \
@@ -140,12 +140,12 @@ limitations under the License.
       else if (n < 0)                                                          \
         high = mid;                                                            \
       else                                                                     \
-        return low;                                                            \
+        return mid;                                                            \
     }                                                                          \
     return NULL;                                                               \
   }
 
-#define ac_search_least_compare_m(name, keytype, datatype)                   \
+#define ac_search_least_compare_m(name, keytype, datatype)                     \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value)) {                 \
     if (!num_elements)                                                         \
@@ -166,7 +166,7 @@ limitations under the License.
     return NULL;                                                               \
   }
 
-#define ac_search_greatest_compare_m(name, keytype, datatype)                \
+#define ac_search_greatest_compare_m(name, keytype, datatype)                  \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value)) {                 \
     if (!num_elements)                                                         \
@@ -190,7 +190,7 @@ limitations under the License.
     return NULL;                                                               \
   }
 
-#define ac_search_lower_bound_compare_m(name, keytype, datatype)             \
+#define ac_search_lower_bound_compare_m(name, keytype, datatype)               \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value)) {                 \
     datatype *low = base;                                                      \
@@ -207,7 +207,7 @@ limitations under the License.
     return low;                                                                \
   }
 
-#define ac_search_upper_bound_compare_m(name, keytype, datatype)             \
+#define ac_search_upper_bound_compare_m(name, keytype, datatype)               \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value)) {                 \
     datatype *low = base;                                                      \
@@ -224,7 +224,7 @@ limitations under the License.
     return low;                                                                \
   }
 
-#define ac_search_arg_m(name, keytype, datatype, compare)                    \
+#define ac_search_arg_m(name, keytype, datatype, compare)                      \
   datatype *name(keytype *p, datatype *base, size_t num_elements, void *arg) { \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
@@ -237,12 +237,12 @@ limitations under the License.
       else if (n < 0)                                                          \
         high = mid;                                                            \
       else                                                                     \
-        return low;                                                            \
+        return mid;                                                            \
     }                                                                          \
     return NULL;                                                               \
   }
 
-#define ac_search_least_arg_m(name, keytype, datatype, compare)              \
+#define ac_search_least_arg_m(name, keytype, datatype, compare)                \
   datatype *name(keytype *p, datatype *base, size_t num_elements, void *arg) { \
     if (!num_elements)                                                         \
       return NULL;                                                             \
@@ -262,7 +262,7 @@ limitations under the License.
     return NULL;                                                               \
   }
 
-#define ac_search_greatest_arg_m(name, keytype, datatype, compare)           \
+#define ac_search_greatest_arg_m(name, keytype, datatype, compare)             \
   datatype *name(keytype *p, datatype *base, size_t num_elements, void *arg) { \
     if (!num_elements)                                                         \
       return NULL;                                                             \
@@ -285,8 +285,8 @@ limitations under the License.
     return NULL;                                                               \
   }
 
-#define ac_search_lower_bound_arg_m(name, keytype, datatype, compare)        \
-  datatype *name(char *p, datatype *base, size_t num_elements, void *arg) {    \
+#define ac_search_lower_bound_arg_m(name, keytype, datatype, compare)          \
+  datatype *name(keytype *p, datatype *base, size_t num_elements, void *arg) { \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -301,8 +301,8 @@ limitations under the License.
     return low;                                                                \
   }
 
-#define ac_search_upper_bound_arg_m(name, keytype, datatype, compare)        \
-  datatype *name(char *p, datatype *base, size_t num_elements, void *arg) {    \
+#define ac_search_upper_bound_arg_m(name, keytype, datatype, compare)          \
+  datatype *name(keytype *p, datatype *base, size_t num_elements, void *arg) { \
     datatype *low = base;                                                      \
     datatype *high = base + num_elements;                                      \
     datatype *mid;                                                             \
@@ -317,7 +317,7 @@ limitations under the License.
     return low;                                                                \
   }
 
-#define ac_search_compare_arg_m(name, keytype, datatype, compare)            \
+#define ac_search_compare_arg_m(name, keytype, datatype, compare)              \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value, void *arg),        \
                  void *arg) {                                                  \
@@ -332,12 +332,12 @@ limitations under the License.
       else if (n < 0)                                                          \
         high = mid;                                                            \
       else                                                                     \
-        return low;                                                            \
+        return mid;                                                            \
     }                                                                          \
     return NULL;                                                               \
   }
 
-#define ac_search_least_compare_arg_m(name, keytype, datatype, compare)      \
+#define ac_search_least_compare_arg_m(name, keytype, datatype, compare)        \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value, void *arg),        \
                  void *arg) {                                                  \
@@ -359,7 +359,7 @@ limitations under the License.
     return NULL;                                                               \
   }
 
-#define ac_search_greatest_compare_arg_m(name, keytype, datatype, compare)   \
+#define ac_search_greatest_compare_arg_m(name, keytype, datatype, compare)     \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value, void *arg),        \
                  void *arg) {                                                  \
@@ -384,8 +384,7 @@ limitations under the License.
     return NULL;                                                               \
   }
 
-#define ac_search_lower_bound_compare_arg_m(name, keytype, datatype,         \
-                                              compare)                         \
+#define ac_search_lower_bound_compare_arg_m(name, keytype, datatype, compare)  \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value, void *arg),        \
                  void *arg) {                                                  \
@@ -403,8 +402,7 @@ limitations under the License.
     return low;                                                                \
   }
 
-#define ac_search_upper_bound_compare_arg_m(name, keytype, datatype,         \
-                                              compare)                         \
+#define ac_search_upper_bound_compare_arg_m(name, keytype, datatype, compare)  \
   datatype *name(keytype *p, datatype *base, size_t num_elements,              \
                  int compare(keytype *key, datatype *value, void *arg),        \
                  void *arg) {                                                  \

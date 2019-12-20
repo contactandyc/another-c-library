@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -I$(top_srcdir)/src @AM_CFLAGS@
 
-check_PROGRAMS = demo1 demo2 demo3 demo4 demo5 demo6 quicksort_demo
+check_PROGRAMS = demo1 demo2 demo3 demo4 demo5 demo6 quicksort_demo rf
 demo1_SOURCES = demo1.c
 demo1_LDADD = $(top_builddir)/src/libac.a
 
@@ -22,3 +22,6 @@ demo6_LDADD = $(top_builddir)/src/libac.a
 
 quicksort_demo_SOURCES = quicksort_demo.c
 quicksort_demo_LDADD = $(top_builddir)/src/libac.a
+
+rf_SOURCES = rf.c
+rf_LDADD = $(top_builddir)/src/libac.a

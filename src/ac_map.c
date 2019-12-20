@@ -113,14 +113,13 @@ static void tree_copy(ac_map_t *n, ac_map_t **res, ac_map_t *parent,
     tree_copy(n->left, &c->left, c, copy, tag);
   else
     c->left = NULL;
-  if (n->left)
+  if (n->right)
     tree_copy(n->right, &c->right, c, copy, tag);
   else
     c->right = NULL;
 }
 
-ac_map_t *ac_map_copy(ac_map_t *root, ac_map_copy_node_f copy,
-                          void *tag) {
+ac_map_t *ac_map_copy(ac_map_t *root, ac_map_copy_node_f copy, void *tag) {
   ac_map_t *res = NULL;
   if (root)
     tree_copy(root, &res, NULL, copy, tag);
@@ -137,8 +136,8 @@ static int count_black_nodes(ac_map_t *n) {
   return black_nodes;
 }
 
-static void print_node_with_color_to_buffer(ac_buffer_t *bh,
-                                            ac_pool_t *pool, ac_map_t *n,
+static void print_node_with_color_to_buffer(ac_buffer_t *bh, ac_pool_t *pool,
+                                            ac_map_t *n,
                                             print_node_to_string_f print_node) {
   bool red = rb_is_red(n);
   char *s = print_node(pool, n);
@@ -150,7 +149,7 @@ static void print_node_with_color_to_buffer(ac_buffer_t *bh,
 }
 
 bool ac_map_valid(ac_pool_t *pool, ac_map_t *root,
-                    print_node_to_string_f print_node) {
+                  print_node_to_string_f print_node) {
   ac_buffer_t *bh = ac_buffer_init(10000);
   bool valid = ac_map_valid_to_buffer(bh, pool, root, print_node);
   if (!valid)
@@ -160,9 +159,8 @@ bool ac_map_valid(ac_pool_t *pool, ac_map_t *root,
 }
 
 /* test if valid */
-bool ac_map_valid_to_buffer(ac_buffer_t *bh, ac_pool_t *pool,
-                              ac_map_t *root,
-                              print_node_to_string_f print_node) {
+bool ac_map_valid_to_buffer(ac_buffer_t *bh, ac_pool_t *pool, ac_map_t *root,
+                            print_node_to_string_f print_node) {
   /* an empty tree is valid */
   if (!root)
     return true;
@@ -285,7 +283,7 @@ static char *get_printed_key(ac_pool_t *pool, ac_map_t *n,
 
   if ((flags & AC_MAP_DONT_PRINT_BLACK_HEIGHT) == 0)
     return ac_pool_strdupf(pool, "%s%s-%d%s", red ? "(" : "", s,
-                             get_black_height(n), red ? ")" : "");
+                           get_black_height(n), red ? ")" : "");
   else
     return ac_pool_strdupf(pool, "%s%s%s", red ? "(" : "", s, red ? ")" : "");
 }
@@ -316,8 +314,8 @@ static void copy_tree_to_print(ac_pool_t *pool, ac_map_t *node,
                        flags);
 }
 
-static ac_map_print_t *
-find_left_parent_with_right_child(ac_map_print_t *item, int *depth) {
+static ac_map_print_t *find_left_parent_with_right_child(ac_map_print_t *item,
+                                                         int *depth) {
   while (item->parent &&
          (item->parent->right == item || !item->parent->right)) {
     *depth += item->depth;
@@ -328,7 +326,7 @@ find_left_parent_with_right_child(ac_map_print_t *item, int *depth) {
 }
 
 static ac_map_print_t *find_left_most_at_depth(ac_map_print_t *item,
-                                                 int depth) {
+                                               int depth) {
   if (!item)
     return NULL;
 
@@ -372,7 +370,7 @@ static int get_node_depth(ac_map_print_t *item) {
 }
 
 void ac_map_print(ac_pool_t *pool, ac_map_t *root,
-                    print_node_to_string_f print_node, int flags) {
+                  print_node_to_string_f print_node, int flags) {
   ac_buffer_t *bh = ac_buffer_init(10000);
   ac_map_print_to_buffer(bh, pool, root, print_node, flags);
   if (ac_buffer_length(bh))
@@ -380,9 +378,8 @@ void ac_map_print(ac_pool_t *pool, ac_map_t *root,
   ac_buffer_destroy(bh);
 }
 
-void ac_map_print_to_buffer(ac_buffer_t *bh, ac_pool_t *pool,
-                              ac_map_t *root,
-                              print_node_to_string_f print_node, int flags) {
+void ac_map_print_to_buffer(ac_buffer_t *bh, ac_pool_t *pool, ac_map_t *root,
+                            print_node_to_string_f print_node, int flags) {
   if (!root)
     return;
 
@@ -503,8 +500,7 @@ static void rotate_right(ac_map_t *A, ac_map_t **root) {
     rb_set_parent(tmp, A);
 }
 
-void ac_map_fix_insert(ac_map_t *node, ac_map_t *parent,
-                         ac_map_t **root) {
+void ac_map_fix_insert(ac_map_t *node, ac_map_t *parent, ac_map_t **root) {
   rb_set_red(node);
   rb_set_parent(node, parent);
   node->left = node->right = NULL;
