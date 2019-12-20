@@ -73,7 +73,6 @@ export default function IndexPage() {
           <ol>
             <li>To provide an open source collection of algorithms necessary to build complex applications</li>
             <li>To help engineers understand algorithms and C better, so that they can create their own</li>
-            <li>To show that it is possible to overcome many of the known challenges with C</li>
             <li>To help people to learn what it takes to create something new</li>
             <li>Build scalable applications using technology like Kubernetes, nginx, and docker</li>
           </ol>
