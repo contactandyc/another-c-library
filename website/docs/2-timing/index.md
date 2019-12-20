@@ -2546,6 +2546,6 @@ clean:
 
 The difference is that instead of the OBJECTS, HEADER_FILES, and FLAGS variables being specified in the Makefile, they are included by including $(ROOT)/src/Makefile.include.
 
-# [The Buffer Object](3_buffer.md)
+# [The Buffer Object](../3-buffer/index.md)
 
-[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

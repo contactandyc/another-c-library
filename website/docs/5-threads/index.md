@@ -278,6 +278,6 @@ It takes 0.027 seconds to do the 10 million additions for a single thread (if th
 
 Pthreads also support conditions that are like the pagers above.  They will be described later before needing them.  The next project will require a mutex.
 
-# [Macros](6_macros.md)
+# [Macros](../6-macros/index.md)
 
-[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

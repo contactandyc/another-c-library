@@ -160,6 +160,6 @@ cd $ac/illustrations/1_getting_started/1_test_setup
 I would highly recommend going through tutorials if you are not familiar with the command line. Understanding the terminal is essential for any programmer. I do not plan on utilizing many terminal related commands but will try to detail the used commands.
 
 
-# [Timing Your Code (the first project)](2_timing.md)
+# [Timing Your Code (the first project)](../2-timing/index.md)
 
-[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

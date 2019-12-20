@@ -164,6 +164,6 @@ int done;
 
 # To Be Continued
 
-# [The Pool Object](9_pool.md)
+# [The Pool Object](../9-pool/index.md)
 
-[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

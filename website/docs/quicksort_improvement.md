@@ -188,3 +188,5 @@ ac_sort: 9078.500ns
 I've run many different tests and compared it with various implementations of quicksort (including the C++ sort) and found that the improvement is better across the board.  In some cases, the C++ sort is more efficient than ac_sort and vice-versa for unsorted data.  I hope that this improvement can be adopted by the different implementations of quicksort!  Please share if you like this improvement to an almost 80 year old algorithm.
 
 I'm working on a detailed explanation of how the ac_sort algorithm works and will publish it soon!
+
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

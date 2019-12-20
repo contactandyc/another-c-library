@@ -784,6 +784,6 @@ void *buffer_append_alloc(buffer_t *h, size_t length) {
 
 If you followed everything in this, that is great.  Otherwise, it might make more sense as the buffer object is used throughout the project.  Next up is /2_linked_structures.md
 
-# [Linked Lists](4_linked_lists.md)
+# [Linked Lists](../4-linked-lists/index.md)
 
-[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

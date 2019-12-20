@@ -328,6 +328,6 @@ A common use case for the pool is to allocate a bunch of times and then clear an
 
 # TO BE CONTINUED
 
-# [Binary Search Trees](10_binary_search_trees.md)
+# [Binary Search Trees](../10-binary-search-trees/index.md)
 
-[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

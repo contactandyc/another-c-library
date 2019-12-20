@@ -447,3 +447,5 @@ ac_multimap_insert2_arg_m(name, datatype, mapname, compare)
                           ac_map_node_t **root,
                           void *arg);
 ```
+
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

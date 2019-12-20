@@ -602,6 +602,6 @@ grep -rn ac_timer .
 
 ac_timer can be replaced with a function name or another object name (or whatever you want to find).
 
-# Continue to build out the [allocator implementation](8_allocator_impl.md)!
+# Continue to build out the [allocator implementation](../8-allocator-implementation/index.md)!
 
-[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

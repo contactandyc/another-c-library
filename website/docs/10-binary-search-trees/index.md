@@ -1434,6 +1434,6 @@ char *get_printed_key(ac_pool_t *pool, node_t *n ) {
 - Printing a binary search tree is largely challenging because of the need to fit in a two-dimensional space.  It involves copying the binary tree into a print-friendly structure and pushing down nodes that don't fit.
 - The pool can be useful for constructing nodes in a tree, especially if you don't want to worry about deconstructing the tree.
 
-# [Balancing Binary Search Trees](11_balancing_binary_search_trees.md)
+# [Balancing Binary Search Trees](../11-balancing-binary-search-trees/index.md)
 
-[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

@@ -405,6 +405,6 @@ int main( int argc, char *argv[] ) {
 &point == p ? "equal" : "not equal"
 ```
 
-# [The Global Allocator Object](7_allocator.md)
+# [The Global Allocator Object](../7-allocator/index.md)
 
-[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

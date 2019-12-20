@@ -807,6 +807,6 @@ void node_print(node_t *np) {
 
 Next up is a brief explanation of threads, and then we will use what we've learned to create a very useful allocation object.  In this chapter, I began relaxing how much I'm explaining.  A very important skill is to learn to read code (regardless of how hard it is to read).  As this book progresses, there will be less in the way of explanations.
 
-# [Threads](5_threads.md)
+# [Threads](../5-threads/index.md)
 
-[Table of Contents](../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
