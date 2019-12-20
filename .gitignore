@@ -12,6 +12,7 @@ Makefile
 config.status
 config.log
 compile
+node_modules
 *~
 *.la
 libtool
