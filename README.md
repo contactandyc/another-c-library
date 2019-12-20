@@ -8,7 +8,7 @@ This software and documentation contains code and ideas derived from works publi
 Goals of this project...
 1. To provide an open source collection of algorithms necessary to build complex applications
 2. To help engineers understand algorithms and C better, so that they can create their own
-3. To show that it is possible to overcome many of the known challenges with C
+3. To show that it is possible to overcome many of the known challenges in C
 4. To help people to learn what it takes to create something new
 5. Build scalable applications using technology like Kubernetes, nginx, and docker.
 
@@ -92,13 +92,13 @@ make
 18. (Coming soon!) Quicksort
 19. (Coming soon!) Building web services in C
 
-# [Things that have been helpful to me](docs/tips.md)
-1. [Line spacing in markdown](docs/tips.md#line-spacing-in-markdown)
-2. [Escape characters in markdown](docs/tips.md#escape-characters-in-markdown)
-3. [Create multiline macro in C](docs/tips.md#create-multiline-macro-in-c)
-4. [Static inline vs inline](docs/tips.md#static-inline-vs-inline)
-5. [Regex find replace](docs/tips.md#regex-find-replace)
-6. [Atom-beautify problems](docs/tips.md#atom-beautify-problems)
+# [Things that have been helpful to me](website/docs/tips.md)
+1. [Line spacing in markdown](website/docs/tips.md#line-spacing-in-markdown)
+2. [Escape characters in markdown](website/docs/tips.md#escape-characters-in-markdown)
+3. [Create multiline macro in C](website/docs/tips.md#create-multiline-macro-in-c)
+4. [Static inline vs inline](website/docs/tips.md#static-inline-vs-inline)
+5. [Regex find replace](website/docs/tips.md#regex-find-replace)
+6. [Atom-beautify problems](website/docs/tips.md#atom-beautify-problems)
 
 
 # Some useful reading...
@@ -122,4 +122,4 @@ alt="C Programming for Beginners" width="480" height="360" border="10" /></a>
 ## Understanding the machine
 [Why software developers should care about CPU caches](https://medium.com/software-design/why-software-developers-should-care-about-cpu-caches-8da04355bb8a)<br/>
 
-# Let's [get started](docs/1_getting_started.md)!
+# Let's [get started](website/docs/1_getting_started.md)!
