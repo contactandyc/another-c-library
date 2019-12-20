@@ -13,6 +13,7 @@ config.status
 config.log
 compile
 node_modules
+.cache
 *~
 *.la
 libtool
