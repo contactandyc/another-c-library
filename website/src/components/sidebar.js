@@ -1,11 +1,30 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { Link } from "gatsby"
+
+function Headings(props) {
+  return (
+    <ul style={props.style.ul}>
+      {props.arr.map(({ value: val }) => {
+        let id = val.replace(/\s+/g, '-').toLowerCase();
+        return (
+          <li key={id} style={props.style.li}>
+            <Link
+              to={`/${props.type}${props.path}#${id}`}
+              activeStyle={props.style.activeLink}>
+              {val}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 function Sidebar(props) {
   const styles = {
     sidebar: {
-      fontFamily: `-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif`,
-      width: `400px`,
+      fontFamily: `-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen',
+      'Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif`,
       height: `100vh`,
       padding: `15px`,
       color: `#1E4E8C`,
@@ -14,7 +33,7 @@ function Sidebar(props) {
       borderLeft: `solid 1px #EDF2F7`
     },
     activeLink: {
-      color: `#38A169`,
+      color: `#1A202C`,
       fontWeight: `700`
     },
     ul: {
@@ -26,32 +45,36 @@ function Sidebar(props) {
     }
   }
 
-  const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
-  let titles = [];
-  let paths = [];
+  props.allPages.edges.sort(function(a, b) {
+    let ai = parseInt(a.node.frontmatter.title);
+    let bi = parseInt(b.node.frontmatter.title);
+    return ai - bi;
+  });
 
-  for (let i=0; i<props.allPages.edges.length; i++) {
-    if (props.allPages.edges[i].node.frontmatter.title !== "") {
-      titles.push(props.allPages.edges[i].node.frontmatter.title);
-      paths.push(props.allPages.edges[i].node.frontmatter.path);
-    }
-  }
+  const [active, setActive] = useState(false);
 
-  titles.sort(collator.compare);
-  paths.sort(collator.compare);
+  const elmArr = props.allPages.edges.filter(elm => elm.node.frontmatter.title.length > 0);
 
   return (
     <div style={styles.sidebar} className="Sidebar">
       <div>
-        {titles.map((val, i) => {
+        {elmArr.map((val, i) => {
           return (
-            <div key={i}>
-              <Link
-                to={`/${props.type}${paths[i]}`}
-                activeStyle={styles.activeLink}>
-                  {val}
-              </Link>
-            </div>
+              <div key={i}>
+                <Link
+                  to={`/${props.type}${val.node.frontmatter.path}`}
+                  activeStyle={styles.activeLink}
+                  onClick={() => setActive(true)}>
+                    {val.node.frontmatter.title}
+                </Link>
+                {active === true &&
+                  <Headings
+                    arr={val.node.headings}
+                    style={styles}
+                    path={val.node.frontmatter.paht}
+                    type={props.type} />
+                }
+              </div>
           );
         })}
       </div>

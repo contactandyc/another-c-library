@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "10. Binary Search Trees"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
-
 # Binary Search Trees
 
 ## The basic structure
@@ -667,11 +665,11 @@ node_print(pool, root);
 The Makefile also includes the src library to incorporate the ac_pool object.
 
 The following code is found in <i>illustrations/10_binary_search_trees/1_binary_search_tree</i>
-```bash
+```
 cd $ac/illustrations/10_binary_search_trees/1_binary_search_tree
 ```
 
-```bash
+```
 $ make
 gcc -g -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
 Creating binary_search_tree for PDCBAEMLOQTRYZ
@@ -729,7 +727,7 @@ void node_destroy(node_t *n) {
 
 Notice that the ac_free is commented out.  Let's uncomment it and run make again.
 
-```bash
+```
 $ make
 gcc -g -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
 Creating binary_search_tree for PDCBAEMLOQTRYZ
@@ -775,7 +773,7 @@ return 0;
 ```
 
 Let's uncomment the ac_free(arg); line and run again.
-```bash
+```
 $ make
 gcc -g -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
 Creating binary_search_tree for PDCBAEMLOQTRYZ
@@ -803,7 +801,7 @@ test_data_structure.c:244 [ac_pool] size: 1050, max_size: 1050, initial_size: 10
 
 The test_data_structure program allows us to print multiple binary search trees if we pass a third argument, which is the number of random trees to print (in addition to the one that is in order at the end).
 
-```bash
+```
 $ ./test_data_structure PDCBAEMLOQTRYZ 2
 Creating binary_search_tree for PDCBAEMLOQTRYZ
 L1
@@ -870,7 +868,7 @@ test_data_structure.c:244 [ac_pool] size: 3150, max_size: 3150, initial_size: 10
 
 Notice that since we printed 3 trees, the total bytes allocated increased to 4140 bytes.  Let's review the test_data_structure function for a moment.
 
-```bash
+```
 void test_data_structure(ac_pool_t *pool, const char *arg, int repeat) {
   printf("Creating %s for %s\n", DATA_STRUCTURE, arg);
   node_t *root;
@@ -895,12 +893,12 @@ void test_data_structure(ac_pool_t *pool, const char *arg, int repeat) {
 For each call of node_print, the pool uses more memory.  However, we can clear the pool just after each print since the pool is only used for allocation within the node_print call.  More specifically, we can clear the pool at the beginning of the for loop to repeat building, printing, and destroying the tree, and just before we recreate the tree one last time.  If you uncomment the ac_pool_clear calls, you can go ahead and rebuild.
 
 Rebuild
-```bash
+```
 make
 ```
 
 and run again
-```bash
+```
 $ ./test_data_structure PDCBAEMLOQTRYZ 2
 .
 .
@@ -912,7 +910,7 @@ test_data_structure.c:246 [ac_pool] size: 1050, max_size: 1050, initial_size: 10
 
 You should see that the memory usage didn't grow this time.  If we uncomment the ac_pool_destroy call in the main function, we will see the following output.
 
-```bash
+```
 $ make
 gcc -g -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
 Creating binary_search_tree for PDCBAEMLOQTRYZ
@@ -939,7 +937,7 @@ There are no longer any memory leaks, and the pool is being used efficiently.  I
 Before moving on, it is worth looking at how unbalanced binary search trees can become.  The simplest way to do it is to put all of the keys in sequence.
 
 For example,
-```bash
+```
 $ ./test_data_structure abcdefgh
 Creating binary_search_tree for abcdefgh
 a1
@@ -963,7 +961,7 @@ print_using_reverse_iteration: hgfedcba
 ```
 
 or
-```bash
+```
 $ ./test_data_structure hgfedcba
 Creating binary_search_tree for hgfedcba
 h1
@@ -990,11 +988,11 @@ To understand how to print a binary search tree, I've made a slight modification
 
 The code that follows can be found in illustrations/10_binary_search_trees/2_binary_search_tree
 
-```bash
+```
 cd $ac/illustrations/10_binary_search_trees/2_binary_search_tree
 ```
 
-```bash
+```
 $ make
 gcc -g -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
 Creating binary_search_tree for PDCBAEMLOQTRYZ
@@ -1434,6 +1432,4 @@ char *get_printed_key(ac_pool_t *pool, node_t *n ) {
 - Printing a binary search tree is largely challenging because of the need to fit in a two-dimensional space.  It involves copying the binary tree into a print-friendly structure and pushing down nodes that don't fit.
 - The pool can be useful for constructing nodes in a tree, especially if you don't want to worry about deconstructing the tree.
 
-# [Balancing Binary Search Trees](../11-balancing-binary-search-trees/index.md)
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)

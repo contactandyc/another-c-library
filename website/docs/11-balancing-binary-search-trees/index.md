@@ -4,18 +4,16 @@ posttype: "ebook"
 title: "11. Balancing Binary Search Trees"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
-
 # Balancing Binary Search Trees
 
 This builds significantly on the last section about [binary search trees](../10-binary-search-trees/index.md).  To start, let's explore why balancing a binary search tree is important.
 
 The following code is found in <i>illustrations/11_balancing_binary_search_trees/1_binary_search_tree</i>
-```bash
+```
 cd $ac/illustrations/11_balancing_binary_search_trees/1_binary_search_tree
 ```
 
-```bash
+```
 make
 ```
 
@@ -26,7 +24,7 @@ In this case, I've not included examples in the Makefile.  I've also commented o
 To understand why balancing a binary search tree is important, let's look at some worst-case and bad scenarios.
 
 One worst case scenario
-```bash
+```
 $ ./test_data_structure ABCDEFGHI
 Creating binary_search_tree for ABCDEFGHI
 A1
@@ -49,7 +47,7 @@ A1
 ```
 
 Another worst-case scenario
-```bash
+```
 $ ./test_data_structure IHGFEDCBA
 Creating binary_search_tree for IHGFEDCBA
 I1
@@ -73,7 +71,7 @@ A9
 
 
 A mixed case where the tree isn't balanced
-```bash
+```
 $ ./test_data_structure IHGFEDCBAabcdef
 Creating binary_search_tree for IHGFEDCBAabcdef
 I1
@@ -96,7 +94,7 @@ A9
 ```
 
 Yet another worst-case scenario.
-```bash
+```
 $ ./test_data_structure Izpagkml
 Creating binary_search_tree for Izpagkml
 I1
@@ -192,7 +190,7 @@ void recolor( node_t *n ) {
 
 Rotations are used to balance binary search trees when using the red-black tree algorithm.  The following examples will not include colors and are just made up.  A right rotation around R
 
-```bash
+```
 G
 |\
 E R
@@ -201,7 +199,7 @@ E R
 ```
 
 would result in
-```bash
+```
 G
 |\
 E N
@@ -210,7 +208,7 @@ E N
 ```
 
 A left rotation around G would result in
-```bash
+```
 N
 |\
 G R
@@ -219,7 +217,7 @@ E
 ```
 
 A right rotation around G would result in
-```bash
+```
 N
 |\
 E R
@@ -269,30 +267,30 @@ Rotating to the right is similar to rotating to the left (except you need to swa
 I've written a tool to help you to understand how colors and rotations work.
 
 The following code is found in <i>illustrations/11_balancing_binary_search_trees/2_tree_operations</i>
-```bash
+```
 cd $ac/illustrations/11_balancing_binary_search_trees/2_tree_operations
 ```
 
-```bash
+```
 make
 ```
 
-```bash
+```
 ./tree_operations
 ```
 
 You will be prompted with the following...
-```bash
+```
 (i)nsert, (e)rase, (r)ight_rotate, (l)eft_rotate, (R)ed, (b)lack, re(c)olor, (h)elp, (q)uit
 ```
 
 type
-```bash
+```
 i a
 ```
 
 outputs
-```bash
+```
 (a0)
 
 The root is not black!
@@ -303,12 +301,12 @@ The root is not black!
 If the node is in parenthesis, it is red.  On your terminal, it should print in the red color, as well.  Whenever you insert a node, it is painted red.  You can use the tool to try and turn this into a proper red-black tree.  In the red-black tree, the root is always black.  We can paint a black by typing the following.
 
 type
-```bash
+```
 b a
 ```
 
 outputs
-```bash
+```
 a1
 
 Starting with a valid red black tree
@@ -328,7 +326,7 @@ The above tree is a valid red-black tree
 The first operation was **insert a** broke the red-black tree rules.  It was fixed by painting the root node black.
 
 type
-```bash
+```
 i b
 ```
 outputs
@@ -354,11 +352,11 @@ The above tree is a valid red-black tree
 In this case, nothing needed to be done because b's parent was black.
 
 type
-```bash
+```
 i c
 ```
 outputs
-```bash
+```
 a1
   \
    (b1)
@@ -372,7 +370,7 @@ a1
 In this case, c's parent b is red.  If we rotate around a to the left, it should fix it.
 
 type
-```bash
+```
 l a
 ```
 outputs
@@ -411,11 +409,11 @@ The above tree is a valid red-black tree
 ```
 
 type
-```bash
+```
 i d
 ```
 outputs
-```bash
+```
 b1
 | \
 |  (c1)
@@ -429,11 +427,11 @@ b1
 Since the parent (c) and the uncle (a) are both red, we can try recoloring around the grandparent (b).
 
 type
-```bash
+```
 c b
 ```
 outputs
-```bash
+```
 (b0)
 |   \
 a1   c1
@@ -446,11 +444,11 @@ The root is not black!
 If the tree is balanced, we can always just paint the root node black.
 
 type
-```bash
+```
 b b
 ```
 outputs
-```bash
+```
 b1
 | \
 a2 c2
@@ -495,11 +493,11 @@ The above tree is a valid red-black tree
 ```
 
 type
-```bash
+```
 i e
 ```
 outputs
-```bash
+```
 b1
 | \
 a2 c2
@@ -514,11 +512,11 @@ a2 c2
 
 This can be resolved through a left rotation.
 type
-```bash
+```
 l c
 ```
 outputs
-```bash
+```
 b1
 | \
 a2 d2
@@ -563,11 +561,11 @@ The above tree is a valid red-black tree
 
 The tool will also allow you to erase nodes.  Let\'s erase a to start.
 type
-```bash
+```
 e a
 ```
 outputs
-```bash
+```
 b1
   \
    d2
@@ -580,11 +578,11 @@ b1 has one right child, and it isn't red
 ```
 
 We can try a left rotation around b
-```bash
+```
 l b
 ```
 outputs
-```bash
+```
 d1
 | \
 |  (e1)
@@ -596,11 +594,11 @@ b2
 (e1) has a different black height than (c2)
 ```
 If we color e black, the tree will be a proper red-black tree.
-```bash
+```
 b e
 ```
 outputs
-```bash
+```
 d1
 | \
 |  e2
@@ -657,7 +655,7 @@ I'll reference this tool in the explanation of the red-black tree that comes nex
 
 The tool (tree_operations) can also start with a valid red-black tree, which you can modify by specifying a sequence of characters in the order in which you wish the characters to be inserted.
 
-```bash
+```
 $ ./tree_operations ABC
 B1
 | \
@@ -666,7 +664,7 @@ B1
 (A1)
 ```
 
-```bash
+```
 $ ./tree_operations ABCD
 B1
 | \
@@ -675,7 +673,7 @@ A2 C2
       (D2)
 ```
 
-```bash
+```
 $ ./tree_operations BADC
 B1
 | \
@@ -684,7 +682,7 @@ A2 D2
    (C2)
 ```
 
-```bash
+```
 $ ./tree_operations ABCDEFGHIJKLMNOPQRSTUVWXYZ
 H1
 | \
@@ -717,6 +715,4 @@ A4 C4
 
 Once the tool is loaded, you can insert or erase nodes and try and figure out how to make it work as a red-black tree again.
 
-# [The Red Black Tree](../12-red-black-tree/index.md)
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)

@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "8. The Global Allocator Implementation"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
-
 # The Global Allocator Implementation
 
 Implementing the allocator is rather involved and uses much of what you've learned in the prior chapters. However, it should help you to understand how to code or to improve it should you desire to.
@@ -164,6 +162,4 @@ int done;
 
 # To Be Continued
 
-# [The Pool Object](../9-pool/index.md)
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)

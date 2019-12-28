@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "3. The Buffer Object"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
-
 # The Buffer Object
 
 ## How it compares to other languages
@@ -27,21 +25,21 @@ int main( int argc, char *argv[] ) {
 
 building:
 
-```bash
+```
 git clone https://github.com/contactandyc/realtime.git
 cd illustrations/buffer/1_buffer
 gcc hello_buffer.c buffer.c -o hello_buffer
 ```
 
 output
-```bash
+```
 $ ./hello_buffer
 Hello Buffer!
 $
 ```
 
 Instead of <i>gcc hello...</i>, you can run
-```bash
+```
 make
 ```
 
@@ -784,6 +782,4 @@ void *buffer_append_alloc(buffer_t *h, size_t length) {
 
 If you followed everything in this, that is great.  Otherwise, it might make more sense as the buffer object is used throughout the project.  Next up is /2_linked_structures.md
 
-# [Linked Lists](../4-linked-lists/index.md)
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)

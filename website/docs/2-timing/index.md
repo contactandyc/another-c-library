@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "2. Timing Your Code"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
-
 # Timing Your Code (the first project)
 
 ## A brief introduction to C
@@ -15,7 +13,7 @@ In the project, there is an illustrations folder that contains most of the code.
 At various points in this project, we will be timing code in an attempt to optimize it.  Our first object is going to be simple but will illustrate how I plan to maintain separation between interfaces and their respective implementation.
 
 The following code is found in <i>illustrations/2_timing/1_timer</i>
-```bash
+```
 cd $ac/illustrations/2_timing/1_timer
 ```
 
@@ -363,7 +361,7 @@ size_t strlen(const char *s) {
   ...
 ```
 
-```bash
+```
 warning: initializing 'char *' with an expression of type 'const char *' discards qualifiers
 ```
 
@@ -443,12 +441,12 @@ int main( int argc, char *argv[]) {
 ```
 
 If you build the program using
-```bash
+```
 gcc void_pointers.c -o void_pointers -Wall
 ```
 
 and run it
-```bash
+```
 ./void_pointers
 ```
 
@@ -873,7 +871,7 @@ clean:
 ```
 
 When you run
-```bash
+```
 make
 ```
 
@@ -899,7 +897,7 @@ gcc test_timer.c -o test_timer
 
 If you did not want to use a Makefile to build test_timer, you could do so from the command line using the following command.
 
-```bash
+```
 gcc test_timer.c -o test_timer
 ```
 
@@ -911,7 +909,7 @@ In the last section, we explored how to time the reverse_string function.  In th
 
 The timing for the work in <i>illustrations/2_timing/2_timer</i> was:
 
-```bash
+```
 $ make
 gcc test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -924,7 +922,7 @@ overall time_spent: 67.0470ns
 
 This section's code is found in <i>illustrations/2_timing/2_timer</i>
 
-```bash
+```
 $ make
 gcc test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -937,7 +935,7 @@ overall time_spent: 49.6200ns
 
 Running `make` yields a 17.5 nanosecond improvement.  The following test demonstrates the difference between 1_timer and 2_timer:
 
-```bash
+```
 $ diff test_timer.c ../1_timer/test_timer.c
 30,35d29
 <     long copy_t1 = get_time();
@@ -973,7 +971,7 @@ long time_spent = (test_t2-test_t1) - (copy_t2-copy_t1);
 In the last section, we eliminated the cost of the strcpy and loop from the timing.  Another thing to do is to reconsider our reverse_string function.  The reverse_string calls strlen to get the length of the string s.  We could try and just pass the length of s into the call.  We can get the length of the argument outside of the repeated and timed test.  For completeness, we will compare the timing of 2_timer with 3_timer.
 
 The timing for the work in <i>illustrations/2_timing/2_timer</i> was...
-```bash
+```
 $ make
 gcc test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -985,7 +983,7 @@ overall time_spent: 49.9950ns
 ```
 
 This section's code is found in <i>illustrations/2_timing/3_timer</i>
-```bash
+```
 $ make
 gcc test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -997,7 +995,7 @@ overall time_spent: 35.3460ns
 ```
 
 Running make yields a 14.5 nanosecond improvement.  The difference between 2_timer and 3_timer can be found by running...
-```bash
+```
 $ diff test_timer.c ../2_timer/test_timer.c
 7c7,8
 < void reverse_string( char *s, size_t len ) {
@@ -1062,7 +1060,7 @@ The length is passed into the reverse_string call so that reverse_string doesn't
 It's important not to forget that the compiler can optimize the code further.  You can pass a flag called -O3 to gcc and sometimes see an improvement.
 
 The timing for the work in <i>illustrations/2_timing/3_timer</i> was...
-```bash
+```
 $ make
 gcc test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -1074,7 +1072,7 @@ overall time_spent: 35.3460ns
 ```
 
 This section's code is found in <i>illustrations/2_timing/4_timer</i>
-```bash
+```
 $ make
 gcc -O3 test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -1086,7 +1084,7 @@ overall time_spent: 12.2880ns
 ```
 
 Running make yields a 23 nanosecond improvement!  The only difference is in the Makefile.
-```bash
+```
 $ diff . ../3_timer/
 diff ./Makefile ../3_timer/Makefile
 4c4
@@ -1102,7 +1100,7 @@ The -O3 optimization (full optimization) was turned on in gcc.  It is good actua
 This section's code is found in <i>illustrations/2_timing/5_timer</i>
 
 If you run diff -q . ../4_timer/, a brief summary of what changed will be displayed.
-```bash
+```
 $ diff -q . ../4_timer/
 Files ./Makefile and ../4_timer/Makefile differ
 Only in .: file2.c
@@ -1163,7 +1161,7 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-```bash
+```
 $ gcc test_reverse.c -o test_reverse
 In file included from test_reverse.c:1:
 ./file2.c:1:31: error: unknown type name 'size_t'
@@ -1204,7 +1202,7 @@ The error indicates that the type size_t is not known.  Use your favorite search
 ```
 
 and then run gcc again.
-```bash
+```
 $ gcc test_reverse.c -o test_reverse
 In file included from test_reverse.c:1:
 ./file2.c:15:18: error: variable has incomplete type 'struct timeval'
@@ -1256,7 +1254,7 @@ Add this right after #include <stdio.h> to file2.c
 ```
 
 Again, run gcc to check for more errors
-```bash
+```
 $ gcc test_reverse.c -o test_reverse
 test_reverse.c:8:15: warning: implicitly declaring library function 'strdup' with type 'char *(const char *)' [-Wimplicit-function-declaration]
     char *s = strdup(argv[i]); // string duplicate
@@ -1332,7 +1330,7 @@ int main( int argc, char *argv[] ) {
 ```
 
 Now if you run gcc:
-```bash
+```
 $ gcc test_reverse.c -o test_reverse
 $
 ```
@@ -1340,7 +1338,7 @@ $
 All of the errors and warnings are gone.  
 
 We can run test_reverse like...
-```bash
+```
 $ ./test_reverse This is a test
 This => sihT
 is => si
@@ -1350,7 +1348,7 @@ test => tset
 
 If you were following along and changing file2.c, you can run make again to see if the changes work in the original test_timer.
 
-```bash
+```
 $ make
 gcc -O3 test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -1406,7 +1404,7 @@ change to
 If you go back and change test_timer.c in <i>illustrations/2_timing/5_timer</i> and then run make, you will get some of the same errors that we had when building test_reverse.
 
 in illustrations/2_timing/5_timer after making above change
-```bash
+```
 $ make
 gcc -O3 test_timer.c -o test_timer
 In file included from test_timer.c:1:
@@ -1430,7 +1428,7 @@ make: *** [test_timer] Error 1
 ```
 
 If we make the change in <i>illustrations/2_timing/6_timer</i> and run make
-```bash
+```
 $ make
 gcc -O3 test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -1472,7 +1470,7 @@ long get_time();
 Declaring the functions this way, lets the compiler know that the functions do exist.  The syntax is the same as writing the function, except you replace the {} with a semicolon.
 
 If you run make...
-```bash
+```
 $ make
 gcc -O3 test_timer.c -o test_timer
 Undefined symbols for architecture x86_64:
@@ -1495,7 +1493,7 @@ gcc -O3 file2.c test_timer.c -o test_timer
 ```
 
 Save and run make again
-```bash
+```
 $ make
 gcc -O3 file2.c test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -1577,7 +1575,7 @@ So that test_timer will be built if file2.h is updated.
 This section's code is found in <i>illustrations/2_timing/9_xxx</i>
 
 To build the code run...
-```bash
+```
 $ make
 gcc -O3 xxx.c test_xxx.c -o test_xxx
 ./test_xxx
@@ -1778,7 +1776,7 @@ test_timer: test_timer.c timer.c timer.h
 ```
 
 Build the project...
-```bash
+```
 $ make
 gcc -O3 timer.c test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -2226,7 +2224,7 @@ int main( int argc, char *argv[]) {
 ```
 
 The beginning should look familiar
-```bash
+```
 #include "timer.h"
 
 #include <stdio.h>
@@ -2396,7 +2394,7 @@ $ diff timer.h ac_timer.h
 ```
 
 The same thing is done for timer.c (copy to ac_timer.c and apply rules).
-```bash
+```
 $ diff timer.c ac_timer.c
 1c1
 < #include "timer.h"
@@ -2446,29 +2444,29 @@ The following code is found in <i>illustrations/2_timing/12_timer</i>
 Once the object has the ac prefix, we can move it to the src directory.  This is done by executing the following command - this actually won't work as it already has been moved.
 
 This command will not work because it was done for you.
-```bash
+```
 mv ac_timer.h ac_timer.c $ac/src
 ```
 
 You can see that the files exist by running
-```bash
+```
 cd $ac/src
 ls -l ac_timer.*
 ```
 
 which will output
-```bash
+```
 -rw-r--r--  1 ac  staff  1777 Sep 11 12:12 ac_timer.c
 -rw-r--r--  1 ac  staff  1314 Sep 11 12:12 ac_timer.h
 ```
 
 You can change back to the previous directory (illustrations/2_timing/12_timer) by running
-```bash
+```
 cd -
 ```
 
 or
-```bash
+```
 cd $ac/illustrations/2_timing/12_timer
 ```
 
@@ -2476,7 +2474,7 @@ cd - allows you to change to the directory that you were in previously and is us
 
 Ensuring the program builds properly requires a few changes to Makefile. The diff looks like the following:
 
-```bash
+```
 $ diff Makefile ../11_timer/Makefile
 1,5d0
 < ROOT=../../..
@@ -2546,6 +2544,4 @@ clean:
 
 The difference is that instead of the OBJECTS, HEADER_FILES, and FLAGS variables being specified in the Makefile, they are included by including $(ROOT)/src/Makefile.include.
 
-# [The Buffer Object](../3-buffer/index.md)
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)

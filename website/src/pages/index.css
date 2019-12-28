@@ -5,7 +5,9 @@ a {
 }
 
 a:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  filter: brightness(80%);
+  transition: .6s;
 }
 
 button:hover {
@@ -25,7 +27,6 @@ li {
 pre[class*="language"] {
   border-radius: 0;
   background: #f6f8fa; /* #1A202C */
-  overflow-x: scroll;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   text-shadow: none;
 }
@@ -37,6 +38,11 @@ pre[class*="language"] {
   padding: 3px;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   text-shadow: none;
+}
+
+code[class*="language-"], pre[class*="language-"] {
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.85rem;
 }
 
 .Footer {

@@ -1,6 +1,7 @@
-import React from "react"
+import React, { useState } from "react"
 import { Helmet } from "react-helmet"
-import { graphql } from "gatsby"
+import { Link, graphql } from "gatsby"
+import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -10,6 +11,26 @@ import Sidebar from "../components/sidebar"
 function EbookPage({ data }) {
   const currentPage = data.markdownRemark
   const allPages = data.allMarkdownRemark
+  const currPos = parseInt(currentPage.frontmatter.title);
+
+  allPages.edges.sort(function(a, b) {
+    let ai = parseInt(a.node.frontmatter.title);
+    let bi = parseInt(b.node.frontmatter.title);
+    return ai - bi;
+  });
+
+  let prev = { node: { frontmatter: { title: "Home", path: "/" }}};
+  let next = { node: { frontmatter: { title: "Home", path: "/" }}};
+
+  if (currPos + 2 < allPages.edges.length && currPos > 1) {
+    next = allPages.edges[currPos + 2];
+    prev = allPages.edges[currPos];
+  } else if (currPos <= 1) {
+    next = allPages.edges[currPos + 2];
+  } else if (currPos + 2 >= allPages.edges.length) {
+    prev = allPages.edges[currPos];
+  }
+
 
   const styles = {
     main: {
@@ -24,6 +45,7 @@ function EbookPage({ data }) {
     },
     sidebar: {
       background: `#F7FAFC`,
+      width: `500px`,
       height: `100vh`,
       padding: `15px`,
       color: `#63B3ED`,
@@ -33,6 +55,15 @@ function EbookPage({ data }) {
     activeLink: {
       color: `#38A169`,
       fontWeight: `700`
+    },
+    postFooter: {
+      display: `flex`,
+      justifyContent: `space-between`,
+      borderTop: `solid 1px black`,
+      paddingTop: `10px`
+    },
+    arrow: {
+      paddingTop: `5px`
     }
   }
 
@@ -44,10 +75,21 @@ function EbookPage({ data }) {
 
         <div style={styles.content} className="Content">
           <h1>{currentPage.frontmatter.title}</h1>
+          <p>Copyright {new Date().getFullYear()} Andy Curtis & Daniel Curtis</p>
           <MdContent content={currentPage.html} />
+          <div style={styles.postFooter}>
+            <Link to={`/ebook/${prev.node.frontmatter.path}`}>
+              <FaArrowAltCircleLeft style={styles.arrow}/> {prev.node.frontmatter.title}
+            </Link>
+            <Link to={`/ebook/${next.node.frontmatter.path}`}>
+              {next.node.frontmatter.title} <FaArrowAltCircleRight style={styles.arrow} />
+            </Link>
+          </div>
         </div>
 
-        <Sidebar allPages={allPages} type="ebook"/>
+        <Sidebar
+          allPages={allPages}
+          type="ebook" />
 
       </div>
     </Layout>

@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "7. The Global Allocator Object"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
-
 # The Global Allocator Object
 
 A quick note about C allocation methods:
@@ -328,11 +326,11 @@ To test these changes out, I've modified code from $ac/illustrations/2_timing/13
 
 
 The following code is found in <i>illustrations/6_allocator/1_timing</i>
-```bash
+```
 cd $ac/illustrations/6_allocator/1_timing
 ```
 
-```bash
+```
 $ make
 gcc -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -385,7 +383,7 @@ To fix the code, we need to make sure that copy_timer is destroyed and s is free
 The error reported logged the ac_timer_init line as opposed to the ac_malloc inside of ac_timer_init.  This is likely more useful unless you are testing the individual object.
 
 Go ahead and uncomment those lines and run make again
-```bash
+```
 $ make
 gcc -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -397,7 +395,7 @@ overall time_spent: 9.5440ns
 ```
 
 Go ahead and revert your changes.  You can revert your changes in the current directory by running the following git command.  If you don't specify the ., then it will revert all changes in the whole repo (so this command can be somewhat dangerous!)
-```bash
+```
 git checkout .
 ```
 
@@ -411,12 +409,12 @@ If we change this to
 FLAGS += -D_AC_DEBUG_MEMORY_=\"memory.log\"
 ```
 run
-```bash
+```
 make clean
 ```
 
 and then
-```bash
+```
 $ make
 gcc -O3 -I../../../src -D_AC_DEBUG_MEMORY_=\"memory.log\" ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_timer.c -o test_timer
 ./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
@@ -428,13 +426,13 @@ overall time_spent: 7.4940ns
 ```
 
 There is a new file called memory.log in this directory.
-```bash
+```
 $ ls
 Makefile	memory.log	test_timer	test_timer.c
 ```
 
 You can view memory.log by running
-```bash
+```
 $ cat memory.log
 99 byte(s) allocated in 4 allocations (160 byte(s) overhead)
 test_timer.c:24: 27
@@ -532,7 +530,7 @@ timer_destroy(overall_timer);
 
 You can see that there are timer objects, malloc, and free.  Given that malloc, calloc, realloc, strdup, and free are so common in code, I opted not to provide any extra qualifiers other than ac.  I aim to make code highly optimized and very readable.  Another important feature of qualified naming is that it makes it possible to search for all places something exists.  For example, to find all cases where ac_timer are used, you can run..
 
-```bash
+```
 cd $ac/illustrations
 grep -rn ac_timer .
 ```  
@@ -596,12 +594,10 @@ FLAGS += -D_AC_DEBUG_MEMORY_=\"memory.log\"
 
 8.  You can grep for any line of code which contains an object using the following approach.  The following grep line will search all subdirectories for the string ac_timer and report the filename and line number where the text is found.
 
-```bash
+```
 grep -rn ac_timer .
 ```
 
 ac_timer can be replaced with a function name or another object name (or whatever you want to find).
 
-# Continue to build out the [allocator implementation](../8-allocator-implementation/index.md)!
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)

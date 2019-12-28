@@ -4,19 +4,17 @@ posttype: "ebook"
 title: "13. The Map Object"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
-
 # The Map Object
 - Turning the red black tree into a map
 
 *This and the src/ac_map.h/c files were started on Monday 9/23/19 and are still a work in progress.*
 
 The code for this section is found in <i>illustrations/13_map/1_map</i>
-```bash
+```
 cd $ac/illustrations/13_map/1_map
 ```
 
-```bash
+```
 $ make
 gcc -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c ../../../src/ac_map.c test_data_structure.c -o test_data_structure
 ./test_data_structure ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 10000
@@ -448,4 +446,4 @@ ac_multimap_insert2_arg_m(name, datatype, mapname, compare)
                           void *arg);
 ```
 
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)

@@ -24,13 +24,13 @@ To find and replace all instances of less(a, b) with less(a, b, arg)
 I use Atom with atom-beautify when coding.  Recently, I ran across an error where I couldn't get it to work with C/C++ code.  I had to do the following to get it to work.
 
 Install llvm
-```bash
+```
 brew install llvm
 ```
 
 Add path in Atom (path may be different to llvm)<br/>
 Atom => Preferences => Packages => atom-beautify => Settings => Executables => ClangFormat<br/>
-```bash
+```
 /usr/local/Cellar/llvm/9.0.0/bin
 ```
 

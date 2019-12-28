@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "5. Introducing Threads"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
-
 ## Introducing threads
 
 Imagine if you were building a block building, and you had to paint the level on each block up to 100 levels.  To know which block to paint, you would look at the last block on the building, add one to it, and go and paint your block.  Once the block is dry, you can come back and put the block on the building.  At this point, you can repeat the process.  You are only allowed to paint one block at a time, and you must look at the highest block to determine what to paint on the next block.  
@@ -76,7 +74,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-```bash
+```
 $ gcc test_code.c -o test_code -lpthread
 $ ./test_code
 global_number (should be 10000000)= 2010195
@@ -88,14 +86,14 @@ Notice that the number is not 10 million.  When global_number++ happens, each th
 
 When writing software which has resources that need protecting, one should generally assume that you must protect them (using the equivalent of the stop signs mentioned above).  Sometimes, when you run software and tests, the result will look okay.  This doesn't necessarily mean that the code is thread safe.  On my computer, when I compiled the code with the -O3 option, I got the following result:
 
-```bash
+```
 cd $ac/illustrations/4_threads/2_thread
 gcc -O3 test_code.c -o test_code -lpthread
 ./test_code
 ```
 
 Outputs
-```bash
+```
 global_number (should be 10000000)= 10000000
 ```
 
@@ -132,7 +130,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-```bash
+```
 $ gcc test_code.c -o test_code -lpthread
 $ ./test_code
 local_number (should be 10000000)= 2010195
@@ -181,7 +179,7 @@ int main(int argc, char *argv[]) {
 ```
 
 When a mutex protects the addition, the local number ends up being what we expected.
-```bash
+```
 $ gcc -O3 test_code.c -o test_code -lpthread
 $ ./test_code
 local_number (should be 10000000)= 10000000
@@ -207,14 +205,14 @@ Note that the worker_t structure (w) is shared amongst all of the threads.
 
 Before ending this chapter, we should consider how long each task takes and the advantages and disadvantages of threads and coordination.
 
-```bash
+```
 cd $ac/illustrations/4_threads/1_thread
 make
 time ./test_code
 ```
 
 outputs
-```bash
+```
 global_number (should be 10000000)= 2586841
 
 real	0m0.045s
@@ -222,14 +220,14 @@ user	0m0.326s
 sys	0m0.003s
 ```
 
-```bash
+```
 cd $ac/illustrations/4_threads/4_thread
 make
 time ./test_code
 ```
 
 outputs
-```bash
+```
 local_number (should be 10000000)= 10000000
 
 real	0m0.641s
@@ -238,14 +236,14 @@ sys	0m4.836s
 ```
 
 Coordination takes time.  We can test this code in optimized mode
-```bash
+```
 cd $ac/illustrations/4_threads/5_thread
 make
 time ./test_code
 ```
 
 outputs
-```bash
+```
 local_number (should be 10000000)= 10000000
 
 real	0m0.652s
@@ -257,14 +255,14 @@ The optimized build doesn't improve performance.
 
 Finally, if we look at the last example (6_single_thread), we can see that the performance is much faster.
 
-```bash
+```
 cd $ac/illustrations/4_threads/6_single_thread
 make
 time ./test_code
 ```
 
 outputs
-```bash
+```
 local_number (should be 10000000)= 10000000
 
 real	0m0.027s
@@ -278,6 +276,4 @@ It takes 0.027 seconds to do the 10 million additions for a single thread (if th
 
 Pthreads also support conditions that are like the pagers above.  They will be described later before needing them.  The next project will require a mutex.
 
-# [Macros](../6-macros/index.md)
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)

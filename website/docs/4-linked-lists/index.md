@@ -4,7 +4,7 @@ posttype: "ebook"
 title: "4. Linked Lists"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
+
 
 # Linked Lists
 
@@ -31,7 +31,7 @@ clean:
 ```
 
 When you run
-```bash
+```
 make
 ```
 
@@ -56,7 +56,7 @@ gcc test_data_structure.c $(DATA_STRUCTURE).c -o test_data_structure -DDATA_STRU
 
 If you didn't want to use a Makefile to build test_data_structure, you could do so from the command line using the following command.
 
-```bash
+```
 gcc test_data_structure.c singly_linked_list.c -o test_data_structure -DDATA_STRUCTURE=\"singly_linked_list\"
 ```
 
@@ -807,6 +807,4 @@ void node_print(node_t *np) {
 
 Next up is a brief explanation of threads, and then we will use what we've learned to create a very useful allocation object.  In this chapter, I began relaxing how much I'm explaining.  A very important skill is to learn to read code (regardless of how hard it is to read).  As this book progresses, there will be less in the way of explanations.
 
-# [Threads](../5-threads/index.md)
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)

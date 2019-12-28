@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "6. Macros"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
-
 # Macros
 
 The C compiler allows us to create a macro (basically defining one thing as another).  Two individual constants can be useful for debugging.
@@ -27,12 +25,12 @@ int main( int argc, char *argv[]) {
 ```
 
 Build it
-```bash
+```
 gcc test_special_constants.c -o test_special_constants
 ```
 
 And run it
-```bash
+```
 $ ./test_special_constants
 This line of code is at line 4 in function main in the file test_special_constants.c
 ```
@@ -150,7 +148,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-```bash
+```
 $ gcc test_code.c -o test_code
 test_special_constants.c:11:26: error: unexpected ';' before ')'
   printf("5 x 6 = %d\n", multiply_by_x(6));
@@ -198,7 +196,7 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-```bash
+```
 $ gcc test_code.c -o test_code
 test_special_constants.c:12:3: error: use of undeclared identifier 'tmp'
   swap(x, y);
@@ -235,7 +233,7 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-```bash
+```
 $ gcc test_code.c -o test_code
 $ ./test_code
 before swap: (5, 10)
@@ -262,14 +260,14 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-```bash
+```
 $ gcc test_code.c -o test_code
 $ ./test_code
 NOT DEBUG: 5
 ```
 
 You can define compiler directives from the command line using the -D option in gcc.  Multiple directives can be defined by repeating the -D option.
-```bash
+```
 $ gcc -D_DEBUG_ test_code.c -o test_code
 $ ./test_code
 DEBUG: 5
@@ -405,6 +403,4 @@ int main( int argc, char *argv[] ) {
 &point == p ? "equal" : "not equal"
 ```
 
-# [The Global Allocator Object](../7-allocator/index.md)
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)

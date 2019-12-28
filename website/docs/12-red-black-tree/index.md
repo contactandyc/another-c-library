@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "12. The Red-Black Tree"
 ---
 
-Copyright 2019 Andy Curtis & Daniel Curtis
-
 # The Red-Black Tree
 
 The red-black tree is a mostly balanced binary search tree that was invented by Leonidas J. Guibas and Robert Sedgewick.
@@ -30,13 +28,13 @@ My additional rules for clarification which are based upon the first 5 rules.
 
 The red-black tree is balanced through rotations and changing colors, which were discussed in [Balancing Binary Search Trees](../11-balancing-binary-search-trees/index.md).  Make sure the tree_operations tool is built from the last section if you want to follow along.
 
-```bash
+```
 cd $ac/illustrations/11_balancing_binary_search_trees/2_tree_operations
 make
 ```
 
 Then run
-```bash
+```
 $ $ac/bin/tree_operations ABC
 B1
 | \
@@ -51,7 +49,7 @@ q
 To make sure that it is working.
 
 The code for this section is found in <i>illustrations/12_red_black_tree/1_red_black_tree</i>
-```bash
+```
 cd $ac/illustrations/12_red_black_tree/1_red_black_tree
 make
 ```
@@ -384,7 +382,7 @@ To recap, if the parent and uncle are red, paint the parent and uncle black and 
 The following example adds the letter 0 (zero) to the left of (A2).  This creates the same case as above, but when recoloring happens (c B), (B1) and (D1) are both red. D becomes the new node. It is an example where recoloring creates a parent and child, which are both red.
 
 This is illustrated by the tool below.
-```bash
+```
 $ $ac/bin/tree_operations FDGBEABCDEFGHI
 F1
 | \
@@ -461,7 +459,7 @@ The code is below:
 
 If the node being inserted is to the right of the parent, it needs to be rotated to the left to keep one child to either side after the rotation.  If the left rotate isn't done first, the following will happen:
 
-```bash
+```
 $ $ac/bin/tree_operations FDGB
 F1
 | \
@@ -504,7 +502,7 @@ Notice that while swapping colors during the rotate, that the placement of the b
 
 After inserting A, do a right rotation on its grandparent D because its uncle is NULL (NULL is black).
 
-```bash
+```
 $ $ac/bin/tree_operations FDGB
 F1
 | \
@@ -540,7 +538,7 @@ B2
 
 In the example below, C is inserted to the left of B.  Both C and B are red.  Left rotate around B (the parent) before right rotating through D (the grandparent).
 
-```bash
+```
 Starting with a valid red black tree
 ====================================
 F1
@@ -642,7 +640,7 @@ If you consider the following examples, it should be clear why erasing a red lea
 
 The tree_operations has a -q feature which is less verbose (you don't get the menu or the list of operations that lead to a successful red-black tree structure).
 
-```bash
+```
 $ $ac/bin/tree_operations -q ABC
 B1
 | \
@@ -663,7 +661,7 @@ B1
 The above tree is a valid red black tree
 ```
 
-```bash
+```
 $ $ac/bin/tree_operations -q ABC
 B1
 | \
@@ -685,7 +683,7 @@ The above tree is a valid red black tree
 ```
 
 The case where fixing the color is important is shown below.  A has no children and is black.
-```bash
+```
 $ $ac/bin/tree_operations -q ABCD
 B1
 | \
@@ -727,7 +725,7 @@ else {
 - Move G into F's spot.
 - color G's right (H) black
 
-```bash
+```
 $ $ac/bin/tree_operations -q ABCDEFGH
 D1
 | \
@@ -770,7 +768,7 @@ The above tree is a valid red black tree
 
 <b>An example where the successor is black:</b> In this case, B is erased, C is the successor and is black.  C is colored the color of B.  The tree becomes invalid because C has a single black child (single children must be red).  The color must be fixed.
 
-```bash
+```
 $ $ac/bin/tree_operations -q ABCDEFGH
 D1
 | \
@@ -797,7 +795,7 @@ A2
 ```
 
 Finally, an example where the successor is red.
-```bash
+```
 $ $ac/bin/tree_operations -q ABC
 B1
 | \
@@ -845,7 +843,7 @@ If the successor is to the left of the node to the right of the node to erase, t
 
 In the example below H is erased and replaced with its successor (I).  I has a right child M which becomes a child of N and is colored black.
 
-```bash
+```
 $ $ac/bin/tree_operations -q ACBFHEGPNIONM
 F1
 | \
@@ -896,7 +894,7 @@ The above tree is a valid red black tree
 
 In the example below, H is erased (which is black) and replaced with I, which doesn't have a child.  The color must be fixed.
 
-```bash
+```
 $ $ac/bin/tree_operations -q ACBFHEGPNION
 F1
 | \
@@ -927,7 +925,7 @@ A3 C3      (O3)
 ```
 
 In the example below, N is erased (which is red) and replaced with O, which doesn't have a right child.  Because N is red, O will be red, and the overall tree height will be maintained.  The red black tree properties remain valid.
-```bash
+```
 $ $ac/bin/tree_operations -q ACBFHEGPNION
 F1
 | \
@@ -1086,7 +1084,7 @@ if(sibling->color == RED) {
 
 
 In the example below, erase A, the sibling is O (which is red), and the parent is E:
-```bash
+```
 $ $ac/bin/tree_operations -q AEIOUY
 E1
 | \
@@ -1149,26 +1147,26 @@ else {
 
 First, check to see if the sibling's right child is red.  If it is, color it black and rotate left around the parent.
 
-```bash
+```
 EXAMPLE
 ```
 
 If not, check if the sibling's left child is red.  If it is, rotate right around the sibling, then left around the parent.  Finally, color the sibling black (the rotations will have changed the sibling's color).
 
-```bash
+```
 EXAMPLE
 ```
 
 Finally, if neither of the sibling's children are red, color the sibling red.  If the parent is red or is the root, color the parent black.  Otherwise, fix the color for the parent's parent and set the node to pair up with a sibling to be the parent.
 
-```bash
+```
 EXAMPLE
 ```
 
 ## Packing color into the parent node
 
 The code for this section is found in <i>illustrations/12_red_black_tree/2_red_black_tree</i>
-```bash
+```
 cd $ac/illustrations/12_red_black_tree/2_red_black_tree
 make
 ```
@@ -1213,7 +1211,7 @@ We can then use the following #define macros to access and set the parent node a
 
 The rest of the change involves converting code, which accesses the parent pointer or the color to one of these macros.  You can run the following command to find all of the diffs.  I'll show a few.
 
-```bash
+```
 diff red_black_tree.c ../1_red_black_tree/red_black_tree.c | less
 ```
 
@@ -1262,5 +1260,4 @@ rb_clear_black(n);
 
 and so on.
 
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis
+[Table of Contents (only if viewing on Github)](../../../README.md)
