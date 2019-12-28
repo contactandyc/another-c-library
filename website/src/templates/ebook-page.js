@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Helmet } from "react-helmet"
 import { Link, graphql } from "gatsby"
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa"
@@ -66,6 +66,7 @@ function EbookPage({ data }) {
       paddingTop: `5px`
     }
   }
+
 
   return (
     <Layout>

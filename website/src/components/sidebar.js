@@ -51,9 +51,21 @@ function Sidebar(props) {
     return ai - bi;
   });
 
-  const [active, setActive] = useState(false);
+  const [active, setActive] = useState();
 
   const elmArr = props.allPages.edges.filter(elm => elm.node.frontmatter.title.length > 0);
+
+  let headings;
+
+  useEffect(() => {
+    if (active) {
+      headings = <Headings
+                    arr={active.node.headings}
+                    style={styles}
+                    path={active.node.frontmatter.path}
+                    type={props.type} />
+    }
+  });
 
   return (
     <div style={styles.sidebar} className="Sidebar">
@@ -64,16 +76,10 @@ function Sidebar(props) {
                 <Link
                   to={`/${props.type}${val.node.frontmatter.path}`}
                   activeStyle={styles.activeLink}
-                  onClick={() => setActive(true)}>
+                  onClick={() => setActive(val)}>
                     {val.node.frontmatter.title}
                 </Link>
-                {active === true &&
-                  <Headings
-                    arr={val.node.headings}
-                    style={styles}
-                    path={val.node.frontmatter.paht}
-                    type={props.type} />
-                }
+                {headings}
               </div>
           );
         })}
