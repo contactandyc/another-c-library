@@ -470,9 +470,9 @@ ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options) {
     abort();
 
   ac_out_t *r;
-  if (options->lz4 || ac_io_extension(filename, ".lz4"))
+  if ((!filename && options->lz4) || ac_io_extension(filename, ".lz4"))
     r = _ac_out_init_lz4(filename, options);
-  else if (options->gz || ac_io_extension(filename, ".gz"))
+  else if ((!filename && options->gz) || ac_io_extension(filename, ".gz"))
     r = _ac_out_init_gz(filename, options);
   else
     r = _ac_out_init(filename, options);
