@@ -23,6 +23,8 @@ limitations under the License.
 
 #include "impl/ac_out.h"
 
+/* ac_out_options_t is declared in impl/ac_out.h.  r is expected to point to a
+   structure of this type (and not NULL). */
 void ac_out_init_options(ac_out_options_t *r);
 void ac_out_fd(ac_out_options_t *r, int fd, bool owner);
 void ac_out_buffer_size(ac_out_options_t *r, size_t buffer_size);
