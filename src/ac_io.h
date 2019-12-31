@@ -18,6 +18,19 @@ limitations under the License.
 #define _ac_io_H
 
 #include "ac_common.h"
+#include <inttypes.h>
+
+typedef int ac_io_format_t;
+
+ac_io_format_t ac_io_delimiter(int delim);
+ac_io_format_t ac_io_fixed(int size);
+ac_io_format_t ac_io_prefix();
+
+typedef struct {
+  char *record;
+  uint32_t length;
+  int32_t tag;
+} ac_io_record_t;
 
 size_t ac_io_file_size(const char *filename);
 
@@ -31,5 +44,25 @@ char *_ac_io_read_file(size_t *len, const char *filename, const char *caller);
 #define ac_io_read_file(len, filename) _ac_io_read_file(len, filename)
 char *_ac_io_read_file(size_t *len, const char *filename);
 #endif
+
+/*
+  Make the given directory if it doesn't already exist.  Return false if an
+  error occurred.
+*/
+bool ac_io_make_directory(const char *path);
+
+/*
+   This will take a full filename and temporarily place a \0 in place of the
+   last slash (/).  If there isn't a slash, then it will return true. Otherwise,
+   it will check to see if path exists and create it if it does not exist.  If
+   an error occurs, false will be returned.
+*/
+bool ac_io_make_path_valid(char *filename);
+
+/*
+  test if filename has extension, extension is expected to have . (ex - ".lz4")
+  If filename is NULL, false will be returned.
+*/
+bool ac_io_extension(const char *filename, const char *extension);
 
 #endif

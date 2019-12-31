@@ -78,7 +78,19 @@ ac_allocator_t *global_allocator = NULL;
 
 void save_old_log(ac_allocator_t *a, size_t saves, char *tmp) {
   int num = 0;
-  while (saves) {
+  int s = saves;
+  for (int i = 32; i > 0; i--) {
+    uint32_t ix = i - 1;
+    uint32_t v = 1 << ix;
+    v--;
+    if ((saves & v) == v) {
+      num = ix;
+      break;
+    }
+  }
+  // printf("%lu => %d\n", saves, num);
+  while (num) {
+    num--;
     char *p = tmp;
     char *old_name = p;
     if (num) {
@@ -86,11 +98,11 @@ void save_old_log(ac_allocator_t *a, size_t saves, char *tmp) {
       p += strlen(old_name) + 1;
     } else
       old_name = (char *)a->logfile;
-    num++;
+
     char *new_name = p;
-    sprintf(new_name, "%s.%d", a->logfile, num);
+    sprintf(new_name, "%s.%d", a->logfile, num + 1);
+    // printf("rename: %s => %s\n", old_name, new_name);
     rename(old_name, new_name);
-    saves >>= 1;
   }
 }
 
@@ -106,9 +118,12 @@ void *dump_global_allocations_thread(void *arg) {
   while (!done) {
     save_old_log(a, save, tmp);
     pthread_mutex_lock(&a->mutex);
+    time_t t = time(NULL);
     FILE *out = fopen(a->logfile, "wb");
+    fprintf(out, "%s", ctime(&t));
     _ac_dump_global_allocations(a, out);
     fclose(out);
+    save++;
     if (a->done)
       done = 1;
     else {

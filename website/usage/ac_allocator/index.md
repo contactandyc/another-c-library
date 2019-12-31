@@ -52,7 +52,7 @@ is undefined, the ac_ methods will work exactly like their C counterparts.  To e
 
 # Detecting Memory Loss
 
-A common mistake that developers make (myself included) is to forget to free memory that was previously allocated.  The ac_... allocation methods assist developers in making sure that allocations are cleaned up.
+A common mistake that I've made is to forget to free memory that was previously allocated.  The ac_... allocation methods assist developers in making sure that allocations are cleaned up.
 
 demo1.c
 ```c
@@ -107,7 +107,7 @@ With the memory leak fixed, nothing is printed to stderr.
 
 ## Double Free
 
-A common mistake developers make (at least one I've made many times) is to free memory twice resulting in a corrupt state and possibly crashing the program.  The ac_... allocation methods will detect freeing memory more than once.
+A common mistake I've made many times is to free memory twice resulting in a corrupt state and possibly crashing the program.  The ac_... allocation methods will detect freeing memory more than once.
 
 demo1b.c
 ```c

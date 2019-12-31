@@ -29,6 +29,53 @@ limitations under the License.
 #include <sys/types.h>
 #include <unistd.h>
 
+bool ac_io_extension(const char *filename, const char *extension) {
+  if (filename && strlen(filename) > strlen(extension) &&
+      !strcmp(filename + strlen(filename) - strlen(extension), extension))
+    return true;
+  return false;
+}
+
+ac_io_format_t ac_io_delimiter(int delim) {
+  delim++;
+  return -delim;
+}
+
+ac_io_format_t ac_io_fixed(int size) { return size; }
+
+ac_io_format_t ac_io_prefix() { return 0; }
+
+bool ac_io_make_directory(const char *path) {
+  DIR *d = opendir(path);
+  if (d)
+    closedir(d);
+  else {
+    char *cmd = (char *)ac_malloc(11 + strlen(path));
+    sprintf(cmd, "mkdir -p %s", path);
+    if (system(cmd) != 0) {
+      ac_free(cmd);
+      return false;
+    }
+    ac_free(cmd);
+  }
+  chmod(path,
+        S_IWUSR | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+  return true;
+}
+
+bool ac_io_make_path_valid(char *filename) {
+  char *slash = strrchr(filename, '/');
+  if (!slash)
+    return true;
+  *slash = 0;
+  if (!ac_io_make_directory(filename)) {
+    *slash = '/';
+    return false;
+  }
+  *slash = '/';
+  return true;
+}
+
 size_t ac_io_file_size(const char *filename) {
   if (!filename)
     return 0;
@@ -61,7 +108,7 @@ char *_ac_io_read_file(size_t *len, const char *filename) {
     if (buf) {
       size_t s = length;
       size_t pos = 0;
-      size_t chunk = 1024 * 1024 * 1024;
+      size_t chunk = 64 * 1024 * 1024;
       while (s > chunk) {
         if (read(fd, buf + pos, chunk) != chunk) {
           ac_free(buf);

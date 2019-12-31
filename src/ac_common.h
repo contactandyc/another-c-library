@@ -40,8 +40,9 @@ Snapshots are saved in increasing intervals.
 /* How often should the memory be checked? It is always checked in the
    beginning and every _AC_DEBUG_MEMORY_SPEED_ seconds assuming
    _AC_DEBUG_MEMORY_ is defined as a string (and not NULL). */
+#ifndef _AC_DEBUG_MEMORY_SPEED_
 #define _AC_DEBUG_MEMORY_SPEED_ 60
-
+#endif
 /*
   Given an address of a member of a structure, the base object type, and the
   field name, return the address of the base structure.
