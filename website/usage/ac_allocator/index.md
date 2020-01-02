@@ -1,3 +1,9 @@
+---
+path: "/allocator"
+posttype: "usage"
+title: "ac_pool"
+---
+
 # ac_allocator
 
 The allocator provides an alternative to malloc, calloc, realloc, strdup, and free.  The functions are prefixed with ac_ (as everything in this library is).  
