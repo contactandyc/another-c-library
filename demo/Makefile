@@ -6,7 +6,7 @@ PROGRAMS=out_demo lz4_demo quicksort_demo demo1 demo1b demo1c demo1d demo2 demo3
 
 all: $(PROGRAMS) examples
 
-$(PROGRAMS): %: %.c
+$(PROGRAMS): %: %.c $(OBJECTS) $(HEADER_FILES)
 	gcc $(FLAGS) $(OBJECTS) $< -o $@
 
 canada.json:

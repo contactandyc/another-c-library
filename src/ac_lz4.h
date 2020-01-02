@@ -20,7 +20,7 @@ limitations under the License.
 #include "ac_common.h"
 
 #include <inttypes.h>
-#include <
+
 enum ac_lz4_block_size_s { s64kb = 0, s256kb = 1, s1mb = 2, s4mb = 3 };
 typedef enum ac_lz4_block_size_s ac_lz4_block_size_t;
 

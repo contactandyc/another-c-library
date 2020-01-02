@@ -14,23 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-struct ac_in_s;
-typedef struct ac_in_s ac_in_t;
+struct ac_in_base_s;
+typedef struct ac_in_base_s ac_in_base_t;
 
 typedef struct {
   char *buffer;
-  size_t buffer_length;
-  size_t buffer_size;
-  size_t lz4_buffer_size;
-  bool buffer_owned;
-  int fd;
-  bool fd_owner;
-  ac_io_format_t format;
-  bool abort_on_error;
-  int32_t tag;
-
-  bool gz;
-  bool lz4;
-
-  bool full_record_required;
-} ac_in_options_t;
+  size_t used;
+  size_t size;
+  size_t pos;
+  bool eof;
+  bool owner;
+} ac_in_buffer_t;

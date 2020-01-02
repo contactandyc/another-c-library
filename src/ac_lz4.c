@@ -329,7 +329,7 @@ ac_lz4_t *_ac_lz4_init_decompress(void *header, uint32_t header_size) {
   r->size = h.size;
   r->content_checksum = h.content_checksum;
   r->block_checksum = h.block_checksum;
-  r->block_header_size = 4 + (h.block_checksum ? 4 : 0);
+  r->block_header_size = h.block_checksum ? 4 : 0;
   r->header = (uint8_t *)h.header;
   r->header_size = 7;
   if (h.content_checksum)

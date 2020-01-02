@@ -417,56 +417,61 @@ static ac_out_t *_ac_out_init(const char *filename, ac_out_options_t *options) {
   return h;
 }
 
-void ac_out_init_options(ac_out_options_t *r) {
-  r->buffer_size = 64 * 1024;
-  r->append_mode = false;
-  r->safe_mode = false;
-  r->write_ack_file = false;
-  r->level = 1;
-  r->size = s64kb;
-  r->block_checksum = false;
-  r->content_checksum = false;
-  r->abort_on_error = false;
-  r->format = 0;
-  r->lz4 = false;
-  r->gz = false;
-  r->fd = -1;
-  r->fd_owner = true;
+void ac_out_options_init(ac_out_options_t *h) {
+  h->buffer_size = 64 * 1024;
+  h->append_mode = false;
+  h->safe_mode = false;
+  h->write_ack_file = false;
+  h->level = 1;
+  h->size = s64kb;
+  h->block_checksum = false;
+  h->content_checksum = false;
+  h->abort_on_error = false;
+  h->format = 0;
+  h->lz4 = false;
+  h->gz = false;
+  h->fd = -1;
+  h->fd_owner = true;
 }
 
-void ac_out_fd(ac_out_options_t *r, int fd, bool owner) {
-  r->fd = fd;
-  r->fd_owner = owner;
+void ac_out_options_fd(ac_out_options_t *h, int fd, bool owner) {
+  h->fd = fd;
+  h->fd_owner = owner;
 }
 
-void ac_out_buffer_size(ac_out_options_t *r, size_t buffer_size) {
-  r->buffer_size = buffer_size;
+void ac_out_options_buffer_size(ac_out_options_t *h, size_t buffer_size) {
+  h->buffer_size = buffer_size;
 }
 
-void ac_out_format(ac_out_options_t *r, ac_io_format_t format) {
-  r->format = format;
+void ac_out_options_format(ac_out_options_t *h, ac_io_format_t format) {
+  h->format = format;
 }
 
-void ac_out_abort_on_error(ac_out_options_t *r) { r->abort_on_error = true; }
-
-void ac_out_append_mode(ac_out_options_t *r) { r->append_mode = true; }
-
-void ac_out_safe_mode(ac_out_options_t *r) { r->safe_mode = true; }
-
-void ac_out_write_ack_file(ac_out_options_t *r) { r->write_ack_file = true; }
-
-void ac_out_gz(ac_out_options_t *r, int level) {
-  r->gz = true;
-  r->level = level;
+void ac_out_options_abort_on_error(ac_out_options_t *h) {
+  h->abort_on_error = true;
 }
 
-void ac_out_lz4(ac_out_options_t *r, int level, ac_lz4_block_size_t size,
-                bool block_checksum, bool content_checksum) {
-  r->lz4 = true;
-  r->level = level;
-  r->size = size;
-  r->block_checksum = block_checksum;
-  r->content_checksum = content_checksum;
+void ac_out_options_append_mode(ac_out_options_t *h) { h->append_mode = true; }
+
+void ac_out_options_safe_mode(ac_out_options_t *h) { h->safe_mode = true; }
+
+void ac_out_options_write_ack_file(ac_out_options_t *h) {
+  h->write_ack_file = true;
+}
+
+void ac_out_options_gz(ac_out_options_t *h, int level) {
+  h->gz = true;
+  h->level = level;
+}
+
+void ac_out_options_lz4(ac_out_options_t *h, int level,
+                        ac_lz4_block_size_t size, bool block_checksum,
+                        bool content_checksum) {
+  h->lz4 = true;
+  h->level = level;
+  h->size = size;
+  h->block_checksum = block_checksum;
+  h->content_checksum = content_checksum;
 }
 
 ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options) {
@@ -485,20 +490,20 @@ ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options) {
   if (options->fd != -1 && (options->safe_mode || options->write_ack_file))
     abort();
 
-  ac_out_t *r;
+  ac_out_t *h;
   if ((!filename && options->lz4) || ac_io_extension(filename, ".lz4"))
-    r = _ac_out_init_lz4(filename, options);
+    h = _ac_out_init_lz4(filename, options);
   else if ((!filename && options->gz) || ac_io_extension(filename, ".gz"))
-    r = _ac_out_init_gz(filename, options);
+    h = _ac_out_init_gz(filename, options);
   else
-    r = _ac_out_init(filename, options);
+    h = _ac_out_init(filename, options);
 
-  if (r) {
+  if (h) {
     if (options->format < 0)
-      r->delimiter = (-options->format) - 1;
+      h->delimiter = (-options->format) - 1;
   } else if (options->abort_on_error)
     abort();
-  return r;
+  return h;
 }
 
 bool ac_out_write(ac_out_t *h, const void *d, size_t len) {

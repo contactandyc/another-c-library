@@ -25,17 +25,18 @@ limitations under the License.
 
 /* ac_out_options_t is declared in impl/ac_out.h.  r is expected to point to a
    structure of this type (and not NULL). */
-void ac_out_init_options(ac_out_options_t *r);
-void ac_out_fd(ac_out_options_t *r, int fd, bool owner);
-void ac_out_buffer_size(ac_out_options_t *r, size_t buffer_size);
-void ac_out_format(ac_out_options_t *r, ac_io_format_t format);
-void ac_out_abort_on_error(ac_out_options_t *r);
-void ac_out_append_mode(ac_out_options_t *r);
-void ac_out_safe_mode(ac_out_options_t *r);
-void ac_out_write_ack_file(ac_out_options_t *r);
-void ac_out_gz(ac_out_options_t *r, int level);
-void ac_out_lz4(ac_out_options_t *r, int level, ac_lz4_block_size_t size,
-                bool block_checksum, bool content_checksum);
+void ac_out_options_init(ac_out_options_t *h);
+void ac_out_options_fd(ac_out_options_t *h, int fd, bool owner);
+void ac_out_options_buffer_size(ac_out_options_t *h, size_t buffer_size);
+void ac_out_options_format(ac_out_options_t *h, ac_io_format_t format);
+void ac_out_options_abort_on_error(ac_out_options_t *h);
+void ac_out_options_append_mode(ac_out_options_t *h);
+void ac_out_options_safe_mode(ac_out_options_t *h);
+void ac_out_options_write_ack_file(ac_out_options_t *h);
+void ac_out_options_gz(ac_out_options_t *h, int level);
+void ac_out_options_lz4(ac_out_options_t *h, int level,
+                        ac_lz4_block_size_t size, bool block_checksum,
+                        bool content_checksum);
 
 ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options);
 
