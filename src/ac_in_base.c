@@ -14,6 +14,7 @@ struct ac_in_base_s {
   char *filename;
   int fd;
   gzFile gz;
+  bool can_close;
   ac_buffer_t *bh;
   char *zerop;
   char zero;
@@ -81,7 +82,7 @@ ac_in_base_t *ac_in_base_reinit(ac_in_base_t *base, size_t buffer_size) {
   return h;
 }
 
-ac_in_base_t *ac_in_base_init_gz(const char *filename, int fd,
+ac_in_base_t *ac_in_base_init_gz(const char *filename, int fd, bool can_close,
                                  size_t buffer_size) {
   gzFile gz = NULL;
   if (fd == -1)
@@ -108,11 +109,12 @@ ac_in_base_t *ac_in_base_init_gz(const char *filename, int fd,
   }
   h->fd = -1;
   h->gz = gz;
+  h->can_close = can_close;
   fill_blocks(h, &(h->buf));
   return h;
 }
 
-ac_in_base_t *ac_in_base_init(const char *filename, int fd,
+ac_in_base_t *ac_in_base_init(const char *filename, int fd, bool can_close,
                               size_t buffer_size) {
   if (fd == -1)
     fd = open(filename, O_RDONLY);
@@ -133,19 +135,20 @@ ac_in_base_t *ac_in_base_init(const char *filename, int fd,
     strcpy(h->filename, filename);
   }
   h->fd = fd;
+  h->can_close = can_close;
   fill_blocks(h, &(h->buf));
   return h;
 }
 
 ac_in_base_t *ac_in_base_init_from_buffer(char *buffer, size_t buffer_size,
-                                          bool owner) {
+                                          bool can_free) {
   ac_in_base_t *h = (ac_in_base_t *)ac_calloc(sizeof(ac_in_base_t));
   h->fd = -1;
   h->buf.buffer = buffer;
   h->buf.size = buffer_size;
   h->buf.used = buffer_size;
   h->buf.eof = true;
-  h->buf.owner = owner;
+  h->buf.can_free = can_free;
   return h;
 }
 
@@ -362,10 +365,11 @@ char *ac_in_base_read(ac_in_base_t *h, int32_t len) {
 void ac_in_base_destroy(ac_in_base_t *h) {
   if (h->bh)
     ac_buffer_destroy(h->bh);
-  if (h->buf.owner)
+  if (h->buf.can_free)
     ac_free(h->buf.buffer);
-  if (h->fd != -1)
+  if (h->fd != -1 && h->can_close)
     close(h->fd);
+  // TODO: Support can_close properly for gz files
   if (h->gz)
     gzclose(h->gz);
   ac_free(h);

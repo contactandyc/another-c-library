@@ -17,7 +17,9 @@ limitations under the License.
 #ifndef _ac_io_H
 #define _ac_io_H
 
+#include "ac_buffer.h"
 #include "ac_common.h"
+
 #include <inttypes.h>
 
 typedef int ac_io_format_t;
@@ -31,6 +33,15 @@ typedef struct {
   uint32_t length;
   int32_t tag;
 } ac_io_record_t;
+
+typedef bool (*ac_io_reducer_f)(ac_io_record_t *res, const ac_io_record_t *r,
+                                size_t num_r, ac_buffer_t *bh, void *tag);
+
+typedef int (*ac_io_compare_f)(const ac_io_record_t *, const ac_io_record_t *,
+                               void *tag);
+
+bool ac_io_keep_first(ac_io_record_t *res, const ac_io_record_t *r,
+                      size_t num_r, ac_buffer_t *bh, void *tag);
 
 size_t ac_io_file_size(const char *filename);
 

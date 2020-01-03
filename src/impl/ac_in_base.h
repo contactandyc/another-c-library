@@ -23,5 +23,5 @@ typedef struct {
   size_t size;
   size_t pos;
   bool eof;
-  bool owner;
+  bool can_free;
 } ac_in_buffer_t;

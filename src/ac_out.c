@@ -478,7 +478,7 @@ ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options) {
   ac_out_options_t opts;
   if (!options) {
     options = &opts;
-    ac_out_init_options(options);
+    ac_out_options_init(options);
   }
 
   if (!filename && options->fd == -1)

@@ -13,11 +13,12 @@
 
 #include "impl/ac_in_base.h"
 
-ac_in_base_t *ac_in_base_init_gz(const char *filename, int fd,
+ac_in_base_t *ac_in_base_init_gz(const char *filename, int fd, bool can_close,
                                  size_t buffer_size);
-ac_in_base_t *ac_in_base_init(const char *filename, int fd, size_t buffer_size);
+ac_in_base_t *ac_in_base_init(const char *filename, int fd, bool can_close,
+                              size_t buffer_size);
 ac_in_base_t *ac_in_base_init_from_buffer(char *buffer, size_t buffer_size,
-                                          bool owner);
+                                          bool can_free);
 ac_in_base_t *ac_in_base_reinit(ac_in_base_t *base, size_t buffer_size);
 
 const char *ac_in_base_filename(ac_in_base_t *h);

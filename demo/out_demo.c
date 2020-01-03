@@ -15,11 +15,11 @@ int main(int argc, char *argv[]) {
   }
   if (argc == 2) {
     ac_out_options_t options;
-    ac_out_init_options(&options);
-    ac_out_buffer_size(&options, 10 * 1024 * 1024);
-    ac_out_format(&options, ac_io_delimiter('\n'));
-    ac_out_write_ack_file(&options);
-    // ac_out_gz(&options, 9);
+    ac_out_options_init(&options);
+    ac_out_options_buffer_size(&options, 10 * 1024 * 1024);
+    ac_out_options_format(&options, ac_io_delimiter('\n'));
+    ac_out_options_write_ack_file(&options);
+    ac_out_options_gz(&options, 9);
     ac_out_t *out = ac_out_init(argv[1], &options);
 
     uint32_t block_size = 80;

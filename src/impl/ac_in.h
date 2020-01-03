@@ -18,15 +18,14 @@ struct ac_in_s;
 typedef struct ac_in_s ac_in_t;
 
 typedef struct {
-  char *buffer;
-  size_t buffer_length;
   size_t buffer_size;
-  size_t lz4_buffer_size;
-  bool buffer_owned;
-  int fd;
-  bool fd_owner;
+  size_t compressed_buffer_size;
+
   ac_io_format_t format;
   bool abort_on_error;
+  bool abort_on_partial_record;
+  bool abort_on_file_not_found;
+  bool abort_on_file_empty;
   int32_t tag;
 
   bool gz;
@@ -34,3 +33,5 @@ typedef struct {
 
   bool full_record_required;
 } ac_in_options_t;
+
+void ac_in_empty(ac_in_t *h);
