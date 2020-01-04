@@ -16,10 +16,6 @@ limitations under the License.
 
 #include "ac_lz4.h"
 
-#define LZ4_STATIC_LINKING_ONLY
-#define LZ4_HC_STATIC_LINKING_ONLY
-#define XXH_INLINE_ALL
-
 #include "lz4/lz4.h"
 #include "lz4/lz4hc.h"
 #include "lz4/xxhash.h"

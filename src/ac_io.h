@@ -40,8 +40,20 @@ typedef bool (*ac_io_reducer_f)(ac_io_record_t *res, const ac_io_record_t *r,
 typedef int (*ac_io_compare_f)(const ac_io_record_t *, const ac_io_record_t *,
                                void *tag);
 
+typedef size_t (*ac_io_partition_f)(const ac_io_record_t *r, size_t num_part,
+                                    void *tag);
+
+typedef bool (*ac_io_fixed_reducer_f)(char *d, size_t num_r, void *tag);
+
+typedef void (*ac_io_fixed_sort_f)(void *p, size_t total_elems);
+
+typedef int (*ac_io_fixed_compare_f)(const void *p1, const void *p2, void *tag);
+
 bool ac_io_keep_first(ac_io_record_t *res, const ac_io_record_t *r,
                       size_t num_r, ac_buffer_t *bh, void *tag);
+
+size_t ac_io_hash_partition(const ac_io_record_t *r, size_t num_part,
+                            void *tag);
 
 size_t ac_io_file_size(const char *filename);
 

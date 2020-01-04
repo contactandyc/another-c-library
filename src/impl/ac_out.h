@@ -35,3 +35,28 @@ typedef struct {
   int fd;
   bool fd_owner;
 } ac_out_options_t;
+
+typedef struct {
+  ac_io_partition_f partition;
+  void *partition_tag;
+  size_t num_partitions;
+
+  ac_io_compare_f compare;
+  void *compare_tag;
+
+  size_t num_per_group;
+  ac_io_compare_f int_compare;
+  void *int_compare_tag;
+
+  ac_io_reducer_f reducer;
+  void *reducer_tag;
+
+  ac_io_fixed_reducer_f fixed_reducer;
+  void *fixed_reducer_tag;
+
+  ac_io_fixed_compare_f fixed_compare;
+  void *fixed_compare_tag;
+
+  ac_io_fixed_sort_f fixed_sort;
+  void *fixed_sort_tag;
+} ac_out_ext_options_t;

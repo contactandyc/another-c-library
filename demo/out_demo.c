@@ -20,7 +20,13 @@ int main(int argc, char *argv[]) {
     ac_out_options_format(&options, ac_io_delimiter('\n'));
     ac_out_options_write_ack_file(&options);
     ac_out_options_gz(&options, 9);
-    ac_out_t *out = ac_out_init(argv[1], &options);
+
+    ac_out_ext_options_t ext_options;
+    ac_out_ext_options_init(&ext_options);
+    ac_out_ext_options_partition(&ext_options, ac_io_hash_partition, NULL);
+    ac_out_ext_options_num_partitions(&ext_options, 5);
+
+    ac_out_t *out = ac_out_ext_init(argv[1], &options, &ext_options);
 
     uint32_t block_size = 80;
     char *block = (char *)ac_malloc(block_size);

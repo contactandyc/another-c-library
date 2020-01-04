@@ -26,6 +26,11 @@ limitations under the License.
 extern "C" {
 #endif
 
+/* to support lz4 linkage */
+#define LZ4_STATIC_LINKING_ONLY
+#define LZ4_HC_STATIC_LINKING_ONLY
+#define XXH_INLINE_ALL
+
 /*
 Defining _AC_DEBUG_MEMORY_ will check that memory is properly
 freed (and try some rudimentary double free checks).  If memory

@@ -28,7 +28,15 @@ limitations under the License.
 
 typedef bool (*ac_out_write_f)(ac_out_t *h, const void *d, size_t len);
 
+const int AC_OUT_NORMAL_TYPE = 0;
+const int AC_OUT_PARTITIONED_TYPE = 1;
+const int AC_OUT_SORTED_TYPE = 2;
+
 struct ac_out_s {
+  int type;
+  ac_out_options_t options;
+  ac_out_write_f write_record;
+
   int fd;
   char *filename;
   char *buffer;
@@ -45,8 +53,8 @@ struct ac_out_s {
 
   ac_lz4_t *lz4;
 
-  int delimiter;
-  ac_out_options_t options;
+  unsigned char delimiter;
+  uint32_t fixed;
 };
 
 static bool _write_to_gz(gzFile *fd, const char *p, size_t len) {
@@ -316,7 +324,7 @@ static ac_out_t *_ac_out_init_lz4(const char *filename,
     strcat(tmp, "-safe.lz4");
   }
 
-  if (h->fd != -1)
+  if (h->fd == -1)
     h->fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC, 0777);
   uint32_t header_size = 0;
   const char *header = ac_lz4_get_header(lz4, &header_size);
@@ -474,6 +482,96 @@ void ac_out_options_lz4(ac_out_options_t *h, int level,
   h->content_checksum = content_checksum;
 }
 
+void ac_out_ext_options_init(ac_out_ext_options_t *h) {
+  memset(h, 0, sizeof(*h));
+}
+
+/* options for creating a partitioned output */
+void ac_out_ext_options_partition(ac_out_ext_options_t *h,
+                                  ac_io_partition_f part, void *tag) {
+  h->partition = part;
+  h->partition_tag = tag;
+}
+
+void ac_out_ext_options_num_partitions(ac_out_ext_options_t *h,
+                                       size_t num_partitions) {
+  h->num_partitions = num_partitions;
+}
+
+/* options for sorting the output */
+void ac_out_ext_options_compare(ac_out_ext_options_t *h,
+                                ac_io_compare_f compare, void *tag) {
+  h->compare = compare;
+  h->compare_tag = tag;
+}
+
+void ac_out_ext_options_intermediate_group_size(ac_out_ext_options_t *h,
+                                                size_t num_per_group) {
+  h->num_per_group = num_per_group;
+}
+
+void ac_out_ext_options_intermediate_compare(ac_out_ext_options_t *h,
+                                             ac_io_compare_f compare,
+                                             void *tag) {
+  h->int_compare = compare;
+  h->int_compare_tag = tag;
+}
+
+/* set the reducer */
+void ac_out_ext_options_reducer(ac_out_ext_options_t *h,
+                                ac_io_reducer_f reducer, void *tag) {
+  h->reducer = reducer;
+  h->reducer_tag = tag;
+}
+
+/* options for fixed output */
+void ac_out_ext_options_fixed_reducer(ac_out_ext_options_t *h,
+                                      ac_io_fixed_reducer_f reducer,
+                                      void *tag) {
+  h->fixed_reducer = reducer;
+  h->fixed_reducer_tag = tag;
+}
+
+void ac_out_ext_options_fixed_compare(ac_out_ext_options_t *h,
+                                      ac_io_fixed_compare_f compare,
+                                      void *tag) {
+  h->fixed_compare = compare;
+  h->fixed_compare_tag = tag;
+}
+
+void ac_out_ext_options_fixed_sort(ac_out_ext_options_t *h,
+                                   ac_io_fixed_sort_f sort, void *tag) {
+  h->fixed_sort = sort;
+  h->fixed_sort_tag = tag;
+}
+
+bool ac_out_write_prefix(ac_out_t *h, const void *d, size_t len) {
+  uint32_t length = len;
+  if (!ac_out_write(h, &length, sizeof(length)) || !ac_out_write(h, d, length))
+    return false;
+  return true;
+}
+
+static bool _ac_out_write_delimiter(ac_out_t *h, const void *d, size_t len) {
+  if (!ac_out_write(h, d, len) ||
+      !ac_out_write(h, &h->delimiter, sizeof(h->delimiter)))
+    return false;
+  return true;
+}
+
+static bool _ac_out_write_fixed(ac_out_t *h, const void *d, size_t len) {
+  if (len != h->fixed)
+    abort();
+  return ac_out_write(h, d, len);
+}
+
+bool ac_out_write_delimiter(ac_out_t *h, const void *d, size_t len,
+                            char delim) {
+  if (!ac_out_write(h, d, len) || !ac_out_write(h, &delim, sizeof(delim)))
+    return false;
+  return true;
+}
+
 ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options) {
   ac_out_options_t opts;
   if (!options) {
@@ -499,11 +597,22 @@ ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options) {
     h = _ac_out_init(filename, options);
 
   if (h) {
-    if (options->format < 0)
-      h->delimiter = (-options->format) - 1;
+    if (options->format < 0) {
+      int delim = (-options->format) - 1;
+      h->delimiter = delim;
+      h->write_record = _ac_out_write_delimiter;
+    } else if (options->format > 0) {
+      h->fixed = options->format;
+      h->write_record = _ac_out_write_fixed;
+    } else
+      h->write_record = ac_out_write_prefix;
   } else if (options->abort_on_error)
     abort();
   return h;
+}
+
+bool ac_out_write_record(ac_out_t *h, const void *d, size_t len) {
+  return h->write_record(h, d, len);
 }
 
 bool ac_out_write(ac_out_t *h, const void *d, size_t len) {
@@ -538,33 +647,14 @@ static bool ac_out_flush(ac_out_t *h) {
   return false;
 }
 
-bool ac_out_write_prefix(ac_out_t *h, const void *d, size_t len) {
-  uint32_t length = len;
-  if (!ac_out_write(h, &length, sizeof(length)) || !ac_out_write(h, d, length))
-    return false;
-  return true;
-}
-
-bool ac_out_write_delimiter(ac_out_t *h, const void *d, size_t len,
-                            char delim) {
-  if (!ac_out_write(h, d, len) || !ac_out_write(h, &delim, sizeof(delim)))
-    return false;
-  return true;
-}
-
-bool ac_out_write_record(ac_out_t *h, const void *d, size_t len) {
-  if (h->options.format == 0)
-    return ac_out_write_prefix(h, d, len);
-  else if (h->options.format < 0)
-    return ac_out_write_delimiter(h, d, len, h->delimiter);
-  else {
-    if (len != h->options.format)
-      abort();
-    return ac_out_write(h, d, len);
-  }
-}
+static void ac_out_ext_destroy(ac_out_t *hp);
 
 void ac_out_destroy(ac_out_t *h) {
+  if (h->type != AC_OUT_NORMAL_TYPE) {
+    ac_out_ext_destroy(h);
+    return;
+  }
+
   ac_out_flush(h);
   if (h->fd > -1 && h->options.fd_owner)
     close(h->fd);
@@ -584,4 +674,127 @@ void ac_out_destroy(ac_out_t *h) {
   }
 
   ac_free(h);
+}
+
+/** ac_out_ext functionality **/
+static void suffix_filename_with_id(char *dest, const char *filename,
+                                    size_t id) {
+  strcpy(dest, filename);
+  if (ac_io_extension(filename, ".lz4"))
+    sprintf(dest + strlen(dest) - 4, "_%lu.lz4", id);
+  else if (ac_io_extension(filename, ".gz"))
+    sprintf(dest + strlen(dest) - 3, "_%lu.gz", id);
+  else
+    sprintf(dest + strlen(dest), "_%lu", id);
+}
+
+/** ac_out_partitioned_t **/
+typedef struct {
+  int type;
+  ac_out_options_t options;
+  ac_out_write_f write_record;
+
+  ac_out_ext_options_t ext_options;
+
+  ac_out_t **partitions;
+  size_t num_partitions;
+  ac_io_partition_f partition;
+  void *partition_tag;
+} ac_out_partitioned_t;
+
+bool write_partitioned_record(ac_out_t *hp, const void *d, size_t len) {
+  ac_out_partitioned_t *h = (ac_out_partitioned_t *)hp;
+
+  ac_io_record_t r;
+  r.length = len;
+  r.record = (char *)d;
+  r.tag = 0;
+
+  size_t partition = h->partition(&r, h->num_partitions, h->partition_tag);
+  if (partition >= h->num_partitions)
+    return false;
+
+  ac_out_t *o = h->partitions[partition];
+  return o->write_record(o, d, len);
+}
+
+ac_out_t *ac_out_partitioned_init(const char *filename,
+                                  ac_out_options_t *options,
+                                  ac_out_ext_options_t *ext_options) {
+  if (ext_options->num_partitions == 0)
+    return ac_out_init(filename, options);
+  else if (ext_options->num_partitions == 1) {
+    if (!filename)
+      abort();
+    // give suffix to filename
+    char *tmp_name = (char *)ac_malloc(strlen(filename) + 3);
+    suffix_filename_with_id(tmp_name, filename, 0);
+    ac_out_t *r = ac_out_init(tmp_name, options);
+    ac_free(tmp_name);
+    return r;
+  } else {
+    if (!filename)
+      abort();
+
+    ac_out_partitioned_t *h = (ac_out_partitioned_t *)ac_malloc(
+        sizeof(ac_out_partitioned_t) +
+        (sizeof(ac_out_t *) * ext_options->num_partitions));
+    h->options = *options;
+    h->ext_options = *ext_options;
+    h->partitions = (ac_out_t **)(h + 1);
+    h->num_partitions = ext_options->num_partitions;
+    h->partition = ext_options->partition;
+    h->partition_tag = ext_options->partition_tag;
+
+    char *tmp_name = (char *)ac_malloc(strlen(filename) + 20);
+    for (size_t i = 0; i < h->num_partitions; i++) {
+      suffix_filename_with_id(tmp_name, filename, i);
+      // printf("%s\n", tmp_name);
+      h->partitions[i] = ac_out_init(tmp_name, options);
+    }
+    h->write_record = write_partitioned_record;
+    ac_free(tmp_name);
+    h->type = AC_OUT_PARTITIONED_TYPE;
+    return (ac_out_t *)h;
+  }
+}
+
+void ac_out_partitioned_destroy(ac_out_t *hp) {
+  ac_out_partitioned_t *h = (ac_out_partitioned_t *)hp;
+  for (size_t i = 0; i < h->num_partitions; i++)
+    ac_out_destroy(h->partitions[i]);
+  ac_free(h);
+}
+
+typedef struct {
+  int type;
+  ac_out_options_t options;
+  ac_out_write_f write_record;
+
+  ac_out_ext_options_t ext_options;
+} ac_out_sorted_t;
+
+ac_out_t *ac_out_sorted_init(const char *filename, ac_out_options_t *options,
+                             ac_out_ext_options_t *ext_options) {
+  return NULL;
+}
+
+void ac_out_sorted_destroy(ac_out_t *hp) {}
+
+static void ac_out_ext_destroy(ac_out_t *hp) {
+  if (hp->type == AC_OUT_PARTITIONED_TYPE)
+    ac_out_partitioned_destroy(hp);
+  else if (hp->type == AC_OUT_SORTED_TYPE)
+    ac_out_sorted_destroy(hp);
+  else
+    abort();
+}
+
+ac_out_t *ac_out_ext_init(const char *filename, ac_out_options_t *options,
+                          ac_out_ext_options_t *ext_options) {
+  if (ext_options->compare)
+    return ac_out_sorted_init(filename, options, ext_options);
+  else if (ext_options->partition)
+    return ac_out_partitioned_init(filename, options, ext_options);
+  return ac_out_init(filename, options);
 }

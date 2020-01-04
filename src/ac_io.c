@@ -29,10 +29,18 @@ limitations under the License.
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "lz4/xxhash.h"
+
 bool ac_io_keep_first(ac_io_record_t *res, const ac_io_record_t *r,
                       size_t num_r, ac_buffer_t *bh, void *tag) {
   *res = *r;
   return true;
+}
+
+size_t ac_io_hash_partition(const ac_io_record_t *r, size_t num_part,
+                            void *tag) {
+  XXH64_hash_t hash = XXH64(r->record, r->length, 0);
+  return hash % num_part;
 }
 
 bool ac_io_extension(const char *filename, const char *extension) {
