@@ -38,7 +38,10 @@ typedef struct {
   /* need to set first block */
   bool use_extra_thread;
   bool lz4_tmp;
-  int tag;
+
+  bool sort_before_partitioning;
+  bool sort_while_partitioning;
+  size_t num_sort_threads;
 
   ac_io_partition_f partition;
   void *partition_tag;

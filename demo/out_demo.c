@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   if (argc == 2) {
     ac_out_options_t options;
     ac_out_options_init(&options);
-    ac_out_options_buffer_size(&options, 3 * 1024 * 1024);
+    ac_out_options_buffer_size(&options, 800 * 1024 * 1024);
     ac_out_options_format(&options, ac_io_delimiter('\n'));
     ac_out_options_write_ack_file(&options);
     ac_out_options_gz(&options, 9);
@@ -30,8 +30,10 @@ int main(int argc, char *argv[]) {
     ac_out_ext_options_partition(&ext_options, ac_io_hash_partition, NULL);
     ac_out_ext_options_num_partitions(&ext_options, 5);
     ac_out_ext_options_compare(&ext_options, compare_strings, NULL);
-    // ac_out_ext_options_intermediate_group_size(&ext_options, 10);
-    // ac_out_ext_use_extra_thread(&ext_options);
+    ac_out_ext_options_intermediate_group_size(&ext_options, 10);
+    ac_out_ext_options_use_extra_thread(&ext_options);
+    // ac_out_ext_options_sort_before_partitioning(&ext_options);
+    ac_out_ext_options_num_sort_threads(&ext_options, 6);
 
     ac_out_t *out = ac_out_ext_init(argv[1], &options, &ext_options);
 

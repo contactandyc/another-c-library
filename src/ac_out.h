@@ -25,7 +25,7 @@ limitations under the License.
 
 #include "ac_in.h"
 
-/* ac_out_options_t is declared in impl/ac_out.h.  r is expected to point to a
+/* ac_out_options_t is declared in impl/ac_out.h.  h is expected to point to a
    structure of this type (and not NULL). */
 void ac_out_options_init(ac_out_options_t *h);
 void ac_out_options_buffer_size(ac_out_options_t *h, size_t buffer_size);
@@ -41,6 +41,22 @@ void ac_out_options_lz4(ac_out_options_t *h, int level,
 
 /* extended options are for partitioned output, sorted output, or both */
 void ac_out_ext_options_init(ac_out_ext_options_t *h);
+
+/* Normally if data is partitioned and sorted, partitioning would happen first.
+   This has the added cost of writing the unsorted partitions.  Because the
+   data is partitioned first, sorting can happen in parallel.  In some cases,
+   it may be desirable to sort first and then partition the sorted data.  This
+   option exists for those cases. */
+void ac_out_ext_options_sort_before_partitioning(ac_out_ext_options_t *h);
+
+/* Normally sorting will happen after partitions are written as more threads
+   can be used for doing this.  However, sorting can occur while the partitions
+   are being written out using this option. */
+void ac_out_ext_options_sort_while_partitioning(ac_out_ext_options_t *h);
+
+/* when partitioning and sorting - how many partitions can be sorted at once? */
+void ac_out_ext_options_num_sort_threads(ac_out_ext_options_t *h,
+                                         size_t num_sort_threads);
 
 /* options for creating a partitioned output */
 void ac_out_ext_options_partition(ac_out_ext_options_t *h,
@@ -71,20 +87,29 @@ void ac_out_ext_options_intermediate_reducer(ac_out_ext_options_t *h,
                                              ac_io_reducer_f reducer,
                                              void *tag);
 
-void ac_out_ext_use_extra_thread(ac_out_ext_options_t *h);
+void ac_out_ext_options_use_extra_thread(ac_out_ext_options_t *h);
 
-void ac_out_ext_dont_compress_tmp(ac_out_ext_options_t *h);
+void ac_out_ext_options_dont_compress_tmp(ac_out_ext_options_t *h);
 
+/* open a file for writing with a given filename */
 ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options);
+
+/* use an open file for writing.  If fd_owner is true, the file descriptor
+   will be closed when this is destroyed. */
 ac_out_t *ac_out_init_with_fd(int fd, bool fd_owner, ac_out_options_t *options);
+
+/* write to a regular, partitioned, or sorted file. */
 ac_out_t *ac_out_ext_init(const char *filename, ac_out_options_t *options,
                           ac_out_ext_options_t *ext_options);
 
+/* write record in the format specified by ac_out_options_format(...) */
 bool ac_out_write_record(ac_out_t *h, const void *d, size_t len);
 
-void ac_out_tag(ac_out_t *h, int tag);
+/* This only works if output is sorted.  This will bypass the writing of the
+   final file and give you access to the cursor. */
 ac_in_t *ac_out_in(ac_out_t *h);
 
+/* destroy the output. */
 void ac_out_destroy(ac_out_t *h);
 
 /* these methods only work if writing to a single file */

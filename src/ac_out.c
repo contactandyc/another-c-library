@@ -430,8 +430,12 @@ static ac_out_t *_ac_out_init(const char *filename, int fd, bool fd_owner,
     h->fd = fd;
   else if (append_mode)
     h->fd = open(tmp, O_WRONLY | O_CREAT | O_APPEND, 0777);
-  else
+  else {
     h->fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+    if (h->fd == -1) {
+      perror("Unable to open file\n");
+    }
+  }
   h->write_d = _ac_out_write;
   return h;
 }
@@ -493,11 +497,24 @@ void ac_out_ext_options_init(ac_out_ext_options_t *h) {
   h->lz4_tmp = true;
 }
 
-void ac_out_ext_use_extra_thread(ac_out_ext_options_t *h) {
+void ac_out_ext_options_sort_while_partitioning(ac_out_ext_options_t *h) {
+  h->sort_while_partitioning = true;
+}
+
+void ac_out_ext_options_num_sort_threads(ac_out_ext_options_t *h,
+                                         size_t num_sort_threads) {
+  h->num_sort_threads = num_sort_threads;
+}
+
+void ac_out_ext_options_sort_before_partitioning(ac_out_ext_options_t *h) {
+  h->sort_before_partitioning = true;
+}
+
+void ac_out_ext_options_use_extra_thread(ac_out_ext_options_t *h) {
   h->use_extra_thread = true;
 }
 
-void ac_out_ext_dont_compress_tmp(ac_out_ext_options_t *h) {
+void ac_out_ext_options_dont_compress_tmp(ac_out_ext_options_t *h) {
   h->lz4_tmp = false;
 }
 
@@ -575,11 +592,17 @@ void ac_out_ext_options_fixed_sort(ac_out_ext_options_t *h,
   h->fixed_sort_tag = tag;
 }
 
-bool ac_out_write_prefix(ac_out_t *h, const void *d, size_t len) {
+bool _ac_out_write_prefix(ac_out_t *h, const void *d, size_t len) {
   uint32_t length = len;
   if (!ac_out_write(h, &length, sizeof(length)) || !ac_out_write(h, d, length))
     return false;
   return true;
+}
+
+bool ac_out_write_prefix(ac_out_t *h, const void *d, size_t len) {
+  if (h->type)
+    return false;
+  return _ac_out_write_prefix(h, d, len);
 }
 
 static bool _ac_out_write_delimiter(ac_out_t *h, const void *d, size_t len) {
@@ -597,6 +620,8 @@ static bool _ac_out_write_fixed(ac_out_t *h, const void *d, size_t len) {
 
 bool ac_out_write_delimiter(ac_out_t *h, const void *d, size_t len,
                             char delim) {
+  if (h->type)
+    return false;
   if (!ac_out_write(h, d, len) || !ac_out_write(h, &delim, sizeof(delim)))
     return false;
   return true;
@@ -636,7 +661,7 @@ ac_out_t *_ac_out_init_(const char *filename, int fd, bool fd_owner,
       h->fixed = options->format;
       h->write_record = _ac_out_write_fixed;
     } else
-      h->write_record = ac_out_write_prefix;
+      h->write_record = _ac_out_write_prefix;
   } else if (options->abort_on_error)
     abort();
   return h;
@@ -656,6 +681,8 @@ bool ac_out_write_record(ac_out_t *h, const void *d, size_t len) {
 }
 
 bool ac_out_write(ac_out_t *h, const void *d, size_t len) {
+  if (h->type)
+    return false;
   if (!len)
     return true;
   if (h->write_d) {
@@ -717,15 +744,27 @@ void ac_out_destroy(ac_out_t *h) {
 }
 
 /** ac_out_ext functionality **/
-static void suffix_filename_with_id(char *dest, const char *filename,
-                                    size_t id) {
+static void suffix_filename_with_id(char *dest, const char *filename, size_t id,
+                                    const char *extra, bool use_lz4) {
   strcpy(dest, filename);
   if (ac_io_extension(filename, ".lz4"))
-    sprintf(dest + strlen(dest) - 4, "_%lu.lz4", id);
-  else if (ac_io_extension(filename, ".gz"))
-    sprintf(dest + strlen(dest) - 3, "_%lu.gz", id);
-  else
-    sprintf(dest + strlen(dest), "_%lu", id);
+    sprintf(dest + strlen(dest) - 4, "%s%s_%lu.lz4", extra ? "_" : "",
+            extra ? extra : "", id);
+  else if (ac_io_extension(filename, ".gz")) {
+    if (use_lz4)
+      sprintf(dest + strlen(dest) - 3, "%s%s_%lu.lz4", extra ? "_" : "",
+              extra ? extra : "", id);
+    else
+      sprintf(dest + strlen(dest) - 3, "%s%s_%lu.gz", extra ? "_" : "",
+              extra ? extra : "", id);
+  } else {
+    if (use_lz4)
+      sprintf(dest + strlen(dest), "%s%s_%lu.lz4", extra ? "_" : "",
+              extra ? extra : "", id);
+    else
+      sprintf(dest + strlen(dest), "%s%s_%lu", extra ? "_" : "",
+              extra ? extra : "", id);
+  }
 }
 
 /** ac_out_partitioned_t **/
@@ -734,12 +773,24 @@ typedef struct {
   ac_out_options_t options;
   ac_out_write_f write_record;
 
+  char *filename;
+
   ac_out_ext_options_t ext_options;
+
+  ac_out_options_t part_options;
+  ac_out_ext_options_t ext_part_options;
+
+  ac_in_options_t in_options;
 
   ac_out_t **partitions;
   size_t num_partitions;
   ac_io_partition_f partition;
   void *partition_tag;
+
+  size_t *tasks;
+  size_t *taskp;
+  size_t *taskep;
+  pthread_mutex_t mutex;
 } ac_out_partitioned_t;
 
 bool write_partitioned_record(ac_out_t *hp, const void *d, size_t len) {
@@ -761,15 +812,22 @@ bool write_partitioned_record(ac_out_t *hp, const void *d, size_t len) {
 ac_out_t *ac_out_partitioned_init(const char *filename,
                                   ac_out_options_t *options,
                                   ac_out_ext_options_t *ext_options) {
-  if (ext_options->num_partitions == 0)
-    return ac_out_init(filename, options);
-  else if (ext_options->num_partitions == 1) {
+  if (ext_options->num_partitions == 0) {
+    ac_io_partition_f partition = ext_options->partition;
+    ext_options->partition = NULL;
+    ac_out_t *r = ac_out_ext_init(filename, options, ext_options);
+    ext_options->partition = partition;
+    return r;
+  } else if (ext_options->num_partitions == 1) {
     if (!filename)
       abort();
     // give suffix to filename
-    char *tmp_name = (char *)ac_malloc(strlen(filename) + 3);
-    suffix_filename_with_id(tmp_name, filename, 0);
-    ac_out_t *r = ac_out_init(tmp_name, options);
+    char *tmp_name = (char *)ac_malloc(strlen(filename) + 20);
+    ac_io_partition_f partition = ext_options->partition;
+    ext_options->partition = NULL;
+    suffix_filename_with_id(tmp_name, filename, 0, NULL, false);
+    ac_out_t *r = ac_out_ext_init(tmp_name, options, ext_options);
+    ext_options->partition = partition;
     ac_free(tmp_name);
     return r;
   } else {
@@ -777,20 +835,39 @@ ac_out_t *ac_out_partitioned_init(const char *filename,
       abort();
 
     ac_out_partitioned_t *h = (ac_out_partitioned_t *)ac_malloc(
-        sizeof(ac_out_partitioned_t) +
+        sizeof(ac_out_partitioned_t) + strlen(filename) + 1 +
         (sizeof(ac_out_t *) * ext_options->num_partitions));
     h->options = *options;
+    h->part_options = *options;
     h->ext_options = *ext_options;
+    h->ext_part_options = *ext_options;
     h->partitions = (ac_out_t **)(h + 1);
     h->num_partitions = ext_options->num_partitions;
+    h->filename = (char *)(h->partitions + ext_options->num_partitions);
+    strcpy(h->filename, filename);
     h->partition = ext_options->partition;
     h->partition_tag = ext_options->partition_tag;
 
-    char *tmp_name = (char *)ac_malloc(strlen(filename) + 20);
+    h->part_options.buffer_size = options->buffer_size / h->num_partitions;
+    h->ext_part_options.partition = NULL;
+
+    if (!h->ext_options.sort_while_partitioning) {
+      ac_out_options_format(&(h->part_options), ac_io_prefix());
+      h->part_options.write_ack_file = false;
+    }
+
+    char *tmp_name = (char *)ac_malloc(strlen(filename) + 40);
     for (size_t i = 0; i < h->num_partitions; i++) {
-      suffix_filename_with_id(tmp_name, filename, i);
       // printf("%s\n", tmp_name);
-      h->partitions[i] = ac_out_init(tmp_name, options);
+      if (h->ext_options.sort_while_partitioning || !h->ext_options.compare) {
+        suffix_filename_with_id(tmp_name, filename, i, NULL, false);
+        h->partitions[i] = ac_out_ext_init(tmp_name, &(h->part_options),
+                                           &(h->ext_part_options));
+      } else {
+        suffix_filename_with_id(tmp_name, filename, i, "unsorted",
+                                h->ext_options.lz4_tmp);
+        h->partitions[i] = ac_out_init(tmp_name, &(h->part_options));
+      }
     }
     h->write_record = write_partitioned_record;
     ac_free(tmp_name);
@@ -799,10 +876,84 @@ ac_out_t *ac_out_partitioned_init(const char *filename,
   }
 }
 
+void *sort_partitions(void *arg) {
+  ac_out_partitioned_t *h = (ac_out_partitioned_t *)arg;
+  char *filename = h->filename;
+  char *tmp_name = (char *)ac_malloc(strlen(h->filename) + 40);
+
+  while (true) {
+    pthread_mutex_lock(&h->mutex);
+    size_t *tp = h->taskp;
+    h->taskp++;
+    pthread_mutex_unlock(&h->mutex);
+    if (tp >= h->taskep)
+      break;
+
+    suffix_filename_with_id(tmp_name, filename, *tp, "unsorted",
+                            h->ext_options.lz4_tmp);
+    ac_in_t *in = ac_in_init(tmp_name, &(h->in_options));
+    suffix_filename_with_id(tmp_name, filename, *tp, NULL, false);
+    ac_out_t *out =
+        ac_out_ext_init(tmp_name, &(h->part_options), &(h->ext_part_options));
+    ac_io_record_t *r;
+    while ((r = ac_in_advance(in)) != NULL)
+      ac_out_write_record(out, r->record, r->length);
+    ac_out_destroy(out);
+    ac_in_destroy(in);
+  }
+  ac_free(tmp_name);
+  return NULL;
+}
+
 void ac_out_partitioned_destroy(ac_out_t *hp) {
   ac_out_partitioned_t *h = (ac_out_partitioned_t *)hp;
-  for (size_t i = 0; i < h->num_partitions; i++)
+  for (size_t i = 0; i < h->num_partitions; i++) {
     ac_out_destroy(h->partitions[i]);
+  }
+  if (!h->ext_options.sort_while_partitioning && h->ext_options.compare) {
+    /*  buffer_size memory, num_threads, input, output - prefer input
+       because OS will buffer output.
+      */
+    size_t num_threads = h->ext_options.num_sort_threads;
+    if (num_threads < 1)
+      num_threads = 1;
+    if (num_threads > h->num_partitions)
+      num_threads = h->num_partitions;
+
+    size_t buffer_size = h->options.buffer_size / (num_threads * 2);
+
+    ac_out_options_buffer_size(&(h->part_options), buffer_size);
+    ac_out_options_format(&(h->part_options), h->options.format);
+    h->ext_part_options.use_extra_thread = false;
+    ac_in_options_init(&(h->in_options));
+    ac_in_options_buffer_size(&(h->in_options), buffer_size);
+    ac_in_options_format(&(h->in_options), ac_io_prefix());
+
+    h->tasks = (size_t *)ac_malloc(sizeof(size_t) * h->num_partitions);
+    h->taskp = h->tasks;
+    h->taskep = h->tasks + h->num_partitions;
+    for (size_t i = 0; i < h->num_partitions; i++)
+      h->tasks[i] = i;
+
+    pthread_mutex_init(&h->mutex, NULL);
+    pthread_t *threads =
+        (pthread_t *)ac_malloc(sizeof(pthread_t) * num_threads);
+    for (size_t i = 0; i < num_threads; i++)
+      pthread_create(threads + i, NULL, sort_partitions, h);
+    for (size_t i = 0; i < num_threads; i++)
+      pthread_join(threads[i], NULL);
+    pthread_mutex_destroy(&h->mutex);
+    ac_free(h->tasks);
+    ac_free(threads);
+    char *filename = h->filename;
+    char *tmp_name = (char *)ac_malloc(strlen(h->filename) + 40);
+    for (size_t i = 0; i < h->num_partitions; i++) {
+      suffix_filename_with_id(tmp_name, filename, i, "unsorted",
+                              h->ext_options.lz4_tmp);
+      remove(tmp_name);
+    }
+    ac_free(tmp_name);
+  }
   ac_free(h);
 }
 
@@ -847,6 +998,8 @@ typedef struct {
   pthread_t thread;
   bool out_in_called;
   extra_t *extras;
+
+  int tag;
 
   ac_out_ext_options_t ext_options;
   ac_out_ext_options_t partition_options;
@@ -1058,8 +1211,19 @@ void write_sorted(ac_out_sorted_t *h) {
     write_sorted_thread(h);
 }
 
+void ac_out_tag(ac_out_t *hp, int tag) {
+  ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
+  if (h->type != AC_OUT_SORTED_TYPE)
+    return;
+
+  h->tag = tag;
+}
+
 ac_in_t *ac_out_in(ac_out_t *hp) {
   ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
+  if (h->type != AC_OUT_SORTED_TYPE)
+    return NULL;
+
   if (h->out_in_called)
     return NULL;
 
@@ -1150,7 +1314,7 @@ bool write_sorted_record(ac_out_t *hp, const void *d, size_t len) {
   ac_io_record_t *r = (ac_io_record_t *)bp;
   r->record = ep;
   r->length = len;
-  r->tag = h->ext_options.tag;
+  r->tag = h->tag;
   bp += sizeof(*r);
 
   h->b->bp = bp;
@@ -1258,7 +1422,9 @@ static void ac_out_ext_destroy(ac_out_t *hp) {
 
 ac_out_t *ac_out_ext_init(const char *filename, ac_out_options_t *options,
                           ac_out_ext_options_t *ext_options) {
-  if (ext_options->compare)
+  if (ext_options->partition && !ext_options->sort_before_partitioning)
+    return ac_out_partitioned_init(filename, options, ext_options);
+  else if (ext_options->compare)
     return ac_out_sorted_init(filename, options, ext_options);
   else if (ext_options->partition)
     return ac_out_partitioned_init(filename, options, ext_options);
