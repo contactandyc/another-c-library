@@ -17,21 +17,21 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 
-#define ac_sortl_print_def(name, datatype)                                     \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            void (*print_element)(datatype * el));
+#define ac_sortl_print_def(name, type)                                         \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            void (*print_element)(type * el));
 
-#define ac_sortl_print_arg_def(name, datatype)                                 \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            void (*print_element)(datatype * el, void *arg), void *arg);
+#define ac_sortl_print_arg_def(name, type)                                     \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            void (*print_element)(type * el, void *arg), void *arg);
 
-#define ac_sortl_print_m(name, datatype)                                       \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            void (*print_element)(datatype * el)) {                            \
+#define ac_sortl_print_m(name, type)                                           \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            void (*print_element)(type * el)) {                                \
     if (func_line)                                                             \
       printf("%s ", func_line);                                                \
     printf("%ld elements\n", num_elements);                                    \
-    datatype *ep = base + num_elements;                                        \
+    type *ep = base + num_elements;                                            \
     while (base < ep) {                                                        \
       print_element(base);                                                     \
       base++;                                                                  \
@@ -39,13 +39,13 @@ limitations under the License.
     printf("\n");                                                              \
   }
 
-#define ac_sortl_print_arg_m(name, datatype)                                   \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            void (*print_element)(datatype * el, void *arg), void *arg) {      \
+#define ac_sortl_print_arg_m(name, type)                                       \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            void (*print_element)(type * el, void *arg), void *arg) {          \
     if (func_line)                                                             \
       printf("%s ", func_line);                                                \
     printf("%ld elements\n", num_elements);                                    \
-    datatype *ep = base + num_elements;                                        \
+    type *ep = base + num_elements;                                            \
     while (base < ep) {                                                        \
       print_element(base, arg);                                                \
       base++;                                                                  \
@@ -53,28 +53,28 @@ limitations under the License.
     printf("\n");                                                              \
   }
 
-#define ac_sortl_test_def(name, datatype)                                      \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            void (*print_element)(datatype * el));
+#define ac_sortl_test_def(name, type)                                          \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            void (*print_element)(type * el));
 
-#define ac_sortl_test_arg_def(name, datatype)                                  \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            void (*print_element)(datatype * el, void *arg), void *arg);
+#define ac_sortl_test_arg_def(name, type)                                      \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            void (*print_element)(type * el, void *arg), void *arg);
 
-#define ac_sortl_test_less_def(name, datatype)                                 \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            bool (*less)(datatype * a, datatype * b),                          \
-            void (*print_element)(datatype * el));
+#define ac_sortl_test_less_def(name, type)                                     \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            bool (*less)(type * a, type * b),                                  \
+            void (*print_element)(type * el));
 
-#define ac_sortl_test_less_arg_def(name, datatype)                             \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            bool (*less)(datatype * a, datatype * b, void *arg),               \
-            void (*print_element)(datatype * el, void *arg), void *arg);
+#define ac_sortl_test_less_arg_def(name, type)                                 \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            bool (*less)(type * a, type * b, void *arg),                       \
+            void (*print_element)(type * el, void *arg), void *arg);
 
-#define ac_sortl_test_m(name, less, datatype)                                  \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            void (*print_element)(datatype * el)) {                            \
-    datatype *ep = base + num_elements;                                        \
+#define ac_sortl_test_m(name, less, type)                                      \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            void (*print_element)(type * el)) {                                \
+    type *ep = base + num_elements;                                            \
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
@@ -92,10 +92,10 @@ limitations under the License.
     }                                                                          \
   }
 
-#define ac_sortl_test_arg_m(name, less, datatype)                              \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            void (*print_element)(datatype * el, void *arg), void *arg) {      \
-    datatype *ep = base + num_elements;                                        \
+#define ac_sortl_test_arg_m(name, less, type)                                  \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            void (*print_element)(type * el, void *arg), void *arg) {          \
+    type *ep = base + num_elements;                                            \
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
@@ -113,11 +113,11 @@ limitations under the License.
     }                                                                          \
   }
 
-#define ac_sortl_test_less_m(name, datatype)                                   \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            bool (*less)(datatype * a, datatype * b),                          \
-            void (*print_element)(datatype * el)) {                            \
-    datatype *ep = base + num_elements;                                        \
+#define ac_sortl_test_less_m(name, type)                                       \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            bool (*less)(type * a, type * b),                                  \
+            void (*print_element)(type * el)) {                                \
+    type *ep = base + num_elements;                                            \
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
@@ -135,11 +135,11 @@ limitations under the License.
     }                                                                          \
   }
 
-#define ac_sortl_test_less_arg_m(name, datatype)                               \
-  void name(char *func_line, datatype *base, ssize_t num_elements,             \
-            bool (*less)(datatype * a, datatype * b, void *arg),               \
-            void (*print_element)(datatype * el, void *arg), void *arg) {      \
-    datatype *ep = base + num_elements;                                        \
+#define ac_sortl_test_less_arg_m(name, type)                                   \
+  void name(char *func_line, type *base, ssize_t num_elements,                 \
+            bool (*less)(type * a, type * b, void *arg),                       \
+            void (*print_element)(type * el, void *arg), void *arg) {          \
+    type *ep = base + num_elements;                                            \
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
@@ -173,12 +173,11 @@ typedef struct {
   void name(type *base, size_t num_elements, void *arg);
 
 #define ac_sortl_less_def(name, type)                                          \
-  void name(type *base, size_t num_elements,                                   \
-            bool (*less)(datatype * a, datatype * b));
+  void name(type *base, size_t num_elements, bool (*less)(type * a, type * b));
 
 #define ac_sortl_less_arg_def(name, type)                                      \
   void name(type *base, size_t num_elements,                                   \
-            bool (*less)(datatype * a, datatype * b, void *arg), void *arg);
+            bool (*less)(type * a, type * b, void *arg), void *arg);
 
 #define ac_sortl_m(name, type, less)                                           \
   void name(type *base, size_t num_elements) {                                 \
@@ -1006,7 +1005,7 @@ typedef struct {
 
 #define ac_sortl_less_m(name, type)                                            \
   void name(type *base, size_t num_elements,                                   \
-            bool (*less)(datatype * a, datatype * b)) {                        \
+            bool (*less)(type * a, type * b)) {                                \
     type *a;                                                                   \
     type *b;                                                                   \
     type *c;                                                                   \
@@ -1419,7 +1418,7 @@ typedef struct {
 
 #define ac_sortl_less_arg_m(name, type)                                        \
   void name(type *base, size_t num_elements,                                   \
-            bool (*less)(datatype * a, datatype * b, void *arg), void *arg) {  \
+            bool (*less)(type * a, type * b, void *arg), void *arg) {          \
     type *a;                                                                   \
     type *b;                                                                   \
     type *c;                                                                   \

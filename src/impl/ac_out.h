@@ -37,6 +37,11 @@ typedef struct {
 } ac_out_options_t;
 
 typedef struct {
+  /* need to set first block */
+  bool use_extra_thread;
+  bool lz4_tmp;
+  int tag;
+
   ac_io_partition_f partition;
   void *partition_tag;
   size_t num_partitions;

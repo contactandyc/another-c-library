@@ -32,6 +32,11 @@ typedef struct {
   bool lz4;
 
   bool full_record_required;
+
+  ac_io_compare_f compare;
+  void *compare_tag;
+  ac_io_reducer_f reducer;
+  void *reducer_tag;
 } ac_in_options_t;
 
 void ac_in_empty(ac_in_t *h);

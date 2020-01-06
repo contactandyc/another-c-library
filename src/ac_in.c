@@ -16,6 +16,15 @@ typedef ac_io_record_t *(*ac_in_advance_unique_f)(ac_in_t *h, size_t *num_r);
 
 static const int AC_IN_NORMAL_TYPE = 0; // default (due to memset)
 static const int AC_IN_EXT_TYPE = 1;
+static const int AC_IN_RECORDS_TYPE = 2;
+
+size_t ac_in_count(ac_in_t *h) {
+  size_t r = 0;
+  while (ac_in_advance(h))
+    r++;
+  ac_in_destroy(h);
+  return r;
+}
 
 struct ac_in_s {
   ac_in_options_t options;
@@ -30,6 +39,10 @@ struct ac_in_s {
   ac_in_advance_unique_f advance_unique;
   ac_in_advance_unique_f advance_unique_tmp;
   ac_buffer_t *group_bh;
+
+  ac_in_advance_f sub_advance;
+  ac_buffer_t *reducer_bh;
+  ac_buffer_t *reducer_group_bh;
 
   ac_in_base_t *base;
 
@@ -301,19 +314,24 @@ static ac_io_record_t *_reset_unique_(ac_in_t *h, size_t *num_r) {
 }
 
 void ac_in_reset(ac_in_t *h) {
-  h->advance = _reset_;
-  h->advance_unique = _reset_unique_;
-  h->current_tmp = h->current;
-  h->current = NULL;
-  h->num_current_tmp = h->num_current;
-  h->num_current = 0;
+  if (h->current) {
+    h->advance = _reset_;
+    h->advance_unique = _reset_unique_;
+    h->current_tmp = h->current;
+    h->current = NULL;
+    h->num_current_tmp = h->num_current;
+    h->num_current = 0;
+  }
 }
 
 void ac_in_ext_destroy(ac_in_t *h);
+void ac_in_records_destroy(ac_in_t *hp);
 
 void ac_in_destroy(ac_in_t *h) {
   if (h->type == AC_IN_EXT_TYPE)
     ac_in_ext_destroy(h);
+  else if (h->type == AC_IN_RECORDS_TYPE)
+    ac_in_records_destroy(h);
   else {
     if (h->base)
       ac_in_base_destroy(h->base);
@@ -381,6 +399,8 @@ void ac_in_empty(ac_in_t *h) {
   h->advance_unique_tmp = h->advance_unique;
   h->advance_tmp = h->advance;
 }
+
+ac_io_record_t *advance_reduced(ac_in_t *h);
 
 ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
                      size_t buf_len, bool can_free, ac_in_options_t *options) {
@@ -493,8 +513,76 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
   }
   h->advance_unique = ac_in_advance_unique_single;
   h->advance_unique_tmp = h->advance_unique;
+
+  if (options->reducer) {
+    h->reducer_bh = ac_buffer_init(256);
+    h->reducer_group_bh = ac_buffer_init(256);
+    h->sub_advance = h->advance;
+    h->advance = advance_reduced;
+  }
+
   h->advance_tmp = h->advance;
   return h;
+}
+
+ac_io_record_t *advance_reduced(ac_in_t *h) {
+  ac_buffer_t *bh = h->reducer_group_bh;
+  ac_io_compare_f compare = h->options.compare;
+  void *tag = h->options.compare_tag;
+  ac_buffer_clear(bh);
+  ac_io_record_t r1;
+  ac_io_record_t *r;
+  ac_io_record_t *res;
+  size_t num_records;
+  do {
+    if ((r = h->sub_advance(h)) == NULL) {
+      ac_in_empty(h);
+      return NULL;
+    }
+
+    ac_buffer_set(bh, &(r->length), sizeof(r->length));
+    ac_buffer_append(bh, &(r->tag), sizeof(r->tag));
+    ac_buffer_append(bh, r->record, r->length);
+    ac_buffer_appendc(bh, 0);
+    num_records = 1;
+    r1 = *r;
+    while ((r = h->sub_advance(h)) != NULL) {
+      char *b = ac_buffer_data(bh);
+      b += sizeof(r->length) + sizeof(r->tag);
+      r1.record = b;
+
+      if (compare(&r1, r, tag)) {
+        ac_in_reset(h);
+        break;
+      }
+      ac_buffer_set(bh, &(r->length), sizeof(r->length));
+      ac_buffer_append(bh, &(r->tag), sizeof(r->tag));
+      ac_buffer_append(bh, r->record, r->length);
+      ac_buffer_appendc(bh, 0);
+      num_records++;
+    }
+    size_t len = ac_buffer_length(bh);
+    res = (ac_io_record_t *)ac_buffer_append_alloc(
+        bh, num_records * sizeof(ac_io_record_t));
+    ac_io_record_t *rp = res;
+    char *ptr = ac_buffer_data(bh);
+    char *endp = ptr + len;
+    while (ptr < endp) {
+      rp->length = (*(uint32_t *)(ptr));
+      ptr += sizeof(uint32_t);
+      rp->tag = (*(int *)(ptr));
+      ptr += sizeof(int);
+      rp->record = ptr;
+      ptr += rp->length;
+      ptr++;
+      rp++;
+    }
+  } while (!h->options.reducer(&(h->rec), res, num_records, h->reducer_bh,
+                               h->options.reducer_tag));
+
+  h->num_current = 1;
+  h->current = &(h->rec);
+  return h->current;
 }
 
 ac_in_t *ac_in_init(const char *filename, ac_in_options_t *options) {
@@ -767,6 +855,7 @@ char *ac_in_lz4_read(ac_in_t *h, uint32_t len) {
 }
 
 void ac_in_options_init(ac_in_options_t *h) {
+  memset(h, 0, sizeof(*h));
   h->buffer_size = 128 * 1024;
   h->compressed_buffer_size = 0;
 
@@ -817,6 +906,15 @@ void ac_in_options_gz(ac_in_options_t *h, size_t buffer_size) { h->gz = true; }
 void ac_in_options_lz4(ac_in_options_t *h, size_t buffer_size) {
   h->lz4 = true;
   h->compressed_buffer_size = buffer_size;
+}
+
+void ac_in_options_reducer(ac_in_options_t *h, ac_io_compare_f compare,
+                           void *compare_tag, ac_io_reducer_f reducer,
+                           void *reducer_tag) {
+  h->compare = compare;
+  h->compare_tag = compare_tag;
+  h->reducer = reducer;
+  h->reducer_tag = reducer_tag;
 }
 
 /*****************************************************************************
@@ -871,23 +969,31 @@ static inline int in_heap_compare2(in_heap_t *h, ac_io_record_t *a,
   return h->compare(a, b->current, h->compare_tag);
 }
 
+void test_heap(in_heap_t *h) {
+  for (size_t i = 1; i <= h->size; i++) {
+    if (h->heap[i] == NULL)
+      abort();
+  }
+}
+
 static inline void in_heap_push(in_heap_t *h, ac_in_t *item) {
   if (h->size >= h->max_size) {
     h->max_size = h->size * 2;
     ac_in_t **heap =
         (ac_in_t **)ac_malloc((h->max_size + 1) * sizeof(ac_in_t *));
-    memcpy(heap, h->heap, (h->size * sizeof(ac_in_t *)));
+    memcpy(heap, h->heap, ((h->size + 1) * sizeof(ac_in_t *)));
     ac_free(h->heap);
     h->heap = heap;
   }
   h->size++;
   ssize_t num = h->size;
   ac_in_t **heap = h->heap;
-  ac_in_t *tmp = heap[num];
+  // ac_in_t *tmp = heap[num];
   heap[num] = item;
-  heap[0] = tmp;
+  // heap[0] = tmp;
   ssize_t i = num;
   ssize_t j = i >> 1;
+  ac_in_t *tmp;
 
   while (j > 0 && in_heap_compare(h, heap[i], heap[j]) < 0) {
     tmp = heap[i];
@@ -1142,4 +1248,96 @@ void ac_in_ext_keep_first(ac_in_t *hp) {
   h->reducer = ac_io_keep_first;
   h->reducer_tag = NULL;
   h->reducer_bh = NULL;
+}
+
+/* ac_in_records_t - this allows a cursor to be created with an array of
+   ac_io_record_t structures */
+typedef struct {
+  ac_in_options_t options;
+  int type;
+  ac_io_record_t rec;
+  ac_io_record_t *current;
+  size_t num_current;
+  ac_io_record_t *current_tmp;
+  size_t num_current_tmp;
+  ac_in_advance_f advance;
+  ac_in_advance_f advance_tmp;
+  ac_in_advance_unique_f advance_unique;
+  ac_in_advance_unique_f advance_unique_tmp;
+  ac_buffer_t *group_bh;
+
+  ac_io_record_t *records;
+  size_t num_records;
+  ac_io_record_t *rp;
+  ac_io_record_t *ep;
+
+  ac_buffer_t *reducer_bh;
+} ac_in_records_t;
+
+void ac_in_records_destroy(ac_in_t *hp) {
+  ac_in_records_t *h = (ac_in_records_t *)hp;
+  if (h->reducer_bh)
+    ac_buffer_destroy(h->reducer_bh);
+  ac_free(h);
+}
+
+ac_io_record_t *ac_in_records_advance(ac_in_t *hp) {
+  ac_in_records_t *h = (ac_in_records_t *)hp;
+  if (h->rp < h->ep) {
+    h->current = h->rp;
+    h->rp++;
+    h->num_current = 1;
+    return h->current;
+  }
+  ac_in_empty(hp);
+  return NULL;
+}
+
+ac_io_record_t *ac_in_records_advance_and_reduce(ac_in_t *hp) {
+  ac_in_records_t *h = (ac_in_records_t *)hp;
+  ac_in_options_t *opts = &h->options;
+  ac_io_compare_f compare = opts->compare;
+  void *tag = opts->compare_tag;
+  while (h->rp < h->ep) {
+    ac_io_record_t *cur = h->rp;
+    ac_io_record_t *rp = cur;
+    rp++;
+    while (rp < h->ep && !compare(cur, rp, tag))
+      rp++;
+    h->rp = rp;
+    if (opts->reducer(&(h->rec), cur, rp - cur, h->reducer_bh,
+                      opts->reducer_tag)) {
+      h->current = &(h->rec);
+      h->num_current = 1;
+      return h->current;
+    }
+  }
+  ac_in_empty(hp);
+  return NULL;
+}
+
+ac_in_t *ac_in_records_init(ac_io_record_t *records, size_t num_records,
+                            ac_in_options_t *options) {
+  ac_in_options_t opts;
+  if (!options) {
+    options = &opts;
+    ac_in_options_init(options);
+  }
+
+  ac_in_records_t *h = (ac_in_records_t *)ac_calloc(sizeof(ac_in_records_t));
+  h->options = *options;
+  h->type = AC_IN_RECORDS_TYPE;
+  h->records = records;
+  h->num_records = num_records;
+  h->rp = records;
+  h->ep = records + num_records;
+  h->options = *options;
+
+  if (options->reducer) {
+    h->reducer_bh = ac_buffer_init(256);
+    h->advance = h->advance_tmp = ac_in_records_advance_and_reduce;
+  } else
+    h->advance = h->advance_tmp = ac_in_records_advance;
+  h->advance_unique = h->advance_unique_tmp = ac_in_advance_unique_single;
+  return (ac_in_t *)h;
 }

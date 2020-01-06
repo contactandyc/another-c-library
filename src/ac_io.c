@@ -31,6 +31,8 @@ limitations under the License.
 
 #include "lz4/xxhash.h"
 
+ac_sort_compare_arg_m(ac_io_sort_records, ac_io_record_t);
+
 bool ac_io_keep_first(ac_io_record_t *res, const ac_io_record_t *r,
                       size_t num_r, ac_buffer_t *bh, void *tag) {
   *res = *r;
@@ -97,6 +99,15 @@ size_t ac_io_file_size(const char *filename) {
   if (stat(filename, &sb) == -1 || (sb.st_mode & S_IFMT) != S_IFREG)
     return 0;
   return sb.st_size;
+}
+
+bool ac_io_file_exists(const char *filename) {
+  if (!filename)
+    return false;
+  struct stat sb;
+  if (stat(filename, &sb) == -1 || (sb.st_mode & S_IFMT) != S_IFREG)
+    return false;
+  return true;
 }
 
 #ifdef _AC_DEBUG_MEMORY_

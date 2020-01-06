@@ -22,6 +22,7 @@ limitations under the License.
 
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <time.h>
 #include <unistd.h>
 #include <zlib.h>
@@ -426,6 +427,8 @@ static ac_out_t *_ac_out_init(const char *filename, ac_out_options_t *options) {
 }
 
 void ac_out_options_init(ac_out_options_t *h) {
+  memset(h, 0, sizeof(*h));
+
   h->buffer_size = 64 * 1024;
   h->append_mode = false;
   h->safe_mode = false;
@@ -484,6 +487,7 @@ void ac_out_options_lz4(ac_out_options_t *h, int level,
 
 void ac_out_ext_options_init(ac_out_ext_options_t *h) {
   memset(h, 0, sizeof(*h));
+  h->lz4_tmp = true;
 }
 
 /* options for creating a partitioned output */
@@ -767,19 +771,446 @@ void ac_out_partitioned_destroy(ac_out_t *hp) {
 }
 
 typedef struct {
+  char *buffer;
+  char *bp;
+  char *ep;
+  size_t num_records;
+  size_t size;
+} ac_out_buffer_t;
+
+const int EXTRA_IN = 0;
+const int EXTRA_FILENAME = 1;
+const int EXTRA_FILE_TO_REMOVE = EXTRA_FILENAME;
+const int EXTRA_ACK_FILE = EXTRA_FILENAME | 2;
+
+typedef struct extra_s {
+  int type;
+  void *p;
+  struct extra_s *next;
+} extra_t;
+
+typedef struct {
   int type;
   ac_out_options_t options;
   ac_out_write_f write_record;
 
+  ac_io_compare_f compare;
+  void *compare_tag;
+
+  ac_in_options_t file_options;
+
+  char *filename;
+  char *suffix;
+
+  char *tmp_filename;
+
+  ac_out_buffer_t buf1, buf2;
+  ac_out_buffer_t *b, *b2;
+
+  size_t num_written;
+  size_t num_group_written;
+
+  bool thread_started;
+  pthread_t thread;
+  bool out_in_called;
+  extra_t *extras;
+
   ac_out_ext_options_t ext_options;
 } ac_out_sorted_t;
 
+bool write_sorted_record(ac_out_t *hp, const void *d, size_t len);
+
+static void _extra_add(ac_out_t *hp, void *p, int type) {
+  ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
+  extra_t *extra;
+  if (type & EXTRA_FILENAME) {
+    char *f = (char *)p;
+    extra = (extra_t *)ac_malloc(sizeof(extra_t) + strlen(f) + 1);
+    extra->p = (void *)(extra + 1);
+    strcpy((char *)extra->p, f);
+  } else {
+    extra = (extra_t *)ac_malloc(sizeof(extra_t));
+    extra->p = p;
+  }
+  extra->type = type;
+  extra->next = h->extras;
+  h->extras = extra;
+}
+
+void ac_out_sorted_add_in(ac_out_t *hp, ac_in_t *in) {
+  _extra_add(hp, in, EXTRA_IN);
+}
+
+void ac_out_sorted_add_file_to_remove(ac_out_t *hp, const char *filename) {
+  _extra_add(hp, (void *)filename, EXTRA_FILE_TO_REMOVE);
+}
+
+void ac_out_sorted_add_ack_file(ac_out_t *hp, const char *filename) {
+  _extra_add(hp, (void *)filename, EXTRA_ACK_FILE);
+}
+
+static void tmp_filename(char *dest, const char *filename, uint32_t n,
+                         const char *suffix) {
+  sprintf(dest, "%s_%u_tmp%s", filename, n, suffix);
+}
+
+static void group_tmp_filename(char *dest, const char *filename, uint32_t n,
+                               const char *suffix) {
+  sprintf(dest, "%s_%u_gtmp%s", filename, n, suffix);
+}
+
+static inline void clear_buffer(ac_out_buffer_t *b) {
+  b->bp = b->buffer;
+  b->ep = b->bp + b->size;
+  b->num_records = 0;
+}
+
+static inline void init_buffer(ac_out_buffer_t *b, size_t buffer_size) {
+  b->buffer = (char *)ac_malloc(buffer_size);
+  b->size = buffer_size;
+  clear_buffer(b);
+}
+
+static ac_in_t *_in_from_buffer(ac_out_sorted_t *h, ac_out_buffer_t *b) {
+  if (!b->num_records)
+    return NULL;
+
+  ac_io_record_t *r = (ac_io_record_t *)b->buffer;
+  uint32_t num_r = b->num_records;
+  ac_io_sort_records(r, num_r, h->compare, h->compare_tag);
+
+  clear_buffer(b);
+  return ac_in_records_init(r, num_r, &(h->file_options));
+}
+
 ac_out_t *ac_out_sorted_init(const char *filename, ac_out_options_t *options,
                              ac_out_ext_options_t *ext_options) {
+  ac_out_options_t opts;
+  if (!options) {
+    options = &opts;
+    ac_out_options_init(options);
+  }
+  size_t buffer_size = options->buffer_size;
+  ac_out_sorted_t *h = (ac_out_sorted_t *)ac_calloc(
+      sizeof(ac_out_sorted_t) + (strlen(filename) * 3) + 100);
+  h->filename = (char *)(h + 1);
+  strcpy(h->filename, filename);
+  h->compare = ext_options->compare;
+  h->compare_tag = ext_options->compare_tag;
+  h->type = AC_OUT_SORTED_TYPE;
+
+  h->out_in_called = false;
+
+  h->tmp_filename = h->filename + strlen(filename) + 1;
+  if (ac_io_extension(filename, ".lz4")) {
+    h->filename[strlen(filename) - 4] = 0;
+    h->suffix = (char *)".lz4";
+  } else if (ac_io_extension(filename, ".gz")) {
+    h->suffix = (char *)".gz";
+    h->filename[strlen(filename) - 3] = 0;
+  }
+
+  h->thread_started = false;
+
+  h->ext_options = *ext_options;
+  h->options = *options;
+
+  ac_in_options_init(&(h->file_options));
+  if (ext_options->reducer)
+    ac_in_options_reducer(&(h->file_options), ext_options->compare,
+                          ext_options->compare_tag, ext_options->reducer,
+                          ext_options->reducer_tag);
+
+  if (ext_options->use_extra_thread) {
+    buffer_size /= 2;
+    init_buffer(&h->buf1, buffer_size);
+    init_buffer(&h->buf2, buffer_size);
+    h->b = &(h->buf1);
+    h->b2 = &(h->buf2);
+  } else {
+    init_buffer(&h->buf1, buffer_size);
+    h->b = &(h->buf1);
+    h->b2 = &(h->buf1);
+  }
+  h->write_record = write_sorted_record;
+  return (ac_out_t *)h;
+}
+
+static inline void wait_on_thread(ac_out_sorted_t *h) {
+  if (h->thread_started) {
+    pthread_join(h->thread, NULL);
+    h->thread_started = false;
+  }
+}
+
+ac_out_t *get_next_tmp(ac_out_sorted_t *h, bool tmp_only) {
+  const char *suffix = h->ext_options.lz4_tmp ? ".lz4" : "";
+  if (!tmp_only && h->ext_options.num_per_group) {
+    group_tmp_filename(h->tmp_filename, h->filename, h->num_group_written,
+                       suffix);
+    h->num_group_written++;
+  } else {
+    tmp_filename(h->tmp_filename, h->filename, h->num_written, suffix);
+    h->num_written++;
+  }
+  // allow output buffer to be supplied to ac_out_options...
+  // allow input buffer to be supplied as well
+  ac_out_options_t options;
+  ac_out_options_init(&options);
+  ac_out_options_format(&options, ac_io_prefix());
+  /* reuse the same buffer? */
+  ac_out_options_buffer_size(&options, 10 * 1024 * 1024);
+  return ac_out_init(h->tmp_filename, &options);
+}
+
+void check_for_merge(ac_out_sorted_t *h) {
+  if (!h->ext_options.num_per_group ||
+      h->num_group_written < h->ext_options.num_per_group)
+    return;
+
+  ac_out_t *out = get_next_tmp(h, true);
+
+  ac_in_options_t opts;
+  ac_in_options_init(&opts);
+  ac_in_options_format(&opts, ac_io_prefix());
+  ac_in_t *in =
+      ac_in_ext_init(h->ext_options.compare, h->ext_options.compare_tag, &opts);
+  if (h->ext_options.reducer)
+    ac_in_ext_reducer(in, h->ext_options.reducer, h->ext_options.reducer_tag);
+
+  const char *suffix = h->ext_options.lz4_tmp ? ".lz4" : "";
+  for (size_t i = 0; i < h->num_group_written; i++) {
+    group_tmp_filename(h->tmp_filename, h->filename, i, suffix);
+    ac_in_ext_add(in, ac_in_init(h->tmp_filename, &opts), 0);
+  }
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL)
+    ac_out_write_record(out, r->record, r->length);
+
+  ac_out_destroy(out);
+  ac_in_destroy(in);
+  h->num_group_written = 0;
+}
+
+void *write_sorted_thread(void *arg) {
+  ac_out_sorted_t *h = (ac_out_sorted_t *)arg;
+  ac_in_t *in = _in_from_buffer(h, h->b2);
+  ac_out_t *out = get_next_tmp(h, false);
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL)
+    ac_out_write_record(out, r->record, r->length);
+  ac_in_destroy(in);
+  ac_out_destroy(out);
+
+  if (h->ext_options.num_per_group)
+    check_for_merge(h);
   return NULL;
 }
 
-void ac_out_sorted_destroy(ac_out_t *hp) {}
+void write_sorted(ac_out_sorted_t *h) {
+  if (h->b->bp == h->b->buffer)
+    return;
+  wait_on_thread(h);
+  if (h->ext_options.use_extra_thread) {
+    ac_out_buffer_t *tmp = h->b;
+    h->b = h->b2;
+    h->b2 = tmp;
+
+    h->thread_started = true;
+    pthread_create(&h->thread, NULL, write_sorted_thread, h);
+  } else
+    write_sorted_thread(h);
+}
+
+ac_in_t *ac_out_in(ac_out_t *hp) {
+  ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
+  if (h->out_in_called)
+    return NULL;
+
+  h->out_in_called = true;
+
+  if (!h->num_written && !h->num_group_written)
+    return _in_from_buffer(h, h->b);
+
+  if (h->b->num_records) {
+    wait_on_thread(h);
+    if (h->ext_options.use_extra_thread) {
+      ac_out_buffer_t *tmp = h->b;
+      h->b = h->b2;
+      h->b2 = tmp;
+    }
+    if (h->ext_options.num_per_group)
+      h->ext_options.num_per_group =
+          h->num_group_written ? h->num_group_written : 1;
+    write_sorted_thread(h);
+  }
+
+  ac_in_options_t opts;
+  ac_in_options_init(&opts);
+  ac_in_options_format(&opts, ac_io_prefix());
+  ac_in_t *in =
+      ac_in_ext_init(h->ext_options.compare, h->ext_options.compare_tag, &opts);
+  if (h->ext_options.reducer)
+    ac_in_ext_reducer(in, h->ext_options.reducer, h->ext_options.reducer_tag);
+
+  const char *suffix = h->ext_options.lz4_tmp ? ".lz4" : "";
+  for (size_t i = 0; i < h->num_written; i++) {
+    tmp_filename(h->tmp_filename, h->filename, i, suffix);
+    ac_in_ext_add(in, ac_in_init(h->tmp_filename, &opts), 0);
+  }
+  return in;
+}
+
+/*
+TODO: Add support for fixed length records.  These records don't need the
+ac_io_record_t record array and can simply be sorted in place.
+
+bool write_fixed_sorted_record(ac_out_t *hp, const void *d, size_t len) {
+  ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
+  if (len != h->fixed)
+    abort();
+
+  char *bp = h->b->bp;
+  if (bp + len > h->b->ep) {
+    write_sorted(h);
+    bp = h->b->bp;
+  }
+
+  memcpy(bp, d, len);
+  bp += len;
+  h->b->bp = bp;
+  h->b->num_records++;
+  return true;
+}
+*/
+
+bool write_sorted_record(ac_out_t *hp, const void *d, size_t len) {
+  if (len > 0xffffffffU)
+    return false;
+  ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
+
+  size_t length = len + sizeof(ac_io_record_t) + 5;
+  char *bp = h->b->bp;
+  if (bp + length > h->b->ep) {
+    write_sorted(h);
+    bp = h->b->bp;
+    // TODO: Support records that are larger than the buffer
+    // if (bp + length > h->b->ep)
+    //  return write_one_record(h, d, len);
+  }
+
+  /* Write data to the end of the buffer and the records to the beginning.
+     This has the effect of keeping the records in the original order and
+     makes effective use of the buffer from both ends.  Later, the records
+     will be sorted.  The data is written with a zero terminator to make it
+     easy for string comparison functions.
+  */
+  char *ep = h->b->ep;
+  ep--;
+  *ep = 0;
+  ep -= len;
+  memcpy(ep, d, len);
+
+  ac_io_record_t *r = (ac_io_record_t *)bp;
+  r->record = ep;
+  r->length = len;
+  r->tag = h->ext_options.tag;
+  bp += sizeof(*r);
+
+  h->b->bp = bp;
+  h->b->ep = ep;
+  h->b->num_records++;
+
+  return true;
+}
+
+void ac_out_ext_remove_tmp_files(char *tmp, const char *filename,
+                                 bool lz4_tmp) {
+  const char *suffix = lz4_tmp ? ".lz4" : "";
+  uint32_t skipped = 0;
+  for (uint32_t i = 0; skipped < 4; i++) {
+    tmp_filename(tmp, filename, i, suffix);
+    if (ac_io_file_exists(tmp))
+      remove(tmp);
+    else
+      skipped++;
+  }
+  skipped = 0;
+  for (uint32_t i = 0; skipped < 4; i++) {
+    group_tmp_filename(tmp, filename, i, suffix);
+    if (ac_io_file_exists(tmp))
+      remove(tmp);
+    else
+      skipped++;
+  }
+}
+
+static void remove_extras(ac_out_sorted_t *h) {
+  extra_t *extra = h->extras;
+  while (extra) {
+    if (extra->type == EXTRA_FILE_TO_REMOVE)
+      remove((char *)extra->p);
+    extra = extra->next;
+  }
+}
+
+static void touch_extras(ac_out_sorted_t *h) {
+  extra_t *extra = h->extras;
+  while (extra) {
+    if (extra->type == EXTRA_ACK_FILE) {
+      FILE *out = fopen((char *)extra->p, "wb");
+      fclose(out);
+    }
+    extra = extra->next;
+  }
+}
+
+static void destroy_extra_ins(ac_out_sorted_t *h) {
+  extra_t *extra = h->extras;
+  while (extra) {
+    if (extra->type == EXTRA_IN) {
+      ac_in_t *in = (ac_in_t *)extra->p;
+      if (in)
+        ac_in_destroy(in);
+      extra->p = NULL;
+    }
+    extra = extra->next;
+  }
+}
+
+void ac_out_sorted_destroy(ac_out_t *hp) {
+  ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
+  ac_in_t *in = ac_out_in(hp);
+  if (in) {
+    sprintf(h->tmp_filename, "%s%s", h->filename, h->suffix ? h->suffix : "");
+    ac_out_t *out = ac_out_init(h->tmp_filename, &(h->options));
+    ac_io_record_t *r;
+    while ((r = ac_in_advance(in)) != NULL)
+      ac_out_write_record(out, r->record, r->length);
+    ac_out_destroy(out);
+    ac_in_destroy(in);
+  }
+  if (h->buf1.buffer)
+    ac_free(h->buf1.buffer);
+  if (h->buf2.buffer)
+    ac_free(h->buf2.buffer);
+  /*
+  ac_out_ext_remove_tmp_files(h->tmp_filename, h->filename,
+                              h->ext_options.lz4_tmp);
+  */
+  destroy_extra_ins(h);
+  remove_extras(h);
+  touch_extras(h);
+
+  extra_t *extra = h->extras;
+  while (extra) {
+    extra_t *next = extra->next;
+    ac_free(extra);
+    extra = next;
+  }
+
+  ac_free(h);
+}
 
 static void ac_out_ext_destroy(ac_out_t *hp) {
   if (hp->type == AC_OUT_PARTITIONED_TYPE)

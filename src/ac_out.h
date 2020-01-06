@@ -40,9 +40,10 @@ void ac_out_options_lz4(ac_out_options_t *h, int level,
                         ac_lz4_block_size_t size, bool block_checksum,
                         bool content_checksum);
 
-/* options for creating a partitioned output */
+/* extended options are for partitioned output, sorted output, or both */
 void ac_out_ext_options_init(ac_out_ext_options_t *h);
 
+/* options for creating a partitioned output */
 void ac_out_ext_options_partition(ac_out_ext_options_t *h,
                                   ac_io_partition_f part, void *tag);
 

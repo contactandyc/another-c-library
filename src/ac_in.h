@@ -73,21 +73,11 @@ void ac_in_options_tag(ac_in_options_t *h, int tag);
 void ac_in_options_gz(ac_in_options_t *h, size_t buffer_size);
 void ac_in_options_lz4(ac_in_options_t *h, size_t buffer_size);
 
-/* use this function to create an ac_in_t which allows multiple input streams */
-ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *tag,
-                        ac_in_options_t *options);
-
-/* When there are multiple input streams, this would keep only the first equal
-   record across the streams. */
-void ac_in_ext_keep_first(ac_in_t *h);
-
-/* When there are multiple input streams, set the reducer */
-void ac_in_ext_reducer(ac_in_t *h, ac_io_reducer_f reducer, void *tag);
-
-/* The tag can be options->tag from init of in if that makes sense.  Otherwise,
-  this can be useful to distinguish different input sources. The first param
-  h must be initialized with ac_in_init_compare. */
-void ac_in_ext_add(ac_in_t *h, ac_in_t *in, int tag);
+/* Within a single cursor, reduce equal items.  In this case, it is assumed
+   that the contents are sorted.  */
+void ac_in_options_reducer(ac_in_options_t *h, ac_io_compare_f compare,
+                           void *compare_tag, ac_io_reducer_f reducer,
+                           void *reducer_tag);
 
 /* The filename dictates whether the file is normal, gzip compressed (.gz
    extension), or lz4 compressed (.lz4 extension).  If options is NULL, default
@@ -106,6 +96,27 @@ ac_in_t *ac_in_init_with_fd(int fd, bool can_close, ac_in_options_t *options);
    object is destroyed, the buffer should be freed. */
 ac_in_t *ac_in_init_with_buffer(void *buf, size_t len, bool can_free,
                                 ac_in_options_t *options);
+
+/* Use this to create an ac_in_t which allows cursoring over an array of
+   ac_io_record_t structures. */
+ac_in_t *ac_in_records_init(ac_io_record_t *records, size_t num_records,
+                            ac_in_options_t *options);
+
+/* Use this function to create an ac_in_t which allows multiple input streams */
+ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *tag,
+                        ac_in_options_t *options);
+
+/* When there are multiple input streams, this would keep only the first equal
+   record across the streams. */
+void ac_in_ext_keep_first(ac_in_t *h);
+
+/* When there are multiple input streams, set the reducer */
+void ac_in_ext_reducer(ac_in_t *h, ac_io_reducer_f reducer, void *tag);
+
+/* The tag can be options->tag from init of in if that makes sense.  Otherwise,
+  this can be useful to distinguish different input sources. The first param
+  h must be initialized with ac_in_init_compare. */
+void ac_in_ext_add(ac_in_t *h, ac_in_t *in, int tag);
 
 /* Count the records and close the cursor */
 size_t ac_in_count(ac_in_t *h);

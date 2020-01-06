@@ -8,6 +8,10 @@
 #include <string.h>
 #include <unistd.h>
 
+int compare_strings(ac_io_record_t *a, ac_io_record_t *b, void *tag) {
+  return strcmp(a->record, b->record);
+}
+
 int main(int argc, char *argv[]) {
   if (argc < 2 || (!strcmp(argv[1], "-d") && argc < 3)) {
     printf("%s <output>\n", argv[0]);
@@ -16,7 +20,7 @@ int main(int argc, char *argv[]) {
   if (argc == 2) {
     ac_out_options_t options;
     ac_out_options_init(&options);
-    ac_out_options_buffer_size(&options, 10 * 1024 * 1024);
+    ac_out_options_buffer_size(&options, 3 * 1024 * 1024);
     ac_out_options_format(&options, ac_io_delimiter('\n'));
     ac_out_options_write_ack_file(&options);
     ac_out_options_gz(&options, 9);
@@ -25,13 +29,15 @@ int main(int argc, char *argv[]) {
     ac_out_ext_options_init(&ext_options);
     ac_out_ext_options_partition(&ext_options, ac_io_hash_partition, NULL);
     ac_out_ext_options_num_partitions(&ext_options, 5);
+    ac_out_ext_options_compare(&ext_options, compare_strings, NULL);
+    ac_out_ext_options_intermediate_group_size(&ext_options, 10);
 
     ac_out_t *out = ac_out_ext_init(argv[1], &options, &ext_options);
 
     uint32_t block_size = 80;
     char *block = (char *)ac_malloc(block_size);
     uint32_t len;
-    for (int j = 0; j < 1000; j++) {
+    for (int j = 0; j < 100000; j++) {
       for (int i = 'A'; i < 'Z'; i++) {
         memset(block, i, block_size);
         ac_out_write_record(out, block, block_size);
