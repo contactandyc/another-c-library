@@ -27,6 +27,14 @@ limitations under the License.
 #include <unistd.h>
 #include <zlib.h>
 
+/* options for fixed output -- TODO */
+void ac_out_ext_options_fixed_compare(ac_out_ext_options_t *h,
+                                      ac_io_fixed_compare_f compare, void *tag);
+void ac_out_ext_options_fixed_sort(ac_out_ext_options_t *h,
+                                   ac_io_fixed_sort_f sort, void *tag);
+void ac_out_ext_options_fixed_reducer(ac_out_ext_options_t *h,
+                                      ac_io_fixed_reducer_f reducer, void *tag);
+
 typedef bool (*ac_out_write_f)(ac_out_t *h, const void *d, size_t len);
 
 const int AC_OUT_NORMAL_TYPE = 0;
@@ -490,6 +498,14 @@ void ac_out_ext_options_init(ac_out_ext_options_t *h) {
   h->lz4_tmp = true;
 }
 
+void ac_out_ext_use_extra_thread(ac_out_ext_options_t *h) {
+  h->use_extra_thread = true;
+}
+
+void ac_out_ext_dont_compress_tmp(ac_out_ext_options_t *h) {
+  h->lz4_tmp = false;
+}
+
 /* options for creating a partitioned output */
 void ac_out_ext_options_partition(ac_out_ext_options_t *h,
                                   ac_io_partition_f part, void *tag) {
@@ -507,6 +523,10 @@ void ac_out_ext_options_compare(ac_out_ext_options_t *h,
                                 ac_io_compare_f compare, void *tag) {
   h->compare = compare;
   h->compare_tag = tag;
+  if (!h->int_compare) {
+    h->int_compare = compare;
+    h->int_compare_tag = tag;
+  }
 }
 
 void ac_out_ext_options_intermediate_group_size(ac_out_ext_options_t *h,
@@ -526,6 +546,17 @@ void ac_out_ext_options_reducer(ac_out_ext_options_t *h,
                                 ac_io_reducer_f reducer, void *tag) {
   h->reducer = reducer;
   h->reducer_tag = tag;
+  if (!h->int_reducer) {
+    h->int_reducer = reducer;
+    h->int_reducer_tag = tag;
+  }
+}
+
+void ac_out_ext_options_intermediate_reducer(ac_out_ext_options_t *h,
+                                             ac_io_reducer_f reducer,
+                                             void *tag) {
+  h->int_reducer = reducer;
+  h->int_reducer_tag = tag;
 }
 
 /* options for fixed output */
@@ -794,9 +825,6 @@ typedef struct {
   ac_out_options_t options;
   ac_out_write_f write_record;
 
-  ac_io_compare_f compare;
-  void *compare_tag;
-
   ac_in_options_t file_options;
 
   char *filename;
@@ -816,6 +844,7 @@ typedef struct {
   extra_t *extras;
 
   ac_out_ext_options_t ext_options;
+  ac_out_ext_options_t partition_options;
 } ac_out_sorted_t;
 
 bool write_sorted_record(ac_out_t *hp, const void *d, size_t len);
@@ -877,7 +906,8 @@ static ac_in_t *_in_from_buffer(ac_out_sorted_t *h, ac_out_buffer_t *b) {
 
   ac_io_record_t *r = (ac_io_record_t *)b->buffer;
   uint32_t num_r = b->num_records;
-  ac_io_sort_records(r, num_r, h->compare, h->compare_tag);
+  ac_io_sort_records(r, num_r, h->ext_options.int_compare,
+                     h->ext_options.int_compare_tag);
 
   clear_buffer(b);
   return ac_in_records_init(r, num_r, &(h->file_options));
@@ -895,8 +925,6 @@ ac_out_t *ac_out_sorted_init(const char *filename, ac_out_options_t *options,
       sizeof(ac_out_sorted_t) + (strlen(filename) * 3) + 100);
   h->filename = (char *)(h + 1);
   strcpy(h->filename, filename);
-  h->compare = ext_options->compare;
-  h->compare_tag = ext_options->compare_tag;
   h->type = AC_OUT_SORTED_TYPE;
 
   h->out_in_called = false;
@@ -913,13 +941,16 @@ ac_out_t *ac_out_sorted_init(const char *filename, ac_out_options_t *options,
   h->thread_started = false;
 
   h->ext_options = *ext_options;
+  h->partition_options = *ext_options;
+  h->partition_options.compare = NULL;
   h->options = *options;
 
   ac_in_options_init(&(h->file_options));
-  if (ext_options->reducer)
-    ac_in_options_reducer(&(h->file_options), ext_options->compare,
-                          ext_options->compare_tag, ext_options->reducer,
-                          ext_options->reducer_tag);
+  if (ext_options->int_reducer)
+    ac_in_options_reducer(&(h->file_options), ext_options->int_compare,
+                          ext_options->int_compare_tag,
+                          ext_options->int_reducer,
+                          ext_options->int_reducer_tag);
 
   if (ext_options->use_extra_thread) {
     buffer_size /= 2;
@@ -1183,7 +1214,8 @@ void ac_out_sorted_destroy(ac_out_t *hp) {
   ac_in_t *in = ac_out_in(hp);
   if (in) {
     sprintf(h->tmp_filename, "%s%s", h->filename, h->suffix ? h->suffix : "");
-    ac_out_t *out = ac_out_init(h->tmp_filename, &(h->options));
+    ac_out_t *out = ac_out_ext_init(h->tmp_filename, &(h->options),
+                                    &(h->partition_options));
     ac_io_record_t *r;
     while ((r = ac_in_advance(in)) != NULL)
       ac_out_write_record(out, r->record, r->length);
@@ -1194,10 +1226,8 @@ void ac_out_sorted_destroy(ac_out_t *hp) {
     ac_free(h->buf1.buffer);
   if (h->buf2.buffer)
     ac_free(h->buf2.buffer);
-  /*
   ac_out_ext_remove_tmp_files(h->tmp_filename, h->filename,
                               h->ext_options.lz4_tmp);
-  */
   destroy_extra_ins(h);
   remove_extras(h);
   touch_extras(h);

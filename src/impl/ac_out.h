@@ -56,6 +56,9 @@ typedef struct {
   ac_io_reducer_f reducer;
   void *reducer_tag;
 
+  ac_io_reducer_f int_reducer;
+  void *int_reducer_tag;
+
   ac_io_fixed_reducer_f fixed_reducer;
   void *fixed_reducer_tag;
 

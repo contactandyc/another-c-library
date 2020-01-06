@@ -30,7 +30,8 @@ int main(int argc, char *argv[]) {
     ac_out_ext_options_partition(&ext_options, ac_io_hash_partition, NULL);
     ac_out_ext_options_num_partitions(&ext_options, 5);
     ac_out_ext_options_compare(&ext_options, compare_strings, NULL);
-    ac_out_ext_options_intermediate_group_size(&ext_options, 10);
+    // ac_out_ext_options_intermediate_group_size(&ext_options, 10);
+    // ac_out_ext_use_extra_thread(&ext_options);
 
     ac_out_t *out = ac_out_ext_init(argv[1], &options, &ext_options);
 

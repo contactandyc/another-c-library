@@ -50,28 +50,31 @@ void ac_out_ext_options_partition(ac_out_ext_options_t *h,
 void ac_out_ext_options_num_partitions(ac_out_ext_options_t *h,
                                        size_t num_partitions);
 
-/* options for sorting the output */
-void ac_out_ext_options_compare(ac_out_ext_options_t *h,
-                                ac_io_compare_f compare, void *tag);
-
+/* By default, tmp files are written every time the buffer fills and all of the
+   tmp files are merged at the end.  This causes the tmp files to be merged
+   once the number of tmp files reaches the num_per_group. */
 void ac_out_ext_options_intermediate_group_size(ac_out_ext_options_t *h,
                                                 size_t num_per_group);
+
+/* options for comparing output */
+void ac_out_ext_options_compare(ac_out_ext_options_t *h,
+                                ac_io_compare_f compare, void *tag);
 
 void ac_out_ext_options_intermediate_compare(ac_out_ext_options_t *h,
                                              ac_io_compare_f compare,
                                              void *tag);
 
-/* set the reducer */
+/* set the reducers */
 void ac_out_ext_options_reducer(ac_out_ext_options_t *h,
                                 ac_io_reducer_f reducer, void *tag);
 
-/* options for fixed output */
-void ac_out_ext_options_fixed_reducer(ac_out_ext_options_t *h,
-                                      ac_io_fixed_reducer_f reducer, void *tag);
-void ac_out_ext_options_fixed_compare(ac_out_ext_options_t *h,
-                                      ac_io_fixed_compare_f compare, void *tag);
-void ac_out_ext_options_fixed_sort(ac_out_ext_options_t *h,
-                                   ac_io_fixed_sort_f sort, void *tag);
+void ac_out_ext_options_intermediate_reducer(ac_out_ext_options_t *h,
+                                             ac_io_reducer_f reducer,
+                                             void *tag);
+
+void ac_out_ext_use_extra_thread(ac_out_ext_options_t *h);
+
+void ac_out_ext_dont_compress_tmp(ac_out_ext_options_t *h);
 
 ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options);
 ac_out_t *ac_out_ext_init(const char *filename, ac_out_options_t *options,
