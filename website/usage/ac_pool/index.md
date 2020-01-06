@@ -7,7 +7,7 @@ title: "ac_pool"
 
 # ac_pool
 
-The ac_pool provides an api similar to malloc, calloc, strdup, and more.  The pool uses an allocate and clear approach.  There is no free method.  It has no free function. The clear call clears all of the memory that has been previously allocated from the pool. Internally, resets a counter to zero to clear and adds to the counter to allocate (most of the time), so it is very efficient.
+The ac_pool provides an api similar to malloc, calloc, strdup, and more.  The pool uses an allocate and clear approach.  There is no free method.  The clear call clears all of the memory that has been previously allocated from the pool. Internally, resets a counter to zero to clear and adds to the counter to allocate (most of the time), so it is very efficient.
 
 
 ### Commonly used functions
