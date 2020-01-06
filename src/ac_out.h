@@ -28,7 +28,6 @@ limitations under the License.
 /* ac_out_options_t is declared in impl/ac_out.h.  r is expected to point to a
    structure of this type (and not NULL). */
 void ac_out_options_init(ac_out_options_t *h);
-void ac_out_options_fd(ac_out_options_t *h, int fd, bool owner);
 void ac_out_options_buffer_size(ac_out_options_t *h, size_t buffer_size);
 void ac_out_options_format(ac_out_options_t *h, ac_io_format_t format);
 void ac_out_options_abort_on_error(ac_out_options_t *h);
@@ -77,6 +76,7 @@ void ac_out_ext_use_extra_thread(ac_out_ext_options_t *h);
 void ac_out_ext_dont_compress_tmp(ac_out_ext_options_t *h);
 
 ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options);
+ac_out_t *ac_out_init_with_fd(int fd, bool fd_owner, ac_out_options_t *options);
 ac_out_t *ac_out_ext_init(const char *filename, ac_out_options_t *options,
                           ac_out_ext_options_t *ext_options);
 

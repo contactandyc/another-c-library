@@ -47,6 +47,7 @@ struct ac_out_s {
   ac_out_write_f write_record;
 
   int fd;
+  bool fd_owner;
   char *filename;
   char *buffer;
   size_t buffer_pos;
@@ -132,7 +133,7 @@ start:;
     }
   }
   if (!_write_to_fd(&(h->fd), h->buffer2, h->buffer_pos2)) {
-    if (h->options.fd_owner)
+    if (h->fd_owner)
       close(h->fd);
     h->fd = -1;
     return false;
@@ -154,7 +155,7 @@ static bool _ac_out_write(ac_out_t *h, const void *d, size_t len) {
       return true;
     else {
       if (!_write_to_fd(&(h->fd), h->buffer, h->buffer_pos)) {
-        if (h->options.fd_owner)
+        if (h->fd_owner)
           close(h->fd);
         h->fd = -1;
         return false;
@@ -167,7 +168,7 @@ static bool _ac_out_write(ac_out_t *h, const void *d, size_t len) {
   memcpy(h->buffer + h->buffer_pos, d, diff);
   h->buffer_pos += diff;
   if (!_write_to_fd(&(h->fd), h->buffer, h->buffer_pos)) {
-    if (h->options.fd_owner)
+    if (h->fd_owner)
       close(h->fd);
     h->fd = -1;
     return false;
@@ -178,7 +179,7 @@ static bool _ac_out_write(ac_out_t *h, const void *d, size_t len) {
   h->buffer_pos = 0;
   if (len >= h->buffer_size) {
     if (!_write_to_fd(&(h->fd), p, len)) {
-      if (h->options.fd_owner)
+      if (h->fd_owner)
         close(h->fd);
       h->fd = -1;
 
@@ -268,7 +269,7 @@ static bool _ac_out_write_gz(ac_out_t *h, const void *d, size_t len) {
   return true;
 }
 
-static ac_out_t *_ac_out_init_lz4(const char *filename,
+static ac_out_t *_ac_out_init_lz4(const char *filename, int fd, bool fd_owner,
                                   ac_out_options_t *options) {
   bool append_mode = options->append_mode;
   if (append_mode) {
@@ -311,7 +312,7 @@ static ac_out_t *_ac_out_init_lz4(const char *filename,
   ac_out_t *h = (ac_out_t *)ac_malloc(sizeof(ac_out_t) + buffer_size + 8 +
                                       filename_length + extra);
   memset(h, 0, sizeof(*h));
-  h->fd = options->fd;
+  h->fd = fd;
   h->lz4 = lz4;
   h->buffer = (char *)(h + 1);
   h->buffer2 = h->buffer + block_size;
@@ -345,7 +346,7 @@ static ac_out_t *_ac_out_init_lz4(const char *filename,
   return h;
 }
 
-static ac_out_t *_ac_out_init_gz(const char *filename,
+static ac_out_t *_ac_out_init_gz(const char *filename, int fd, bool fd_owner,
                                  ac_out_options_t *options) {
   size_t buffer_size = options->buffer_size;
   bool append_mode = options->append_mode;
@@ -387,15 +388,16 @@ static ac_out_t *_ac_out_init_gz(const char *filename,
   mode[1] = options->level + '0';
   mode[2] = 0;
 
-  if (options->fd != -1)
-    h->gz = gzdopen(options->fd, mode);
+  if (fd != -1)
+    h->gz = gzdopen(fd, mode);
   else
     h->gz = gzopen(tmp, mode);
   h->write_d = _ac_out_write_gz;
   return h;
 }
 
-static ac_out_t *_ac_out_init(const char *filename, ac_out_options_t *options) {
+static ac_out_t *_ac_out_init(const char *filename, int fd, bool fd_owner,
+                              ac_out_options_t *options) {
   size_t buffer_size = options->buffer_size;
   bool append_mode = options->append_mode;
 
@@ -424,8 +426,8 @@ static ac_out_t *_ac_out_init(const char *filename, ac_out_options_t *options) {
     strcat(tmp, "-safe");
   }
 
-  if (options->fd != -1)
-    h->fd = options->fd;
+  if (fd != -1)
+    h->fd = fd;
   else if (append_mode)
     h->fd = open(tmp, O_WRONLY | O_CREAT | O_APPEND, 0777);
   else
@@ -449,13 +451,6 @@ void ac_out_options_init(ac_out_options_t *h) {
   h->format = 0;
   h->lz4 = false;
   h->gz = false;
-  h->fd = -1;
-  h->fd_owner = true;
-}
-
-void ac_out_options_fd(ac_out_options_t *h, int fd, bool owner) {
-  h->fd = fd;
-  h->fd_owner = owner;
 }
 
 void ac_out_options_buffer_size(ac_out_options_t *h, size_t buffer_size) {
@@ -607,29 +602,30 @@ bool ac_out_write_delimiter(ac_out_t *h, const void *d, size_t len,
   return true;
 }
 
-ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options) {
+ac_out_t *_ac_out_init_(const char *filename, int fd, bool fd_owner,
+                        ac_out_options_t *options) {
   ac_out_options_t opts;
   if (!options) {
     options = &opts;
     ac_out_options_init(options);
   }
 
-  if (!filename && options->fd == -1)
+  if (!filename && fd == -1)
     abort();
-  if (options->fd != -1 && options->append_mode)
+  if (fd != -1 && options->append_mode)
     abort();
   if (options->safe_mode && options->append_mode) /* not a valid combination */
     abort();
-  if (options->fd != -1 && (options->safe_mode || options->write_ack_file))
+  if (fd != -1 && (options->safe_mode || options->write_ack_file))
     abort();
 
   ac_out_t *h;
   if ((!filename && options->lz4) || ac_io_extension(filename, ".lz4"))
-    h = _ac_out_init_lz4(filename, options);
+    h = _ac_out_init_lz4(filename, fd, fd_owner, options);
   else if ((!filename && options->gz) || ac_io_extension(filename, ".gz"))
-    h = _ac_out_init_gz(filename, options);
+    h = _ac_out_init_gz(filename, fd, fd_owner, options);
   else
-    h = _ac_out_init(filename, options);
+    h = _ac_out_init(filename, fd, fd_owner, options);
 
   if (h) {
     if (options->format < 0) {
@@ -644,6 +640,15 @@ ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options) {
   } else if (options->abort_on_error)
     abort();
   return h;
+}
+
+ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options) {
+  return _ac_out_init_(filename, -1, true, options);
+}
+
+ac_out_t *ac_out_init_with_fd(int fd, bool fd_owner,
+                              ac_out_options_t *options) {
+  return _ac_out_init_(NULL, fd, fd_owner, options);
 }
 
 bool ac_out_write_record(ac_out_t *h, const void *d, size_t len) {
@@ -691,7 +696,7 @@ void ac_out_destroy(ac_out_t *h) {
   }
 
   ac_out_flush(h);
-  if (h->fd > -1 && h->options.fd_owner)
+  if (h->fd > -1 && h->fd_owner)
     close(h->fd);
 
   if (h->lz4)

@@ -32,8 +32,6 @@ typedef struct {
 
   bool gz;
   bool lz4;
-  int fd;
-  bool fd_owner;
 } ac_out_options_t;
 
 typedef struct {
