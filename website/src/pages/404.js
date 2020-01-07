@@ -7,7 +7,7 @@ function NotFoundPage() {
   return (
     <Layout>
       <SEO title="404: Not found" />
-      <h1>NOT FOUND</h1>
+      <h1>404: NOT FOUND</h1>
       <p>You just hit a route that does not exist.</p>
     </Layout>
   );
