@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "10. Binary Search Trees"
 ---
 
-# Binary Search Trees
-
 ## The basic structure
 
 
@@ -47,7 +45,7 @@ node_t *root = NULL;
 
 To build the tree, we will need functionality to insert new nodes.  For now, we will assume that our tree maintains unique keys (no duplicate letters).  In a binary search tree insert method, you first find the place where the node would go, and then if it doesn't already exist, you add the node.  It is often a good idea to search for the node before inserting.  This will eliminate the need to create and destroy the node needlessly if it already existed.  It also is easier to understand the find method, so it comes next.
 
-# Find
+## Find
 
 ```c
 node_t *node_find(char key, node_t *root) {
@@ -78,7 +76,7 @@ node_t *node_find(char key, node_t *root) {
 
 The recursive method requires less code but is less efficient as the recursion requires more stack manipulation.  Recursive functions are extremely powerful, but when they can be represented as a non-recursive method that is more efficient, it is usually best to use the non-recursive method.
 
-# Insert
+## Insert
 
 The node_insert method will require a pointer to the root pointer so that it can potentially modify what the root is. Insert works much like find, except that it needs to find the spot where the new node can fit.  To find that spot, the parent of that spot must be saved and the actual spot itself.  Because the spot where the new node can fit will be NULL, you can use the parent pointer from a given node.  Once a place is found, the node to insert's parent is to set to the saved parent, the left and right pointers are set to NULL, and the spot is set to reference the node.
 ```c

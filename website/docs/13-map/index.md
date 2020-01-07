@@ -4,7 +4,6 @@ posttype: "ebook"
 title: "13. The Map Object"
 ---
 
-# The Map Object
 - Turning the red black tree into a map
 
 *This and the src/ac_map.h/c files were started on Monday 9/23/19 and are still a work in progress.*

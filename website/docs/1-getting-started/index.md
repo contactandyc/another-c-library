@@ -4,7 +4,7 @@ posttype: "ebook"
 title: "1. Getting Started"
 ---
 
-# A quick word about licensing
+## A quick word about licensing
 
 Throughout this book, the following notice will appear at the top of most of the files.
 
@@ -24,7 +24,7 @@ limitations under the License.
 
 My goal is to produce a work that is unencumbered by licenses, and hope that others will find this code or parts of it useful.
 
-# Getting Started
+## Getting Started
 
 This first chapter covers setting up the computer for the projects in succeeding chapters. The following instructions execute in macOS Terminal, which holds consistent with Linux. However, Windows Command Line (now Terminal) may require some variation of the given commands.
 
@@ -158,4 +158,4 @@ cd $ac/illustrations/1_getting_started/1_test_setup
 
 I would highly recommend going through tutorials if you are not familiar with the command line. Understanding the terminal is essential for any programmer. I do not plan on utilizing many terminal related commands but will try to detail the used commands.
 
-[Table of Contents (only if viewing on Github)](../../../README.md)
+[Table of Contents (if viewing on Github)](../../../README.md)

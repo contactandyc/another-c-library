@@ -1,10 +1,10 @@
 ---
 path: "/5-threads"
 posttype: "ebook"
-title: "5. Introducing Threads"
+title: "5. Threads"
 ---
 
-## Introducing threads
+## Introducing Threads
 
 Imagine if you were building a block building, and you had to paint the level on each block up to 100 levels.  To know which block to paint, you would look at the last block on the building, add one to it, and go and paint your block.  Once the block is dry, you can come back and put the block on the building.  At this point, you can repeat the process.  You are only allowed to paint one block at a time, and you must look at the highest block to determine what to paint on the next block.  
 

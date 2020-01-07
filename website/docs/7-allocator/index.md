@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "7. The Global Allocator Object"
 ---
 
-# The Global Allocator Object
-
 A quick note about C allocation methods:
 
 In C, there are five basic functions for allocating memory (technically there are more, but they are rarely used).
@@ -565,7 +563,7 @@ Binary file ./2_timing/12_timer/test_timer matches
 
 This feature alone is extremely valuable when working with a large codebase.  It takes longer to write each line of code, but the reader can easily find every line of code where the object is used.  This makes it easier to find example code and to build upon the work of others.
 
-# A Quick Recap
+## A Quick Recap
 
 1.  The 5 basic allocation methods in C are...
 ```c

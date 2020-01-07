@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "9. The Pool Object"
 ---
 
-# The Pool Object
-
 What if our object could keep track of allocations and free memory for us?  This is generally the basis for languages that use garbage collection.  I'm going to illustrate how to build several objects which greatly reduce the number of calls to malloc and free (and reduce the risk that you will have memory leaks).  
 
 The first is an object which I've used for almost my whole career.  I've called it a pool.  The basic idea with this object is that you can allocate and clear.  It has no free function.  When you clear, you clear all of the memory that has been previously allocated from the pool. Internally, it is very efficient in that all it typically does is reset a counter to zero.  The base interface will look something like the following.

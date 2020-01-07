@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "14. The Set and Multimap"
 ---
 
-# The set and multimap
-
 ## The set
 
 C++ and other languages define sets such that the entire value is the key.  The ac_map.h/c doesn't break out the key and value.  The find and insert methods can use some or all of the structure.  

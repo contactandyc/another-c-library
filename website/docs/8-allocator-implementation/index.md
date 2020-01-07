@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "8. The Global Allocator Implementation"
 ---
 
-# The Global Allocator Implementation
-
 Implementing the allocator is rather involved and uses much of what you've learned in the prior chapters. However, it should help you to understand how to code or to improve it should you desire to.
 
 - Doubly linked lists to track allocations.
@@ -160,6 +158,6 @@ pthread_mutex_t mutex;
 int done;
 ```
 
-# To Be Continued
+### To Be Continued
 
 [Table of Contents (only if viewing on Github)](../../../README.md)

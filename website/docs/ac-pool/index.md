@@ -7,7 +7,7 @@ title: "ac_pool"
 The ac_pool provides an api similar to malloc, calloc, strdup, and more.  The pool uses an allocate and clear approach.  There is no free method.  It has no free function. The clear call clears all of the memory that has been previously allocated from the pool. Internally, resets a counter to zero to clear and adds to the counter to allocate (most of the time), so it is very efficient.
 
 
-### Commonly used functions
+## Commonly used functions
 ```c
 #include "ac_pool.h"
 
@@ -60,7 +60,8 @@ void ac_pool_destroy(ac_pool_t *h);<br/>
 Once the pool is no longer needed, call ac_pool_destroy to clean up all of its resources.  Calling ac_pool_destroy will invalidate all of the memory that has been allocated from the pool object.
 
 
-### More advanced functions or less used
+## More advanced functions or less used
+
 ```c
 char *ac_pool_strdupvf(ac_pool_t *h, const char *format, va_list args);
 void *ac_pool_min_max_alloc(ac_pool_t *h, size_t *rlen,
@@ -101,6 +102,7 @@ void ac_pool_reset(ac_pool_t *h, ac_pool_checkpoint_t *cp);<br/>
 Checkpoint and reset work together.  ac_pool_checkpoint sets a marker in the pool for which it can be reset to with ac_pool_reset.  This can be useful if you want to allow the pool to grow and shrink back to a certain point.
 
 ## Dependencies
+
 Dependencies are the files necessary to include in your own package.  You can also just include the whole ac_ library.
 ```
 ac_allocator.h

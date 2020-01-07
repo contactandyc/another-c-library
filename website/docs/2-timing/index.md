@@ -1,10 +1,8 @@
 ---
 path: "/2-timing"
 posttype: "ebook"
-title: "2. Timing Your Code"
+title: "2. Timing Your Code (First Project)"
 ---
-
-# Timing Your Code (the first project)
 
 ## A brief introduction to C
 
@@ -337,7 +335,7 @@ while(*p)
 
 because the check for 0 is redundant.  It doesn't hurt anything to add the != 0, and sometimes it makes code easier to read.
 
-## The void type
+### The void type
 
 A function with a return type of void means that the function does not expect to return anything. An example might be:
 
@@ -966,7 +964,7 @@ The second change subtracts the time spent doing everything but the reverse stri
 long time_spent = (test_t2-test_t1) - (copy_t2-copy_t1);
 ```
 
-## Doing a better job of timing continued
+### Doing a better job of timing continued
 
 In the last section, we eliminated the cost of the strcpy and loop from the timing.  Another thing to do is to reconsider our reverse_string function.  The reverse_string calls strlen to get the length of the string s.  We could try and just pass the length of s into the call.  We can get the length of the argument outside of the repeated and timed test.  For completeness, we will compare the timing of 2_timer with 3_timer.
 
@@ -1374,7 +1372,7 @@ test_timer: test_timer.c file2.c
 
 This change is helpful because it says that the test_timer block should run if any of the files have changed.  Now that test_timer is made up of two files, we should list both files.  Internally, make simply looks at the time stamp of test_timer and test_timer.c and file2.c.  If test_timer.c or file2.c has a timestamp that is greater than test_timer (or test_timer doesn't exist), then the block will be run again.
 
-## Splitting up your code into multiple files part 2
+### Splitting up your code into multiple files part 2
 
 This section's code is found in <i>illustrations/2_timing/6_timer</i>
 
@@ -1506,7 +1504,7 @@ overall time_spent: 10.6030ns
 
 Everything works as expected.
 
-## Separating the implementation from the interface (part 2)
+### Separating the implementation from the interface (part 2)
 
 This section's code is found in <i>illustrations/2_timing/8_timer</i>
 

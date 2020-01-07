@@ -4,10 +4,6 @@ posttype: "ebook"
 title: "4. Linked Lists"
 ---
 
-
-
-# Linked Lists
-
 ## A data structure interface
 
 We will explore the singly linked list, the doubly linked list, binary search trees, and finally, the red-black tree.  Each of these builds upon each other in complexity and can share a similar interface.  The code and interfaces are meant more for understanding and to show various optimizations along the way.  A linked list and binary search trees allow for inserting, finding, erasing, and iteration.

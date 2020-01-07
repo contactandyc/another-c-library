@@ -54,7 +54,7 @@ The ac_allocator is a lightweight allocator (in debug mode) and identical to the
 Two macros control memory debugging.  If \_AC_DEBUG_MEMORY_
 is undefined, the ac_ methods will work exactly like their C counterparts.  To enable memory debuging, \_AC_DEBUG_MEMORY_ should be defined as NULL (-D_AC_DEBUG_MEMORY_=NULL) to write output to standard error or as a filename ('-D_AC_DEBUG_MEMORY_="memory.log"') to write output to files.  If a filename is used, \_AC_DEBUG_MEMORY_SPEED_ can be defined to an interval and the filename will serve as a base name with snapshots taken periodically.  These parameters can be compiled in or set in ac_common.h.
 
-# Detecting Memory Loss
+## Detecting Memory Loss
 
 A common mistake that I've made is to forget to free memory that was previously allocated.  The ac_... allocation methods assist developers in making sure that allocations are cleaned up.
 

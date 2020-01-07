@@ -4,8 +4,6 @@ posttype: "ebook"
 title: "6. Macros"
 ---
 
-# Macros
-
 The C compiler allows us to create a macro (basically defining one thing as another).  Two individual constants can be useful for debugging.
 
 ```

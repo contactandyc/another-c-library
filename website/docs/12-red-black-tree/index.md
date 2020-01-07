@@ -4,9 +4,8 @@ posttype: "ebook"
 title: "12. The Red-Black Tree"
 ---
 
-# The Red-Black Tree
-
 The red-black tree is a mostly balanced binary search tree that was invented by Leonidas J. Guibas and Robert Sedgewick.
+
 ## The properties of a red-black tree
 
 Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
