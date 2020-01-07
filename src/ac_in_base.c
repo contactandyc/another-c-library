@@ -202,7 +202,7 @@ char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, char delim,
     reset_block(b);
     sp = b->buffer;
     p = sp + b->used;
-    b->pos = b->used;
+    // b->pos = b->used;
     fill_blocks(h, b);
     char *ep = p + b->used;
     while (p < ep) {

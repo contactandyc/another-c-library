@@ -498,7 +498,7 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
       h->advance = _advance_prefix_lz4;
     fill_blocks(h, &(h->buf));
   } else {
-    h = (ac_in_t *)ac_malloc(sizeof(ac_in_t));
+    h = (ac_in_t *)ac_calloc(sizeof(ac_in_t));
     h->options = *options;
     h->base = base;
     h->rec.tag = options->tag;
