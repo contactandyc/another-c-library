@@ -68,7 +68,7 @@ function SEO({ description, lang, meta, title }) {
 SEO.defaultProps = {
   lang: `en`,
   meta: [],
-  description: ``,
+  description: `Another C Library rebuilds, and in some cases, improves upon, some of the most useful Computer Science algorithms from the ground up for engineers to build complex, scalable applications.`,
 }
 
 SEO.propTypes = {

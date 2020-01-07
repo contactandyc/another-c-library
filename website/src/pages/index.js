@@ -9,7 +9,7 @@ import "./index.css";
 function IndexPage() {
   return (
     <Layout>
-      <SEO title="Home" />
+      <SEO title="Build complex, scalable applications" />
       <div className="Index-hr">
         <div className="Index-hr-txt">
           <h2 className="Index-h2">Another C Library</h2>

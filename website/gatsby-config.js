@@ -1,7 +1,7 @@
 module.exports = {
   siteMetadata: {
     title: `Another C Library`,
-    description: `A documentation site for Another C Library.`,
+    description: `Another C Library rebuilds, and in some cases, improves upon, some of the most useful Computer Science algorithms from the ground up for engineers to build complex, scalable applications.`,
     author: `Daniel Curtis`,
   },
   plugins: [
@@ -14,6 +14,12 @@ module.exports = {
         path: `${__dirname}/src/images`,
       },
     },
+    {
+      resolve: `gatsby-plugin-google-analytics`,
+      options: {
+        trackingId: "UA-155680388-1",
+    },
+    `gatsby-plugin-sitemap`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
