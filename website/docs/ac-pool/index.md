@@ -1,5 +1,5 @@
 ---
-path: "/pool"
+path: "/ac-pool"
 posttype: "docs"
 title: "ac_pool"
 ---
