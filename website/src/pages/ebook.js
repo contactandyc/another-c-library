@@ -1,41 +1,22 @@
-import React from "react"
-import { Link, graphql } from "gatsby"
-import { FaExternalLinkAlt } from "react-icons/fa"
+import React from "react";
+import { Link, graphql } from "gatsby";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
-import Layout from "../components/layout"
-import SEO from "../components/seo"
-import Sidebar from "../components/sidebar"
+import Layout from "../components/layout";
+import SEO from "../components/seo";
+import Sidebar from "../components/sidebar";
+import "./index.css";
 
-export default function Ebook({ data }) {
-  const allPages = data.allMarkdownRemark
-  const styles = {
-    main: {
-      margin: `0 auto`,
-      maxWidth: `1200px`,
-      display: `flex`
-    },
-    content: {
-      color: `black`,
-      margin: `0`,
-      padding: `20px`
-    },
-    sidebar: {
-      background: `#F7FAFC`,
-      width: `20vw`,
-      height: `100vh`,
-      padding: `15px`,
-      color: `#63B3ED`,
-      position: `sticky`,
-      top: `62px`,
-    }
-  }
+function Ebook({ data }) {
+  const allPages = data.allMarkdownRemark;
 
   return (
     <Layout>
-      <SEO title="A C Programming Language eBook" />
-      <div style={styles.main}>
-        <div style={styles.content} className="Content">
-          <h1>A C Programming Language eBook</h1>
+      <SEO title="Learn C Programming" />
+
+      <div className="Ebook-mn">
+        <div className="Ebook-cntnt Content">
+          <h1>Learn C Programming</h1>
           <p>The book/library started in August 2019, so it's a work in progress.
           This is not a usage book. We're working on a book that simply explains usage.
           We follow patterns used by <a href="https://nikhilm.github.io/uvbook/index.html" target="_blank" rel="noopener noreferrer">https://nikhilm.github.io/uvbook/index.html <FaExternalLinkAlt /></a>.
@@ -47,19 +28,19 @@ export default function Ebook({ data }) {
               take several reads before you fully get it. The examples intentionally
               build upon each other, but may build too quickly for some. Feel free to <Link to="/contact">contact us</Link> with questions.</p>
         </div>
-
         <Sidebar allPages={allPages} type="ebook" />
-
       </div>
     </Layout>
   );
 }
-// filter: { frontmatter: { posttype: { eq: "ebook" }}} below sort in allMarkdownRemark
+
+export default Ebook;
 
 export const pageQuery = graphql`
   query EbookQuery {
     allMarkdownRemark(
       sort: { order: ASC, fields: [frontmatter___title] }
+      filter: { frontmatter: { posttype: { eq: "ebook" }}}
     ) {
       edges {
         node {
@@ -67,8 +48,9 @@ export const pageQuery = graphql`
           frontmatter {
             title
             path
+            posttype
           }
-          headings(depth: h1) {
+          headings(depth: h2) {
             value
           }
         }

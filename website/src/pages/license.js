@@ -1,23 +1,15 @@
-import React from "react"
-import { FaExternalLinkAlt } from "react-icons/fa"
+import React from "react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
-import Layout from "../components/layout"
-import SEO from "../components/seo"
+import Layout from "../components/layout";
+import SEO from "../components/seo";
+import "./index.css";
 
 function License() {
-  const styles = {
-    main: {
-      margin: `0 auto`,
-      maxWidth: `1200px`,
-      minHeight: `60vh`,
-      padding: `50px 10px`
-    }
-  }
-
   return (
     <Layout>
       <SEO title="License" />
-      <div style={styles.main}>
+      <div className="License-mn">
         <h1>License</h1>
         <p>Our goal is to produce a work that is unencumbered by licenses, and hope that
         others will find this code or parts of it useful. This software and documentation
@@ -53,4 +45,4 @@ function License() {
   );
 }
 
-export default License
+export default License;

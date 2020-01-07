@@ -9,22 +9,26 @@ function Header() {
       top: `0`,
       backgroundColor: `#1A202C`,
       zIndex: `1`,
+      color: `white`
     },
     nav: {
       margin: `auto`,
       maxWidth: 1200,
     },
     link: {
-      color: `white`,
       fontSize: `1.25rem`,
       padding: `1rem 1.5rem`,
       fontFamily: `-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif`
-   },
+    },
     linkActive: {
       color: `#38A169`,
       borderBottom: `solid 4px #2F855A`,
       backgroundColor: `#2D3748`
+    },
+    p: {
+      margin: `auto`,
     }
+
   }
 
   return (
@@ -47,7 +51,7 @@ function Header() {
           activeStyle={styles.linkActive}
           partiallyActive={true}
           to="/ebook/">
-          A C eBook
+          Learn C
         </Link>
         <a
           style={styles.link}
@@ -56,6 +60,7 @@ function Header() {
           href="https://github.com/contactandyc/another-c-library">
           Github <FaExternalLinkAlt style={{ paddingTop: 5 }}/>
         </a>
+        <p style={styles.p}>Version 1.0</p>
       </nav>
     </header>
   );

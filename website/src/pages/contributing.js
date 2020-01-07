@@ -1,24 +1,16 @@
-import React from "react"
-import { FaExternalLinkAlt } from "react-icons/fa"
-import { Link } from "gatsby"
+import React from "react";
+import { FaExternalLinkAlt } from "react-icons/fa";
+import { Link } from "gatsby";
 
-import Layout from "../components/layout"
-import SEO from "../components/seo"
+import Layout from "../components/layout";
+import SEO from "../components/seo";
+import "./index.css"; // uses license.js styles
 
 function Contributing() {
-  const styles = {
-    main: {
-      margin: `0 auto`,
-      maxWidth: `1200px`,
-      minHeight: `60vh`,
-      padding: `50px 10px`
-    }
-  }
-
   return (
     <Layout>
-      <SEO title="License" />
-      <div style={styles.main}>
+      <SEO title="Contributing" />
+      <div className="License-mn">
         <h1>Contributing</h1>
         <p>Another C Library is under very active development. Our hope is that others
         will contribute! While we are in the early stages of library creation, please
@@ -34,4 +26,4 @@ function Contributing() {
   );
 }
 
-export default Contributing
+export default Contributing;

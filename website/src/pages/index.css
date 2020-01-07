@@ -1,3 +1,18 @@
+/*
+  CSS Styling Guidelines:
+  1. Search for file name to find component styling
+  2. Global styles impact all elements, use sparingly
+  3. Avoid inline styling
+  4. Class naming convention:
+      <Component name>-<element without vowels if possible>
+      i.e. for a Book component button the name would be "Book-btn"
+*/
+
+/* Global Styles */
+html {
+  font-family: -apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif`;
+}
+
 a {
   text-decoration: none;
   cursor: pointer;
@@ -41,8 +56,17 @@ pre[class*="language"] {
 }
 
 code[class*="language-"], pre[class*="language-"] {
-  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
+  text-shadow: none;
+}
+
+pre {
+  background: #f6f8fa;
   font-size: 0.85rem;
+  font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
+  line-height: 32px;
+  overflow: scroll;
+  text-shadow: none;
 }
 
 .Footer {
@@ -63,7 +87,6 @@ code[class*="language-"], pre[class*="language-"] {
   width: 72vw;
 }
 
-
 @media only screen and (max-width: 600px) {
   nav, .Footer {
     flex-direction: column;
@@ -77,4 +100,139 @@ code[class*="language-"], pre[class*="language-"] {
   .Content {
     width: 100%;
   }
+}
+
+/* index.js */
+.Index-mn {
+  max-width: 1200px;
+  margin: 80px auto;
+  padding: 10px;
+}
+
+.Index-hr {
+  background-color: #2D3748;
+  height: 50vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.Index-h2 {
+  font-size: calc(16px + 2vw);
+  margin: 0 auto;
+  color: white;
+  border-bottom: none;
+}
+
+.Index-h3 {
+  font-size: calc(16px + 1vw);
+  color: #E2E8F0;
+}
+
+.Index-p {
+  color: #1A202C;
+  list-style: none;
+}
+
+.Index-hr-txt {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.Index-cd {
+  font-size: calc(16px + 1.5vw);
+  background-color: #4A5568;
+  padding: 5px;
+}
+
+.Index-btn {
+  border-radius: 10px;
+  border: none;
+  padding: 10px 24px;
+  margin: 10px;
+  font-size: 18px;
+  background: #3182CE;
+  color: white;
+  cursor: pointer;
+}
+
+/* md-page.js */
+.Md-mn {
+  margin: 0 auto;
+  max-width: 1200px;
+  display: flex;
+}
+
+.Md-cntnt {
+  color: black;
+  margin: 0;
+  padding: 20px;
+}
+
+.Md-actv-lnk {
+  color: #38A169;
+  font-weight: 700;
+}
+
+.Md-pst-ftr {
+  display: flex;
+  justify-content: space-between;
+  border-top: solid 1px black;
+  padding-top: 10px;
+}
+
+.Md-rrw {
+  padding-top: 5px;
+}
+
+/* ebook.js, docs.js */
+.Ebook-mn {
+  margin: 0 auto;
+  max-width: 1200px;
+  display: flex;
+}
+
+.Ebook-cntnt {
+  color: black;
+  margin: 0;
+  padding: 20px;
+}
+
+.Ebook-sdbr {
+  background: #F7FAFC;
+  width: 20vw;
+  height: 100vh;
+  padding: 15px;
+  color: #63B3ED;
+  position: sticky;
+  top: 62px;
+}
+
+/* license.js, contact.js, contributing.js */
+.License-mn {
+  margin: 0 auto;
+  max-width: 1200px;
+  min-height: 60vh;
+  padding: 50px 10px;
+}
+
+/* footer.js */
+.Footer-ctr {
+  background-color: #1A202C;
+  padding: 10px;
+  color: white;
+}
+
+.Footer-ul {
+  list-style: none;
+  margin-left: 0;
+}
+
+.Footer-lnk {
+  color: #3182CE;
+}
+
+.Footer-p {
+  margin-bottom: 15px;
 }

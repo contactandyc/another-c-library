@@ -1,23 +1,15 @@
-import React from "react"
-import { FaExternalLinkAlt } from "react-icons/fa"
+import React from "react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
-import Layout from "../components/layout"
-import SEO from "../components/seo"
+import Layout from "../components/layout";
+import SEO from "../components/seo";
+import "./index.css"; // uses license.js styles
 
 function Contact() {
-  const styles = {
-    main: {
-      margin: `0 auto`,
-      maxWidth: `1200px`,
-      minHeight: `60vh`,
-      padding: `50px 10px`
-    }
-  }
-
   return (
     <Layout>
-      <SEO title="License" />
-      <div style={styles.main}>
+      <SEO title="Contact" />
+      <div className="License-mn">
         <h1>Contact</h1>
         <p>Currently, the creators of this library are open to new professional
         opportunities as well as suggestions reguarding the library.</p>
@@ -36,4 +28,4 @@ function Contact() {
   );
 }
 
-export default Contact
+export default Contact;

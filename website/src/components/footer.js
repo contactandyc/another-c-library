@@ -3,7 +3,6 @@ import { graphql, useStaticQuery, Link } from "gatsby"
 import { FaExternalLinkAlt } from "react-icons/fa"
 
 function Footer() {
-  // posttype under path
   const data = useStaticQuery(graphql`
     query SitePages {
       allMarkdownRemark(sort: {order: ASC, fields: [frontmatter___title]}) {
@@ -12,115 +11,96 @@ function Footer() {
             id
             frontmatter {
               title
+              posttype
               path
             }
           }
         }
       }
     }
-  `)
-  const styles = {
-    footer: {
-      backgroundColor: `#1A202C`,
-      padding: `10px`,
-      color: `white`,
-      fontFamily: `-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif`
-    },
-    ul: {
-      listStyle: `none`,
-      marginLeft: 0,
-    },
-    link: {
-      color: `#3182CE`,
-    },
-    p: {
-      marginBottom: `15px`
-    }
-  }
+  `);
 
-  const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
-  let titles = [];
-  let paths = [];
+  data.allMarkdownRemark.edges.sort(function(a, b) {
+    let ai = parseInt(a.node.frontmatter.title);
+    let bi = parseInt(b.node.frontmatter.title);
+    return ai - bi;
+  });
 
-  for (let i=0; i<data.allMarkdownRemark.edges.length; i++) {
-    if (data.allMarkdownRemark.edges[i].node.frontmatter.title !== "") {
-      titles.push(data.allMarkdownRemark.edges[i].node.frontmatter.title);
-      paths.push(data.allMarkdownRemark.edges[i].node.frontmatter.path);
-    }
-  }
-
-  titles.sort(collator.compare);
-  paths.sort(collator.compare);
+  const elmArr = data.allMarkdownRemark.edges.filter(elm => elm.node.frontmatter.title.length > 0);
+  const docsArr = elmArr.filter(elm => elm.node.frontmatter.posttype === "docs");
+  const ebookArr = elmArr.filter(elm => elm.node.frontmatter.posttype === "ebook");
 
   return (
-    <footer style={styles.footer}>
+    <footer className="Footer-ctr">
       <div className="Footer">
-
         <div>
           <h1 style={{ margin: `10px 0` }}>Another C Library</h1>
-          <p style={styles.p}>© {new Date().getFullYear()} Andy Curtis & Daniel Curtis</p>
-          <ul style={styles.ul}>
-            <li><Link style={styles.link} to="/contact">Contact</Link></li>
-            <li><Link style={styles.link} to="/contributing">Contributing</Link></li>
-            <li><Link style={styles.link} to="/license">License</Link></li>
+          <p className="Footer-p">© {new Date().getFullYear()} Andy Curtis & Daniel Curtis</p>
+          <ul className="Footer-ul">
+            <li><Link className="Footer-lnk" to="/contact">Contact</Link></li>
+            <li><Link className="Footer-lnk" to="/contributing">Contributing</Link></li>
+            <li><Link className="Footer-lnk" to="/license">License</Link></li>
           </ul>
         </div>
 
         <div>
-          <h2 style={{ margin: `10px auto` }}>A C eBook</h2>
-          <ul style={styles.ul}>
-            {titles
-              /*.filter(i => i.node.frontmatter.posttype === "ebook")*/
-              .map((val, i) => {
+          <h2 style={{ margin: `10px auto` }}>Learn C</h2>
+          <ul className="Footer-ul">
+            {ebookArr.map((val, i) => {
                 return (
                   <li key={i}>
-                    <Link
-                      to={`/ebook/${paths[i]}`}
-                      activeStyle={styles.activeLink}>
-                      {val}
+                    <Link to={`/ebook${val.node.frontmatter.path}`}>
+                      {val.node.frontmatter.title}
                     </Link>
                   </li>
-                )
-              })
-            }
+                );
+              })}
           </ul>
         </div>
 
         <div>
-          {/* commenting out until documentation is built
-          <h2 style={{ margin: `10px auto` }}>Documentation</h2>
-          <ul style={styles.ul}>
-            {data.allMarkdownRemark.edges
-              .filter(i => i.node.frontmatter.posttype === "doc")
-              .map(({ node: i }) => {
-                return (
-                  <li key={i.id}>
-                    <Link
-                      to={`/docs/${i.frontmatter.path}`}
-                      activeStyle={styles.activeLink}>
-                      {i.frontmatter.title}
-                    </Link>
-                  </li>
-                )
-              })
-            }
-          </ul>*/}
+          <div>
+            <h2 style={{ margin: `10px auto` }}>Documentation</h2>
+            <ul className="Footer-ul">
+              {docsArr.map((val, i) => {
+                  return (
+                    <li key={i}>
+                      <Link to={`/docs${val.node.frontmatter.path}`}>
+                        {val.node.frontmatter.title}
+                      </Link>
+                    </li>
+                  );
+                })}
+            </ul>
+          </div>
 
           <h2 style={{ margin: `10px auto` }}>Resources</h2>
-          <ul style={styles.ul}>
+          <ul className="Footer-ul">
             <li>
-              <a href="https://medium.com/software-design/why-software-developers-should-care-about-cpu-caches-8da04355bb8a" target="_blank" rel="noopener noreferrer" style={styles.link}>
-                Why software developers should care about CPU caches <FaExternalLinkAlt />
+              <a
+                href="https://medium.com/software-design/why-software-developers-should-care-about-cpu-caches-8da04355bb8a"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="Footer-lnk">
+                  Why software developers should care about CPU caches <FaExternalLinkAlt />
               </a>
             </li>
             <li>
-              <a href="https://github.com/contactandyc/another-c-library/blob/master/docs/tips.md#create-multiline-macro-in-c" target="_blank" rel="noopener noreferrer" style={styles.link}>
-                Helpful Tips for Formatting <FaExternalLinkAlt />
+              <a
+                href="https://github.com/contactandyc/another-c-library/blob/master/docs/tips.md#create-multiline-macro-in-c"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="Footer-lnk">
+                  Helpful Tips for Formatting <FaExternalLinkAlt />
               </a>
             </li>
             <li>
-              <a href="https://mitpress.mit.edu/books/introduction-algorithms-third-edition" target="_blank" rel="noopener noreferrer" style={styles.link}>
-                Introduction to Alogorithms <FaExternalLinkAlt />
+              <a
+                href="https://mitpress.mit.edu/books/introduction-algorithms-third-edition"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="Footer-lnk">
+                  Introduction to Alogorithms <FaExternalLinkAlt />
               </a>
             </li>
           </ul>
@@ -132,4 +112,4 @@ function Footer() {
   );
 }
 
-export default Footer
+export default Footer;

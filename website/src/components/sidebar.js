@@ -2,22 +2,28 @@ import React, { useState, useEffect } from "react"
 import { Link } from "gatsby"
 
 function Headings(props) {
-  return (
-    <ul style={props.style.ul}>
-      {props.arr.map(({ value: val }) => {
-        let id = val.replace(/\s+/g, '-').toLowerCase();
-        return (
-          <li key={id} style={props.style.li}>
-            <Link
-              to={`/${props.type}${props.path}#${id}`}
-              activeStyle={props.style.activeLink}>
-              {val}
-            </Link>
-          </li>
-        );
-      })}
-    </ul>
-  );
+  if (props.title === props.curr) {
+    return (
+      <ul style={props.style.ul}>
+        {props.arr.map(({ value: val }) => {
+          let id = val.replace(/\s+/g, '-').toLowerCase();
+          return (
+            <li key={id} style={props.style.li}>
+              <Link
+                to={`/${props.type}${props.path}#${id}`}
+                activeStyle={props.style.activeLink}>
+                {val}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  } else {
+    return (
+      <></>
+    );
+  }
 }
 
 function Sidebar(props) {
@@ -51,21 +57,9 @@ function Sidebar(props) {
     return ai - bi;
   });
 
-  const [active, setActive] = useState();
+  let elmArr = props.allPages.edges.filter(elm => elm.node.frontmatter.title.length > 0);
 
-  const elmArr = props.allPages.edges.filter(elm => elm.node.frontmatter.title.length > 0);
-
-  let headings;
-
-  useEffect(() => {
-    if (active) {
-      headings = <Headings
-                    arr={active.node.headings}
-                    style={styles}
-                    path={active.node.frontmatter.path}
-                    type={props.type} />
-    }
-  });
+  elmArr = elmArr.filter(elm => elm.node.frontmatter.posttype === props.type);
 
   return (
     <div style={styles.sidebar} className="Sidebar">
@@ -75,11 +69,16 @@ function Sidebar(props) {
               <div key={i}>
                 <Link
                   to={`/${props.type}${val.node.frontmatter.path}`}
-                  activeStyle={styles.activeLink}
-                  onClick={() => setActive(val)}>
+                  activeStyle={styles.activeLink}>
                     {val.node.frontmatter.title}
                 </Link>
-                {headings}
+                <Headings
+                  arr={val.node.headings}
+                  curr={props.current}
+                  title={val.node.frontmatter.title}
+                  style={styles}
+                  type={props.type}
+                  path={val.node.frontmatter.path} />
               </div>
           );
         })}
@@ -88,24 +87,4 @@ function Sidebar(props) {
   );
 }
 
-export default Sidebar
-
-/*
-<Subheadings active={active} i={i} type={props.type} styles={styles} />
-
-<ul style={styles.ul}>
-  {i.headings.map(({ value: x }) => {
-    let id = x.replace(/\s+/g, '-').toLowerCase();
-
-    return (
-      <li key={id} style={styles.li}>
-        <Link
-        to={`/${props.type}${i.frontmatter.path}#${id}`}
-        activeStyle={styles.activeLink}>
-          {x}
-        </Link>
-      </li>
-    )
-  })}
-</ul>}
-*/
+export default Sidebar;
