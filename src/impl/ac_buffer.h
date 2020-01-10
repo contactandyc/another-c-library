@@ -30,10 +30,9 @@ struct ac_buffer_s {
 
 static inline ac_buffer_t *ac_buffer_pool_init(ac_pool_t *pool,
                                                size_t initial_size) {
-  ac_buffer_t *h = (ac_buffer_t *)ac_pool_alloc(pool, sizeof(ac_buffer_t));
+  ac_buffer_t *h = (ac_buffer_t *)ac_pool_calloc(pool, sizeof(ac_buffer_t));
   h->data = (char *)ac_pool_alloc(pool, initial_size + 1);
   h->data[0] = 0;
-  h->length = 0;
   h->size = initial_size;
   h->pool = pool;
   return h;

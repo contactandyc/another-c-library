@@ -83,18 +83,6 @@ char *ac_task_output_base2(ac_task_part_t *tp, ac_task_output_t *outp,
 char *ac_task_input_name(ac_task_part_t *tp, ac_task_input_t *inp,
                          size_t partition);
 
-void ac_task_runner(ac_task_t *task, ac_task_part_f runner);
-
-void ac_task_input_files(ac_task_t *task, const char *name, double ram_pct,
-                         ac_task_check_input_f check);
-
-static const size_t AC_OUTPUT_KEEP = 1;
-static const size_t AC_OUTPUT_USE_FIRST = 2;
-static const size_t AC_OUTPUT_SPLIT = 4;
-
-void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
-                    double out_ram_pct, double in_ram_pct, size_t flags);
-
 ac_schedule_t *ac_schedule_init(size_t num_partitions, size_t cpus, size_t ram,
                                 size_t disk_space);
 void ac_schedule_ack_dir(ac_schedule_t *h, const char *ack_dir);
@@ -104,6 +92,52 @@ ac_task_t *ac_schedule_task(ac_schedule_t *h, const char *task_name,
                             bool partitioned, ac_task_f setup);
 
 void ac_schedule_run(ac_schedule_t *h, ac_task_part_f on_complete);
+
+/* Destroy the scheduler */
+void ac_schedule_destroy(ac_schedule_t *h);
+
+/**************************************************************************
+The following functions should be called from the setup callback methods
+specified by ac_schedule_task.
+***************************************************************************/
+
+/* Define what should run for the given task */
+void ac_task_runner(ac_task_t *task, ac_task_part_f runner);
+
+/* Define outside input files to a task.  Inputs from other tasks are auto
+   configured through ac_task_output. Inputs are named for convenience with
+   the expectation that the check method would confirm if data has changed.
+
+   The ram_pct is what percentage of ram this input should use for the given
+   task (and should range from 0-1).
+   */
+void ac_task_input_files(ac_task_t *task, const char *name, double ram_pct,
+                         ac_task_check_input_f check);
+
+/* Once intermediate files are no longer required, they are removed unless
+   AC_OUTPUT_KEEP is defined. */
+static const size_t AC_OUTPUT_KEEP = 1;
+
+/* Files are typically assumed to not be split and meant to be used from
+   one partition to the next.  For example, if partition 3 of a task produces
+   an output to destination task, it is assumed that the output is meant for
+   partition 3 of the destination task.
+
+   AC_OUTPUT_USE_FIRST would cause the destination task to use the first
+   partition of the source task.
+
+   AC_OUTPUT_SPLIT would cause the destination task to use all of the source
+   partitions data.
+*/
+static const size_t AC_OUTPUT_USE_FIRST = 2;
+static const size_t AC_OUTPUT_SPLIT = 4;
+
+/* Defines an output which will use name as the base name.  The destinations
+   are a list of output tasks which can be NULL to specify none, or multiple if
+   separated by vertical bars.
+*/
+void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
+                    double out_ram_pct, double in_ram_pct, size_t flags);
 
 /* Use this if the dependency must finish completely prior to task running.
    Vertical bars can seperate dependencies.
@@ -122,8 +156,11 @@ void ac_task_do_nothing(ac_task_t *task);
 /* this forces a task to run everytime no matter what */
 void ac_task_run_everytime(ac_task_t *task);
 
-void ac_schedule_print(ac_schedule_t *h);
+/**************************************************************************
+Other helper functions
+**************************************************************************/
 
-void ac_schedule_destroy(ac_schedule_t *h);
+/* Debugging - print the internals */
+void ac_schedule_print(ac_schedule_t *h);
 
 #endif

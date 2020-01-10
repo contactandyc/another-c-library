@@ -20,6 +20,7 @@ limitations under the License.
 /* defines NULL, size_t, offsetof */
 #include <stddef.h>
 /* because I like to use true, false, and bool */
+#include <inttypes.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus

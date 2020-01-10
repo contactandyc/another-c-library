@@ -350,6 +350,9 @@ void ac_in_destroy(ac_in_t *h) {
       ac_lz4_destroy(h->lz4);
     if (h->out)
       ac_out_destroy(h->out);
+    if (h->group_bh)
+      ac_buffer_destroy(h->group_bh);
+
     ac_free(h);
   }
 }
@@ -401,8 +404,8 @@ static void fill_blocks(ac_in_t *h, ac_in_buffer_t *dest) {
 }
 
 void ac_in_empty(ac_in_t *h) {
-  if (h->group_bh)
-    ac_buffer_destroy(h->group_bh);
+  // if (h->group_bh)
+  //   ac_buffer_destroy(h->group_bh);
   h->current = NULL;
   h->current_tmp = NULL;
   h->num_current = 0;
@@ -1138,8 +1141,12 @@ void ac_in_ext_destroy(ac_in_t *hp) {
   if (h->reducer_bh)
     ac_buffer_destroy(h->reducer_bh);
 
+  if (h->group_bh)
+    ac_buffer_destroy(h->group_bh);
+
   if (h->out)
     ac_out_destroy(h->out);
+
   ac_free(h);
 }
 
@@ -1316,6 +1323,8 @@ void ac_in_records_destroy(ac_in_t *hp) {
   ac_in_records_t *h = (ac_in_records_t *)hp;
   if (h->reducer_bh)
     ac_buffer_destroy(h->reducer_bh);
+  if (h->group_bh)
+    ac_buffer_destroy(h->group_bh);
   if (h->out)
     ac_out_destroy(h->out);
   ac_free(h);
