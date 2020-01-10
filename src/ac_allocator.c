@@ -147,11 +147,11 @@ ac_allocator_t *ac_allocator_init(const char *filename, bool thread_safe) {
   a->done = 0;
   a->thread_safe = thread_safe;
   if (thread_safe) {
+    pthread_mutex_init(&a->mutex, NULL);
     if (filename) {
       pthread_cond_init(&a->cond, NULL);
       pthread_create(&(a->thread), NULL, dump_global_allocations_thread, a);
     }
-    pthread_mutex_init(&a->mutex, NULL);
   }
   return a;
 }

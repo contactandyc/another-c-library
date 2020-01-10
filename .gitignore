@@ -8,7 +8,6 @@ install-sh
 missing
 ltmain.sh
 Makefile.in
-Makefile
 config.status
 config.log
 compile

@@ -4,12 +4,16 @@
 #include "ac_common.h"
 #include "ac_io.h"
 #include "ac_lz4.h"
+#include "ac_out.h"
 
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <time.h>
 #include <unistd.h>
 #include <zlib.h>
+
+void ac_out_destroy(ac_out_t *out);
 
 typedef ac_io_record_t *(*ac_in_advance_f)(ac_in_t *h);
 typedef ac_io_record_t *(*ac_in_advance_unique_f)(ac_in_t *h, size_t *num_r);
@@ -38,6 +42,10 @@ struct ac_in_s {
   ac_in_advance_f advance_tmp;
   ac_in_advance_unique_f advance_unique;
   ac_in_advance_unique_f advance_unique_tmp;
+  ac_in_advance_f count_advance;
+  size_t limit;
+  size_t record_num;
+  ac_out_t *out;
   ac_buffer_t *group_bh;
 
   ac_in_advance_f sub_advance;
@@ -95,6 +103,7 @@ ac_io_record_t *ac_in_advance_group(ac_in_t *h, size_t *num_r,
 
   ac_io_record_t r1;
   r1 = *r;
+  r1.record = ac_buffer_data(bh) + sizeof(r->length) + sizeof(r->tag);
   while ((r = h->advance(h)) != NULL) {
     char *b = ac_buffer_data(bh);
     b += sizeof(r->length) + sizeof(r->tag);
@@ -104,10 +113,12 @@ ac_io_record_t *ac_in_advance_group(ac_in_t *h, size_t *num_r,
       ac_in_reset(h);
       break;
     }
-    ac_buffer_set(bh, &(r->length), sizeof(r->length));
+    ac_buffer_append(bh, &(r->length), sizeof(r->length));
     ac_buffer_append(bh, &(r->tag), sizeof(r->tag));
     ac_buffer_append(bh, r->record, r->length);
     ac_buffer_appendc(bh, 0);
+    r1.record = ac_buffer_data(bh) + sizeof(r->length) + sizeof(r->tag);
+
     num_records++;
   }
   size_t len = ac_buffer_length(bh);
@@ -119,8 +130,8 @@ ac_io_record_t *ac_in_advance_group(ac_in_t *h, size_t *num_r,
   while (ptr < endp) {
     rp->length = (*(uint32_t *)(ptr));
     ptr += sizeof(uint32_t);
-    rp->tag = (*(int *)(ptr));
-    ptr += sizeof(int);
+    rp->tag = (*(int32_t *)(ptr));
+    ptr += sizeof(int32_t);
     rp->record = ptr;
     ptr += rp->length;
     ptr++;
@@ -337,6 +348,8 @@ void ac_in_destroy(ac_in_t *h) {
       ac_in_base_destroy(h->base);
     if (h->lz4)
       ac_lz4_destroy(h->lz4);
+    if (h->out)
+      ac_out_destroy(h->out);
     ac_free(h);
   }
 }
@@ -525,6 +538,21 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
   return h;
 }
 
+static ac_io_record_t *count_and_advance(ac_in_t *h) {
+  h->record_num++;
+  if (h->record_num < h->limit)
+    return h->count_advance(h);
+
+  ac_in_empty(h);
+  return NULL;
+}
+
+void ac_in_limit(ac_in_t *h, size_t limit) {
+  h->limit = limit;
+  h->count_advance = h->advance;
+  h->advance = h->advance_tmp = count_and_advance;
+}
+
 ac_io_record_t *advance_reduced(ac_in_t *h) {
   ac_buffer_t *bh = h->reducer_group_bh;
   ac_io_compare_f compare = h->options.compare;
@@ -570,8 +598,8 @@ ac_io_record_t *advance_reduced(ac_in_t *h) {
     while (ptr < endp) {
       rp->length = (*(uint32_t *)(ptr));
       ptr += sizeof(uint32_t);
-      rp->tag = (*(int *)(ptr));
-      ptr += sizeof(int);
+      rp->tag = (*(int32_t *)(ptr));
+      ptr += sizeof(int32_t);
       rp->record = ptr;
       ptr += rp->length;
       ptr++;
@@ -1049,6 +1077,10 @@ typedef struct {
   ac_in_advance_f advance_tmp;
   ac_in_advance_unique_f advance_unique;
   ac_in_advance_unique_f advance_unique_tmp;
+  ac_in_advance_f count_advance;
+  size_t limit;
+  size_t record_num;
+  ac_out_t *out;
   ac_buffer_t *group_bh;
 
   ac_in_t **active;
@@ -1074,8 +1106,7 @@ ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *tag,
     ac_in_options_init(options);
   }
 
-  ac_in_ext_t *h = (ac_in_ext_t *)ac_malloc(sizeof(ac_in_ext_t));
-  memset(h, 0, sizeof(*h));
+  ac_in_ext_t *h = (ac_in_ext_t *)ac_calloc(sizeof(ac_in_ext_t));
   h->type = AC_IN_EXT_TYPE;
   h->compare = compare;
   h->compare_tag = tag;
@@ -1106,6 +1137,9 @@ void ac_in_ext_destroy(ac_in_t *hp) {
 
   if (h->reducer_bh)
     ac_buffer_destroy(h->reducer_bh);
+
+  if (h->out)
+    ac_out_destroy(h->out);
   ac_free(h);
 }
 
@@ -1264,6 +1298,10 @@ typedef struct {
   ac_in_advance_f advance_tmp;
   ac_in_advance_unique_f advance_unique;
   ac_in_advance_unique_f advance_unique_tmp;
+  ac_in_advance_f count_advance;
+  size_t limit;
+  size_t record_num;
+  ac_out_t *out;
   ac_buffer_t *group_bh;
 
   ac_io_record_t *records;
@@ -1278,6 +1316,8 @@ void ac_in_records_destroy(ac_in_t *hp) {
   ac_in_records_t *h = (ac_in_records_t *)hp;
   if (h->reducer_bh)
     ac_buffer_destroy(h->reducer_bh);
+  if (h->out)
+    ac_out_destroy(h->out);
   ac_free(h);
 }
 
@@ -1340,4 +1380,52 @@ ac_in_t *ac_in_records_init(ac_io_record_t *records, size_t num_records,
     h->advance = h->advance_tmp = ac_in_records_advance;
   h->advance_unique = h->advance_unique_tmp = ac_in_advance_unique_single;
   return (ac_in_t *)h;
+}
+
+void ac_in_destroy_out(ac_in_t *in, ac_out_t *out) { in->out = out; }
+
+void default_transform(ac_in_t *in, ac_out_t *out, void *tag) {
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL)
+    ac_out_write_record(out, r->record, r->length);
+}
+
+static void get_tmp_name(char *dest, const char *fmt) {
+  static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  static int id = 0;
+  int next;
+  pthread_mutex_lock(&mutex);
+  next = id;
+  id++;
+  pthread_mutex_unlock(&mutex);
+  sprintf(dest, fmt, id);
+}
+
+ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,
+                         ac_io_compare_f compare, void *compare_tag,
+                         ac_io_reducer_f reducer, void *reducer_tag,
+                         ac_in_transform_f transform, void *tag) {
+  ac_out_options_t opts;
+  ac_out_options_init(&opts);
+  ac_out_options_buffer_size(&opts, buffer_size);
+  ac_out_options_format(&opts, format);
+
+  ac_out_ext_options_t ext_opts;
+  ac_out_ext_options_init(&ext_opts);
+  ac_out_ext_options_compare(&ext_opts, compare, compare_tag);
+  if (reducer)
+    ac_out_ext_options_reducer(&ext_opts, reducer, reducer_tag);
+  char *name = (char *)ac_malloc(100);
+  get_tmp_name(name, "transform_%d.lz4");
+  ac_out_t *out = ac_out_ext_init(name, &opts, &ext_opts);
+  ac_free(name);
+
+  if (!transform)
+    transform = default_transform;
+
+  transform(in, out, tag);
+  ac_in_destroy(in);
+  in = ac_out_in(out);
+  ac_in_destroy_out(in, out);
+  return in;
 }

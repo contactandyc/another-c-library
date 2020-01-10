@@ -14,9 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-struct ac_out_s;
-typedef struct ac_out_s ac_out_t;
-
 typedef struct {
   size_t buffer_size;
   bool append_mode;

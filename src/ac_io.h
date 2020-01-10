@@ -22,6 +22,7 @@ limitations under the License.
 #include "ac_sort.h"
 
 #include <inttypes.h>
+#include <time.h>
 
 typedef int ac_io_format_t;
 
@@ -60,6 +61,8 @@ size_t ac_io_hash_partition(const ac_io_record_t *r, size_t num_part,
 bool ac_io_file_exists(const char *filename);
 
 size_t ac_io_file_size(const char *filename);
+
+time_t ac_io_modified(const char *filename);
 
 /* char *ac_io_read_file(size_t *len, const char *filename); */
 

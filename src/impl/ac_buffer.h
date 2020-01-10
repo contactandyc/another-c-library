@@ -29,9 +29,8 @@ struct ac_buffer_s {
 };
 
 static inline ac_buffer_t *ac_buffer_pool_init(ac_pool_t *pool,
-                                                   size_t initial_size) {
-  ac_buffer_t *h =
-      (ac_buffer_t *)ac_pool_alloc(pool, sizeof(ac_buffer_t));
+                                               size_t initial_size) {
+  ac_buffer_t *h = (ac_buffer_t *)ac_pool_alloc(pool, sizeof(ac_buffer_t));
   h->data = (char *)ac_pool_alloc(pool, initial_size + 1);
   h->data[0] = 0;
   h->length = 0;
@@ -83,14 +82,23 @@ static inline void *ac_buffer_resize(ac_buffer_t *h, size_t length) {
 }
 
 static inline void *ac_buffer_append_alloc(ac_buffer_t *h, size_t length) {
+  size_t m = h->length & 7;
+  if (m > 0) {
+    m = 8 - m;
+    if (m + h->length > h->size)
+      _ac_buffer_grow(h, m + h->length);
+    h->length += m;
+    h->data[h->length] = 0;
+  }
+
   if (length + h->length > h->size)
     _ac_buffer_grow(h, length + h->length);
   char *r = h->data + h->length;
   h->length += length;
-  r[h->length] = 0;
+  r[length] = 0;
 #ifdef _AC_DEBUG_MEMORY_
-  if (length > h->max_length)
-    h->max_length = length;
+  if (h->length > h->max_length)
+    h->max_length = h->length;
 #endif
   return r;
 }
@@ -98,7 +106,7 @@ static inline void *ac_buffer_append_alloc(ac_buffer_t *h, size_t length) {
 void _ac_buffer_append(ac_buffer_t *h, const void *data, size_t length);
 
 static inline void ac_buffer_append(ac_buffer_t *h, const void *data,
-                                      size_t length) {
+                                    size_t length) {
   _ac_buffer_append(h, data, length);
 }
 
@@ -162,7 +170,7 @@ static inline void *ac_buffer_alloc(ac_buffer_t *h, size_t length) {
 }
 
 static inline void _ac_buffer_set(ac_buffer_t *h, const void *data,
-                                    size_t length) {
+                                  size_t length) {
   if (length > h->size)
     _ac_buffer_alloc(h, length);
   memcpy(h->data, data, length);
@@ -175,7 +183,7 @@ static inline void _ac_buffer_set(ac_buffer_t *h, const void *data,
 }
 
 static inline void ac_buffer_set(ac_buffer_t *h, const void *data,
-                                   size_t length) {
+                                 size_t length) {
   _ac_buffer_set(h, data, length);
 }
 
@@ -193,7 +201,7 @@ static inline void ac_buffer_setn(ac_buffer_t *h, char ch, ssize_t n) {
 }
 
 static inline void ac_buffer_setvf(ac_buffer_t *h, const char *fmt,
-                                     va_list args) {
+                                   va_list args) {
   h->length = 0;
   ac_buffer_appendvf(h, fmt, args);
 }

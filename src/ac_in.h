@@ -11,6 +11,8 @@
 
 #include "impl/ac_in.h"
 
+typedef void (*ac_in_transform_f)(ac_in_t *in, ac_out_t *out, void *tag);
+
 /* ac_in_options_t is declared in impl/ac_in.h and not opaque.  h is expected
    to point to a structure of this type (and not NULL). */
 void ac_in_options_init(ac_in_options_t *h);
@@ -105,6 +107,18 @@ ac_in_t *ac_in_records_init(ac_io_record_t *records, size_t num_records,
 /* Use this function to create an ac_in_t which allows multiple input streams */
 ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *tag,
                         ac_in_options_t *options);
+
+/* Useful to limit the number of records for testing */
+void ac_in_limit(ac_in_t *h, size_t limit);
+
+/* After in is destroyed, destroy the given output, useful in transformations */
+void ac_in_destroy_out(ac_in_t *in, ac_out_t *out);
+
+/* Transform the data and return a new cursor */
+ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,
+                         ac_io_compare_f compare, void *compare_tag,
+                         ac_io_reducer_f reducer, void *reducer_tag,
+                         ac_in_transform_f transform, void *tag);
 
 /* When there are multiple input streams, this would keep only the first equal
    record across the streams. */

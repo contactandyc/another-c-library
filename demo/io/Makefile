@@ -2,7 +2,7 @@ ROOT=../..
 include $(ROOT)/src/Makefile.include
 
 FLAGS += -D_AC_DEBUG_MEMORY_=NULL -lz
-PROGRAMS=demo1 user_ratings_to_binary get_correlations
+PROGRAMS=demo1 scheduler user_ratings_to_binary get_correlations
 
 all: $(PROGRAMS) examples
 

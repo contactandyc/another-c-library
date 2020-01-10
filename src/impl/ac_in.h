@@ -16,6 +16,8 @@ limitations under the License.
 
 struct ac_in_s;
 typedef struct ac_in_s ac_in_t;
+struct ac_out_s;
+typedef struct ac_out_s ac_out_t;
 
 typedef struct {
   size_t buffer_size;

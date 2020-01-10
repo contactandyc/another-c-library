@@ -21,9 +21,9 @@ limitations under the License.
 #include "ac_io.h"
 #include "ac_lz4.h"
 
-#include "impl/ac_out.h"
-
 #include "ac_in.h"
+
+#include "impl/ac_out.h"
 
 /* open a file for writing with a given filename */
 ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options);

@@ -165,3 +165,112 @@ char *ac_pool_strdupvf(ac_pool_t *pool, const char *fmt, va_list args) {
   va_end(args_copy);
   return r;
 }
+
+char **_ac_pool_split(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
+  static char *nil = NULL;
+  if (!s) {
+    if (num_splits)
+      *num_splits = 0;
+    return &nil;
+  }
+  char *p = s;
+  size_t num = 1;
+  while (*p != 0) {
+    if (*p == delim)
+      num++;
+    p++;
+  }
+  if (num_splits)
+    *num_splits = num;
+  char **r = (char **)ac_pool_alloc(h, sizeof(char *) * (num + 1));
+  char **wr = r;
+  *wr = s;
+  wr++;
+  while (*s != 0) {
+    if (*s == delim) {
+      *s = 0;
+      s++;
+      *wr = s;
+      wr++;
+    } else
+      s++;
+  }
+  *wr = NULL;
+  return r;
+}
+
+char **ac_pool_split(ac_pool_t *h, size_t *num_splits, char delim,
+                     const char *p) {
+  return _ac_pool_split(h, num_splits, delim, ac_pool_strdup(h, p));
+}
+
+char **ac_pool_splitf(ac_pool_t *h, size_t *num_splits, char delim,
+                      const char *p, ...) {
+  va_list args;
+  va_start(args, p);
+  char *r = ac_pool_strdupvf(h, p, args);
+  va_end(args);
+  return _ac_pool_split(h, num_splits, delim, r);
+}
+
+char **_ac_pool_split2(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
+  static char *nil = NULL;
+  if (!s) {
+    if (num_splits)
+      *num_splits = 0;
+    return &nil;
+  }
+
+  char *p = s;
+  while (*p == '|')
+    p++;
+  if (*p == 0) {
+    if (num_splits)
+      *num_splits = 0;
+    return &nil;
+  }
+  s = p;
+  size_t num = 1;
+  while (*p != 0) {
+    if (*p == delim) {
+      num++;
+      p++;
+      while (*p == delim)
+        p++;
+    } else
+      p++;
+  }
+  if (num_splits)
+    *num_splits = num;
+  char **r = (char **)ac_pool_alloc(h, sizeof(char *) * (num + 1));
+  char **wr = r;
+  *wr = s;
+  wr++;
+  while (*s != 0) {
+    if (*s == delim) {
+      *s = 0;
+      s++;
+      while (*s == delim)
+        s++;
+      *wr = s;
+      wr++;
+    } else
+      s++;
+  }
+  *wr = NULL;
+  return r;
+}
+
+char **ac_pool_split2(ac_pool_t *h, size_t *num_splits, char delim,
+                      const char *p) {
+  return _ac_pool_split2(h, num_splits, delim, ac_pool_strdup(h, p));
+}
+
+char **ac_pool_split2f(ac_pool_t *h, size_t *num_splits, char delim,
+                       const char *p, ...) {
+  va_list args;
+  va_start(args, p);
+  char *r = ac_pool_strdupvf(h, p, args);
+  va_end(args);
+  return _ac_pool_split2(h, num_splits, delim, r);
+}
