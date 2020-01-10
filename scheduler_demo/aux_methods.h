@@ -7,7 +7,7 @@
 #include "ac_io.h"
 #include "ac_out.h"
 
-#define INPUT_MV "ts/mv_%07lu.txt"
+#define INPUT_MV "training_set/mv_%07lu.txt"
 #define NUM_INPUT_MV 17770
 #define MAX_RATINGS_PER_DAY 5
 
