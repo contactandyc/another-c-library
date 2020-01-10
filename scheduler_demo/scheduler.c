@@ -14,7 +14,7 @@ bool task_completed(ac_task_part_t *tp) {
 bool setup_convert_ratings(ac_task_t *task) {
   ac_task_runner(task, convert_ratings);
   ac_task_input_files(task, "mv", 0.05, check_mv_files);
-  ac_task_output(task, "by_user", "sort_by_user_and_item", 0.95, 0.10,
+  ac_task_output(task, "by_user.lz4", "sort_by_user_and_item", 0.95, 0.10,
                  AC_OUTPUT_KEEP | AC_OUTPUT_SPLIT);
   return true;
 }
@@ -23,7 +23,7 @@ bool setup_sort_by_user_and_item(ac_task_t *task) {
   // this shouldn't be needed once input dependencies are resolved
   ac_task_dependency(task, "convert_ratings");
   ac_task_runner(task, sort_entries_by_user_and_item);
-  ac_task_output(task, "user_item", "merge_by_user_and_item", 0.95, 0.10,
+  ac_task_output(task, "user_item.lz4", "merge_by_user_and_item", 0.95, 0.10,
                  AC_OUTPUT_KEEP | AC_OUTPUT_SPLIT);
   return true;
 }
@@ -31,8 +31,8 @@ bool setup_sort_by_user_and_item(ac_task_t *task) {
 bool setup_merge_by_user_and_item(ac_task_t *task) {
   ac_task_dependency(task, "sort_by_user_and_item");
   ac_task_runner(task, merge_entries_by_user_and_item);
-  ac_task_output(task, "user_item", NULL, 0.4, 0.10, AC_OUTPUT_KEEP);
-  ac_task_output(task, "item_user", NULL, 0.4, 0.10, AC_OUTPUT_KEEP);
+  ac_task_output(task, "user_item.lz4", NULL, 0.4, 0.10, AC_OUTPUT_KEEP);
+  ac_task_output(task, "item_user.lz4", NULL, 0.4, 0.10, AC_OUTPUT_KEEP);
   return true;
 }
 

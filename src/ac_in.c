@@ -486,9 +486,10 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
     uint32_t block_size = ac_lz4_block_size(lz4);
     uint32_t block_header_size = ac_lz4_block_header_size(lz4);
     uint32_t compressed_size = ac_lz4_compressed_size(lz4);
-    if (buffer_size < compressed_size + block_header_size + 4)
+    if (buffer_size < compressed_size + block_header_size + 4) {
+      // printf("reinit\n");
       base = ac_in_base_reinit(base, compressed_size + block_header_size + 4);
-
+    }
     buffer_size = options->compressed_buffer_size;
     if (buffer_size < block_size)
       buffer_size = block_size;
@@ -512,7 +513,9 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
       h->advance = _advance_fixed_lz4;
     } else
       h->advance = _advance_prefix_lz4;
+    // printf("%p filling\n", h);
     fill_blocks(h, &(h->buf));
+    // printf("%p filled: %lu, %s\n", h, buffer_size, filename ? filename : "");
   } else {
     h = (ac_in_t *)ac_calloc(sizeof(ac_in_t));
     h->options = *options;

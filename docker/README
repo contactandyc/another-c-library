@@ -1,0 +1,13 @@
+docker build -t gcc/ac .
+docker run -d -v ~/code/another-c-library:/code gcc/ac
+
+# Hash can be just the first few characters that are printed after
+# docker run call above.  You can also find it by running "docker ps"
+docker exec -it <hash> /bin/bash
+
+
+# To shut it down later
+docker kill <hash>
+
+# To see what's running
+docker ps

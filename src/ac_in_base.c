@@ -75,8 +75,8 @@ ac_in_base_t *ac_in_base_reinit(ac_in_base_t *base, size_t buffer_size) {
     h->filename = h->buf.buffer + buffer_size + 1;
     strcpy(h->filename, base->filename);
   }
-  if (h->buf.pos)
-    memcpy(h->buf.buffer, base->buf.buffer, h->buf.pos);
+  if (h->buf.used)
+    memcpy(h->buf.buffer, base->buf.buffer, h->buf.used);
 
   ac_free(base);
   return h;
@@ -226,7 +226,7 @@ char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, char delim,
   //    that can be used to handle full result.  Make 1.5x because it'll have
   //    to grow at least once most of the time if less than this.
   h->bh = ac_buffer_init((b->used * 3) / 2);
-  printf("buffer_init(%lu) (2)\n", (b->used * 3) / 2);
+  // printf("buffer_init(%lu) (2)\n", (b->used * 3) / 2);
   while (1) {
     ac_buffer_append(h->bh, b->buffer, b->used);
     b->used = 0;
@@ -294,7 +294,7 @@ char *ac_in_base_readz(ac_in_base_t *h, int32_t *rlen, int32_t len) {
        internal buffer.  In this case, a buffer is used and
        all data is copied into it. */
     h->bh = ac_buffer_init(len);
-    printf("buffer_init(%u)\n", len);
+    // printf("buffer_init(%u)\n", len);
     ac_buffer_resize(h->bh, len);
     ac_in_buffer_t tmp;
     tmp.buffer = ac_buffer_data(h->bh);
