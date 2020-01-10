@@ -494,7 +494,8 @@ void ac_out_options_lz4(ac_out_options_t *h, int level,
 
 void ac_out_ext_options_init(ac_out_ext_options_t *h) {
   memset(h, 0, sizeof(*h));
-  h->lz4_tmp = true;
+  h->lz4_tmp = false;
+  // h->lz4_tmp = true;
 }
 
 void ac_out_ext_options_sort_while_partitioning(ac_out_ext_options_t *h) {

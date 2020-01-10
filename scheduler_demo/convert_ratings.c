@@ -32,7 +32,7 @@ bool convert_ratings(ac_task_part_t *tp) {
         entry.rating = rating;
         entry.user_id = user_id;
         entry.item_id = i;
-        //  printf("%d,%d,%d,%d\n", entry.user_id, entry.item_id, entry.rating,
+        // printf("%d,%d,%d,%d\n", entry.user_id, entry.item_id, entry.rating,
         //         entry.date);
         ac_out_write_record(out, &entry, sizeof(entry));
       }

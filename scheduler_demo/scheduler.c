@@ -23,15 +23,26 @@ bool setup_sort_by_user_and_item(ac_task_t *task) {
   // this shouldn't be needed once input dependencies are resolved
   ac_task_dependency(task, "convert_ratings");
   ac_task_runner(task, sort_entries_by_user_and_item);
-  ac_task_output(task, "user_item", NULL, 0.95, 0.10, AC_OUTPUT_KEEP);
+  ac_task_output(task, "user_item", "merge_by_user_and_item", 0.95, 0.10,
+                 AC_OUTPUT_KEEP | AC_OUTPUT_SPLIT);
+  return true;
+}
+
+bool setup_merge_by_user_and_item(ac_task_t *task) {
+  ac_task_dependency(task, "sort_by_user_and_item");
+  ac_task_runner(task, merge_entries_by_user_and_item);
+  ac_task_output(task, "user_item", NULL, 0.4, 0.10, AC_OUTPUT_KEEP);
+  ac_task_output(task, "item_user", NULL, 0.4, 0.10, AC_OUTPUT_KEEP);
   return true;
 }
 
 int main(int argc, char *argv[]) {
-  ac_schedule_t *scheduler = ac_schedule_init(4, 4, 1000, 100);
+  ac_schedule_t *scheduler = ac_schedule_init(16, 16, 1000, 100);
   ac_schedule_task(scheduler, "convert_ratings", true, setup_convert_ratings);
   ac_schedule_task(scheduler, "sort_by_user_and_item", true,
                    setup_sort_by_user_and_item);
+  ac_schedule_task(scheduler, "merge_by_user_and_item", true,
+                   setup_merge_by_user_and_item);
   ac_schedule_run(scheduler, task_completed);
   ac_schedule_destroy(scheduler);
   return 0;
