@@ -1,6 +1,6 @@
 ---
 path: "/3-buffer"
-posttype: "ebook"
+posttype: "tutorial"
 title: "3. The Buffer Object"
 ---
 

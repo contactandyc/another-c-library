@@ -15,7 +15,6 @@ function Contact() {
         opportunities as well as suggestions reguarding the library.</p>
         <h2 style={{marginBottom: `8px`}}>Andy Curtis</h2>
         <p><strong>Senior Software Engineer & Chief Architect</strong><br />
-        <a href="https://andycurtis.me" target="_blank" rel="noopener noreferrer">https://AndyCurtis.me <FaExternalLinkAlt /></a><br />
         <a href="mailto:contactandyc@gmail.com">contactandyc@gmail.com <FaExternalLinkAlt /></a>
         </p>
         <h2 style={{marginBottom: `8px`}}>Daniel Curtis</h2>

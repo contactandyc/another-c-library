@@ -1,4 +1,8 @@
-# Improving Quicksort
+---
+path: "/improving-quicksort"
+posttype: "docs"
+title: "Improving Quicksort"
+---
 
 Quicksort is an extremely popular sorting algorithm developed by Tony Hoare. His basic intuition was that sorting a set of items could be done using a sequence of swaps around a pivot point. The pivot point would be used to divide the data such that all data less than or equal to the pivot would sit on one side and the rest of data would sit on the other side.  I've noticed an improvement that doesn't seem to be found in any of the implementations.  The idea is explored at the end (feel free to skip the basic description of quicksort if you know it).
 
@@ -124,11 +128,11 @@ The normal partitioning can continue with the middle DDKJ items as the AB and EF
 
 A couple of things to notice here.  Even though we chose the midpoint of 5, we didn't end up with great partitioning.  If the first, last, or mid was chosen it would have only been slightly worse.  In addition to this, we had to sort sparse items to find the median of 5.  If the 5 items chosen were all equal (and perhaps D), then there would be 2 Ds to the left of the pivot and 2 Ds to the right.  This is okay as the eventual sort will move the 2 Ds to the left to be next to the pivot (along with any other Ds).  The probability only slightly increases no matter which method is used.  The median of 3 or 5 does yield one slight advantage in that 2 or 3 items respectively will be partitioned off at each stage.
 
-## An important intuition to quicksort
+### An important intuition to quicksort
 
 Quicksort performs best when data is randomized.  Having partially sorted data mixed into quicksort doesn't generally improve the overall performance of the algorithm.  Quicksort performs well when midpoints are chosen and it subsequently will often somewhat randomize perhaps previously partially sorted blocks.
 
-# The Improvement to Quicksort
+## The Improvement to Quicksort
 
 The improvement that I've found is to consider Robert Sedgewick's choosing of the midpoint of N points.  During this process, one can know by the lack of reshuffling that the set of N points is in order (or in reverse order).  If it is known that the set of N points is in order and N is sufficiently large (perhaps 5-9 points), then you can check the original set to see if the set itself was in order.  The larger N is, the less likely that the set would randomly be in order.  If one were to consider the likelihood of 5 randomly or spatially selected points being in order and the data not being in order, one would only check the order less than 2% of the time.  If the number of points is increased to 9, then the order would only need to be checked less than 0.01% of the time.   This should only be applied on the first iteration of partitioning as it is highly likely that the input to the sort is already sorted, all equal, or reversed.  It is very unlikely that a sub-partition is both sorted and in the right place.  Consider the following example.
 
@@ -188,5 +192,3 @@ ac_sort: 9078.500ns
 I've run many different tests and compared it with various implementations of quicksort (including the C++ sort) and found that the improvement is better across the board.  In some cases, the C++ sort is more efficient than ac_sort and vice-versa for unsorted data.  I hope that this improvement can be adopted by the different implementations of quicksort!  Please share if you like this improvement to an almost 80 year old algorithm.
 
 I'm working on a detailed explanation of how the ac_sort algorithm works and will publish it soon!
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

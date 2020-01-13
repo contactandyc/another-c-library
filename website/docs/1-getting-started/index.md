@@ -1,6 +1,6 @@
 ---
 path: "/1-getting-started"
-posttype: "ebook"
+posttype: "tutorial"
 title: "1. Getting Started"
 ---
 

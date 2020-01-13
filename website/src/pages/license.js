@@ -23,7 +23,7 @@ function License() {
           engineers over the years and certainly borrowed approaches from their work.
           I will try and call out where I have learned things when it is relevant (and I
             remember). I'm sure that there are better ways to do things and welcome help!</p>
-        <p>Throughout the eBook and documentation on this website, the following notice will
+        <p>Throughout the tutorial and documentation on this website, the following notice will
         appear at the top of most of the files:</p>
         <p><strong>Copyright 2019 Andy Curtis & Daniel Curtis</strong></p>
         <p>Licensed under the Apache License, Version 2.0 (the "License");

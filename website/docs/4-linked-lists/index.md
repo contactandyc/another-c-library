@@ -1,6 +1,6 @@
 ---
 path: "/4-linked-lists"
-posttype: "ebook"
+posttype: "tutorial"
 title: "4. Linked Lists"
 ---
 

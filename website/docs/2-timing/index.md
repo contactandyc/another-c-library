@@ -1,6 +1,6 @@
 ---
 path: "/2-timing"
-posttype: "ebook"
+posttype: "tutorial"
 title: "2. Timing Your Code (First Project)"
 ---
 

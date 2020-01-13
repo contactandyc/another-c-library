@@ -1,6 +1,6 @@
 ---
 path: "/9-pool"
-posttype: "ebook"
+posttype: "tutorial"
 title: "9. The Pool Object"
 ---
 

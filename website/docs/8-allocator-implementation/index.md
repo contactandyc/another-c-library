@@ -1,6 +1,6 @@
 ---
 path: "/8-allocator-implementation"
-posttype: "ebook"
+posttype: "tutorial"
 title: "8. The Global Allocator Implementation"
 ---
 

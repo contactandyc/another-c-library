@@ -1,6 +1,6 @@
 ---
 path: "/12-red-black-tree"
-posttype: "ebook"
+posttype: "tutorial"
 title: "12. The Red-Black Tree"
 ---
 

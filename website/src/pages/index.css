@@ -188,20 +188,20 @@ pre {
   padding-top: 5px;
 }
 
-/* ebook.js, docs.js */
-.Ebook-mn {
+/* Tutorial.js, docs.js */
+.Tutorial-mn {
   margin: 0 auto;
   max-width: 1200px;
   display: flex;
 }
 
-.Ebook-cntnt {
+.Tutorial-cntnt {
   color: black;
   margin: 0;
   padding: 20px;
 }
 
-.Ebook-sdbr {
+.Tutorial-sdbr {
   background: #F7FAFC;
   width: 20vw;
   height: 100vh;

@@ -28,7 +28,7 @@ function Footer() {
 
   const elmArr = data.allMarkdownRemark.edges.filter(elm => elm.node.frontmatter.title.length > 0);
   const docsArr = elmArr.filter(elm => elm.node.frontmatter.posttype === "docs");
-  const ebookArr = elmArr.filter(elm => elm.node.frontmatter.posttype === "ebook");
+  const tutArr = elmArr.filter(elm => elm.node.frontmatter.posttype === "tutorial");
 
   return (
     <footer className="Footer-ctr">
@@ -46,10 +46,10 @@ function Footer() {
         <div>
           <h2 style={{ margin: `10px auto` }}>Learn C</h2>
           <ul className="Footer-ul">
-            {ebookArr.map((val, i) => {
+            {tutArr.map((val, i) => {
                 return (
                   <li key={i}>
-                    <Link to={`/ebook${val.node.frontmatter.path}`}>
+                    <Link to={`/tutorial${val.node.frontmatter.path}`}>
                       {val.node.frontmatter.title}
                     </Link>
                   </li>

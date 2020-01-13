@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Helmet } from "react-helmet";
 import { Link, graphql } from "gatsby";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";

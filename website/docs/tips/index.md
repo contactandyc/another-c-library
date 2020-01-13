@@ -1,4 +1,10 @@
-# Things that have been helpful to me
+---
+path: "/tips"
+posttype: "docs"
+title: "Helpful Tips"
+---
+
+A list of tips that have been helpful to me:
 
 ## Line spacing in markdown
 Just use a br html tag to create a single line break.  
@@ -60,5 +66,3 @@ return @exe("clang-format").run([
     fs.unlink(dumpFile, ->)
   )
 ```
-
-[Table of Contents](../../../README.md)  - Copyright 2019 Andy Curtis

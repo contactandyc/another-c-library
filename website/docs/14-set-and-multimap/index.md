@@ -1,6 +1,6 @@
 ---
 path: "/14-set-and-multimap"
-posttype: "ebook"
+posttype: "tutorial"
 title: "14. The Set and Multimap"
 ---
 

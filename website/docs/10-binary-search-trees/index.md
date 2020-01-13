@@ -1,6 +1,6 @@
 ---
 path: "/10-binary-search-trees"
-posttype: "ebook"
+posttype: "tutorial"
 title: "10. Binary Search Trees"
 ---
 

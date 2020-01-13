@@ -1,6 +1,6 @@
 ---
 path: "/6-macros"
-posttype: "ebook"
+posttype: "tutorial"
 title: "6. Macros"
 ---
 

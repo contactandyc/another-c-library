@@ -7,15 +7,15 @@ import SEO from "../components/seo";
 import Sidebar from "../components/sidebar";
 import "./index.css";
 
-function Ebook({ data }) {
+function Tutorial({ data }) {
   const allPages = data.allMarkdownRemark;
 
   return (
     <Layout>
       <SEO title="Learn C Programming" />
 
-      <div className="Ebook-mn">
-        <div className="Ebook-cntnt Content">
+      <div className="Tutorial-mn">
+        <div className="Tutorial-cntnt Content">
           <h1>Learn C Programming</h1>
           <p>The book/library started in August 2019, so it's a work in progress.
           This is not a usage book. We're working on a book that simply explains usage.
@@ -27,20 +27,24 @@ function Ebook({ data }) {
               technology). Becoming a great developer takes practice. This book may
               take several reads before you fully get it. The examples intentionally
               build upon each other, but may build too quickly for some. Feel free to <Link to="/contact">contact us</Link> with questions.</p>
+
+          <p><strong>For a more in depth usage guide without a tutorial check out
+          <Link to="/docs/"> our docs.</Link></strong></p>
         </div>
-        <Sidebar allPages={allPages} type="ebook" />
+
+        <Sidebar allPages={allPages} type="tutorial" />
       </div>
     </Layout>
   );
 }
 
-export default Ebook;
+export default Tutorial;
 
 export const pageQuery = graphql`
-  query EbookQuery {
+  query TutorialQuery {
     allMarkdownRemark(
       sort: { order: ASC, fields: [frontmatter___title] }
-      filter: { frontmatter: { posttype: { eq: "ebook" }}}
+      filter: { frontmatter: { posttype: { eq: "tutorial" }}}
     ) {
       edges {
         node {

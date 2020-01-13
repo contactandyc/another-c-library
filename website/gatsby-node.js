@@ -58,9 +58,9 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
   if (node.internal.type === `MarkdownRemark`) {
     let value = createFilePath({ node, getNode });
 
-    if (node.frontmatter.posttype === "ebook") // commented out, testing
-      value = '/ebook' + value;
-    else if (node.frontmatter.posttype === "docs") // uncom
+    if (node.frontmatter.posttype === "tutorial")
+      value = '/tutorial' + value;
+    else if (node.frontmatter.posttype === "docs")
       value = '/docs' + value;
 
     createNodeField({

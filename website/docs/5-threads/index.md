@@ -1,6 +1,6 @@
 ---
 path: "/5-threads"
-posttype: "ebook"
+posttype: "tutorial"
 title: "5. Threads"
 ---
 

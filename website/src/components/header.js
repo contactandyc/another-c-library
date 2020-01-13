@@ -50,8 +50,8 @@ function Header() {
           style={styles.link}
           activeStyle={styles.linkActive}
           partiallyActive={true}
-          to="/ebook/">
-          Learn C
+          to="/tutorial/">
+          Tutorial
         </Link>
         <a
           style={styles.link}

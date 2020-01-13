@@ -1,6 +1,6 @@
 ---
 path: "/7-allocator"
-posttype: "ebook"
+posttype: "tutorial"
 title: "7. The Global Allocator Object"
 ---
 

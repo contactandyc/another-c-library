@@ -1,6 +1,6 @@
 ---
 path: "/13-map"
-posttype: "ebook"
+posttype: "tutorial"
 title: "13. The Map Object"
 ---
 

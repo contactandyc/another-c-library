@@ -1,6 +1,6 @@
 ---
 path: "/11-balancing-binary-search-trees"
-posttype: "ebook"
+posttype: "tutorial"
 title: "11. Balancing Binary Search Trees"
 ---
 
