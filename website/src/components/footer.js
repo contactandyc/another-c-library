@@ -44,21 +44,6 @@ function Footer() {
         </div>
 
         <div>
-          <h2 style={{ margin: `10px auto` }}>Learn C</h2>
-          <ul className="Footer-ul">
-            {tutArr.map((val, i) => {
-                return (
-                  <li key={i}>
-                    <Link to={`/tutorial${val.node.frontmatter.path}`}>
-                      {val.node.frontmatter.title}
-                    </Link>
-                  </li>
-                );
-              })}
-          </ul>
-        </div>
-
-        <div>
           <div>
             <h2 style={{ margin: `10px auto` }}>Documentation</h2>
             <ul className="Footer-ul">
@@ -103,6 +88,21 @@ function Footer() {
                   Introduction to Alogorithms <FaExternalLinkAlt />
               </a>
             </li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 style={{ margin: `10px auto` }}>Tutorial</h2>
+          <ul className="Footer-ul">
+            {tutArr.map((val, i) => {
+                return (
+                  <li key={i}>
+                    <Link to={`/tutorial${val.node.frontmatter.path}`}>
+                      {val.node.frontmatter.title}
+                    </Link>
+                  </li>
+                );
+              })}
           </ul>
         </div>
 
