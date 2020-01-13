@@ -13,7 +13,7 @@ function IndexPage() {
       <div className="Index-hr">
         <div className="Index-hr-txt">
           <h2 className="Index-h2">Another C Library</h2>
-          <h3 className="Index-h3"><code className="Index-cd">ac_</code> library for building scalable, complex applications.</h3>
+          <h3 className="Index-h3"><code className="Index-cd">ac</code> library for building scalable, complex applications.</h3>
             <Link to="/docs/"><button className="Index-btn">Get Started <FaArrowRight style={{ paddingTop: `5px`}}/></button></Link>
             <Link to="/ebook/"><button className="Index-btn">Learn C Programming <FaBook style={{ paddingTop: `5px`}}/></button></Link>
         </div>

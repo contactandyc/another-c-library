@@ -143,7 +143,9 @@ pre {
 .Index-cd {
   font-size: calc(16px + 1.5vw);
   background-color: #4A5568;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   padding: 5px;
+  letter-spacing: 3px;
 }
 
 .Index-btn {
