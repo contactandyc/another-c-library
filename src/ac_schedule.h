@@ -90,12 +90,6 @@ void ac_task_group_compare_arg(ac_task_t *task, ac_worker_data_f create,
 void ac_task_transform_data(ac_task_t *task, ac_worker_data_f create,
                             ac_destroy_worker_data_f destroy);
 
-/* Predefined task runners */
-bool ac_task_in_out(ac_worker_t *w);
-bool ac_task_in_out2(ac_worker_t *w);
-bool ac_task_in_out_custom(ac_worker_t *w, ac_in_out_f cb, void *arg);
-bool ac_task_in_out_custom2(ac_worker_t *w, ac_in_out2_f cb, void *arg);
-
 /* Define outside input files to a task.  Inputs from other tasks are auto
    configured through ac_task_output. Inputs are named for convenience with
    the expectation that the check method would confirm if data has changed.
@@ -120,10 +114,15 @@ static const size_t AC_OUTPUT_KEEP = 1;
 
    AC_OUTPUT_SPLIT would cause the destination task to use all of the source
    partitions data.
+
+   AC_OUTPUT_PARTITION causes the data to not be split and the destination task
+   to use data from the same input partition.  For example, if partition 3 of a
+   task produces an output to destination task, it is assumed that the output
+   is meant for partition 3 of the destination task.
 */
 static const size_t AC_OUTPUT_USE_FIRST = 2;
 static const size_t AC_OUTPUT_SPLIT = 4;
-static const size_t AC_OUTPUT_CHAINED = 8;
+static const size_t AC_OUTPUT_PARTITION = 8;
 
 /* Defines an output which will use name as the base name.  The destinations
    are a list of output tasks which can be NULL to specify none, or multiple if

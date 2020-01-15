@@ -490,6 +490,20 @@ ac_io_file_info_t *file_info_split(ac_worker_t *w, size_t *num_files,
   return res;
 }
 
+ac_io_file_info_t *file_info_normal(ac_worker_t *w, size_t *num_files,
+                                    ac_worker_input_t *inp) {
+  size_t num_partitions = inp->src->task->num_partitions;
+  ac_io_file_info_t *res = (ac_io_file_info_t *)ac_pool_calloc(
+      w->worker_pool, sizeof(*res) * num_partitions);
+  for (size_t i = 0; i < num_partitions; i++) {
+    res[i].filename = ac_worker_input_name(w, inp, i);
+    res[i].tag = i;
+    ac_io_file_info(res + i);
+  }
+  *num_files = num_partitions;
+  return res;
+}
+
 ac_io_file_info_t *file_info_first(ac_worker_t *w, size_t *num_files,
                                    ac_worker_input_t *inp) {
   // check if input files are newer than ack file
@@ -601,9 +615,12 @@ void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
     } else if (flags & AC_OUTPUT_USE_FIRST) {
       file_info = file_info_first;
       ac_task_dependency(n->task, task->task_name);
-    } else {
+    } else if (flags & AC_OUTPUT_PARTITION) {
       file_info = file_info_partition;
       ac_task_partial_dependency(n->task, task->task_name);
+    } else {
+      file_info = file_info_normal;
+      ac_task_dependency(n->task, task->task_name);
     }
     ac_worker_input_t *ti =
         _ac_task_input(n->task, name, to, in_ram_pct, file_info);
@@ -1070,15 +1087,28 @@ char *ac_worker_input_name(ac_worker_t *w, ac_worker_input_t *inp,
   ac_buffer_t *bh = w->schedule_thread->bh;
   ac_buffer_setf(bh, "%s/%s_%lu/", w->task->scheduler->task_dir,
                  inp->src->task->task_name, partition);
-  if (ac_io_extension(base, ".lz4")) {
-    ac_buffer_append(bh, base, strlen(base) - 4);
-    ac_buffer_appendf(bh, "_%lu_%lu.lz4", partition, w->partition);
-  } else if (ac_io_extension(base, ".gz")) {
-    ac_buffer_append(bh, base, strlen(base) - 3);
-    ac_buffer_appendf(bh, "_%lu_%lu.gz", partition, w->partition);
+  if (inp->src->flags & AC_OUTPUT_SPLIT) {
+    if (ac_io_extension(base, ".lz4")) {
+      ac_buffer_append(bh, base, strlen(base) - 4);
+      ac_buffer_appendf(bh, "_%lu_%lu.lz4", partition, w->partition);
+    } else if (ac_io_extension(base, ".gz")) {
+      ac_buffer_append(bh, base, strlen(base) - 3);
+      ac_buffer_appendf(bh, "_%lu_%lu.gz", partition, w->partition);
+    } else {
+      ac_buffer_appends(bh, base);
+      ac_buffer_appendf(bh, "_%lu_%lu", partition, w->partition);
+    }
   } else {
-    ac_buffer_appends(bh, base);
-    ac_buffer_appendf(bh, "_%lu_%lu", partition, w->partition);
+    if (ac_io_extension(base, ".lz4")) {
+      ac_buffer_append(bh, base, strlen(base) - 4);
+      ac_buffer_appendf(bh, "_%lu.lz4", partition);
+    } else if (ac_io_extension(base, ".gz")) {
+      ac_buffer_append(bh, base, strlen(base) - 3);
+      ac_buffer_appendf(bh, "_%lu.gz", partition);
+    } else {
+      ac_buffer_appends(bh, base);
+      ac_buffer_appendf(bh, "_%lu", partition);
+    }
   }
   return ac_pool_strdup(w->worker_pool, ac_buffer_data(bh));
 }
@@ -1109,9 +1139,10 @@ ac_transform_t *clone_transforms(ac_worker_t *w) {
   while (n) {
     if (!head)
       head = tail = ac_pool_dup(w->worker_pool, n, sizeof(*n));
-    else
-      tail = ac_pool_dup(w->worker_pool, n, sizeof(*n));
-
+    else {
+      tail->next = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+      tail = tail->next;
+    }
     tail->input = ac_worker_input(w, tail->input->id);
     tail->next = NULL;
     n = n->next;
@@ -1126,8 +1157,10 @@ void clone_inputs_and_outputs(ac_worker_t *w) {
   while (n) {
     if (!head)
       head = tail = ac_pool_dup(w->worker_pool, n, sizeof(*n));
-    else
-      tail = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+    else {
+      tail->next = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+      tail = tail->next;
+    }
     tail->next = NULL;
     n = n->next;
   }
