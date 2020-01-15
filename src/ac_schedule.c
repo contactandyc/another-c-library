@@ -595,12 +595,16 @@ void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
   ac_task_link_t *n = to->destinations;
   while (n) {
     ac_worker_file_info_f file_info = NULL;
-    if (flags & AC_OUTPUT_SPLIT)
+    if (flags & AC_OUTPUT_SPLIT) {
       file_info = file_info_split;
-    else if (flags & AC_OUTPUT_USE_FIRST)
+      ac_task_dependency(n->task, task->task_name);
+    } else if (flags & AC_OUTPUT_USE_FIRST) {
       file_info = file_info_first;
-    else
+      ac_task_dependency(n->task, task->task_name);
+    } else {
       file_info = file_info_partition;
+      ac_task_partial_dependency(n->task, task->task_name);
+    }
     ac_worker_input_t *ti =
         _ac_task_input(n->task, name, to, in_ram_pct, file_info);
     if (ti) {

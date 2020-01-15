@@ -46,7 +46,7 @@ bool setup_convert_ratings(ac_task_t *task) {
      tasks. */
   ac_task_input_files(task, "mv", 0.05, get_mv_files);
   ac_task_input_format(task, ac_io_delimiter('\n'));
-  // ac_task_input_limit(task, 1000);
+  ac_task_input_limit(task, 1000);
 
   /* specify output */
   ac_task_output(task, "by_user.lz4", "sort_by_user_and_item", 0.95, 0.10,
@@ -76,8 +76,6 @@ void process_group(ac_worker_t *w, ac_io_record_t *r, size_t num_r,
 }
 
 bool setup_sort_by_user_and_item(ac_task_t *task) {
-  ac_task_dependency(task, "convert_ratings");
-
   /* input is specified automatically by setup_convert_ratings ac_task_output */
   /* specify output */
   ac_task_output(task, "user_item_sorted.lz4", "merge_by_user_and_item", 0.95,
@@ -94,8 +92,6 @@ bool setup_sort_by_user_and_item(ac_task_t *task) {
 }
 
 bool setup_merge_by_user_and_item(ac_task_t *task) {
-  ac_task_dependency(task, "sort_by_user_and_item");
-
   ac_task_output(task, "user_item.lz4", NULL, 0.50, 0.10, AC_OUTPUT_KEEP);
   ac_task_output_format(task, ac_io_fixed(sizeof(entry_t)));
 
