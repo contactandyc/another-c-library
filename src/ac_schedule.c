@@ -483,6 +483,7 @@ ac_io_file_info_t *file_info_split(ac_worker_t *w, size_t *num_files,
       w->worker_pool, sizeof(*res) * num_partitions);
   for (size_t i = 0; i < num_partitions; i++) {
     res[i].filename = ac_worker_input_name(w, inp, i);
+    res[i].tag = i;
     ac_io_file_info(res + i);
   }
   *num_files = num_partitions;
@@ -495,6 +496,7 @@ ac_io_file_info_t *file_info_first(ac_worker_t *w, size_t *num_files,
   ac_io_file_info_t *res =
       (ac_io_file_info_t *)ac_pool_calloc(w->worker_pool, sizeof(*res));
   res->filename = ac_worker_input_name(w, inp, 0);
+  res->tag = 0;
   *num_files = 1;
   ac_io_file_info(res);
   return res;
@@ -506,6 +508,7 @@ ac_io_file_info_t *file_info_name(ac_worker_t *w, size_t *num_files,
   ac_io_file_info_t *res =
       (ac_io_file_info_t *)ac_pool_calloc(w->worker_pool, sizeof(*res));
   res->filename = inp->name;
+  res->tag = 0;
   *num_files = 1;
   ac_io_file_info(res);
   return res;
@@ -517,6 +520,7 @@ ac_io_file_info_t *file_info_partition(ac_worker_t *w, size_t *num_files,
   ac_io_file_info_t *res =
       (ac_io_file_info_t *)ac_pool_calloc(w->worker_pool, sizeof(*res));
   res->filename = ac_worker_input_name(w, inp, w->partition);
+  res->tag = w->partition;
   *num_files = 1;
   ac_io_file_info(res);
   return res;
