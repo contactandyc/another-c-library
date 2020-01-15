@@ -41,28 +41,28 @@ typedef struct {
   size_t num_sort_threads;
 
   ac_io_partition_f partition;
-  void *partition_tag;
+  void *partition_arg;
   size_t num_partitions;
 
   ac_io_compare_f compare;
-  void *compare_tag;
+  void *compare_arg;
 
   size_t num_per_group;
   ac_io_compare_f int_compare;
-  void *int_compare_tag;
+  void *int_compare_arg;
 
   ac_io_reducer_f reducer;
-  void *reducer_tag;
+  void *reducer_arg;
 
   ac_io_reducer_f int_reducer;
-  void *int_reducer_tag;
+  void *int_reducer_arg;
 
   ac_io_fixed_reducer_f fixed_reducer;
-  void *fixed_reducer_tag;
+  void *fixed_reducer_arg;
 
   ac_io_fixed_compare_f fixed_compare;
-  void *fixed_compare_tag;
+  void *fixed_compare_arg;
 
   ac_io_fixed_sort_f fixed_sort;
-  void *fixed_sort_tag;
+  void *fixed_sort_arg;
 } ac_out_ext_options_t;

@@ -2,11 +2,28 @@
 
 #include "aux_methods.h"
 
+// bool merge_entries_by_user_and_item(ac_task_part_t *tp);
+bool ac_task_in_out2(ac_task_part_t *tp);
+
 bool merge_entries_by_user_and_item(ac_task_part_t *tp) {
+  /* 1. filename - given
+     2. compare
+     3. ram - given
+     4. format
+  */
+  ac_in_t *in = ac_task_in(tp, 0);
+  ac_out_t *out = ac_task_out(tp, 0);
+  ac_out_t *out2 = ac_task_out(tp, 1);
+  ac_in_out2(in, out, out2);
+  ac_in_destroy(in);
+  ac_out_destroy(out);
+  ac_out_destroy(out2);
+  return true;
+
   ac_task_input_t *inp = ac_task_get_input(tp, 0);
   ac_in_options_t in_opts;
   ac_in_options_init(&in_opts);
-  ac_in_options_format(&in_opts, ac_io_prefix());
+  ac_in_options_format(&in_opts, ac_io_fixed(sizeof(entry_t)));
   ac_in_t *in = ac_in_ext_init(compare_entry_by_user_and_item, NULL, &in_opts);
   size_t in_buffer_size = ac_task_part_ram(tp, inp->ram_pct * 0.20);
 
@@ -18,6 +35,14 @@ bool merge_entries_by_user_and_item(ac_task_part_t *tp) {
                                    in_buffer_size / num_partitions),
                   i);
   }
+
+  // merge could take
+  // 1. output format - could be given
+  // 2. compare - could also be given
+  // 3. partition method
+  // 4. reducer
+
+  // output, compare, reducer (optionally) could be used for input
 
   ac_task_output_t *outp = ac_task_get_output(tp, 0);
   ac_out_t *out =
@@ -43,7 +68,31 @@ bool merge_entries_by_user_and_item(ac_task_part_t *tp) {
   return true;
 }
 
+void process_group(ac_io_record_t *r, size_t num_r, ac_out_t *out, void *tag) {
+  if (num_r > MAX_RATINGS_PER_DAY)
+    return;
+
+  ac_io_record_t *rp = r;
+  ac_io_record_t *ep = r + num_r;
+  while (rp < ep) {
+    ac_out_write_record(out, rp->record, rp->length);
+    rp++;
+  }
+}
+
 bool sort_entries_by_user_and_item(ac_task_part_t *tp) {
+  ac_in_t *in = ac_task_in(tp, 0);
+  ac_out_t *out = ac_task_out(tp, 0);
+  ac_in_out(in, out);
+  in = ac_out_in(out);
+  ac_out_t *out2 = ac_task_out(tp, 1);
+  ac_in_out_group(in, out2, compare_entry_by_user_and_time, NULL, process_group,
+                  NULL);
+  ac_in_destroy(in);
+  ac_out_destroy(out);
+  ac_out_destroy(out2);
+  return true;
+
   ac_task_input_t *inp = ac_task_get_input(tp, 0);
   ac_task_output_t *outp = ac_task_get_output(tp, 0);
   size_t num_partitions = inp->src->num_partitions;

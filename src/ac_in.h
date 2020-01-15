@@ -11,7 +11,7 @@
 
 #include "impl/ac_in.h"
 
-typedef void (*ac_in_transform_f)(ac_in_t *in, ac_out_t *out, void *tag);
+typedef void (*ac_in_transform_f)(ac_in_t *in, ac_out_t *out, void *arg);
 
 /* ac_in_options_t is declared in impl/ac_in.h and not opaque.  h is expected
    to point to a structure of this type (and not NULL). */
@@ -74,12 +74,14 @@ void ac_in_options_tag(ac_in_options_t *h, int tag);
    will default to buffer_size. */
 void ac_in_options_gz(ac_in_options_t *h, size_t buffer_size);
 void ac_in_options_lz4(ac_in_options_t *h, size_t buffer_size);
+void ac_in_options_compressed_buffer_size(ac_in_options_t *h,
+                                          size_t buffer_size);
 
 /* Within a single cursor, reduce equal items.  In this case, it is assumed
    that the contents are sorted.  */
 void ac_in_options_reducer(ac_in_options_t *h, ac_io_compare_f compare,
-                           void *compare_tag, ac_io_reducer_f reducer,
-                           void *reducer_tag);
+                           void *compare_arg, ac_io_reducer_f reducer,
+                           void *reducer_arg);
 
 /* The filename dictates whether the file is normal, gzip compressed (.gz
    extension), or lz4 compressed (.lz4 extension).  If options is NULL, default
@@ -105,8 +107,12 @@ ac_in_t *ac_in_records_init(ac_io_record_t *records, size_t num_records,
                             ac_in_options_t *options);
 
 /* Use this function to create an ac_in_t which allows multiple input streams */
-ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *tag,
+ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *arg,
                         ac_in_options_t *options);
+
+/* Create an input which will open one file at a time in files */
+ac_in_t *ac_in_init_from_list(ac_io_file_info_t *files, size_t num_files,
+                              ac_in_options_t *options);
 
 /* Useful to limit the number of records for testing */
 void ac_in_limit(ac_in_t *h, size_t limit);
@@ -116,16 +122,16 @@ void ac_in_destroy_out(ac_in_t *in, ac_out_t *out);
 
 /* Transform the data and return a new cursor */
 ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,
-                         ac_io_compare_f compare, void *compare_tag,
-                         ac_io_reducer_f reducer, void *reducer_tag,
-                         ac_in_transform_f transform, void *tag);
+                         ac_io_compare_f compare, void *compare_arg,
+                         ac_io_reducer_f reducer, void *reducer_arg,
+                         ac_in_transform_f transform, void *arg);
 
 /* When there are multiple input streams, this would keep only the first equal
    record across the streams. */
 void ac_in_ext_keep_first(ac_in_t *h);
 
 /* When there are multiple input streams, set the reducer */
-void ac_in_ext_reducer(ac_in_t *h, ac_io_reducer_f reducer, void *tag);
+void ac_in_ext_reducer(ac_in_t *h, ac_io_reducer_f reducer, void *arg);
 
 /* The tag can be options->tag from init of in if that makes sense.  Otherwise,
   this can be useful to distinguish different input sources. The first param
@@ -152,12 +158,48 @@ void ac_in_reset(ac_in_t *h);
    num_r will always be 1 until the stream is finished. */
 ac_io_record_t *ac_in_advance_unique(ac_in_t *h, size_t *num_r);
 
-/* Given the comparison function and tag, get all records which are equal and
+/* Given the comparison function and arg, get all records which are equal and
    return them as an array.  This will work with one or more input streams. */
 ac_io_record_t *ac_in_advance_group(ac_in_t *h, size_t *num_r,
-                                    ac_io_compare_f compare, void *tag);
+                                    bool *more_records, ac_io_compare_f compare,
+                                    void *arg);
 
 /* Destroy the input stream (or set of input streams) */
 void ac_in_destroy(ac_in_t *h);
+
+typedef void (*ac_in_out_f)(ac_out_t *out, ac_io_record_t *r, void *arg);
+typedef void (*ac_in_out2_f)(ac_out_t *out, ac_out_t *out2, ac_io_record_t *r,
+                             void *arg);
+typedef void (*ac_in_out_group_f)(ac_out_t *out, ac_io_record_t *r,
+                                  size_t num_r, bool more_records, void *arg);
+typedef void (*ac_in_out_group2_f)(ac_out_t *out, ac_out_t *out2,
+                                   ac_io_record_t *r, size_t num_r,
+                                   bool more_records, void *arg);
+
+/* These are very common transformations.  All of these take a single input and
+   write to one or two outputs.  The custom functions allow for custom filtering
+   and various other transformations.  The group functions will group records
+   based upon the compare function.  */
+
+/* Write all records from in to out */
+void ac_in_out(ac_in_t *in, ac_out_t *out);
+
+/* Call custom callback for every input record (with out, record, and arg). */
+void ac_in_out_custom(ac_in_t *in, ac_out_t *out, ac_in_out_f cb, void *arg);
+
+/* Write all records from in to both out and out2 */
+void ac_in_out2(ac_in_t *in, ac_out_t *out, ac_out_t *out2);
+
+/* Call custom callback for every input record (with out, out2, record, and
+   arg). */
+void ac_in_out_custom2(ac_in_t *in, ac_out_t *out, ac_out_t *out2,
+                       ac_in_out2_f cb, void *arg);
+
+void ac_in_out_group(ac_in_t *in, ac_out_t *out, ac_io_compare_f compare,
+                     void *compare_arg, ac_in_out_group_f group, void *arg);
+
+void ac_in_out_group2(ac_in_t *in, ac_out_t *out, ac_out_t *out2,
+                      ac_io_compare_f compare, void *compare_arg,
+                      ac_in_out_group2_f group, void *arg);
 
 #endif

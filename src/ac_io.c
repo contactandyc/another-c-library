@@ -92,6 +92,17 @@ bool ac_io_make_path_valid(char *filename) {
   return true;
 }
 
+bool ac_io_file_info(ac_io_file_info_t *fi) {
+  if (!fi || !fi->filename)
+    return false;
+  struct stat sb;
+  if (stat(fi->filename, &sb) == -1 || (sb.st_mode & S_IFMT) != S_IFREG)
+    return false;
+  fi->last_modified = sb.st_mtime;
+  fi->size = sb.st_size;
+  return true;
+}
+
 time_t ac_io_modified(const char *filename) {
   if (!filename)
     return 0;

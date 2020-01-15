@@ -36,9 +36,9 @@ typedef struct {
   bool full_record_required;
 
   ac_io_compare_f compare;
-  void *compare_tag;
+  void *compare_arg;
   ac_io_reducer_f reducer;
-  void *reducer_tag;
+  void *reducer_arg;
 } ac_in_options_t;
 
 void ac_in_empty(ac_in_t *h);

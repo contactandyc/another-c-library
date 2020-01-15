@@ -128,7 +128,7 @@ void ac_out_ext_options_num_sort_threads(ac_out_ext_options_t *h,
 
 /* options for creating a partitioned output */
 void ac_out_ext_options_partition(ac_out_ext_options_t *h,
-                                  ac_io_partition_f part, void *tag);
+                                  ac_io_partition_f part, void *arg);
 
 void ac_out_ext_options_num_partitions(ac_out_ext_options_t *h,
                                        size_t num_partitions);
@@ -141,21 +141,21 @@ void ac_out_ext_options_intermediate_group_size(ac_out_ext_options_t *h,
 
 /* options for comparing output */
 void ac_out_ext_options_compare(ac_out_ext_options_t *h,
-                                ac_io_compare_f compare, void *tag);
+                                ac_io_compare_f compare, void *arg);
 
 void ac_out_ext_options_intermediate_compare(ac_out_ext_options_t *h,
                                              ac_io_compare_f compare,
-                                             void *tag);
+                                             void *arg);
 
 /* set the reducers */
 void ac_out_ext_options_reducer(ac_out_ext_options_t *h,
-                                ac_io_reducer_f reducer, void *tag);
+                                ac_io_reducer_f reducer, void *arg);
 
 /* Overrides the reducer specified by ac_out_ext_options_reducer for
    internal reducing of file. */
 void ac_out_ext_options_intermediate_reducer(ac_out_ext_options_t *h,
                                              ac_io_reducer_f reducer,
-                                             void *tag);
+                                             void *arg);
 
 /* Use an extra thread when sorting output. */
 void ac_out_ext_options_use_extra_thread(ac_out_ext_options_t *h);

@@ -19,6 +19,7 @@ limitations under the License.
 
 #include "ac_common.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,12 +33,30 @@ extern "C" {
 #define ac_calloc(len) _ac_calloc_d(NULL, __AC_FILE_LINE__, len, false)
 #define ac_realloc(p, len) _ac_realloc_d(NULL, __AC_FILE_LINE__, p, len, false)
 #define ac_strdup(p) _ac_strdup_d(NULL, __AC_FILE_LINE__, p)
+#define ac_strdupf(p, ...) _ac_strdupf_d(NULL, __AC_FILE_LINE__, p, __VA_ARGS__)
+#define ac_strdupvf(p, args) _ac_strdupvf_d(NULL, __AC_FILE_LINE__, p, args)
+#define ac_strdupa(p) _ac_strdupa_d(NULL, __AC_FILE_LINE__, p)
+#define ac_strdupa2(p) _ac_strdupa2_d(NULL, __AC_FILE_LINE__, p)
+#define ac_memdup(p, len) _ac_memdup_d(NULL, __AC_FILE_LINE__, p, len)
+#define ac_split(num_splits, delim, s)                                         \
+  _ac_split_d(NULL, __AC_FILE_LINE__, num_splits, delim, s)
+#define ac_split2(num_splits, delim, s)                                        \
+  _ac_split2_d(NULL, __AC_FILE_LINE__, num_splits, delim, s)
 #define ac_free(p) _ac_free_d(NULL, __AC_FILE_LINE__, p)
 #else
 #define ac_malloc(len) malloc(len)
 #define ac_calloc(len) calloc(1, len)
 #define ac_realloc(p, len) realloc(p, len)
 #define ac_strdup(p) strdup(p)
+#define ac_strdupf(p, ...) _ac_strdupf(p, __VA_ARGS__)
+#define ac_strdupvf(p, args) _ac_strdupvf(p, args)
+#define ac_strdupa(p) _ac_strdupa(p)
+#define ac_strdupa2(p) _ac_strdupa2(p)
+#define ac_memdup(p, len) _ac_memdup(p, len)
+#define ac_split(num_splits, delim, s)                                         \
+  _ac_split_d(NULL, NULL, num_splits, delim, s)
+#define ac_split2(num_splits, delim, s)                                        \
+  _ac_split2_d(NULL, NULL, num_splits, delim, s)
 #define ac_free(p) free(p)
 #endif
 
@@ -54,6 +73,18 @@ typedef struct ac_allocator_s ac_allocator_t;
 ac_allocator_t *ac_allocator_init(const char *filename, bool thread_safe);
 void ac_allocator_destroy(ac_allocator_t *a);
 
+char *_ac_strdupf_d(ac_allocator_t *a, const char *caller, const char *p, ...);
+char *_ac_strdupf(const char *p, ...);
+char *_ac_strdupvf_d(ac_allocator_t *a, const char *caller, const char *p,
+                     va_list args);
+char *_ac_strdupvf(const char *p, va_list args);
+
+char **_ac_strdupa_d(ac_allocator_t *al, const char *caller, char **a);
+char **_ac_strdupa(char **a);
+
+char **_ac_strdupa2_d(ac_allocator_t *al, const char *caller, char **a);
+char **_ac_strdupa2(char **a);
+
 void ac_dump_global_allocations(ac_allocator_t *a, FILE *out);
 
 void *_ac_malloc_d(ac_allocator_t *a, const char *caller, size_t len,
@@ -68,6 +99,25 @@ void *_ac_realloc_d(ac_allocator_t *a, const char *caller, void *p, size_t len,
 char *_ac_strdup_d(ac_allocator_t *a, const char *caller, const char *p);
 
 void _ac_free_d(ac_allocator_t *a, const char *caller, void *p);
+
+char **_ac_split_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
+                   char delim, const char *s);
+
+char **_ac_split2_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
+                    char delim, const char *s);
+
+static inline void *_ac_memdup_d(ac_allocator_t *a, const char *caller,
+                                 const void *p, size_t len) {
+  void *r = _ac_malloc_d(a, caller, len, false);
+  memcpy(r, p, len);
+  return r;
+}
+
+static inline void *_ac_memdup(const void *p, size_t len) {
+  void *r = malloc(len);
+  memcpy(r, p, len);
+  return r;
+}
 
 #ifdef __cplusplus
 }

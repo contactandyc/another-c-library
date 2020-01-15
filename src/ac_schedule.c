@@ -29,12 +29,11 @@ struct ac_task_state_s {
   ac_task_state_link_t *tasks_to_finish;
 };
 
-struct ac_schedule_thread_s;
-typedef struct ac_schedule_thread_s ac_schedule_thread_t;
-
 struct ac_schedule_thread_s {
   pthread_t thread;
   ac_schedule_t *scheduler;
+  ac_pool_t *pool;
+  ac_buffer_t *bh;
   size_t thread_id;
   size_t partition;
 };
@@ -56,7 +55,7 @@ struct ac_schedule_s {
   ac_schedule_thread_t *threads;
   bool started_threads;
 
-  ac_task_part_f on_complete;
+  ac_worker_f on_complete;
   bool done;
 
   size_t num_partitions;
@@ -68,6 +67,31 @@ struct ac_schedule_s {
   size_t ram;
   size_t cpus;
   size_t disk_space;
+};
+
+struct ac_task_input_link_s;
+typedef struct ac_task_input_link_s ac_task_input_link_t;
+
+struct ac_task_input_link_s {
+  ac_worker_input_t *input;
+  ac_task_input_link_t *next;
+};
+
+struct ac_transform_s;
+typedef struct ac_transform_s ac_transform_t;
+
+struct ac_transform_s {
+  ac_worker_input_t *input;
+  ac_worker_output_t **outputs;
+  size_t num_outputs;
+  ac_runner_f runner;
+  ac_group_runner_f group_runner;
+  ac_io_compare_f group_compare;
+  ac_worker_data_f create_group_compare_arg;
+  ac_destroy_worker_data_f destroy_group_compare_arg;
+  ac_worker_data_f create_data;
+  ac_destroy_worker_data_f destroy_data;
+  ac_transform_t *next;
 };
 
 struct ac_task_s {
@@ -82,10 +106,14 @@ struct ac_task_s {
   ac_schedule_t *scheduler;
 
   ac_task_f setup;
-  ac_task_part_f runner;
+  ac_worker_f runner;
 
-  ac_task_input_t *inputs;
-  ac_task_output_t *outputs;
+  ac_transform_t *transforms;
+
+  ac_task_input_link_t *current_input;
+
+  ac_worker_input_t *inputs;
+  ac_worker_output_t *outputs;
   ac_task_link_t *dependencies;
   ac_task_link_t *partial_dependencies;
   ac_task_link_t *reverse_dependencies;
@@ -102,8 +130,89 @@ struct ac_task_s {
   ac_task_t *next;
 };
 
-ac_task_output_t *ac_task_get_output(ac_task_part_t *tp, size_t pos) {
-  ac_task_output_t *r = tp->task->outputs;
+ac_worker_input_t *ac_task_find_input(ac_task_t *task, const char *name) {
+  ac_worker_input_t *n = task->inputs;
+  while (n) {
+    if (!strcmp(n->name, name))
+      return n;
+    n = n->next;
+  }
+  return NULL;
+}
+
+ac_worker_output_t *ac_task_find_output(ac_task_t *task, const char *name) {
+  ac_worker_output_t *n = task->outputs;
+  while (n) {
+    if (!strcmp(n->name, name))
+      return n;
+    n = n->next;
+  }
+  return NULL;
+}
+
+static ac_transform_t *_ac_task_transform(ac_task_t *task, const char *inp,
+                                          const char *outp) {
+  ac_pool_t *pool = task->scheduler->pool;
+  ac_transform_t *t = (ac_transform_t *)ac_pool_calloc(pool, sizeof(*t));
+  t->input = ac_task_find_input(task, inp);
+  if (!t->input)
+    abort();
+  size_t num_outputs = 0;
+  char **outputs = ac_pool_split2(pool, &num_outputs, '|', outp);
+  t->outputs = (ac_worker_output_t **)ac_pool_calloc(
+      pool, sizeof(ac_worker_output_t *) * (num_outputs + 1));
+  for (size_t i = 0; i < num_outputs; i++) {
+    t->outputs[i] = ac_task_find_output(task, outputs[i]);
+    if (!t->outputs[i])
+      abort();
+  }
+  t->num_outputs = num_outputs;
+
+  if (!task->transforms)
+    task->transforms = t;
+  else {
+    ac_transform_t *n = task->transforms;
+    while (n->next)
+      n = n->next;
+    n->next = t;
+  }
+  return t;
+}
+
+void ac_task_transform(ac_task_t *task, const char *inp, const char *outp,
+                       ac_runner_f runner) {
+  ac_transform_t *t = _ac_task_transform(task, inp, outp);
+  t->runner = runner;
+}
+
+void ac_task_group_transform(ac_task_t *task, const char *inp, const char *outp,
+                             ac_group_runner_f runner,
+                             ac_io_compare_f compare) {
+  ac_transform_t *t = _ac_task_transform(task, inp, outp);
+  t->group_runner = runner;
+  t->group_compare = compare;
+}
+
+void ac_task_group_compare_arg(ac_task_t *task, ac_worker_data_f create,
+                               ac_destroy_worker_data_f destroy) {
+  ac_transform_t *n = task->transforms;
+  while (n->next)
+    n = n->next;
+  n->create_group_compare_arg = create;
+  n->destroy_group_compare_arg = destroy;
+}
+
+void ac_task_transform_data(ac_task_t *task, ac_worker_data_f create,
+                            ac_destroy_worker_data_f destroy) {
+  ac_transform_t *n = task->transforms;
+  while (n->next)
+    n = n->next;
+  n->create_data = create;
+  n->destroy_data = destroy;
+}
+
+ac_worker_output_t *ac_worker_output(ac_worker_t *w, size_t pos) {
+  ac_worker_output_t *r = w->outputs;
   while (r && pos) {
     pos--;
     r = r->next;
@@ -113,8 +222,29 @@ ac_task_output_t *ac_task_get_output(ac_task_part_t *tp, size_t pos) {
   return r;
 }
 
-ac_task_input_t *ac_task_get_input(ac_task_part_t *tp, size_t pos) {
-  ac_task_input_t *r = tp->task->inputs;
+ac_out_t *ac_worker_out(ac_worker_t *w, size_t n) {
+  ac_worker_output_t *o = ac_worker_output(w, n);
+  if (!o)
+    return NULL;
+  size_t flags = o->flags;
+  char *base_name = ac_worker_output_base(w, o);
+  ac_out_options_buffer_size(&(o->options), ac_worker_ram(w, o->ram_pct));
+  if ((flags & AC_OUTPUT_SPLIT) && o->ext_options.partition) {
+    if (o->destinations)
+      ac_out_ext_options_num_partitions(&(o->ext_options),
+                                        o->destinations->task->num_partitions);
+    else
+      ac_out_ext_options_num_partitions(&(o->ext_options),
+                                        o->task->scheduler->num_partitions);
+    return ac_out_ext_init(base_name, &(o->options), &(o->ext_options));
+  } else {
+    o->ext_options.partition = NULL;
+    return ac_out_ext_init(base_name, &(o->options), &(o->ext_options));
+  }
+}
+
+ac_worker_input_t *ac_worker_input(ac_worker_t *w, size_t pos) {
+  ac_worker_input_t *r = w->inputs;
   while (r && pos) {
     pos--;
     r = r->next;
@@ -122,6 +252,32 @@ ac_task_input_t *ac_task_get_input(ac_task_part_t *tp, size_t pos) {
   if (pos)
     return NULL;
   return r;
+}
+
+ac_in_t *ac_worker_in(ac_worker_t *w, size_t n) {
+  ac_worker_input_t *inp = ac_worker_input(w, n);
+  if (!inp || !inp->num_files)
+    return NULL;
+
+  ac_in_t *in = NULL;
+  if (inp->compare && inp->num_files > 1) {
+    ac_in_options_buffer_size(&(inp->options),
+                              ac_worker_ram(w, inp->ram_pct / inp->num_files));
+    in = ac_in_ext_init(inp->compare, inp->compare_arg, &(inp->options));
+    if (inp->reducer)
+      ac_in_ext_reducer(in, inp->reducer, inp->reducer_arg);
+    for (size_t i = 0; i < inp->num_files; i++)
+      ac_in_ext_add(in, ac_in_init(inp->files[i].filename, &(inp->options)), i);
+  } else {
+    ac_in_options_buffer_size(&(inp->options), ac_worker_ram(w, inp->ram_pct));
+    if (inp->num_files > 1)
+      in = ac_in_init_from_list(inp->files, inp->num_files, &(inp->options));
+    else
+      in = ac_in_init(inp->files[0].filename, &(inp->options));
+  }
+  if (inp->limit)
+    ac_in_limit(in, inp->limit);
+  return in;
 }
 
 int compare_task_for_find(const char *key, const ac_task_t *node) {
@@ -268,69 +424,96 @@ static void mark_task_complete(ac_task_state_link_t *state_link,
                                size_t partition, time_t when);
 static bool is_dependencies_complete(ac_task_t *task, size_t partition);
 
-static ac_task_part_t *take_task(ac_schedule_t *scheduler, ac_pool_t *pool,
-                                 ac_task_t *task, size_t partition) {
+static ac_worker_t *take_worker(ac_schedule_t *scheduler, ac_pool_t *pool,
+                                ac_task_t *task, size_t partition) {
   ac_task_state_link_t *avail = available_tasks(scheduler, partition);
   while (avail) {
     if (!task || avail->task == task) {
       unlink_state(scheduler, avail, partition);
-      ac_task_part_t *tp =
-          (ac_task_part_t *)ac_pool_calloc(pool, sizeof(ac_task_part_t));
-      tp->pool = pool;
-      tp->task = avail->task;
-      tp->partition = partition;
-      tp->num_partitions = tp->task->num_partitions;
-      tp->ack_time = -1;
-      tp->__link = avail;
-      return tp;
+      ac_worker_t *w = (ac_worker_t *)ac_pool_calloc(pool, sizeof(ac_worker_t));
+      w->task = avail->task;
+      w->partition = partition;
+      w->num_partitions = w->task->num_partitions;
+      w->ack_time = -1;
+      w->__link = avail;
+      return w;
     }
     avail = avail->next;
   }
   return NULL;
 }
 
-static void _ac_task_input(ac_task_t *task, const char *name,
-                           ac_task_output_t *src, double pct,
-                           ac_task_check_input_f check) {
+static ac_worker_input_t *_ac_task_input(ac_task_t *task, const char *name,
+                                         ac_worker_output_t *src, double pct,
+                                         ac_worker_file_info_f file_info) {
   ac_schedule_t *scheduler = task->scheduler;
   ac_pool_t *pool = scheduler->pool;
 
-  ac_task_input_t *ti = (ac_task_input_t *)ac_pool_calloc(pool, sizeof(*ti));
+  ac_worker_input_t *ti =
+      (ac_worker_input_t *)ac_pool_calloc(pool, sizeof(*ti));
+  ac_in_options_init(&(ti->options));
   ti->name = ac_pool_strdup(pool, name);
   ti->ram_pct = pct;
   ti->task = task;
   ti->src = src;
-  ti->check = check;
-  ti->next = task->inputs;
-  task->inputs = ti;
-}
-
-bool check_split(ac_task_part_t *tp, ac_task_input_t *inp, time_t ack_time) {
-  // check if input files are newer than ack file
-  size_t num_partitions = inp->src->task->num_partitions;
-  for (size_t i = 0; i < num_partitions; i++) {
-    const char *filename = ac_task_input_name(tp, inp, i);
-    if (ac_io_modified(filename) > ack_time)
-      return true;
+  ti->file_info = file_info;
+  if (task->inputs) {
+    ac_worker_input_t *n = task->inputs;
+    while (n->next)
+      n = n->next;
+    ti->id = n->id + 1;
+    n->next = ti;
+  } else {
+    ti->id = 0;
+    task->inputs = ti;
   }
-  return false;
+  return ti;
 }
 
-bool check_first(ac_task_part_t *tp, ac_task_input_t *inp, time_t ack_time) {
-  // check if input files are newer than ack file
-  const char *filename = ac_task_input_name(tp, inp, 0);
-  if (ac_io_modified(filename) > ack_time)
-    return true;
-  return false;
+ac_io_file_info_t *file_info_split(ac_worker_t *w, size_t *num_files,
+                                   ac_worker_input_t *inp) {
+  size_t num_partitions = inp->src->task->num_partitions;
+  ac_io_file_info_t *res = (ac_io_file_info_t *)ac_pool_calloc(
+      w->worker_pool, sizeof(*res) * num_partitions);
+  for (size_t i = 0; i < num_partitions; i++) {
+    res[i].filename = ac_worker_input_name(w, inp, i);
+    ac_io_file_info(res + i);
+  }
+  *num_files = num_partitions;
+  return res;
 }
 
-bool check_partition(ac_task_part_t *tp, ac_task_input_t *inp,
-                     time_t ack_time) {
+ac_io_file_info_t *file_info_first(ac_worker_t *w, size_t *num_files,
+                                   ac_worker_input_t *inp) {
   // check if input files are newer than ack file
-  const char *filename = ac_task_input_name(tp, inp, tp->partition);
-  if (ac_io_modified(filename) > ack_time)
-    return true;
-  return false;
+  ac_io_file_info_t *res =
+      (ac_io_file_info_t *)ac_pool_calloc(w->worker_pool, sizeof(*res));
+  res->filename = ac_worker_input_name(w, inp, 0);
+  *num_files = 1;
+  ac_io_file_info(res);
+  return res;
+}
+
+ac_io_file_info_t *file_info_name(ac_worker_t *w, size_t *num_files,
+                                  ac_worker_input_t *inp) {
+  // check if input files are newer than ack file
+  ac_io_file_info_t *res =
+      (ac_io_file_info_t *)ac_pool_calloc(w->worker_pool, sizeof(*res));
+  res->filename = inp->name;
+  *num_files = 1;
+  ac_io_file_info(res);
+  return res;
+}
+
+ac_io_file_info_t *file_info_partition(ac_worker_t *w, size_t *num_files,
+                                       ac_worker_input_t *inp) {
+  // check if input files are newer than ack file
+  ac_io_file_info_t *res =
+      (ac_io_file_info_t *)ac_pool_calloc(w->worker_pool, sizeof(*res));
+  res->filename = ac_worker_input_name(w, inp, w->partition);
+  *num_files = 1;
+  ac_io_file_info(res);
+  return res;
 }
 
 ac_task_link_t *get_task_list(ac_task_t *task, const char *name,
@@ -374,33 +557,258 @@ void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
   ac_schedule_t *scheduler = task->scheduler;
   ac_pool_t *pool = scheduler->pool;
 
-  ac_task_output_t *to = (ac_task_output_t *)ac_pool_calloc(pool, sizeof(*to));
+  ac_worker_output_t *to =
+      (ac_worker_output_t *)ac_pool_calloc(pool, sizeof(*to));
+  ac_out_options_init(&(to->options));
+  ac_out_ext_options_init(&(to->ext_options));
+
   to->name = ac_pool_strdup(pool, name);
   to->task = task;
   to->ram_pct = out_ram_pct;
   to->destinations = get_task_list(task, name, scheduler, destinations);
   to->flags = flags;
   to->num_partitions = task->num_partitions;
-  to->next = task->outputs;
-  task->outputs = to;
+
+  if (task->outputs) {
+    ac_worker_output_t *n = task->outputs;
+    while (n->next)
+      n = n->next;
+    to->id = n->id + 1;
+    n->next = to;
+  } else {
+    to->id = 0;
+    task->outputs = to;
+  }
+
+  task->current_input = NULL;
 
   ac_task_link_t *n = to->destinations;
   while (n) {
-    ac_task_check_input_f check = NULL;
+    ac_worker_file_info_f file_info = NULL;
     if (flags & AC_OUTPUT_SPLIT)
-      check = check_split;
+      file_info = file_info_split;
     else if (flags & AC_OUTPUT_USE_FIRST)
-      check = check_first;
+      file_info = file_info_first;
     else
-      check = check_partition;
-    _ac_task_input(n->task, name, to, in_ram_pct, check);
+      file_info = file_info_partition;
+    ac_worker_input_t *ti =
+        _ac_task_input(n->task, name, to, in_ram_pct, file_info);
+    if (ti) {
+      ac_task_input_link_t *inp_link =
+          (ac_task_input_link_t *)ac_pool_alloc(pool, sizeof(*inp_link));
+      inp_link->input = ti;
+      inp_link->next = task->current_input;
+      task->current_input = inp_link;
+    }
     n = n->next;
   }
 }
 
 void ac_task_input_files(ac_task_t *task, const char *name, double pct,
-                         ac_task_check_input_f check) {
-  _ac_task_input(task, name, NULL, pct, check);
+                         ac_worker_file_info_f file_info) {
+  ac_schedule_t *scheduler = task->scheduler;
+  ac_pool_t *pool = scheduler->pool;
+  if (!file_info)
+    file_info = file_info_name;
+
+  task->current_input = NULL;
+  ac_worker_input_t *ti = _ac_task_input(task, name, NULL, pct, file_info);
+  if (ti) {
+    ac_task_input_link_t *inp_link =
+        (ac_task_input_link_t *)ac_pool_alloc(pool, sizeof(*inp_link));
+    inp_link->input = ti;
+    inp_link->next = task->current_input;
+    task->current_input = inp_link;
+  }
+}
+
+/* These ac_task_output_... methods must be called after ac_task_output and
+   will apply to the previous ac_task_output call. */
+void ac_task_output_partition(ac_task_t *task, ac_io_partition_f part,
+                              void *arg) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_partition(&(task->outputs->ext_options), part, arg);
+}
+
+void ac_task_output_compare(ac_task_t *task, ac_io_compare_f compare,
+                            void *arg) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_compare(&(task->outputs->ext_options), compare, arg);
+  ac_task_input_compare(task, compare, arg);
+}
+
+void ac_task_output_intermediate_compare(ac_task_t *task,
+                                         ac_io_compare_f compare, void *arg) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_intermediate_compare(&(task->outputs->ext_options),
+                                          compare, arg);
+}
+
+void ac_task_output_keep_first(ac_task_t *task) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_reducer(&(task->outputs->ext_options), ac_io_keep_first,
+                             NULL);
+  ac_task_input_keep_first(task);
+}
+
+void ac_task_output_reducer(ac_task_t *task, ac_io_reducer_f reducer,
+                            void *arg) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_reducer(&(task->outputs->ext_options), reducer, arg);
+  ac_task_input_reducer(task, reducer, arg);
+}
+
+void ac_task_output_intermediate_reducer(ac_task_t *task,
+                                         ac_io_reducer_f reducer, void *arg) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_intermediate_reducer(&(task->outputs->ext_options),
+                                          reducer, arg);
+}
+
+void ac_task_output_group_size(ac_task_t *task, size_t num_per_group,
+                               size_t start) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_intermediate_group_size(&(task->outputs->ext_options),
+                                             num_per_group);
+}
+
+void ac_task_output_use_extra_thread(ac_task_t *task) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_use_extra_thread(&(task->outputs->ext_options));
+}
+
+void ac_task_output_dont_compress_tmp(ac_task_t *task) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_dont_compress_tmp(&(task->outputs->ext_options));
+}
+
+void ac_task_output_sort_before_partitioning(ac_task_t *task) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_sort_before_partitioning(&(task->outputs->ext_options));
+}
+
+void ac_task_output_sort_while_partitioning(ac_task_t *task) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_sort_while_partitioning(&(task->outputs->ext_options));
+}
+
+void ac_task_output_num_sort_threads(ac_task_t *task, size_t num_sort_threads) {
+  if (!task->outputs)
+    return;
+
+  ac_out_ext_options_num_sort_threads(&(task->outputs->ext_options),
+                                      num_sort_threads);
+}
+
+void ac_task_output_format(ac_task_t *task, ac_io_format_t format) {
+  if (!task->outputs)
+    return;
+
+  ac_out_options_format(&(task->outputs->options), format);
+  ac_task_input_format(task, format);
+}
+
+void ac_task_output_safe_mode(ac_task_t *task) {
+  if (!task->outputs)
+    return;
+
+  ac_out_options_safe_mode(&(task->outputs->options));
+}
+
+void ac_task_output_write_ack_file(ac_task_t *task) {
+  if (!task->outputs)
+    return;
+
+  ac_out_options_write_ack_file(&(task->outputs->options));
+}
+
+void ac_task_output_gz(ac_task_t *task, int level) {
+  if (!task->outputs)
+    return;
+
+  ac_out_options_gz(&(task->outputs->options), level);
+}
+
+void ac_task_output_lz4(ac_task_t *task, int level, ac_lz4_block_size_t size,
+                        bool block_checksum, bool content_checksum) {
+  if (!task->outputs)
+    return;
+
+  ac_out_options_lz4(&(task->outputs->options), level, size, block_checksum,
+                     content_checksum);
+}
+
+/* The ac_task_input... methods apply to the previous ac_task_input_files or
+   ac_task_output call.  If the previous ac_task_output call doesn't specify
+   one or more destinations, the calls are silently ignored. */
+void ac_task_input_format(ac_task_t *task, ac_io_format_t format) {
+  ac_task_input_link_t *inp = task->current_input;
+  while (inp) {
+    ac_in_options_format(&(inp->input->options), format);
+    inp = inp->next;
+  }
+}
+
+void ac_task_input_compare(ac_task_t *task, ac_io_compare_f compare,
+                           void *arg) {
+  ac_task_input_link_t *inp = task->current_input;
+  while (inp) {
+    inp->input->compare = compare;
+    inp->input->compare_arg = arg;
+    inp = inp->next;
+  }
+}
+
+void ac_task_input_keep_first(ac_task_t *task) {
+  ac_task_input_reducer(task, ac_io_keep_first, NULL);
+}
+
+void ac_task_input_reducer(ac_task_t *task, ac_io_reducer_f reducer,
+                           void *arg) {
+  ac_task_input_link_t *inp = task->current_input;
+  while (inp) {
+    inp->input->reducer = reducer;
+    inp->input->reducer_arg = arg;
+    inp = inp->next;
+  }
+}
+
+void ac_task_input_compressed_buffer_size(ac_task_t *task, size_t buffer_size) {
+  ac_task_input_link_t *inp = task->current_input;
+  while (inp) {
+    ac_in_options_compressed_buffer_size(&(inp->input->options), buffer_size);
+    inp = inp->next;
+  }
+}
+
+void ac_task_input_limit(ac_task_t *task, size_t limit) {
+  ac_task_input_link_t *inp = task->current_input;
+  while (inp) {
+    inp->input->limit = limit;
+    inp = inp->next;
+  }
 }
 
 static void schedule_setup(ac_schedule_t *h) {
@@ -430,9 +838,9 @@ static void schedule_setup(ac_schedule_t *h) {
       for (size_t i = 0; i < n->num_partitions; i++) {
         if (is_dependencies_complete(n, i)) {
           ac_pool_clear(h->tmp_pool);
-          ac_task_part_t *tp = take_task(h, h->tmp_pool, n, i);
-          if (tp)
-            mark_task_complete(tp->__link, i, current_time);
+          ac_worker_t *w = take_worker(h, h->tmp_pool, n, i);
+          if (w)
+            mark_task_complete(w->__link, i, current_time);
         }
       }
     }
@@ -452,44 +860,45 @@ static bool task_available(ac_task_t *task, size_t partition) {
   return false;
 }
 
-static void write_ack(ac_task_part_t *tp) {
-  char *filename =
-      ac_pool_strdupf(tp->pool, "%s/%s_%lu", tp->task->scheduler->ack_dir,
-                      tp->task->task_name, tp->partition);
+static void write_ack(ac_worker_t *w) {
+  char *filename = ac_pool_strdupf(w->schedule_thread->pool, "%s/%s_%lu",
+                                   w->task->scheduler->ack_dir,
+                                   w->task->task_name, w->partition);
   // printf("%s\n", filename);
   FILE *out = fopen(filename, "wb");
   fclose(out);
 }
 
-static void get_ack_time(ac_task_part_t *tp) {
-  time_t *ack = &(tp->task->state_linkage[tp->partition].ack_time);
+static void get_ack_time(ac_worker_t *w) {
+  time_t *ack = &(w->task->state_linkage[w->partition].ack_time);
   if (*ack == -1) {
-    char *filename =
-        ac_pool_strdupf(tp->pool, "%s/%s_%lu", tp->task->scheduler->ack_dir,
-                        tp->task->task_name, tp->partition);
+    char *filename = ac_pool_strdupf(w->schedule_thread->pool, "%s/%s_%lu",
+                                     w->task->scheduler->ack_dir,
+                                     w->task->task_name, w->partition);
     *ack = ac_io_modified(filename);
   }
-  tp->ack_time = *ack;
+  w->ack_time = *ack;
 }
 
-static ac_task_part_t *task_part_complete(ac_task_part_t *tp, time_t when) {
-  if (when > tp->ack_time)
-    write_ack(tp);
-  // ac_task_part_t *next = NULL;
-  ac_schedule_t *scheduler = tp->task->scheduler;
+static ac_worker_t *worker_complete(ac_worker_t *w, time_t when) {
+  if (when > w->ack_time)
+    write_ack(w);
+  // ac_worker_t *next = NULL;
+  ac_schedule_t *scheduler = w->task->scheduler;
   pthread_mutex_lock(&(scheduler->mutex));
   size_t num_available = scheduler->num_available;
-  mark_task_complete(tp->__link, tp->partition, when);
-  // if (tp->next_task && take_available(tp->next_task, tp->partition))
-  //  next = take_task(tp->next_task, tp->partition);
+  mark_task_complete(w->__link, w->partition, when);
+  // if (w->next_task && take_available(w->next_task, w->partition))
+  //  next = take_worker(w->next_task, w->partition);
   if (!num_available && scheduler->num_available)
     pthread_cond_broadcast(&scheduler->cond);
   pthread_mutex_unlock(&(scheduler->mutex));
   return NULL;
 }
 
-static ac_task_part_t *get_next_task(ac_pool_t *pool, ac_schedule_thread_t *t) {
-  ac_task_part_t *tp = NULL;
+static ac_worker_t *get_next_worker(ac_schedule_thread_t *t) {
+  ac_pool_t *pool = t->pool;
+  ac_worker_t *w = NULL;
   ac_schedule_t *scheduler = t->scheduler;
   // printf("Attempting to get task for %lu\n", t->thread_id);
   pthread_mutex_lock(&(scheduler->mutex));
@@ -501,29 +910,31 @@ static ac_task_part_t *get_next_task(ac_pool_t *pool, ac_schedule_thread_t *t) {
   if (scheduler->num_available) {
     for (size_t p = 0; p < scheduler->num_partitions; p++) {
       size_t px = (p + t->partition) % scheduler->num_partitions;
-      tp = take_task(scheduler, pool, NULL, px);
-      if (tp) {
+      w = take_worker(scheduler, pool, NULL, px);
+      if (w) {
         scheduler->num_running++;
-        tp->running = scheduler->num_running + scheduler->num_available;
-        if (tp->running > scheduler->cpus)
-          tp->running = scheduler->cpus;
+        w->running = scheduler->num_running + scheduler->num_available;
+        if (w->running > scheduler->cpus)
+          w->running = scheduler->cpus;
         break;
       }
     }
   }
   pthread_mutex_unlock(&(scheduler->mutex));
-  if (tp)
-    tp->thread_id = t->thread_id;
-  // if (!tp) {
+  if (w) {
+    w->thread_id = t->thread_id;
+    w->schedule_thread = t;
+  }
+  // if (!w) {
   //  printf("failed to get task for %lu\n", t->thread_id);
   // }
-  return tp;
+  return w;
 }
 
-static void setup_task_part(ac_task_part_t *tp) {}
-static bool run_task_part(ac_task_part_t *tp) {
-  if (tp->task->runner)
-    return tp->task->runner(tp);
+static void setup_worker(ac_worker_t *w) {}
+static bool run_worker(ac_worker_t *w) {
+  if (w->task->runner)
+    return w->task->runner(w);
   return true;
 }
 
@@ -533,19 +944,19 @@ time_t get_ack_time_for_task_and_partition(ac_task_t *task, size_t partition) {
   return task->state_linkage[partition].ack_time;
 }
 
-static bool task_needs_to_run(ac_task_part_t *tp) {
-  if (tp->ack_time == 0)
+static bool worker_needs_to_run(ac_worker_t *w) {
+  if (w->ack_time == 0)
     return true;
 
-  if (tp->task->run_everytime)
+  if (w->task->run_everytime)
     return true;
 
-  ac_task_t *task = tp->task;
+  ac_task_t *task = w->task;
   ac_task_link_t *link = task->reverse_dependencies;
   while (link) {
     for (size_t i = 0; i < link->task->num_partitions; i++) {
       time_t ack_time = get_ack_time_for_task_and_partition(link->task, i);
-      if (ack_time > tp->ack_time)
+      if (ack_time > w->ack_time)
         return true;
     }
     link = link->next;
@@ -553,24 +964,26 @@ static bool task_needs_to_run(ac_task_part_t *tp) {
   link = task->reverse_partial_dependencies;
   while (link) {
     time_t ack_time =
-        get_ack_time_for_task_and_partition(link->task, tp->partition);
-    if (ack_time > tp->ack_time)
+        get_ack_time_for_task_and_partition(link->task, w->partition);
+    if (ack_time > w->ack_time)
       return true;
     link = link->next;
   }
 
-  if (tp->task->inputs) {
-    ac_task_input_t *n = tp->task->inputs;
+  if (w->inputs) {
+    ac_worker_input_t *n = w->inputs;
     while (n) {
-      if (n->check(tp, n, tp->ack_time))
-        return true;
+      for (size_t i = 0; i < n->num_files; i++) {
+        if (n->files[i].last_modified > w->ack_time)
+          return true;
+      }
       n = n->next;
     }
   }
   return false;
 }
 
-static void destroy_task_part(ac_task_part_t *tp) {}
+static void destroy_worker(ac_worker_t *w) {}
 
 static void mark_as_done(ac_schedule_t *scheduler) {
   pthread_mutex_unlock(&(scheduler->mutex));
@@ -581,109 +994,216 @@ static void mark_as_done(ac_schedule_t *scheduler) {
   pthread_mutex_unlock(&(scheduler->mutex));
 }
 
-static char *_ac_task_output_base(ac_task_part_t *tp, ac_task_output_t *outp,
-                                  const char *suffix) {
+static char *_ac_worker_output_base(ac_worker_t *w, ac_worker_output_t *outp,
+                                    const char *suffix) {
   // base_<part><suffix>
-  ac_buffer_setf(tp->bh, "%s/%s_%lu/", tp->task->scheduler->task_dir,
-                 tp->task->task_name, tp->partition);
+  ac_buffer_t *bh = w->schedule_thread->bh;
+  ac_buffer_setf(bh, "%s/%s_%lu/", w->task->scheduler->task_dir,
+                 w->task->task_name, w->partition);
   const char *base = outp->name;
   if (ac_io_extension(base, ".lz4")) {
-    ac_buffer_append(tp->bh, base, strlen(base) - 4);
+    ac_buffer_append(bh, base, strlen(base) - 4);
     if (suffix)
-      ac_buffer_appends(tp->bh, suffix);
-    ac_buffer_appendf(tp->bh, "_%lu.lz4", tp->partition);
-    return ac_buffer_data(tp->bh);
+      ac_buffer_appends(bh, suffix);
+    ac_buffer_appendf(bh, "_%lu.lz4", w->partition);
   } else if (ac_io_extension(base, ".gz")) {
-    ac_buffer_append(tp->bh, base, strlen(base) - 3);
+    ac_buffer_append(bh, base, strlen(base) - 3);
     if (suffix)
-      ac_buffer_appends(tp->bh, suffix);
-    ac_buffer_appendf(tp->bh, "_%lu.gz", tp->partition);
-    return ac_buffer_data(tp->bh);
+      ac_buffer_appends(bh, suffix);
+    ac_buffer_appendf(bh, "_%lu.gz", w->partition);
   } else {
-    ac_buffer_appends(tp->bh, base);
+    ac_buffer_appends(bh, base);
     if (suffix)
-      ac_buffer_appends(tp->bh, suffix);
-    ac_buffer_appendf(tp->bh, "_%lu", tp->partition);
-    return ac_buffer_data(tp->bh);
+      ac_buffer_appends(bh, suffix);
+    ac_buffer_appendf(bh, "_%lu", w->partition);
   }
+  return ac_pool_strdup(w->worker_pool, ac_buffer_data(bh));
 }
 
-char *ac_task_output_base(ac_task_part_t *tp, ac_task_output_t *outp) {
-  return _ac_task_output_base(tp, outp, NULL);
+char *ac_worker_output_base(ac_worker_t *w, ac_worker_output_t *outp) {
+  return _ac_worker_output_base(w, outp, NULL);
 }
 
-char *ac_task_output_base2(ac_task_part_t *tp, ac_task_output_t *outp,
-                           const char *suffix) {
-  return _ac_task_output_base(tp, outp, suffix);
+char *ac_worker_output_base2(ac_worker_t *w, ac_worker_output_t *outp,
+                             const char *suffix) {
+  return _ac_worker_output_base(w, outp, suffix);
 }
 
-char *ac_task_input_name(ac_task_part_t *tp, ac_task_input_t *inp,
-                         size_t partition) {
+char *ac_worker_input_name(ac_worker_t *w, ac_worker_input_t *inp,
+                           size_t partition) {
   const char *base = inp->name;
-  ac_buffer_setf(tp->bh, "%s/%s_%lu/", tp->task->scheduler->task_dir,
+  ac_buffer_t *bh = w->schedule_thread->bh;
+  ac_buffer_setf(bh, "%s/%s_%lu/", w->task->scheduler->task_dir,
                  inp->src->task->task_name, partition);
   if (ac_io_extension(base, ".lz4")) {
-    ac_buffer_append(tp->bh, base, strlen(base) - 4);
-    ac_buffer_appendf(tp->bh, "_%lu_%lu.lz4", partition, tp->partition);
-    return ac_buffer_data(tp->bh);
+    ac_buffer_append(bh, base, strlen(base) - 4);
+    ac_buffer_appendf(bh, "_%lu_%lu.lz4", partition, w->partition);
   } else if (ac_io_extension(base, ".gz")) {
-    ac_buffer_append(tp->bh, base, strlen(base) - 3);
-    ac_buffer_appendf(tp->bh, "_%lu_%lu.gz", partition, tp->partition);
-    return ac_buffer_data(tp->bh);
+    ac_buffer_append(bh, base, strlen(base) - 3);
+    ac_buffer_appendf(bh, "_%lu_%lu.gz", partition, w->partition);
   } else {
-    ac_buffer_appends(tp->bh, base);
-    ac_buffer_appendf(tp->bh, "_%lu_%lu", partition, tp->partition);
-    return ac_buffer_data(tp->bh);
+    ac_buffer_appends(bh, base);
+    ac_buffer_appendf(bh, "_%lu_%lu", partition, w->partition);
   }
+  return ac_pool_strdup(w->worker_pool, ac_buffer_data(bh));
 }
 
-size_t ac_task_part_ram(ac_task_part_t *tp, double pct) {
-  double total_ram = tp->task->scheduler->ram;
-  double running = tp->running;
+size_t ac_worker_ram(ac_worker_t *w, double pct) {
+  double total_ram = w->task->scheduler->ram;
+  double running = w->running;
   running = running / pct;
   size_t res = (size_t)round((total_ram * pct) / running);
   return res * 1024;
 }
 
+static void fill_inputs(ac_worker_t *w) {
+  if (w->inputs) {
+    ac_worker_input_t *n = w->inputs;
+    while (n) {
+      n->num_files = 0;
+      n->files = n->file_info(w, &(n->num_files), n);
+      n = n->next;
+    }
+  }
+}
+
+ac_transform_t *clone_transforms(ac_worker_t *w) {
+  ac_transform_t *head = NULL;
+  ac_transform_t *tail = NULL;
+  ac_transform_t *n = w->task->transforms;
+  while (n) {
+    if (!head)
+      head = tail = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+    else
+      tail = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+
+    tail->input = ac_worker_input(w, tail->input->id);
+    tail->next = NULL;
+    n = n->next;
+  }
+  return head;
+}
+
+void clone_inputs_and_outputs(ac_worker_t *w) {
+  ac_worker_input_t *head = NULL;
+  ac_worker_input_t *tail = NULL;
+  ac_worker_input_t *n = w->task->inputs;
+  while (n) {
+    if (!head)
+      head = tail = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+    else
+      tail = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+    tail->next = NULL;
+    n = n->next;
+  }
+  w->inputs = head;
+  w->outputs = w->task->outputs;
+  w->data = clone_transforms(w);
+}
+
 void *schedule_thread(void *arg) {
   ac_schedule_thread_t *t = (ac_schedule_thread_t *)arg;
-  ac_pool_t *pool = ac_pool_init(65536);
+  t->pool = ac_pool_init(65536);
+  t->bh = ac_buffer_init(200);
+  ac_pool_t *tmp_pool = ac_pool_init(65536);
   while (true) {
-    ac_pool_clear(pool);
-    ac_task_part_t *tp = get_next_task(pool, t);
-    if (!tp)
+    ac_pool_clear(t->pool);
+    ac_worker_t *w = get_next_worker(t);
+    if (!w)
       break;
 
-    tp->bh = ac_buffer_pool_init(pool, 200);
-    get_ack_time(tp);
+    w->worker_pool = t->pool;
+    ac_pool_clear(tmp_pool);
+    w->pool = tmp_pool;
+    get_ack_time(w);
+    clone_inputs_and_outputs(w);
+    fill_inputs(w);
 
-    if (task_needs_to_run(tp)) {
-      setup_task_part(tp);
-      if (!run_task_part(tp)) {
-        destroy_task_part(tp);
+    if (worker_needs_to_run(w)) {
+      setup_worker(w);
+      if (!run_worker(w)) {
+        destroy_worker(w);
         break;
       }
       if (t->scheduler->on_complete) {
-        if (!t->scheduler->on_complete(tp)) {
-          destroy_task_part(tp);
+        if (!t->scheduler->on_complete(w)) {
+          destroy_worker(w);
           break;
         }
       }
-      task_part_complete(tp, time(NULL));
-      destroy_task_part(tp);
+      worker_complete(w, time(NULL));
+      destroy_worker(w);
     } else
-      task_part_complete(tp, tp->ack_time);
+      worker_complete(w, w->ack_time);
   }
-  ac_pool_destroy(pool);
+  ac_pool_destroy(t->pool);
+  ac_pool_destroy(tmp_pool);
+  ac_buffer_destroy(t->bh);
   mark_as_done(t->scheduler);
   return NULL;
 }
 
-void ac_task_runner(ac_task_t *task, ac_task_part_f runner) {
+static bool in_out_runner(ac_worker_t *w) {
+  ac_transform_t *transforms = (ac_transform_t *)w->data;
+  while (transforms) {
+    ac_in_t *in = ac_worker_in(w, transforms->input->id);
+    if (!in)
+      return true;
+
+    ac_out_t **outs = (ac_out_t **)ac_pool_calloc(
+        w->worker_pool, sizeof(ac_out_t *) * transforms->num_outputs);
+    for (size_t i = 0; i < transforms->num_outputs; i++)
+      outs[i] = ac_worker_out(w, transforms->outputs[i]->id);
+
+    if (transforms->create_data)
+      w->transform_data = transforms->create_data(w);
+
+    ac_io_record_t *r;
+    if (transforms->runner) {
+      while ((r = ac_in_advance(in)) != NULL)
+        transforms->runner(w, r, outs);
+    } else if (transforms->group_runner) {
+      void *compare_arg = NULL;
+      if (transforms->create_group_compare_arg)
+        compare_arg = transforms->create_group_compare_arg(w);
+      size_t num_r = 0;
+      bool more_records = false;
+      while ((r = ac_in_advance_group(in, &num_r, &more_records,
+                                      transforms->group_compare,
+                                      compare_arg)) != NULL)
+        transforms->group_runner(w, r, num_r, outs);
+      if (transforms->destroy_group_compare_arg)
+        transforms->destroy_group_compare_arg(w, compare_arg);
+    } else {
+      size_t num_outs = transforms->num_outputs;
+      ac_io_record_t *r;
+      while ((r = ac_in_advance(in)) != NULL) {
+        for (size_t i = 0; i < num_outs; i++)
+          ac_out_write_record(outs[i], r->record, r->length);
+      }
+    }
+    ac_in_destroy(in);
+    if (transforms->next)
+      in = ac_out_in(outs[0]);
+    else
+      ac_out_destroy(outs[0]);
+    for (size_t i = 1; i < transforms->num_outputs; i++)
+      ac_out_destroy(outs[i]);
+    if (transforms->destroy_data)
+      transforms->destroy_data(w, w->transform_data);
+
+    transforms = transforms->next;
+  }
+  return true;
+}
+
+void ac_task_runner(ac_task_t *task, ac_worker_f runner) {
   task->runner = runner;
 }
 
-void ac_schedule_run(ac_schedule_t *h, ac_task_part_f on_complete) {
+void ac_task_default_runner(ac_task_t *task) { task->runner = in_out_runner; }
+
+void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete) {
   schedule_setup(h);
   h->num_running = h->cpus;
   h->on_complete = on_complete;
@@ -746,9 +1266,9 @@ static bool is_task_complete(ac_task_t *task) {
   return true;
 }
 
-static bool is_task_partition_complete(ac_task_t *task, size_t partition) {
+static bool is_worker_complete(ac_task_t *task, size_t partition) {
   if (partition >= task->num_partitions)
-    return is_task_partition_complete(task, 0);
+    return is_worker_complete(task, 0);
 
   if (!task->state_linkage[partition].waiting_on_others &&
       task->state_linkage[partition].completed)
@@ -768,7 +1288,7 @@ static bool is_dependencies_complete(ac_task_t *task, size_t partition) {
   // partial_dependencies
   n = task->partial_dependencies;
   while (n) {
-    if (!is_task_partition_complete(n->task, partition))
+    if (!is_worker_complete(n->task, partition))
       return false;
     n = n->next;
   }
@@ -822,7 +1342,7 @@ static bool _ac_task_dependency(ac_task_t *task, const char *dependency,
 
   if (!task->state_linkage[0].waiting_on_others) {
     for (size_t i = 0; i < task->num_partitions; i++) {
-      if (is_task_partition_complete(d, i))
+      if (is_worker_complete(d, i))
         continue;
 
       ac_task_state_link_t *state_link = task->state_linkage + i;

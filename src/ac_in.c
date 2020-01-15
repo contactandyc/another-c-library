@@ -21,6 +21,7 @@ typedef ac_io_record_t *(*ac_in_advance_unique_f)(ac_in_t *h, size_t *num_r);
 static const int AC_IN_NORMAL_TYPE = 0; // default (due to memset)
 static const int AC_IN_EXT_TYPE = 1;
 static const int AC_IN_RECORDS_TYPE = 2;
+static const int AC_IN_LIST_TYPE = 3;
 
 size_t ac_in_count(ac_in_t *h) {
   size_t r = 0;
@@ -29,6 +30,32 @@ size_t ac_in_count(ac_in_t *h) {
   ac_in_destroy(h);
   return r;
 }
+
+struct ac_in_list_s;
+typedef struct ac_in_list_s ac_in_list_t;
+
+struct ac_in_list_s {
+  ac_in_options_t options;
+  int type;
+  ac_io_record_t rec;
+  ac_io_record_t *current;
+  size_t num_current;
+  ac_io_record_t *current_tmp;
+  size_t num_current_tmp;
+  ac_in_advance_f advance;
+  ac_in_advance_f advance_tmp;
+  ac_in_advance_unique_f advance_unique;
+  ac_in_advance_unique_f advance_unique_tmp;
+  ac_in_advance_f count_advance;
+  size_t limit;
+  size_t record_num;
+  ac_out_t *out;
+  ac_buffer_t *group_bh;
+
+  char **file_list;
+  char **filep;
+  ac_in_t *cur_in;
+};
 
 struct ac_in_s {
   ac_in_options_t options;
@@ -77,7 +104,11 @@ ac_io_record_t *ac_in_advance_unique_single(ac_in_t *h, size_t *num_r) {
 }
 
 ac_io_record_t *ac_in_advance_group(ac_in_t *h, size_t *num_r,
-                                    ac_io_compare_f compare, void *tag) {
+                                    bool *more_records, ac_io_compare_f compare,
+                                    void *arg) {
+  // TODO: group within buffer only - detect buffer switch (save first record
+  // for comparison).
+  *more_records = false;
   if (!h) {
     *num_r = 0;
     return NULL;
@@ -109,7 +140,7 @@ ac_io_record_t *ac_in_advance_group(ac_in_t *h, size_t *num_r,
     b += sizeof(r->length) + sizeof(r->tag);
     r1.record = b;
 
-    if (compare(&r1, r, tag)) {
+    if (compare(&r1, r, arg)) {
       ac_in_reset(h);
       break;
     }
@@ -137,8 +168,8 @@ ac_io_record_t *ac_in_advance_group(ac_in_t *h, size_t *num_r,
     ptr++;
     rp++;
   }
-  h->num_current = num_records;
-  h->current = res;
+  // h->num_current = num_records;
+  // h->current = res;
   *num_r = num_records;
   return res;
 }
@@ -191,7 +222,7 @@ ac_io_record_t *_advance_prefix(ac_in_t *h) {
 static inline ac_io_record_t *_advance_fixed_(ac_in_t *h, uint32_t length) {
   int32_t len = 0;
   h->num_current = 1;
-  char *p = ac_in_base_readz(h->base, &len, h->fixed);
+  char *p = ac_in_base_readz(h->base, &len, length);
   if (len != length) {
     h->current = NULL;
     h->num_current = 0;
@@ -337,12 +368,15 @@ void ac_in_reset(ac_in_t *h) {
 
 void ac_in_ext_destroy(ac_in_t *h);
 void ac_in_records_destroy(ac_in_t *hp);
+void ac_in_destroy_from_list(ac_in_t *hp);
 
 void ac_in_destroy(ac_in_t *h) {
   if (h->type == AC_IN_EXT_TYPE)
     ac_in_ext_destroy(h);
   else if (h->type == AC_IN_RECORDS_TYPE)
     ac_in_records_destroy(h);
+  else if (h->type == AC_IN_LIST_TYPE)
+    ac_in_destroy_from_list(h);
   else {
     if (h->base)
       ac_in_base_destroy(h->base);
@@ -544,6 +578,89 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
   return h;
 }
 
+ac_io_record_t *advance_file_list(ac_in_t *hp) {
+  ac_in_list_t *h = (ac_in_list_t *)hp;
+  if (!h)
+    return NULL;
+
+  h->num_current = 0;
+  ac_io_record_t *r = h->cur_in->advance(h->cur_in);
+  if (!r) {
+    ac_in_destroy(h->cur_in);
+    h->cur_in = NULL;
+    while (!h->cur_in && *(h->filep)) {
+      h->cur_in = ac_in_init(h->filep[0], &(h->options));
+      h->filep++;
+    }
+    if (!h->cur_in) {
+      ac_in_empty(hp);
+      return NULL;
+    }
+    r = h->cur_in->advance(h->cur_in);
+  }
+  h->current = r;
+  h->num_current = 1;
+  return r;
+}
+
+ac_io_record_t *advance_unique_file_list(ac_in_t *hp, size_t *num_r) {
+  ac_in_list_t *h = (ac_in_list_t *)hp;
+  if (!h) {
+    *num_r = 0;
+    return NULL;
+  }
+  ac_io_record_t *r = h->advance(hp);
+  *num_r = h->num_current;
+  return r;
+}
+
+ac_in_t *ac_in_init_from_list(ac_io_file_info_t *files, size_t num_files,
+                              ac_in_options_t *options) {
+  if (!num_files)
+    return NULL;
+
+  ac_in_options_t opts;
+  if (!options) {
+    options = &opts;
+    ac_in_options_init(options);
+  }
+
+  ac_in_list_t *h = (ac_in_list_t *)ac_calloc(
+      sizeof(ac_in_list_t) + (sizeof(char *) * (num_files + 1)));
+  h->file_list = (char **)(h + 1);
+  h->type = AC_IN_LIST_TYPE;
+  h->options = *options;
+  char **fp = h->file_list;
+  for (size_t i = 0; i < num_files; i++) {
+    if (files[i].size) {
+      *fp = ac_strdup(files[i].filename);
+      fp++;
+    }
+  }
+  *fp = NULL;
+  h->filep = h->file_list;
+  while (!h->cur_in && *(h->filep)) {
+    h->cur_in = ac_in_init(h->filep[0], &(h->options));
+    h->filep++;
+  }
+  h->advance = advance_file_list;
+  h->advance_unique = advance_unique_file_list;
+  h->advance_unique_tmp = h->advance_unique;
+  h->advance_tmp = h->advance;
+  return (ac_in_t *)h;
+}
+
+void ac_in_destroy_from_list(ac_in_t *hp) {
+  ac_in_list_t *h = (ac_in_list_t *)hp;
+  if (!h)
+    return;
+  if (h->cur_in)
+    ac_in_destroy(h->cur_in);
+  for (size_t i = 0; h->file_list[i] != NULL; i++)
+    ac_free(h->file_list[i]);
+  ac_free(h);
+}
+
 static ac_io_record_t *count_and_advance(ac_in_t *h) {
   h->record_num++;
   if (h->record_num < h->limit)
@@ -562,7 +679,7 @@ void ac_in_limit(ac_in_t *h, size_t limit) {
 ac_io_record_t *advance_reduced(ac_in_t *h) {
   ac_buffer_t *bh = h->reducer_group_bh;
   ac_io_compare_f compare = h->options.compare;
-  void *tag = h->options.compare_tag;
+  void *arg = h->options.compare_arg;
   ac_buffer_clear(bh);
   ac_io_record_t r1;
   ac_io_record_t *r;
@@ -585,7 +702,7 @@ ac_io_record_t *advance_reduced(ac_in_t *h) {
       b += sizeof(r->length) + sizeof(r->tag);
       r1.record = b;
 
-      if (compare(&r1, r, tag)) {
+      if (compare(&r1, r, arg)) {
         ac_in_reset(h);
         break;
       }
@@ -612,7 +729,7 @@ ac_io_record_t *advance_reduced(ac_in_t *h) {
       rp++;
     }
   } while (!h->options.reducer(&(h->rec), res, num_records, h->reducer_bh,
-                               h->options.reducer_tag));
+                               h->options.reducer_arg));
 
   h->num_current = 1;
   h->current = &(h->rec);
@@ -942,13 +1059,18 @@ void ac_in_options_lz4(ac_in_options_t *h, size_t buffer_size) {
   h->compressed_buffer_size = buffer_size;
 }
 
+void ac_in_options_compressed_buffer_size(ac_in_options_t *h,
+                                          size_t buffer_size) {
+  h->compressed_buffer_size = buffer_size;
+}
+
 void ac_in_options_reducer(ac_in_options_t *h, ac_io_compare_f compare,
-                           void *compare_tag, ac_io_reducer_f reducer,
-                           void *reducer_tag) {
+                           void *compare_arg, ac_io_reducer_f reducer,
+                           void *reducer_arg) {
   h->compare = compare;
-  h->compare_tag = compare_tag;
+  h->compare_arg = compare_arg;
   h->reducer = reducer;
-  h->reducer_tag = reducer_tag;
+  h->reducer_arg = reducer_arg;
 }
 
 /*****************************************************************************
@@ -966,18 +1088,18 @@ struct in_heap_s {
   ssize_t max_size;
   ac_in_t **heap;
   ac_io_compare_f compare;
-  void *compare_tag;
+  void *compare_arg;
 };
 
 static inline void in_heap_init(in_heap_t *h, ssize_t mx,
-                                ac_io_compare_f compare, void *tag) {
+                                ac_io_compare_f compare, void *arg) {
   h->size = 0;
   if (mx < 2)
     mx = 2;
   h->max_size = mx;
   h->heap = (ac_in_t **)ac_malloc((mx + 1) * sizeof(ac_in_t *));
   h->compare = compare;
-  h->compare_tag = tag;
+  h->compare_arg = arg;
 }
 
 static inline void in_heap_clear(in_heap_t *h) { h->size = 0; }
@@ -995,12 +1117,12 @@ static inline ac_in_t **in_heap_base(in_heap_t *h) { return h->heap; }
 static inline size_t in_heap_size(in_heap_t *h) { return h->size; }
 
 static inline int in_heap_compare(in_heap_t *h, ac_in_t *a, ac_in_t *b) {
-  return h->compare(a->current, b->current, h->compare_tag);
+  return h->compare(a->current, b->current, h->compare_arg);
 }
 
 static inline int in_heap_compare2(in_heap_t *h, ac_io_record_t *a,
                                    ac_in_t *b) {
-  return h->compare(a, b->current, h->compare_tag);
+  return h->compare(a, b->current, h->compare_arg);
 }
 
 void test_heap(in_heap_t *h) {
@@ -1098,13 +1220,13 @@ typedef struct {
 
   ac_buffer_t *reducer_bh;
   ac_io_reducer_f reducer;
-  void *reducer_tag;
+  void *reducer_arg;
 
   ac_io_compare_f compare;
-  void *compare_tag;
+  void *compare_arg;
 } ac_in_ext_t;
 
-ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *tag,
+ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *arg,
                         ac_in_options_t *options) {
   ac_in_options_t opts;
   if (!options) {
@@ -1115,9 +1237,9 @@ ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *tag,
   ac_in_ext_t *h = (ac_in_ext_t *)ac_calloc(sizeof(ac_in_ext_t));
   h->type = AC_IN_EXT_TYPE;
   h->compare = compare;
-  h->compare_tag = tag;
+  h->compare_arg = arg;
   h->options = *options;
-  in_heap_init(&(h->heap), 0, compare, tag);
+  in_heap_init(&(h->heap), 0, compare, arg);
 
   ac_in_empty((ac_in_t *)h);
   return (ac_in_t *)h;
@@ -1224,7 +1346,7 @@ ac_io_record_t *ac_in_ext_advance_reduce(ac_in_t *hp) {
     ac_io_record_t *r = ac_in_ext_advance_unique(hp, &num_r);
     if (!r)
       return NULL;
-    if (h->reducer(&h->rec, r, num_r, h->reducer_bh, h->reducer_tag)) {
+    if (h->reducer(&h->rec, r, num_r, h->reducer_bh, h->reducer_arg)) {
       r = h->current = &(h->rec);
       h->num_current = 1;
       return r;
@@ -1268,7 +1390,7 @@ void ac_in_ext_add(ac_in_t *hp, ac_in_t *in, int tag) {
   }
 }
 
-void ac_in_ext_reducer(ac_in_t *hp, ac_io_reducer_f reducer, void *tag) {
+void ac_in_ext_reducer(ac_in_t *hp, ac_io_reducer_f reducer, void *arg) {
   ac_in_ext_t *h = (ac_in_ext_t *)hp;
   if (!h || h->type != AC_IN_EXT_TYPE)
     return;
@@ -1277,7 +1399,7 @@ void ac_in_ext_reducer(ac_in_t *hp, ac_io_reducer_f reducer, void *tag) {
     h->advance = h->advance_tmp = ac_in_ext_advance_reduce;
 
   h->reducer = reducer;
-  h->reducer_tag = tag;
+  h->reducer_arg = arg;
   h->reducer_bh = ac_buffer_init(1024);
 }
 
@@ -1290,7 +1412,7 @@ void ac_in_ext_keep_first(ac_in_t *hp) {
     h->advance = h->advance_tmp = ac_in_ext_advance_reduce;
 
   h->reducer = ac_io_keep_first;
-  h->reducer_tag = NULL;
+  h->reducer_arg = NULL;
   h->reducer_bh = NULL;
 }
 
@@ -1349,16 +1471,16 @@ ac_io_record_t *ac_in_records_advance_and_reduce(ac_in_t *hp) {
   ac_in_records_t *h = (ac_in_records_t *)hp;
   ac_in_options_t *opts = &h->options;
   ac_io_compare_f compare = opts->compare;
-  void *tag = opts->compare_tag;
+  void *arg = opts->compare_arg;
   while (h->rp < h->ep) {
     ac_io_record_t *cur = h->rp;
     ac_io_record_t *rp = cur;
     rp++;
-    while (rp < h->ep && !compare(cur, rp, tag))
+    while (rp < h->ep && !compare(cur, rp, arg))
       rp++;
     h->rp = rp;
     if (opts->reducer(&(h->rec), cur, rp - cur, h->reducer_bh,
-                      opts->reducer_tag)) {
+                      opts->reducer_arg)) {
       h->current = &(h->rec);
       h->num_current = 1;
       return h->current;
@@ -1396,7 +1518,7 @@ ac_in_t *ac_in_records_init(ac_io_record_t *records, size_t num_records,
 
 void ac_in_destroy_out(ac_in_t *in, ac_out_t *out) { in->out = out; }
 
-void default_transform(ac_in_t *in, ac_out_t *out, void *tag) {
+void default_transform(ac_in_t *in, ac_out_t *out, void *arg) {
   ac_io_record_t *r;
   while ((r = ac_in_advance(in)) != NULL)
     ac_out_write_record(out, r->record, r->length);
@@ -1414,9 +1536,9 @@ static void get_tmp_name(char *dest, const char *fmt) {
 }
 
 ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,
-                         ac_io_compare_f compare, void *compare_tag,
-                         ac_io_reducer_f reducer, void *reducer_tag,
-                         ac_in_transform_f transform, void *tag) {
+                         ac_io_compare_f compare, void *compare_arg,
+                         ac_io_reducer_f reducer, void *reducer_arg,
+                         ac_in_transform_f transform, void *arg) {
   ac_out_options_t opts;
   ac_out_options_init(&opts);
   ac_out_options_buffer_size(&opts, buffer_size);
@@ -1424,9 +1546,9 @@ ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,
 
   ac_out_ext_options_t ext_opts;
   ac_out_ext_options_init(&ext_opts);
-  ac_out_ext_options_compare(&ext_opts, compare, compare_tag);
+  ac_out_ext_options_compare(&ext_opts, compare, compare_arg);
   if (reducer)
-    ac_out_ext_options_reducer(&ext_opts, reducer, reducer_tag);
+    ac_out_ext_options_reducer(&ext_opts, reducer, reducer_arg);
   char *name = (char *)ac_malloc(100);
   get_tmp_name(name, "transform_%d.lz4");
   ac_out_t *out = ac_out_ext_init(name, &opts, &ext_opts);
@@ -1435,9 +1557,57 @@ ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,
   if (!transform)
     transform = default_transform;
 
-  transform(in, out, tag);
+  transform(in, out, arg);
   ac_in_destroy(in);
   in = ac_out_in(out);
   ac_in_destroy_out(in, out);
   return in;
+}
+
+void ac_in_out(ac_in_t *in, ac_out_t *out) {
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL)
+    ac_out_write_record(out, r->record, r->length);
+}
+
+void ac_in_out2(ac_in_t *in, ac_out_t *out, ac_out_t *out2) {
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL) {
+    ac_out_write_record(out, r->record, r->length);
+    ac_out_write_record(out2, r->record, r->length);
+  }
+}
+
+void ac_in_out_custom(ac_in_t *in, ac_out_t *out, ac_in_out_f cb, void *arg) {
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL)
+    cb(out, r, arg);
+}
+
+void ac_in_out_custom2(ac_in_t *in, ac_out_t *out, ac_out_t *out2,
+                       ac_in_out2_f cb, void *arg) {
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL)
+    cb(out, out2, r, arg);
+}
+
+void ac_in_out_group(ac_in_t *in, ac_out_t *out, ac_io_compare_f compare,
+                     void *compare_arg, ac_in_out_group_f group, void *arg) {
+  size_t num_r = 0;
+  ac_io_record_t *r;
+  bool more_records = false;
+  while ((r = ac_in_advance_group(in, &num_r, &more_records, compare,
+                                  compare_arg)) != NULL)
+    group(out, r, num_r, more_records, arg);
+}
+
+void ac_in_out_group2(ac_in_t *in, ac_out_t *out, ac_out_t *out2,
+                      ac_io_compare_f compare, void *compare_arg,
+                      ac_in_out_group2_f group, void *arg) {
+  size_t num_r = 0;
+  ac_io_record_t *r;
+  bool more_records = false;
+  while ((r = ac_in_advance_group(in, &num_r, &more_records, compare,
+                                  compare_arg)) != NULL)
+    group(out, out2, r, num_r, more_records, arg);
 }

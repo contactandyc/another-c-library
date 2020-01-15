@@ -166,6 +166,50 @@ char *ac_pool_strdupvf(ac_pool_t *pool, const char *fmt, va_list args) {
   return r;
 }
 
+static size_t count_bytes_in_array(char **a, size_t *n) {
+  size_t len = sizeof(char *);
+  size_t num = 1;
+  while (*a) {
+    len += strlen(*a) + sizeof(char *) + 1;
+    num++;
+    a++;
+  }
+  return len;
+}
+
+char **ac_pool_strdupa(ac_pool_t *pool, char **a) {
+  if (!a)
+    return NULL;
+
+  size_t n = 0;
+  size_t len = count_bytes_in_array(a, &n);
+  char **r = (char **)ac_pool_alloc(pool, len);
+  char *m = (char *)(r + n);
+  char **rp = r;
+  while (*a) {
+    *rp++ = m;
+    char *s = *a;
+    while (*s)
+      *m++ = *s++;
+    *m++ = 0;
+    a++;
+  }
+  *rp = NULL;
+  return r;
+}
+
+char **ac_pool_strdupa2(ac_pool_t *pool, char **a) {
+  if (!a)
+    return NULL;
+
+  char **p = a;
+  while (*p)
+    p++;
+
+  p++;
+  return ac_pool_dup(pool, a, (p - a) * sizeof(char *));
+}
+
 char **_ac_pool_split(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
   static char *nil = NULL;
   if (!s) {
@@ -222,7 +266,7 @@ char **_ac_pool_split2(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
   }
 
   char *p = s;
-  while (*p == '|')
+  while (*p == delim)
     p++;
   if (*p == 0) {
     if (num_splits)

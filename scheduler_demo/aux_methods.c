@@ -1,13 +1,18 @@
 #include "aux_methods.h"
 
+// #define _USE_PREFIX_
+
 ac_in_t *open_fixed_input(const char *in_file, size_t fixed_size,
                           size_t buffer_size) {
   ac_in_options_t in_opts;
   ac_in_options_init(&in_opts);
   ac_in_options_buffer_size(&in_opts, buffer_size);
   // printf("opening %d size\n", ac_io_fixed(fixed_size));
+#ifdef _USE_PREFIX_
   ac_in_options_format(&in_opts, ac_io_prefix());
-  // ac_in_options_format(&in_opts, ac_io_fixed(fixed_size));
+#else
+  ac_in_options_format(&in_opts, ac_io_fixed(fixed_size));
+#endif
   return ac_in_init(in_file, &in_opts);
 }
 
@@ -17,9 +22,11 @@ ac_out_t *open_output(const char *out_file, size_t buffer_size,
   ac_out_options_t out_opts;
   ac_out_options_init(&out_opts);
   ac_out_options_buffer_size(&out_opts, buffer_size);
+#ifdef _USE_PREFIX_
   ac_out_options_format(&out_opts, ac_io_prefix());
-  // ac_out_options_format(&out_opts, ac_io_fixed(sizeof(entry_t)));
-
+#else
+  ac_out_options_format(&out_opts, ac_io_fixed(sizeof(entry_t)));
+#endif
   ac_out_ext_options_t out_ext_opts;
   ac_out_ext_options_init(&out_ext_opts);
   ac_out_ext_options_use_extra_thread(&out_ext_opts);

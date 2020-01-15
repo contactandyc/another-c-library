@@ -36,6 +36,13 @@ typedef struct {
   int32_t tag;
 } ac_io_record_t;
 
+typedef struct {
+  char *filename;
+  size_t size;
+  time_t last_modified;
+  int32_t tag;
+} ac_io_file_info_t;
+
 ac_sort_compare_arg_def(ac_io_sort_records, ac_io_record_t);
 
 typedef bool (*ac_io_reducer_f)(ac_io_record_t *res, const ac_io_record_t *r,
@@ -57,6 +64,8 @@ bool ac_io_keep_first(ac_io_record_t *res, const ac_io_record_t *r,
 
 size_t ac_io_hash_partition(const ac_io_record_t *r, size_t num_part,
                             void *tag);
+
+bool ac_io_file_info(ac_io_file_info_t *fi);
 
 bool ac_io_file_exists(const char *filename);
 

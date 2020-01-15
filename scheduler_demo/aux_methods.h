@@ -76,12 +76,12 @@ static inline int compare_entry_by_item_and_user(ac_io_record_t *a,
     return (p1->user_id < p2->user_id) ? -1 : 1;
   return 0;
 }
-
+/*
 ac_out_t *open_output(const char *out_file, size_t buffer_size,
                       ac_io_compare_f compare, ac_io_partition_f partition,
                       size_t num_out, ac_io_reducer_f reducer);
 
 ac_in_t *open_fixed_input(const char *in_file, size_t fixed_size,
                           size_t buffer_size);
-
+*/
 #endif

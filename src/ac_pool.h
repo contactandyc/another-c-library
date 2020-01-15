@@ -78,6 +78,12 @@ static inline void *ac_pool_calloc(ac_pool_t *h, size_t len);
   like char *s = ac_pool_dup(pool, p, strlen(p)+1); */
 static inline char *ac_pool_strdup(ac_pool_t *h, const char *p);
 
+/* duplicate all of the strings in a AND the NULL terminated pointer array.  */
+char **ac_pool_strdupa(ac_pool_t *pool, char **a);
+
+/* Duplicate the NULL terminated pointer array. */
+char **ac_pool_strdupa2(ac_pool_t *pool, char **a);
+
 /* split a string into N pieces using delimiter.  The array that is returned
    will always be valid with a NULL string at the end if p is NULL. num_splits
    can be NULL if the number of returning pieces is not desired. */
