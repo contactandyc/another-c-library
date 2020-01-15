@@ -52,8 +52,9 @@ struct ac_in_list_s {
   ac_out_t *out;
   ac_buffer_t *group_bh;
 
-  char **file_list;
-  char **filep;
+  ac_io_file_info_t *file_list;
+  ac_io_file_info_t *filep;
+  ac_io_file_info_t *fileep;
   ac_in_t *cur_in;
 };
 
@@ -588,8 +589,13 @@ ac_io_record_t *advance_file_list(ac_in_t *hp) {
   if (!r) {
     ac_in_destroy(h->cur_in);
     h->cur_in = NULL;
-    while (!h->cur_in && *(h->filep)) {
-      h->cur_in = ac_in_init(h->filep[0], &(h->options));
+    ac_in_options_t opts;
+    while (!h->cur_in && h->filep < h->fileep) {
+      opts = h->options;
+      if (h->filep[0].size < opts.buffer_size)
+        opts.buffer_size = h->filep[0].size;
+      opts.tag = h->filep[0].tag;
+      h->cur_in = ac_in_init(h->filep[0].filename, &opts);
       h->filep++;
     }
     if (!h->cur_in) {
@@ -619,28 +625,34 @@ ac_in_t *ac_in_init_from_list(ac_io_file_info_t *files, size_t num_files,
   if (!num_files)
     return NULL;
 
-  ac_in_options_t opts;
+  ac_in_options_t opts2;
   if (!options) {
-    options = &opts;
+    options = &opts2;
     ac_in_options_init(options);
   }
 
   ac_in_list_t *h = (ac_in_list_t *)ac_calloc(
-      sizeof(ac_in_list_t) + (sizeof(char *) * (num_files + 1)));
-  h->file_list = (char **)(h + 1);
+      sizeof(ac_in_list_t) + (sizeof(ac_io_file_info_t) * num_files));
+  h->file_list = (ac_io_file_info_t *)(h + 1);
   h->type = AC_IN_LIST_TYPE;
   h->options = *options;
-  char **fp = h->file_list;
+  ac_io_file_info_t *fp = h->file_list;
   for (size_t i = 0; i < num_files; i++) {
     if (files[i].size) {
-      *fp = ac_strdup(files[i].filename);
+      *fp = files[i];
+      fp->filename = ac_strdup(fp->filename);
       fp++;
     }
   }
-  *fp = NULL;
   h->filep = h->file_list;
-  while (!h->cur_in && *(h->filep)) {
-    h->cur_in = ac_in_init(h->filep[0], &(h->options));
+  h->fileep = h->file_list + num_files;
+  ac_in_options_t opts;
+  while (!h->cur_in && h->filep < h->fileep) {
+    opts = h->options;
+    if (h->filep[0].size < opts.buffer_size)
+      opts.buffer_size = h->filep[0].size;
+    opts.tag = h->filep[0].tag;
+    h->cur_in = ac_in_init(h->filep[0].filename, &opts);
     h->filep++;
   }
   h->advance = advance_file_list;
@@ -656,8 +668,11 @@ void ac_in_destroy_from_list(ac_in_t *hp) {
     return;
   if (h->cur_in)
     ac_in_destroy(h->cur_in);
-  for (size_t i = 0; h->file_list[i] != NULL; i++)
-    ac_free(h->file_list[i]);
+  h->filep = h->file_list;
+  while (h->filep < h->fileep) {
+    ac_free(h->filep->filename);
+    h->filep++;
+  }
   ac_free(h);
 }
 

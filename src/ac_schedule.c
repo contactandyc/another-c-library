@@ -267,13 +267,19 @@ ac_in_t *ac_worker_in(ac_worker_t *w, size_t n) {
     if (inp->reducer)
       ac_in_ext_reducer(in, inp->reducer, inp->reducer_arg);
     for (size_t i = 0; i < inp->num_files; i++)
-      ac_in_ext_add(in, ac_in_init(inp->files[i].filename, &(inp->options)), i);
+      ac_in_ext_add(in, ac_in_init(inp->files[i].filename, &(inp->options)),
+                    inp->files[i].tag);
   } else {
     ac_in_options_buffer_size(&(inp->options), ac_worker_ram(w, inp->ram_pct));
     if (inp->num_files > 1)
       in = ac_in_init_from_list(inp->files, inp->num_files, &(inp->options));
-    else
-      in = ac_in_init(inp->files[0].filename, &(inp->options));
+    else {
+      ac_in_options_t opts = inp->options;
+      if (opts.buffer_size > inp->files[0].size)
+        opts.buffer_size = inp->files[0].size;
+      opts.tag = inp->files[0].tag;
+      in = ac_in_init(inp->files[0].filename, &opts);
+    }
   }
   if (inp->limit)
     ac_in_limit(in, inp->limit);
@@ -933,8 +939,12 @@ static ac_worker_t *get_next_worker(ac_schedule_thread_t *t) {
 
 static void setup_worker(ac_worker_t *w) {}
 static bool run_worker(ac_worker_t *w) {
+  bool r = true;
+  w->timer = ac_timer_init(1);
+  ac_timer_start(w->timer);
   if (w->task->runner)
-    return w->task->runner(w);
+    r = w->task->runner(w);
+  ac_timer_stop(w->timer);
   return true;
 }
 
@@ -983,7 +993,10 @@ static bool worker_needs_to_run(ac_worker_t *w) {
   return false;
 }
 
-static void destroy_worker(ac_worker_t *w) {}
+static void destroy_worker(ac_worker_t *w) {
+  if (w->timer)
+    ac_timer_destroy(w->timer);
+}
 
 static void mark_as_done(ac_schedule_t *scheduler) {
   pthread_mutex_unlock(&(scheduler->mutex));

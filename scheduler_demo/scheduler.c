@@ -1,13 +1,11 @@
 #include "ac_schedule.h"
 #include "aux_methods.h"
-// #include "convert_ratings.h"
-// #include "sort_entries_by_user_and_item.h"
 
 #include <stdio.h>
 
 bool task_completed(ac_worker_t *tp) {
-  printf("Finished %s[%lu] on thread %lu\n", ac_task_name(tp->task),
-         tp->partition, tp->thread_id);
+  printf("Finished %s[%lu] on thread %lu in %0.3fms\n", ac_task_name(tp->task),
+         tp->partition, tp->thread_id, ac_timer_ms(tp->timer));
   return true;
 }
 
@@ -48,6 +46,7 @@ bool setup_convert_ratings(ac_task_t *task) {
      tasks. */
   ac_task_input_files(task, "mv", 0.05, get_mv_files);
   ac_task_input_format(task, ac_io_delimiter('\n'));
+  // ac_task_input_limit(task, 1000);
 
   /* specify output */
   ac_task_output(task, "by_user.lz4", "sort_by_user_and_item", 0.95, 0.10,

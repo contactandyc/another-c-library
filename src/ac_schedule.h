@@ -7,6 +7,7 @@
 #include "ac_io.h"
 #include "ac_out.h"
 #include "ac_pool.h"
+#include "ac_timer.h"
 
 #include <time.h>
 
@@ -241,6 +242,7 @@ struct ac_worker_s {
   ac_worker_output_t *outputs;
   void *data;
   void *transform_data;
+  ac_timer_t *timer;
   size_t partition;
   size_t num_partitions;
   size_t running;
