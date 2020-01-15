@@ -92,16 +92,14 @@ bool setup_sort_by_user_and_item(ac_task_t *task) {
 }
 
 bool setup_merge_by_user_and_item(ac_task_t *task) {
-  ac_task_output(task, "user_item.lz4", NULL, 0.50, 0.10, AC_OUTPUT_KEEP);
+  ac_task_output(task, "user_item.lz4", NULL, 0.20, 0.10, AC_OUTPUT_KEEP);
   ac_task_output_format(task, ac_io_fixed(sizeof(entry_t)));
 
-  ac_task_output(task, "item_user.lz4", NULL, 0.50, 0.10, AC_OUTPUT_KEEP);
+  ac_task_output(task, "item_user.lz4", NULL, 0.70, 0.10, AC_OUTPUT_KEEP);
   ac_task_output_format(task, ac_io_fixed(sizeof(entry_t)));
   ac_task_output_compare(task, compare_entry_by_item_and_user, NULL);
 
   ac_task_default_runner(task);
-  ac_task_transform(task, "user_item_sorted.lz4", "user_item.lz4|item_user.lz4",
-                    NULL);
   return true;
 }
 

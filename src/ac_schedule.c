@@ -825,6 +825,8 @@ void ac_task_input_limit(ac_task_t *task, size_t limit) {
   }
 }
 
+static bool in_out_runner(ac_worker_t *w);
+
 static void schedule_setup(ac_schedule_t *h) {
   if (!h->task_dir)
     h->task_dir = (char *)"tasks";
@@ -835,8 +837,20 @@ static void schedule_setup(ac_schedule_t *h) {
   ac_io_make_directory(h->ack_dir);
   ac_task_t *n = h->head;
   while (n) {
-    if (n->setup)
+    if (n->setup) {
       n->setup(n);
+      if (n->runner == in_out_runner && !n->transforms) {
+        ac_worker_output_t *o = n->outputs;
+        ac_buffer_clear(bh);
+        while (o) {
+          ac_buffer_appends(bh, o->name);
+          if (o->next)
+            ac_buffer_appendc(bh, '|');
+          o = o->next;
+        }
+        ac_task_transform(n, n->inputs[0].name, ac_buffer_data(bh), NULL);
+      }
+    }
     for (size_t i = 0; i < n->num_partitions; i++) {
       ac_buffer_setf(bh, "%s/%s_%lu", h->task_dir, n->task_name, i);
       ac_io_make_directory(ac_buffer_data(bh));
@@ -1226,6 +1240,7 @@ void ac_task_default_runner(ac_task_t *task) { task->runner = in_out_runner; }
 
 void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete) {
   schedule_setup(h);
+
   h->num_running = h->cpus;
   h->on_complete = on_complete;
   h->done = false;
