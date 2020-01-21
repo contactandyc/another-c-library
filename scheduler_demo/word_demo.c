@@ -7,9 +7,10 @@ ac_io_file_info_t *inputs = NULL;
 
 /* By defining the filenames, it is easier to change them as needed.  Also,
    if .lz4 or .gz file extensions are used, the files will be compressed as
-   such!  */
-#define SPLIT_WORDS "split_words"
-#define COUNT_WORDS "count_words"
+   such!  lz4 is often faster than uncompressed and takes less space, so
+   it is highly recommended. */
+#define SPLIT_WORDS "split_words.lz4"
+#define COUNT_WORDS "count_words.lz4"
 #define TMP_WORDS "tmp"
 #define TOKENS_TO_SPLIT_ON "(*\"\',+-/\\| \t{});[].=&%<>!#`:"
 
