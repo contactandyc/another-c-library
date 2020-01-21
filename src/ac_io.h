@@ -36,7 +36,7 @@ typedef struct {
   int32_t tag;
 } ac_io_record_t;
 
-typedef struct {
+typedef struct ac_io_file_info_s {
   char *filename;
   size_t size;
   time_t last_modified;
@@ -67,11 +67,17 @@ size_t ac_io_hash_partition(const ac_io_record_t *r, size_t num_part,
 
 bool ac_io_file_info(ac_io_file_info_t *fi);
 
+ac_io_file_info_t *ac_io_list(const char *path, size_t *num_files,
+                              bool (*file_valid)(const char *filename));
+
 bool ac_io_file_exists(const char *filename);
 
 size_t ac_io_file_size(const char *filename);
 
 time_t ac_io_modified(const char *filename);
+
+bool ac_io_directory(const char *filename);
+bool ac_io_file(const char *filename);
 
 /* char *ac_io_read_file(size_t *len, const char *filename); */
 
@@ -103,5 +109,49 @@ bool ac_io_make_path_valid(char *filename);
   If filename is NULL, false will be returned.
 */
 bool ac_io_extension(const char *filename, const char *extension);
+
+static inline int ac_io_compare_uint64_t(ac_io_record_t *p1, ac_io_record_t *p2,
+                                         void *tag) {
+  uint64_t *a = (uint64_t *)p1->record;
+  uint64_t *b = (uint64_t *)p2->record;
+  if (*a != *b)
+    return (*a < *b) ? -1 : 1;
+  return 0;
+}
+
+static inline int ac_io_compare_uint32_t(ac_io_record_t *p1, ac_io_record_t *p2,
+                                         void *tag) {
+  uint32_t *a = (uint32_t *)p1->record;
+  uint32_t *b = (uint32_t *)p2->record;
+  if (*a != *b)
+    return (*a < *b) ? -1 : 1;
+  return 0;
+}
+
+static inline size_t ac_io_split_by_uint64_t(const ac_io_record_t *r,
+                                             size_t num_part, void *tag) {
+  uint64_t *a = (uint64_t *)r->record;
+  return (*a) % num_part;
+}
+
+static inline size_t ac_io_split_by_uint32_t(const ac_io_record_t *r,
+                                             size_t num_part, void *tag) {
+  uint32_t *a = (uint32_t *)r->record;
+  uint32_t np = num_part;
+  return (*a) % np;
+}
+
+static inline size_t ac_io_split_by_uint64_t_2(const ac_io_record_t *r,
+                                               size_t num_part, void *tag) {
+  uint64_t *a = (uint64_t *)r->record;
+  return (a[1]) % num_part;
+}
+
+static inline size_t ac_io_split_by_uint32_t_2(const ac_io_record_t *r,
+                                               size_t num_part, void *tag) {
+  uint32_t *a = (uint32_t *)r->record;
+  uint32_t np = num_part;
+  return (a[1]) % np;
+}
 
 #endif

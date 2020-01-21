@@ -717,20 +717,58 @@ static bool ac_out_flush(ac_out_t *h) {
 
 static void ac_out_ext_destroy(ac_out_t *hp);
 
+void _ac_out_destroy(ac_out_t *h) {
+  ac_out_flush(h);
+  if (h->fd > -1 && h->fd_owner) {
+    close(h->fd);
+    h->fd = -1;
+  }
+
+  if (h->lz4) {
+    ac_lz4_destroy(h->lz4);
+    h->lz4 = NULL;
+  }
+  if (h->gz) {
+    gzclose(h->gz);
+    h->gz = NULL;
+  }
+}
+
+void remove_out(ac_out_t *h) {
+  if (h->options.safe_mode)
+    remove(h->filename + strlen(h->filename) + 1);
+  else
+    remove(h->filename);
+
+  ac_free(h);
+}
+
+ac_in_t *ac_out_normal_in(ac_out_t *h) {
+  _ac_out_destroy(h);
+  char *filename = h->filename;
+  if (!filename)
+    return NULL;
+
+  if (h->options.safe_mode)
+    filename = filename + strlen(filename) + 1;
+
+  ac_in_options_t opts;
+  ac_in_options_init(&opts);
+  ac_in_options_buffer_size(&opts, h->buffer_size);
+  ac_in_options_format(&opts, h->options.format);
+  ac_in_t *in = ac_in_init(filename, &opts);
+  if (in)
+    ac_in_destroy_out(in, h, remove_out);
+  return in;
+}
+
 void ac_out_destroy(ac_out_t *h) {
   if (h->type != AC_OUT_NORMAL_TYPE) {
     ac_out_ext_destroy(h);
     return;
   }
 
-  ac_out_flush(h);
-  if (h->fd > -1 && h->fd_owner)
-    close(h->fd);
-
-  if (h->lz4)
-    ac_lz4_destroy(h->lz4);
-  if (h->gz)
-    gzclose(h->gz);
+  _ac_out_destroy(h);
 
   if (h->options.safe_mode)
     rename(h->filename + strlen(h->filename) + 1, h->filename);
@@ -906,7 +944,7 @@ void *sort_partitions(void *arg) {
   return NULL;
 }
 
-void ac_out_partitioned_destroy(ac_out_t *hp) {
+void _ac_out_partitioned_destroy(ac_out_t *hp) {
   ac_out_partitioned_t *h = (ac_out_partitioned_t *)hp;
   for (size_t i = 0; i < h->num_partitions; i++) {
     ac_out_destroy(h->partitions[i]);
@@ -955,7 +993,20 @@ void ac_out_partitioned_destroy(ac_out_t *hp) {
     }
     ac_free(tmp_name);
   }
-  ac_free(h);
+}
+
+ac_in_t *ac_out_partitioned_in(ac_out_t *hp) {
+  _ac_out_partitioned_destroy(hp);
+  /*  TODO:
+      1. either a list of files or a compared set with heap */
+  // for now return NULL as this would be unusual case
+  ac_free(hp);
+  return NULL;
+}
+
+void ac_out_partitioned_destroy(ac_out_t *hp) {
+  _ac_out_partitioned_destroy(hp);
+  ac_free(hp);
 }
 
 typedef struct {
@@ -1220,7 +1271,7 @@ void ac_out_tag(ac_out_t *hp, int tag) {
   h->tag = tag;
 }
 
-ac_in_t *ac_out_in(ac_out_t *hp) {
+ac_in_t *_ac_out_sorted_in(ac_out_t *hp) {
   ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
   if (h->type != AC_OUT_SORTED_TYPE)
     return NULL;
@@ -1230,8 +1281,20 @@ ac_in_t *ac_out_in(ac_out_t *hp) {
 
   h->out_in_called = true;
 
-  if (!h->num_written && !h->num_group_written)
+  if (!h->num_written && !h->num_group_written) {
+    if (&(h->buf1) == h->b) {
+      if (h->buf2.buffer) {
+        ac_free(h->buf2.buffer);
+        h->buf2.buffer = NULL;
+      }
+    } else {
+      if (h->buf1.buffer) {
+        ac_free(h->buf1.buffer);
+        h->buf1.buffer = NULL;
+      }
+    }
     return _in_from_buffer(h, h->b);
+  }
 
   if (h->b->num_records) {
     wait_on_thread(h);
@@ -1246,8 +1309,18 @@ ac_in_t *ac_out_in(ac_out_t *hp) {
     write_sorted_thread(h);
   }
 
+  if (h->buf1.buffer) {
+    ac_free(h->buf1.buffer);
+    h->buf1.buffer = NULL;
+  }
+  if (h->buf2.buffer) {
+    ac_free(h->buf2.buffer);
+    h->buf2.buffer = NULL;
+  }
+
   ac_in_options_t opts;
   ac_in_options_init(&opts);
+  ac_in_options_buffer_size(&opts, h->buf1.size / 10);
   ac_in_options_format(&opts, ac_io_prefix());
   ac_in_t *in =
       ac_in_ext_init(h->ext_options.compare, h->ext_options.compare_arg, &opts);
@@ -1255,10 +1328,24 @@ ac_in_t *ac_out_in(ac_out_t *hp) {
     ac_in_ext_reducer(in, h->ext_options.reducer, h->ext_options.reducer_arg);
 
   const char *suffix = h->ext_options.lz4_tmp ? ".lz4" : "";
+  printf("%s num_written: %lu\n", h->filename, h->num_written);
   for (size_t i = 0; i < h->num_written; i++) {
     tmp_filename(h->tmp_filename, h->filename, i, suffix);
-    ac_in_ext_add(in, ac_in_init(h->tmp_filename, &opts), 0);
+    ac_in_ext_add(in, ac_in_init(h->tmp_filename, &opts), i);
   }
+  return in;
+}
+
+ac_in_t *ac_out_in(ac_out_t *hp) {
+  ac_in_t *in = NULL;
+  if (hp->type == AC_OUT_SORTED_TYPE) {
+    in = _ac_out_sorted_in(hp);
+    if (in)
+      ac_in_destroy_out(in, hp, NULL);
+  } else if (hp->type == AC_OUT_PARTITIONED_TYPE)
+    in = ac_out_partitioned_in(hp);
+  else if (hp->type == AC_OUT_NORMAL_TYPE)
+    in = ac_out_normal_in(hp);
   return in;
 }
 
@@ -1381,7 +1468,7 @@ static void destroy_extra_ins(ac_out_sorted_t *h) {
 
 void ac_out_sorted_destroy(ac_out_t *hp) {
   ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
-  ac_in_t *in = ac_out_in(hp);
+  ac_in_t *in = _ac_out_sorted_in(hp);
   if (in) {
     sprintf(h->tmp_filename, "%s%s", h->filename, h->suffix ? h->suffix : "");
     ac_out_t *out = ac_out_ext_init(h->tmp_filename, &(h->options),

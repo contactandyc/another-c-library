@@ -198,6 +198,36 @@ char **ac_pool_strdupa(ac_pool_t *pool, char **a) {
   return r;
 }
 
+static size_t count_bytes_in_arrayn(char **a, size_t num) {
+  size_t len = (sizeof(char *) * (num + 1));
+  for (size_t i = 0; i < num; i++) {
+    len += strlen(*a) + 1;
+    a++;
+  }
+  return len;
+}
+
+char **ac_pool_strdupan(ac_pool_t *pool, char **a, size_t n) {
+  if (!a)
+    return NULL;
+
+  size_t len = count_bytes_in_arrayn(a, n);
+  char **r = (char **)ac_pool_alloc(pool, len);
+  char *m = (char *)(r + n + 1);
+  char **rp = r;
+  char **ae = a + n;
+  while (a < ae) {
+    *rp++ = m;
+    char *s = *a;
+    while (*s)
+      *m++ = *s++;
+    *m++ = 0;
+    a++;
+  }
+  *rp = NULL;
+  return r;
+}
+
 char **ac_pool_strdupa2(ac_pool_t *pool, char **a) {
   if (!a)
     return NULL;
@@ -208,6 +238,132 @@ char **ac_pool_strdupa2(ac_pool_t *pool, char **a) {
 
   p++;
   return ac_pool_dup(pool, a, (p - a) * sizeof(char *));
+}
+
+static inline void setup_tokenize(uint64_t *bits, const char *delim) {
+  bits[0] = bits[1] = 0;
+  const char *p = delim;
+  while (true) {
+    if (*p > 0) {
+      if (*p < 64)
+        bits[0] |= (1 << (*p));
+      else
+        bits[1] |= (1 << ((*p) - 64));
+    } else if (*p == 0)
+      break;
+
+    p++;
+  }
+}
+
+static inline char *skip_delimiter(uint64_t *bits, char *p) {
+  while (*p > 0) {
+    if (*p < 64) {
+      if (bits[0] & (1 << (*p)))
+        p++;
+      else
+        return p;
+    } else {
+      if (bits[1] & (1 << ((*p) - 64)))
+        p++;
+      else
+        return p;
+    }
+  }
+  return p;
+}
+
+char **_ac_pool_tokenize(ac_pool_t *h, size_t *num_splits, const char *delim,
+                         char *s) {
+  static char *nil = NULL;
+  if (!s) {
+    if (num_splits)
+      *num_splits = 0;
+    return &nil;
+  }
+  uint64_t bits[2];
+  setup_tokenize(bits, delim);
+  char *p = skip_delimiter(bits, s);
+  s = p;
+  if (*p == 0) {
+    if (num_splits)
+      *num_splits = 0;
+    return &nil;
+  }
+
+  size_t num = 1;
+  while (true) {
+    if (*p > 0) {
+      if (*p < 64) {
+        if (bits[0] & (1 << (*p))) {
+          num++;
+          p = skip_delimiter(bits, p + 1);
+          if (*p == 0) {
+            num--;
+            break;
+          }
+        } else
+          p++;
+      } else {
+        if (bits[1] & (1 << ((*p) - 64))) {
+          num++;
+          p = skip_delimiter(bits, p + 1);
+          if (*p == 0) {
+            num--;
+            break;
+          }
+        } else
+          p++;
+      }
+    } else if (*p == 0)
+      break;
+    else
+      p++;
+  }
+  if (num_splits)
+    *num_splits = num;
+  char **r = (char **)ac_pool_alloc(h, sizeof(char *) * (num + 1));
+  char **wr = r;
+  *wr = s;
+  p = s;
+  wr++;
+  while (true) {
+    if (*p > 0) {
+      if (*p < 64) {
+        if (bits[0] & (1 << (*p))) {
+          *p = 0;
+          p = skip_delimiter(bits, p + 1);
+          if (*p == 0)
+            break;
+          *wr = p;
+          wr++;
+        } else
+          p++;
+      } else {
+        if (bits[1] & (1 << ((*p) - 64))) {
+          *p = 0;
+          p = skip_delimiter(bits, p + 1);
+          if (*p == 0)
+            break;
+          *wr = p;
+          wr++;
+        } else
+          p++;
+      }
+    } else if (*p == 0)
+      break;
+    else
+      p++;
+  }
+
+  *wr = NULL;
+  return r;
+}
+
+char **ac_pool_tokenize(ac_pool_t *h, size_t *num_splits, const char *delim,
+                        const char *s) {
+  return _ac_pool_tokenize(h, num_splits, delim,
+                           s ? ac_pool_strdup(h, s) : NULL);
 }
 
 char **_ac_pool_split(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
@@ -245,7 +401,7 @@ char **_ac_pool_split(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
 
 char **ac_pool_split(ac_pool_t *h, size_t *num_splits, char delim,
                      const char *p) {
-  return _ac_pool_split(h, num_splits, delim, ac_pool_strdup(h, p));
+  return _ac_pool_split(h, num_splits, delim, p ? ac_pool_strdup(h, p) : NULL);
 }
 
 char **ac_pool_splitf(ac_pool_t *h, size_t *num_splits, char delim,
@@ -307,7 +463,7 @@ char **_ac_pool_split2(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
 
 char **ac_pool_split2(ac_pool_t *h, size_t *num_splits, char delim,
                       const char *p) {
-  return _ac_pool_split2(h, num_splits, delim, ac_pool_strdup(h, p));
+  return _ac_pool_split2(h, num_splits, delim, p ? ac_pool_strdup(h, p) : NULL);
 }
 
 char **ac_pool_split2f(ac_pool_t *h, size_t *num_splits, char delim,

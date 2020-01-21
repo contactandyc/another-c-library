@@ -41,4 +41,4 @@ typedef struct {
   void *reducer_arg;
 } ac_in_options_t;
 
-void ac_in_empty(ac_in_t *h);
+void _ac_in_empty(ac_in_t *h);

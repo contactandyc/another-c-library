@@ -114,11 +114,15 @@ ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *arg,
 ac_in_t *ac_in_init_from_list(ac_io_file_info_t *files, size_t num_files,
                               ac_in_options_t *options);
 
+/* Create an empty cursor - still must be destroyed and won't return anything */
+ac_in_t *ac_in_empty();
+
 /* Useful to limit the number of records for testing */
 void ac_in_limit(ac_in_t *h, size_t limit);
 
 /* After in is destroyed, destroy the given output, useful in transformations */
-void ac_in_destroy_out(ac_in_t *in, ac_out_t *out);
+void ac_in_destroy_out(ac_in_t *in, ac_out_t *out,
+                       void (*destroy_out)(ac_out_t *out));
 
 /* Transform the data and return a new cursor */
 ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,

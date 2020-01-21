@@ -29,9 +29,17 @@ typedef bool (*ac_worker_f)(ac_worker_t *w);
 typedef void *(*ac_worker_data_f)(ac_worker_t *w);
 typedef void (*ac_destroy_worker_data_f)(ac_worker_t *w, void *d);
 
+typedef void (*ac_task_dump_f)(ac_worker_t *w, ac_io_record_t *r,
+                               ac_buffer_t *bh);
+
+void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh);
+
 typedef void (*ac_runner_f)(ac_worker_t *w, ac_io_record_t *r, ac_out_t **out);
 typedef void (*ac_group_runner_f)(ac_worker_t *w, ac_io_record_t *r,
                                   size_t num_r, ac_out_t **out);
+
+typedef void (*ac_io_runner_f)(ac_worker_t *w, ac_in_t **ins, size_t num_ins,
+                               ac_out_t **outs, size_t num_outs);
 
 typedef ac_io_file_info_t *(*ac_worker_file_info_f)(ac_worker_t *w,
                                                     size_t *num_files,
@@ -47,8 +55,8 @@ then attempts to keep your process operating fully within that space.
 
 /* Create the scheduler and specify how many partitions, cpus, ram (in MB),
    and disk space.  Disk space is currently unused - but I have plans for it. */
-ac_schedule_t *ac_schedule_init(size_t num_partitions, size_t cpus, size_t ram,
-                                size_t disk_space);
+ac_schedule_t *ac_schedule_init(int argc, char **args, size_t num_partitions,
+                                size_t cpus, size_t ram);
 
 /* Define where the ack directory should be (default is tasks/ack)*/
 void ac_schedule_ack_dir(ac_schedule_t *h, const char *ack_dir);
@@ -61,6 +69,9 @@ void ac_schedule_task_dir(ac_schedule_t *h, const char *task_dir);
    once all of the tasks have been added to the scheduler. */
 ac_task_t *ac_schedule_task(ac_schedule_t *h, const char *task_name,
                             bool partitioned, ac_task_f setup);
+
+/* An on_complete method that prints completion of each task to stderr */
+bool ac_worker_complete(ac_worker_t *w);
 
 /* Run all of the tasks */
 void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete);
@@ -80,6 +91,9 @@ void ac_task_default_runner(ac_task_t *task);
 
 void ac_task_transform(ac_task_t *task, const char *inp, const char *outp,
                        ac_runner_f runner);
+
+void ac_task_io_transform(ac_task_t *task, const char *inp, const char *outp,
+                          ac_io_runner_f runner);
 
 void ac_task_group_transform(ac_task_t *task, const char *inp, const char *outp,
                              ac_group_runner_f runner, ac_io_compare_f compare);
@@ -131,6 +145,8 @@ static const size_t AC_OUTPUT_PARTITION = 8;
 void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
                     double out_ram_pct, double in_ram_pct, size_t flags);
 
+void ac_task_output_dump(ac_task_t *task, ac_task_dump_f dump, void *arg);
+
 /* These ac_task_output_... methods must be called after ac_task_output and
    will apply to the previous ac_task_output call. */
 void ac_task_output_partition(ac_task_t *task, ac_io_partition_f part,
@@ -180,6 +196,8 @@ void ac_task_output_lz4(ac_task_t *task, int level, ac_lz4_block_size_t size,
    ac_task_output call.  If the previous ac_task_output call doesn't specify
    one or more destinations, the calls are silently ignored. */
 void ac_task_input_format(ac_task_t *task, ac_io_format_t format);
+
+void ac_task_input_dump(ac_task_t *task, ac_task_dump_f dump, void *arg);
 
 void ac_task_input_compare(ac_task_t *task, ac_io_compare_f compare,
                            void *compare_tag);
@@ -236,6 +254,9 @@ struct ac_worker_s {
   ac_pool_t *worker_pool;
   /* The pool can be cleared by application */
   ac_pool_t *pool;
+  /* The bh can be cleared by application */
+  ac_buffer_t *bh;
+
   ac_task_t *task;
   ac_worker_input_t *inputs;
   ac_worker_output_t *outputs;
@@ -266,6 +287,9 @@ struct ac_worker_input_s {
   void *reducer_arg;
   size_t limit;
 
+  ac_task_dump_f dump;
+  void *dump_arg;
+
   ac_task_t *task;
   ac_worker_output_t *src;
   ac_worker_input_t *next;
@@ -278,6 +302,9 @@ struct ac_worker_output_s {
   double ram_pct;
   size_t flags;
   size_t num_partitions;
+
+  ac_task_dump_f dump;
+  void *dump_arg;
 
   ac_out_options_t options;
   ac_out_ext_options_t ext_options;

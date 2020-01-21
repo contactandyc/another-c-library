@@ -50,6 +50,7 @@ struct ac_in_list_s {
   size_t limit;
   size_t record_num;
   ac_out_t *out;
+  void (*destroy_out)(ac_out_t *out);
   ac_buffer_t *group_bh;
 
   ac_io_file_info_t *file_list;
@@ -74,6 +75,7 @@ struct ac_in_s {
   size_t limit;
   size_t record_num;
   ac_out_t *out;
+  void (*destroy_out)(ac_out_t *out);
   ac_buffer_t *group_bh;
 
   ac_in_advance_f sub_advance;
@@ -383,8 +385,8 @@ void ac_in_destroy(ac_in_t *h) {
       ac_in_base_destroy(h->base);
     if (h->lz4)
       ac_lz4_destroy(h->lz4);
-    if (h->out)
-      ac_out_destroy(h->out);
+    if (h->out && h->destroy_out)
+      h->destroy_out(h->out);
     if (h->group_bh)
       ac_buffer_destroy(h->group_bh);
 
@@ -438,7 +440,7 @@ static void fill_blocks(ac_in_t *h, ac_in_buffer_t *dest) {
   }
 }
 
-void ac_in_empty(ac_in_t *h) {
+void _ac_in_empty(ac_in_t *h) {
   // if (h->group_bh)
   //   ac_buffer_destroy(h->group_bh);
   h->current = NULL;
@@ -449,6 +451,12 @@ void ac_in_empty(ac_in_t *h) {
   h->advance_unique = empty_record_unique;
   h->advance_unique_tmp = h->advance_unique;
   h->advance_tmp = h->advance;
+}
+
+ac_in_t *ac_in_empty() {
+  ac_in_t *h = (ac_in_t *)ac_calloc(sizeof(ac_in_t));
+  _ac_in_empty(h);
+  return h;
 }
 
 ac_io_record_t *advance_reduced(ac_in_t *h);
@@ -494,7 +502,7 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
       abort();
 
     h = (ac_in_t *)ac_calloc(sizeof(ac_in_t));
-    ac_in_empty(h);
+    _ac_in_empty(h);
     return h;
   }
 
@@ -505,7 +513,7 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
       if (options->abort_on_file_empty)
         abort();
       h = (ac_in_t *)ac_calloc(sizeof(ac_in_t));
-      ac_in_empty(h);
+      _ac_in_empty(h);
       return h;
     }
     ac_lz4_t *lz4 = ac_lz4_init_decompress(headerp, 7);
@@ -514,7 +522,7 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
       if (options->abort_on_error)
         abort();
       h = (ac_in_t *)ac_calloc(sizeof(ac_in_t));
-      ac_in_empty(h);
+      _ac_in_empty(h);
       return h;
     }
     uint32_t buffer_size = options->buffer_size;
@@ -599,7 +607,7 @@ ac_io_record_t *advance_file_list(ac_in_t *hp) {
       h->filep++;
     }
     if (!h->cur_in) {
-      ac_in_empty(hp);
+      _ac_in_empty(hp);
       return NULL;
     }
     r = h->cur_in->advance(h->cur_in);
@@ -645,7 +653,7 @@ ac_in_t *ac_in_init_from_list(ac_io_file_info_t *files, size_t num_files,
     }
   }
   h->filep = h->file_list;
-  h->fileep = h->file_list + num_files;
+  h->fileep = fp;
   ac_in_options_t opts;
   while (!h->cur_in && h->filep < h->fileep) {
     opts = h->options;
@@ -678,10 +686,10 @@ void ac_in_destroy_from_list(ac_in_t *hp) {
 
 static ac_io_record_t *count_and_advance(ac_in_t *h) {
   h->record_num++;
-  if (h->record_num < h->limit)
+  if (h->record_num <= h->limit)
     return h->count_advance(h);
 
-  ac_in_empty(h);
+  _ac_in_empty(h);
   return NULL;
 }
 
@@ -702,7 +710,7 @@ ac_io_record_t *advance_reduced(ac_in_t *h) {
   size_t num_records;
   do {
     if ((r = h->sub_advance(h)) == NULL) {
-      ac_in_empty(h);
+      _ac_in_empty(h);
       return NULL;
     }
 
@@ -721,7 +729,7 @@ ac_io_record_t *advance_reduced(ac_in_t *h) {
         ac_in_reset(h);
         break;
       }
-      ac_buffer_set(bh, &(r->length), sizeof(r->length));
+      ac_buffer_append(bh, &(r->length), sizeof(r->length));
       ac_buffer_append(bh, &(r->tag), sizeof(r->tag));
       ac_buffer_append(bh, r->record, r->length);
       ac_buffer_appendc(bh, 0);
@@ -1224,6 +1232,7 @@ typedef struct {
   size_t limit;
   size_t record_num;
   ac_out_t *out;
+  void (*destroy_out)(ac_out_t *out);
   ac_buffer_t *group_bh;
 
   ac_in_t **active;
@@ -1256,7 +1265,7 @@ ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *arg,
   h->options = *options;
   in_heap_init(&(h->heap), 0, compare, arg);
 
-  ac_in_empty((ac_in_t *)h);
+  _ac_in_empty((ac_in_t *)h);
   return (ac_in_t *)h;
 }
 
@@ -1322,7 +1331,7 @@ ac_io_record_t *ac_in_ext_advance(ac_in_t *hp) {
     h->current = ac_in_current(in);
     return h->current;
   }
-  ac_in_empty(hp);
+  _ac_in_empty(hp);
   return NULL;
 }
 
@@ -1449,6 +1458,7 @@ typedef struct {
   size_t limit;
   size_t record_num;
   ac_out_t *out;
+  void (*destroy_out)(ac_out_t *out);
   ac_buffer_t *group_bh;
 
   ac_io_record_t *records;
@@ -1478,7 +1488,7 @@ ac_io_record_t *ac_in_records_advance(ac_in_t *hp) {
     h->num_current = 1;
     return h->current;
   }
-  ac_in_empty(hp);
+  _ac_in_empty(hp);
   return NULL;
 }
 
@@ -1501,7 +1511,7 @@ ac_io_record_t *ac_in_records_advance_and_reduce(ac_in_t *hp) {
       return h->current;
     }
   }
-  ac_in_empty(hp);
+  _ac_in_empty(hp);
   return NULL;
 }
 
@@ -1531,7 +1541,11 @@ ac_in_t *ac_in_records_init(ac_io_record_t *records, size_t num_records,
   return (ac_in_t *)h;
 }
 
-void ac_in_destroy_out(ac_in_t *in, ac_out_t *out) { in->out = out; }
+void ac_in_destroy_out(ac_in_t *in, ac_out_t *out,
+                       void (*destroy_out)(ac_out_t *out)) {
+  in->out = out;
+  in->destroy_out = destroy_out ? destroy_out : ac_out_destroy;
+}
 
 void default_transform(ac_in_t *in, ac_out_t *out, void *arg) {
   ac_io_record_t *r;
@@ -1575,7 +1589,7 @@ ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,
   transform(in, out, arg);
   ac_in_destroy(in);
   in = ac_out_in(out);
-  ac_in_destroy_out(in, out);
+  ac_in_destroy_out(in, out, NULL);
   return in;
 }
 
