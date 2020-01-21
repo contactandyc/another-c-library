@@ -22,6 +22,15 @@ cd another-c-library/demo
 make
 ```
 
+The ac_schedule is demonstrated in a second demo directory named scheduler_demo.  This demos how to chain input together through a variety of sorts and merges to produce a final output.  In addition, the sorts and merges will work within the confines of the environment described by the user.  This is something like the hadoop map/reduce framework only written in C (and at the moment, only capable of supporting one box).  This framework attempts to stay out of your way, but also provides a number of useful utilities to get common work done.  
+
+```bash
+cd ../scheduler_demo
+make
+./word_demo -h
+./word_demo .. --cpus 4
+```
+
 The package depends on libuv in the uvdemo directory.  On a mac, use the following command to install libuv.
 ```bash
 brew install libuv
