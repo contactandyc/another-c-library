@@ -12,11 +12,11 @@ function Tutorial({ data }) {
 
   return (
     <Layout>
-      <SEO title="Learn C Programming" />
+      <SEO title="Tutorial" />
 
       <div className="Tutorial-mn">
         <div className="Tutorial-cntnt Content">
-          <h1>Learn C Programming</h1>
+          <h1>Tutorial</h1>
           <p>The book/library started in August 2019, so it's a work in progress.
           This is not a usage book. We're working on a book that simply explains usage.
           We follow patterns used by <a href="https://nikhilm.github.io/uvbook/index.html" target="_blank" rel="noopener noreferrer">https://nikhilm.github.io/uvbook/index.html <FaExternalLinkAlt /></a>.

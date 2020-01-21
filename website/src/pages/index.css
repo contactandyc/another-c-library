@@ -62,7 +62,7 @@ code[class*="language-"], pre[class*="language-"] {
 
 pre {
   background: #f6f8fa;
-  font-size: 0.85rem;
+  font-size: 16px;
   font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
   line-height: 32px;
   overflow: scroll;
@@ -87,7 +87,7 @@ pre {
   width: 72vw;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 800px) {
   nav, .Footer {
     flex-direction: column;
   }
@@ -100,6 +100,36 @@ pre {
   .Content {
     width: 100%;
   }
+  .Index-url {
+    display: none;
+  }
+}
+
+/* header.js */
+.Header {
+  position: sticky;
+  top: 0;
+  background-color: rgb(10, 13, 17);
+  z-index: 1;
+  color: white;
+}
+
+.Header-nv {
+  margin: auto;
+  max-width: 1200px;
+}
+
+.Header-a {
+  font-size: 1.25rem;
+  padding: 1rem 1.5rem;
+}
+
+.Header-a-actv {
+  color: #38A169;
+}
+
+.Header-p {
+  margin: 1rem 1.5rem;
 }
 
 /* index.js */
@@ -110,12 +140,11 @@ pre {
 }
 
 .Index-hr {
-  background-color: #2D3748;
+  background-image: linear-gradient(rgb(10, 13, 17) 0%, rgb(50, 56, 64) 100%);
   height: 50vh;
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 0 auto;
 }
 
 .Index-h2 {
@@ -125,38 +154,68 @@ pre {
   border-bottom: none;
 }
 
-.Index-h3 {
-  font-size: calc(16px + 1vw);
-  color: #E2E8F0;
-}
-
 .Index-p {
   color: #1A202C;
   list-style: none;
 }
 
 .Index-hr-txt {
-  text-align: center;
-  margin: 0 auto;
+  padding: 10px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.Index-h3 {
+  color: #E2E8F0;
+  font-size: calc(16px + .7vw);
 }
 
 .Index-cd {
-  font-size: calc(16px + 1.5vw);
-  background-color: #4A5568;
+  font-size: calc(20px + .7vw);
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-  padding: 5px;
-  letter-spacing: 3px;
+  overflow-x: scroll;
+  line-height: 32px;
+  color: #E2E8F0;
+  background-color: #4A5568;
+  padding: 5px 5px 5px 10px;
+  letter-spacing: 5px;
 }
 
 .Index-btn {
-  border-radius: 10px;
-  border: none;
-  padding: 10px 24px;
-  margin: 10px;
-  font-size: 18px;
-  background: #3182CE;
+  font-size: calc(16px + .7vw);
+  background-color: #4A5568;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   color: white;
+  border: none;
+  padding: 8px 16px;
+  display: flex;
   cursor: pointer;
+  margin: 20px auto;
+}
+
+.Index-crsr {
+  width: 15px;
+  height: 30px;
+  animation: crsr 1.2s infinite;
+  margin-top: 8px;
+}
+
+.Index-url {
+  position: absolute;
+  right: -70px;
+  color: #38A169;
+  transform: rotate(270deg);
+  background-color: #4A5568;
+  padding: 10px;
+  margin: 0;
+}
+
+@keyframes crsr {
+    0% { background: rgb(10, 13, 17); }
+    50% { background: rgb(10, 13, 17); }
+    51% { background: transparent; }
+    99% { background: transparent; }
+    100% { background: rgb(10, 13, 17); }
 }
 
 /* md-page.js */
@@ -221,7 +280,7 @@ pre {
 
 /* footer.js */
 .Footer-ctr {
-  background-color: #1A202C;
+  background-color: rgb(10, 13, 17);
   padding: 10px;
   color: white;
 }

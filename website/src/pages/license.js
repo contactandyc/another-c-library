@@ -37,8 +37,8 @@ function License() {
         See the License for the specific language governing permissions and
         limitations under the License.</p>
 
-        <p>The website itself was built using React and GatsbyJS which are both licensed
-        under the MIT License.</p>
+        <p>The documentation website was built using React and GatsbyJS which are
+        both licensed under the MIT License.</p>
 
       </div>
     </Layout>

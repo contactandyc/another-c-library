@@ -15,12 +15,13 @@ function Contact() {
         opportunities as well as suggestions reguarding the library.</p>
         <h2 style={{marginBottom: `8px`}}>Andy Curtis</h2>
         <p><strong>Senior Software Engineer & Chief Architect</strong><br />
+        <a href="https://linkedin.com/in/andycurtis" target="_blank" rel="noopener noreferrer">LinkedIn <FaExternalLinkAlt /></a><br />
         <a href="mailto:contactandyc@gmail.com">contactandyc@gmail.com <FaExternalLinkAlt /></a>
         </p>
         <h2 style={{marginBottom: `8px`}}>Daniel Curtis</h2>
         <p><strong>Software Engineer</strong><br />
-        <a href="https://linkedin/in/dancurtis" target="_blank" rel="noopener noreferrer">LinkedIn <FaExternalLinkAlt /></a><br />
-        <a href="mailto:daniel17curtis@gmail.com">daniel17curtis@gmail.com <FaExternalLinkAlt /></a>
+        <a href="https://linkedin.com/in/dancurtis" target="_blank" rel="noopener noreferrer">LinkedIn <FaExternalLinkAlt /></a><br />
+        <a href="mailto:contactdcurtis@gmail.com">contactdcurtis@gmail.com <FaExternalLinkAlt /></a>
         </p>
       </div>
     </Layout>

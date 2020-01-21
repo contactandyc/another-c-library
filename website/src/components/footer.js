@@ -38,6 +38,7 @@ function Footer() {
           <p className="Footer-p">© {new Date().getFullYear()} Andy Curtis & Daniel Curtis</p>
           <ul className="Footer-ul">
             <li><Link className="Footer-lnk" to="/contact">Contact</Link></li>
+            <li><Link className="Footer-lnk" to="/conduct">Code of Conduct</Link></li>
             <li><Link className="Footer-lnk" to="/contributing">Contributing</Link></li>
             <li><Link className="Footer-lnk" to="/license">License</Link></li>
           </ul>
