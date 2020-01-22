@@ -78,7 +78,19 @@ ac_allocator_t *global_allocator = NULL;
 
 void save_old_log(ac_allocator_t *a, size_t saves, char *tmp) {
   int num = 0;
-  while (saves) {
+  int s = saves;
+  for (int i = 32; i > 0; i--) {
+    uint32_t ix = i - 1;
+    uint32_t v = 1 << ix;
+    v--;
+    if ((saves & v) == v) {
+      num = ix;
+      break;
+    }
+  }
+  // printf("%lu => %d\n", saves, num);
+  while (num) {
+    num--;
     char *p = tmp;
     char *old_name = p;
     if (num) {
@@ -86,11 +98,11 @@ void save_old_log(ac_allocator_t *a, size_t saves, char *tmp) {
       p += strlen(old_name) + 1;
     } else
       old_name = (char *)a->logfile;
-    num++;
+
     char *new_name = p;
-    sprintf(new_name, "%s.%d", a->logfile, num);
+    sprintf(new_name, "%s.%d", a->logfile, num + 1);
+    // printf("rename: %s => %s\n", old_name, new_name);
     rename(old_name, new_name);
-    saves >>= 1;
   }
 }
 
@@ -106,9 +118,12 @@ void *dump_global_allocations_thread(void *arg) {
   while (!done) {
     save_old_log(a, save, tmp);
     pthread_mutex_lock(&a->mutex);
+    time_t t = time(NULL);
     FILE *out = fopen(a->logfile, "wb");
+    fprintf(out, "%s", ctime(&t));
     _ac_dump_global_allocations(a, out);
     fclose(out);
+    save++;
     if (a->done)
       done = 1;
     else {
@@ -132,11 +147,11 @@ ac_allocator_t *ac_allocator_init(const char *filename, bool thread_safe) {
   a->done = 0;
   a->thread_safe = thread_safe;
   if (thread_safe) {
+    pthread_mutex_init(&a->mutex, NULL);
     if (filename) {
       pthread_cond_init(&a->cond, NULL);
       pthread_create(&(a->thread), NULL, dump_global_allocations_thread, a);
     }
-    pthread_mutex_init(&a->mutex, NULL);
   }
   return a;
 }
@@ -229,6 +244,241 @@ char *_ac_strdup_d(ac_allocator_t *a, const char *caller, const char *p) {
   char *m = (char *)_ac_malloc_d(a, caller, len, false);
   strcpy(m, p);
   return m;
+}
+
+char *_ac_strdupvf(const char *fmt, va_list args) {
+  va_list args_copy;
+  va_copy(args_copy, args);
+  char tmp[32];
+  char *tp = (char *)(&tmp);
+  int n = vsnprintf(tp, 32, fmt, args_copy);
+  if (n < 0)
+    abort();
+  va_end(args_copy);
+  if (n < 32)
+    return strdup(tp);
+
+  char *r = (char *)malloc(n + 1);
+  va_copy(args_copy, args);
+  int n2 = vsnprintf(r, n + 1, fmt, args_copy);
+  if (n != n2)
+    abort(); // should never happen!
+  va_end(args_copy);
+  return r;
+}
+
+char *_ac_strdupvf_d(ac_allocator_t *a, const char *caller, const char *fmt,
+                     va_list args) {
+  va_list args_copy;
+  va_copy(args_copy, args);
+  char tmp[32];
+  char *tp = (char *)(&tmp);
+  int n = vsnprintf(tp, 32, fmt, args_copy);
+  if (n < 0)
+    abort();
+  va_end(args_copy);
+  if (n < 32)
+    return _ac_strdup_d(a, caller, tp);
+
+  char *r = (char *)_ac_malloc_d(a, caller, n + 1, false);
+  va_copy(args_copy, args);
+  int n2 = vsnprintf(r, n + 1, fmt, args_copy);
+  if (n != n2)
+    abort(); // should never happen!
+  va_end(args_copy);
+  return r;
+}
+
+char *_ac_strdupf_d(ac_allocator_t *a, const char *caller, const char *fmt,
+                    ...) {
+  va_list args;
+  va_start(args, fmt);
+  char *r = _ac_strdupvf_d(a, caller, fmt, args);
+  va_end(args);
+  return r;
+}
+
+char *_ac_strdupf(const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  char *r = _ac_strdupvf(fmt, args);
+  va_end(args);
+  return r;
+}
+
+char **_ac_split_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
+                   char delim, const char *s) {
+  static char *nil = NULL;
+  if (!s) {
+    if (num_splits)
+      *num_splits = 0;
+    return &nil;
+  }
+  const char *p = s;
+  size_t num = 1;
+  while (*p != 0) {
+    if (*p == delim)
+      num++;
+    p++;
+  }
+  if (num_splits)
+    *num_splits = num;
+  char **r = NULL;
+  if (caller)
+    r = (char **)_ac_malloc_d(
+        a, caller, (sizeof(char *) * (num + 1)) + (p - s) + 1, false);
+  else
+    r = (char **)malloc((sizeof(char *) * (num + 1)) + (p - s) + 1);
+  char **wr = r;
+  char *sp = (char *)(r + num + 1);
+  strcpy(sp, s);
+  *wr = sp;
+  wr++;
+  while (*sp != 0) {
+    if (*sp == delim) {
+      *sp = 0;
+      sp++;
+      *wr = sp;
+      wr++;
+    } else
+      sp++;
+  }
+  *wr = NULL;
+  return r;
+}
+
+char **_ac_split2_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
+                    char delim, const char *s) {
+  static char *nil = NULL;
+  if (!s) {
+    if (num_splits)
+      *num_splits = 0;
+    return &nil;
+  }
+
+  const char *p = s;
+  while (*p == delim)
+    p++;
+  if (*p == 0) {
+    if (num_splits)
+      *num_splits = 0;
+    return &nil;
+  }
+  s = p;
+  size_t num = 1;
+  while (*p != 0) {
+    if (*p == delim) {
+      num++;
+      p++;
+      while (*p == delim)
+        p++;
+    } else
+      p++;
+  }
+  if (num_splits)
+    *num_splits = num;
+  char **r;
+  if (caller)
+    r = (char **)_ac_malloc_d(
+        a, caller, (sizeof(char *) * (num + 1)) + (p - s) + 1, false);
+  else
+    r = (char **)malloc((sizeof(char *) * (num + 1)) + (p - s) + 1);
+  char **wr = r;
+  char *sp = (char *)(r + num + 1);
+  strcpy(sp, s);
+  *wr = sp;
+  wr++;
+  while (*sp != 0) {
+    if (*sp == delim) {
+      *sp = 0;
+      sp++;
+      while (*sp == delim)
+        sp++;
+      *wr = sp;
+      wr++;
+    } else
+      sp++;
+  }
+  *wr = NULL;
+  return r;
+}
+
+static size_t count_bytes_in_array(char **a, size_t *n) {
+  size_t len = sizeof(char *);
+  size_t num = 1;
+  while (*a) {
+    len += strlen(*a) + sizeof(char *) + 1;
+    num++;
+    a++;
+  }
+  *n = num;
+  return len;
+}
+
+char **_ac_strdupa2_d(ac_allocator_t *al, const char *caller, char **a) {
+  if (!a)
+    return NULL;
+
+  char **p = a;
+  while (*p)
+    p++;
+
+  p++;
+  return _ac_memdup_d(al, caller, a, (p - a) * sizeof(char *));
+}
+
+char **_ac_strdupa2(char **a) {
+  if (!a)
+    return NULL;
+
+  char **p = a;
+  while (*p)
+    p++;
+
+  p++;
+  return _ac_memdup(a, (p - a) * sizeof(char *));
+}
+
+char **_ac_strdupa_d(ac_allocator_t *al, const char *caller, char **a) {
+  if (!a)
+    return NULL;
+
+  size_t n = 0;
+  size_t len = count_bytes_in_array(a, &n);
+  char **r = (char **)_ac_malloc_d(al, caller, len, false);
+  char *m = (char *)(r + n);
+  char **rp = r;
+  while (*a) {
+    *rp++ = m;
+    char *s = *a;
+    while (*s)
+      *m++ = *s++;
+    *m++ = 0;
+    a++;
+  }
+  *rp = NULL;
+  return r;
+}
+
+char **_ac_strdupa(char **a) {
+  if (!a)
+    return NULL;
+
+  size_t n = 0;
+  size_t len = count_bytes_in_array(a, &n);
+  char **r = (char **)malloc(len);
+  char *m = (char *)(r + n);
+  char **rp = r;
+  while (*a) {
+    *rp++ = m;
+    char *s = *a;
+    while (*s)
+      *m++ = *s++;
+    *m++ = 0;
+    a++;
+  }
+  *rp = NULL;
+  return r;
 }
 
 static ac_allocator_node_t *get_ac_node(ac_allocator_t *a, const char *caller,

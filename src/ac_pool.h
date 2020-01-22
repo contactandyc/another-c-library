@@ -78,6 +78,41 @@ static inline void *ac_pool_calloc(ac_pool_t *h, size_t len);
   like char *s = ac_pool_dup(pool, p, strlen(p)+1); */
 static inline char *ac_pool_strdup(ac_pool_t *h, const char *p);
 
+/* duplicate all of the strings in a AND the NULL terminated pointer array.  */
+char **ac_pool_strdupa(ac_pool_t *pool, char **a);
+
+/* duplicate all of the strings in a AND the NULL terminated pointer array.  */
+char **ac_pool_strdupan(ac_pool_t *pool, char **a, size_t num);
+
+/* Duplicate the NULL terminated pointer array. */
+char **ac_pool_strdupa2(ac_pool_t *pool, char **a);
+
+/* split a string into N pieces using any character in delim array.  The array
+   that is returned will always be valid with a NULL string at the end if p is
+   NULL. num_splits can be NULL if the number of returning pieces is not
+   desired. */
+char **ac_pool_tokenize(ac_pool_t *h, size_t *num_splits, const char *delim,
+                        const char *p);
+
+/* split a string into N pieces using delimiter.  The array that is returned
+   will always be valid with a NULL string at the end if p is NULL. num_splits
+   can be NULL if the number of returning pieces is not desired. */
+char **ac_pool_split(ac_pool_t *h, size_t *num_splits, char delim,
+                     const char *p);
+
+/* same as ac_pool_split except allows formatting of input string. */
+char **ac_pool_splitf(ac_pool_t *h, size_t *num_splits, char delim,
+                      const char *p, ...);
+
+/* same as ac_pool_split except empty strings will not be included in the
+   result. */
+char **ac_pool_split2(ac_pool_t *h, size_t *num_splits, char delim,
+                      const char *p);
+
+/* same as ac_pool_split2 except allows formatting of input string. */
+char **ac_pool_split2f(ac_pool_t *h, size_t *num_splits, char delim,
+                       const char *p, ...);
+
 /* like ac_pool_strdup, limited to length (+1 for zero terminator) bytes */
 static inline char *ac_pool_strndup(ac_pool_t *h, const char *p, size_t length);
 

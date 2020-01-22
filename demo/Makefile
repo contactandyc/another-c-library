@@ -1,12 +1,12 @@
 ROOT=..
 include $(ROOT)/src/Makefile.include
 
-FLAGS += -D_AC_DEBUG_MEMORY_=NULL
-PROGRAMS=quicksort_demo demo1 demo2 demo3 demo4 demo5 demo6
+FLAGS += -D_AC_DEBUG_MEMORY_=NULL -lz
+PROGRAMS=out_demo lz4_demo quicksort_demo demo1 demo1b demo1c demo1d demo2 demo3 demo4 demo5 demo6
 
 all: $(PROGRAMS) examples
 
-$(PROGRAMS): %: %.c
+$(PROGRAMS): %: %.c $(OBJECTS) $(HEADER_FILES)
 	gcc $(FLAGS) $(OBJECTS) $< -o $@
 
 canada.json:

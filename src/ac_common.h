@@ -20,11 +20,17 @@ limitations under the License.
 /* defines NULL, size_t, offsetof */
 #include <stddef.h>
 /* because I like to use true, false, and bool */
+#include <inttypes.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* to support lz4 linkage */
+#define LZ4_STATIC_LINKING_ONLY
+#define LZ4_HC_STATIC_LINKING_ONLY
+#define XXH_INLINE_ALL
 
 /*
 Defining _AC_DEBUG_MEMORY_ will check that memory is properly
@@ -40,8 +46,9 @@ Snapshots are saved in increasing intervals.
 /* How often should the memory be checked? It is always checked in the
    beginning and every _AC_DEBUG_MEMORY_SPEED_ seconds assuming
    _AC_DEBUG_MEMORY_ is defined as a string (and not NULL). */
+#ifndef _AC_DEBUG_MEMORY_SPEED_
 #define _AC_DEBUG_MEMORY_SPEED_ 60
-
+#endif
 /*
   Given an address of a member of a structure, the base object type, and the
   field name, return the address of the base structure.
