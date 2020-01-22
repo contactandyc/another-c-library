@@ -1,6 +1,6 @@
 ---
 path: "/pool"
-posttype: "usage"
+posttype: "docs"
 title: "ac_pool"
 ---
 

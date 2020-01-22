@@ -1,6 +1,6 @@
 ---
 path: "/allocator"
-posttype: "usage"
+posttype: "docs"
 title: "ac_allocator"
 ---
 
