@@ -1461,6 +1461,17 @@ void *schedule_thread(void *arg) {
   return NULL;
 }
 
+static void print_task_link(const char *s, ac_task_link_t *tl) {
+  if (!tl)
+    return;
+  printf("%s", s);
+  while (tl) {
+    printf(" %s[%lu]", tl->task->task_name, tl->task->num_partitions);
+    tl = tl->next;
+  }
+  printf("\n");
+}
+
 void list_selected_tasks(void *arg) {
   ac_schedule_thread_t *t = (ac_schedule_thread_t *)arg;
   t->pool = ac_pool_init(65536);
@@ -1487,6 +1498,15 @@ void list_selected_tasks(void *arg) {
       fill_inputs(w);
       printf("task: %s [%lu/%lu]\n", w->task->task_name, w->partition,
              w->task->num_partitions);
+
+      print_task_link("  dependencies: ", w->task->dependencies);
+      print_task_link("  reverse dependencies: ",
+                      w->task->reverse_dependencies);
+      print_task_link("  partial dependencies: ",
+                      w->task->partial_dependencies);
+      print_task_link("  reverse partial dependencies: ",
+                      w->task->reverse_partial_dependencies);
+
       if (w->task->runner == in_out_runner) {
         size_t id = 0;
         printf("  in_out_runner\n");
