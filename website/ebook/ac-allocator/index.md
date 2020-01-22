@@ -1,53 +1,230 @@
 ---
-path: "/ac-allocator"
-posttype: "docs"
+path: "/allocator"
+posttype: "usage"
 title: "ac_allocator"
 ---
 
-The allocator provides an alternative to malloc, calloc, realloc, strdup, and free.  The functions are prefixed with ac_ (as everything in this library is).  
+# ac_allocator
 
 ```c
 #include "ac_allocator.h"
-
-void *ac_malloc(size_t length);
-void *ac_calloc(size_t length);
-void *ac_realloc(void *p, size_t length);
-char *ac_strdup(const char *p);
-void ac_free(void *p);
 ```
 
-## Dependencies
-Dependencies are the files necessary to include in your own package.  You can also just include the whole ac_ library.
+The allocator provides an alternative to malloc, calloc, realloc, strdup, and free.  The functions are prefixed with ac_ (as everything in this library is).  
+
+The following files are necessary to include in your own package.  You can also just include the whole ac_ library.
+
 ```
 ac_allocator.h
 ac_allocator.c
 ac_common.h
 ```
 
-## Documentation
-
-These functions work identically to the functions found in stdlib.h and string.h without the ac_ prefix.  
-
-void \*ac_malloc(size_t length);<br/>
-Allocates length uninitialized bytes and returns it.  If length bytes is not available (the system is out of RAM or doesn't have enough to satisfy the request), NULL is returned.
-
-void \*ac_calloc(size_t length);<br/>
-Similar to ac_malloc, except returned bytes are all set to zero.
-
-void \*ac_realloc(void \*p, size_t length);<br/>
-Attempt to grow or shrink previously allocated memory to be equal to length bytes.  Typically, this will involve allocating a new block of memory and copying the contents of the previously allocated memory (up to length bytes).  It is possible that the block of memory will remain the same, but with a new size.
-
-char \*ac_strdup(const char \*p);<br/>
-Returns a newly allocated block of memory that has a copy of the string passed into it.
-
-void ac_free(void \*p);<br/>
-Free memory allocated using ac_malloc, ac_calloc, ac_realloc, and ac_strdup.
+malloc, calloc, realloc, strdup, and free functions work identically to the functions found in stdlib.h and string.h without the ac_ prefix.  
 
 Additional documentation for [malloc,calloc,realloc,free](https://linux.die.net/man/3/malloc) and [strdup](https://linux.die.net/man/3/strdup) exists.  
 
-If memory is allocated using one of the ac_ methods above, it must later be freed using ac_free.  I did alter the prototype for calloc to accept a single parameter instead of 2.  I believe this makes application code more readable.   
+Memory allocated using one of the ac_ methods above, it must later be freed using ac_free.  I did alter the prototype for calloc to accept a single parameter instead of 2.  I believe this makes application code more readable.   
 
-## Detecting Memory Errors
+## ac_malloc
+```c
+void *ac_malloc(size_t length);
+```
+ac_malloc allocates length uninitialized bytes and returns it.  If length bytes is not available (the system is out of RAM or doesn't have enough to satisfy the request), NULL is returned.
+
+```c
+#include "ac_allocator.h"
+
+#include <stdio.h>
+
+int main( int argc, char *argv[]) {
+  /* Allocate a block that is sized to fit 3 ints */
+  int *x = (int *)ac_malloc(sizeof(int) * 3);
+  x[0] = 1;
+  x[1] = 2;
+  x[2] = 3;
+  printf( "%d, %d, %d\n", x[0], x[1], x[2] );
+  /* Free the allocated block */
+  ac_free(x);
+  return 0;
+}
+```
+
+## ac_calloc
+```c
+void *ac_calloc(size_t length);
+```
+ac_calloc similar to ac_malloc, except returned bytes are all set to zero.  I did alter the prototype for calloc to accept a single parameter instead of 2.  I believe this makes application code more readable.
+
+```c
+#include "ac_allocator.h"
+
+#include <stdio.h>
+
+int main( int argc, char *argv[]) {
+  /* Allocate a zeroed block that is sized to fit 3 ints */
+  int *x = (int *)ac_calloc(sizeof(int) * 3);
+  x[0] = 1;
+  // x[1] = 2;
+  x[2] = 3;
+  /* This should print 1, 0, 3 - zero because memory is zeroed via ac_calloc */
+  printf( "%d, %d, %d\n", x[0], x[1], x[2] );
+  /* Free the allocated block */
+  ac_free(x);
+  return 0;
+}
+```
+
+## ac_realloc
+```c
+void *ac_realloc(void *p, size_t length);
+```
+ac_realloc attempt to grow or shrink previously allocated memory to be equal to length bytes.  Typically, this will involve allocating a new block of memory and copying the contents of the previously allocated memory (up to length bytes).  It is possible that the block of memory will remain the same, but with a new size.
+
+```c
+#include "ac_allocator.h"
+
+#include <stdio.h>
+
+int main( int argc, char *argv[]) {
+  /* Allocate a zeroed block that is sized to fit 3 ints */
+  int *x = (int *)ac_malloc(sizeof(int) * 2);
+  x[0] = 1;
+  x[1] = 2;
+  x = (int *)ac_realloc(x, sizeof(int) * 3);
+  x[2] = 3;
+
+  /* This should print 1, 2, 3 */
+  printf( "%d, %d, %d\n", x[0], x[1], x[2] );
+  /* Free the allocated block */
+  ac_free(x);
+  return 0;
+}
+```
+
+## ac_strdup
+```c
+char *ac_strdup(const char *p);
+```
+ac_strdup returns a newly allocated block of memory that has a copy of the string passed into it.  The returned copy will not necessarily be aligned.
+
+```c
+#include "ac_allocator.h"
+
+#include <stdio.h>
+
+void uppercase(char *s) {
+  while(*s) {
+    if(*s >= 'a' && *s <= 'z')
+      *s = *s - 'a' + 'A';
+    s++;
+  }
+}
+
+int main( int argc, char *argv[]) {
+  /* copy, uppercase, and print command line arguments */
+  for( int i=0; i<argc; i++ ) {
+    char *s = ac_strdup(argv[i]);
+    uppercase(s);
+    printf("%s", s);
+    ac_free(s);
+    if(i+1 < argc)
+      printf( " " );
+    else
+      printf( "\n");
+  }
+  return 0;
+}
+```
+
+## ac_strdupf
+```c
+char *ac_strdupf(const char *p, ...);
+```
+ac_strdupf allocates a copy of the formatted string p.  The returned copy will not necessarily be aligned.
+
+```c
+#include "ac_allocator.h"
+
+#include <stdio.h>
+
+int main( int argc, char *argv[]) {
+  int days_in_year = 365;
+  int months_in_year = 12;
+  char *s = ac_strdupf( "There are %d days and %d months in a year",
+                        days_in_year, months_in_year);
+  printf( "%s\n", s );
+  ac_free(s);
+  return 0;
+}
+```
+
+## ac_strdupvf
+```c
+char *ac_strdupvf(const char *p, va_list args);
+```
+ac_strdupvf similar to ac_strdupf, except that it uses va_list args.  For example, ac_strdupf is implemented using this method as follows.
+
+```c
+char *ac_strdupf(const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  char *r = ac_strdupvf(fmt, args);
+  va_end(args);
+  return r;
+}
+```
+
+You can implement your own strdupf like functions in a similar manner for other objects.
+
+## ac_split
+```c
+char **ac_split(size_t *num_splits, char delim, const char *s);
+```
+ac_split splits a string into N pieces using delimiter.  The array that is returned will be NULL if no splits are returned, otherwise, it will be a NULL terminated list. num_splits can be NULL if the number of returning pieces is not desired.
+
+An example where the number of splits isn't needed (NULL passed as first argument).
+```c
+#include "ac_allocator.h"
+
+#include <stdio.h>
+
+int main( int argc, char *argv[]) {
+  /* Allocate a zeroed block that is sized to fit 3 ints */
+  char **s = ac_split(NULL, ',', "A,B,C");
+  for( size_t i=0; n[i] != NULL; i++ )
+    printf( "[%lu] %s\n", i, s[i]);
+  ac_free(s);
+  return 0;
+}
+```
+
+An example where the number of splits is needed.
+```c
+#include "ac_allocator.h"
+
+#include <stdio.h>
+
+int main( int argc, char *argv[]) {
+  /* Allocate a zeroed block that is sized to fit 3 ints */
+  size_t num_s = 0;
+  char **s = ac_split(&num_s, ',', "A,B,C");
+  for( size_t i=0; i<num_s; i++ )
+    printf( "[%lu] %s\n", i, s[i]);
+  ac_free(s);
+  return 0;
+}
+```
+
+## ac_free
+```c
+void ac_free(void *p);
+```
+ac_free frees memory allocated from functions above.
+
+
+
+## Additional Documentation
 
 The ac_allocator is a lightweight allocator (in debug mode) and identical to the methods which is based upon when not in debug mode.  In debug mode, allocations are tracked which allows one to easily catch memory leaks and some common errors.
 
