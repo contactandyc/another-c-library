@@ -10,9 +10,9 @@ title: "ac_allocator"
 #include "ac_allocator.h"
 ```
 
-The allocator provides an alternative to malloc, calloc, realloc, strdup, and free.  The functions are prefixed with ac_ (as everything in this library is).  
+The allocator provides an alternative to malloc, calloc, realloc, strdup, and free.  The functions are prefixed with ac\_ (as everything in this library is).  
 
-The following files are necessary to include in your own package.  You can also just include the whole ac_ library.
+The following files are necessary to include in your own package.  You can also just include the whole ac\_ library.
 
 ```
 ac_allocator.h
@@ -20,17 +20,17 @@ ac_allocator.c
 ac_common.h
 ```
 
-malloc, calloc, realloc, strdup, and free functions work identically to the functions found in stdlib.h and string.h without the ac_ prefix.  
+malloc, calloc, realloc, strdup, and free functions work identically to the functions found in stdlib.h and string.h without the ac\_ prefix.  
 
 Additional documentation for [malloc,calloc,realloc,free](https://linux.die.net/man/3/malloc) and [strdup](https://linux.die.net/man/3/strdup) exists.  
 
-Memory allocated using one of the ac_ methods above, it must later be freed using ac_free.  I did alter the prototype for calloc to accept a single parameter instead of 2.  I believe this makes application code more readable.   
+Memory allocated using one of the ac\_ methods above, it must later be freed using ac\_free.  I did alter the prototype for calloc to accept a single parameter instead of 2.  I believe this makes application code more readable.   
 
 ## ac_malloc
 ```c
 void *ac_malloc(size_t length);
 ```
-ac_malloc allocates length uninitialized bytes and returns it.  If length bytes is not available (the system is out of RAM or doesn't have enough to satisfy the request), NULL is returned.
+ac\_malloc allocates length uninitialized bytes and returns it.  If length bytes is not available (the system is out of RAM or doesn't have enough to satisfy the request), NULL is returned.
 
 ```c
 #include "ac_allocator.h"
@@ -54,7 +54,7 @@ int main( int argc, char *argv[]) {
 ```c
 void *ac_calloc(size_t length);
 ```
-ac_calloc similar to ac_malloc, except returned bytes are all set to zero.  I did alter the prototype for calloc to accept a single parameter instead of 2.  I believe this makes application code more readable.
+ac\_calloc similar to ac\_malloc, except returned bytes are all set to zero.  I did alter the prototype for calloc to accept a single parameter instead of 2.  I believe this makes application code more readable.
 
 ```c
 #include "ac_allocator.h"
@@ -79,7 +79,7 @@ int main( int argc, char *argv[]) {
 ```c
 void *ac_realloc(void *p, size_t length);
 ```
-ac_realloc attempt to grow or shrink previously allocated memory to be equal to length bytes.  Typically, this will involve allocating a new block of memory and copying the contents of the previously allocated memory (up to length bytes).  It is possible that the block of memory will remain the same, but with a new size.
+ac\_realloc attempt to grow or shrink previously allocated memory to be equal to length bytes.  Typically, this will involve allocating a new block of memory and copying the contents of the previously allocated memory (up to length bytes).  It is possible that the block of memory will remain the same, but with a new size.
 
 ```c
 #include "ac_allocator.h"
@@ -106,7 +106,7 @@ int main( int argc, char *argv[]) {
 ```c
 char *ac_strdup(const char *p);
 ```
-ac_strdup returns a newly allocated block of memory that has a copy of the string passed into it.  The returned copy will not necessarily be aligned.
+ac\_strdup returns a newly allocated block of memory that has a copy of the string passed into it.  The returned copy will not necessarily be aligned.
 
 ```c
 #include "ac_allocator.h"
@@ -141,7 +141,7 @@ int main( int argc, char *argv[]) {
 ```c
 char *ac_strdupf(const char *p, ...);
 ```
-ac_strdupf allocates a copy of the formatted string p.  The returned copy will not necessarily be aligned.
+ac\_strdupf allocates a copy of the formatted string p.  The returned copy will not necessarily be aligned.
 
 ```c
 #include "ac_allocator.h"
@@ -163,7 +163,7 @@ int main( int argc, char *argv[]) {
 ```c
 char *ac_strdupvf(const char *p, va_list args);
 ```
-ac_strdupvf similar to ac_strdupf, except that it uses va_list args.  For example, ac_strdupf is implemented using this method as follows.
+ac\_strdupvf similar to ac_strdupf, except that it uses va_list args.  For example, ac_strdupf is implemented using this method as follows.
 
 ```c
 char *ac_strdupf(const char *fmt, ...) {
@@ -181,7 +181,8 @@ You can implement your own strdupf like functions in a similar manner for other 
 ```c
 char **ac_split(size_t *num_splits, char delim, const char *s);
 ```
-ac_split splits a string into N pieces using delimiter.  The array that is returned will be NULL if no splits are returned, otherwise, it will be a NULL terminated list. num_splits can be NULL if the number of returning pieces is not desired.
+
+ac\_split splits a string into N pieces using delimiter.  The array that is returned will be NULL if no splits are returned, otherwise, it will be a NULL terminated list. num_splits can be NULL if the number of returning pieces is not desired.
 
 An example where the number of splits isn't needed (NULL passed as first argument).
 ```c
@@ -228,8 +229,7 @@ ac_free frees memory allocated from functions above.
 
 The ac_allocator is a lightweight allocator (in debug mode) and identical to the methods which is based upon when not in debug mode.  In debug mode, allocations are tracked which allows one to easily catch memory leaks and some common errors.
 
-Two macros control memory debugging.  If \_AC_DEBUG_MEMORY_
-is undefined, the ac_ methods will work exactly like their C counterparts.  To enable memory debuging, \_AC_DEBUG_MEMORY_ should be defined as NULL (-D_AC_DEBUG_MEMORY_=NULL) to write output to standard error or as a filename ('-D_AC_DEBUG_MEMORY_="memory.log"') to write output to files.  If a filename is used, \_AC_DEBUG_MEMORY_SPEED_ can be defined to an interval and the filename will serve as a base name with snapshots taken periodically.  These parameters can be compiled in or set in ac_common.h.
+Two macros control memory debugging.  If \_AC\_DEBUG\_MEMORY\_ is undefined, the ac\_ methods will work exactly like their C counterparts.  To enable memory debuging, \_AC\_DEBUG\_MEMORY\_ should be defined as NULL (-D\_AC\_DEBUG\_MEMORY\_=NULL) to write output to standard error or as a filename ('-D\_AC\_DEBUG\_MEMORY_="memory.log"') to write output to files.  If a filename is used, \_AC_DEBUG\_MEMORY\_SPEED\_ can be defined to an interval and the filename will serve as a base name with snapshots taken periodically.  These parameters can be compiled in or set in ac_common.h.
 
 ## Detecting Memory Loss
 
