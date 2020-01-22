@@ -183,11 +183,46 @@ char **ac_split(size_t *num_splits, char delim, const char *s);
 ```
 ac_split splits a string into N pieces using delimiter.  The array that is returned will be NULL if no splits are returned, otherwise, it will be a NULL terminated list. num_splits can be NULL if the number of returning pieces is not desired.
 
+An example where the number of splits isn't needed (NULL passed as first argument).
+```c
+#include "ac_allocator.h"
+
+#include <stdio.h>
+
+int main( int argc, char *argv[]) {
+  /* Allocate a zeroed block that is sized to fit 3 ints */
+  char **s = ac_split(NULL, ',', "A,B,C");
+  for( size_t i=0; n[i] != NULL; i++ )
+    printf( "[%lu] %s\n", i, s[i]);
+  ac_free(s);
+  return 0;
+}
+```
+
+An example where the number of splits is needed.
+```c
+#include "ac_allocator.h"
+
+#include <stdio.h>
+
+int main( int argc, char *argv[]) {
+  /* Allocate a zeroed block that is sized to fit 3 ints */
+  size_t num_s = 0;
+  char **s = ac_split(&num_s, ',', "A,B,C");
+  for( size_t i=0; i<num_s; i++ )
+    printf( "[%lu] %s\n", i, s[i]);
+  ac_free(s);
+  return 0;
+}
+```
+
 ## ac_free
 ```c
 void ac_free(void *p);
 ```
 ac_free frees memory allocated from functions above.
+
+
 
 ## Additional Documentation
 
