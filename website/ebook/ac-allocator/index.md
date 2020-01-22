@@ -1,5 +1,5 @@
 ---
-path: "/allocator"
+path: "/ac-allocator"
 posttype: "docs"
 title: "ac_allocator"
 ---
