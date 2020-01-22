@@ -652,9 +652,15 @@ static void dump_file(ac_worker_t *w, const char *filename,
   ac_in_t *in = ac_in_init(filename, &opts);
   ac_io_record_t *r;
   ac_buffer_t *bh = ac_buffer_init(1000);
+  size_t line = 1;
+  bool print_extra = w->task->scheduler->parsed_args.prefix;
   while ((r = ac_in_advance(in)) != NULL) {
     ac_buffer_clear(bh);
     dump(w, r, bh, dump_arg);
+    if (print_extra) {
+      printf("%lu\t", line);
+      line++;
+    }
     if (ac_buffer_length(bh))
       printf("%s\n", ac_buffer_data(bh));
   }
@@ -702,6 +708,8 @@ static void scan_output(ac_worker_t *w, char **files, size_t num_files) {
           dump_file(w, files[i], o->options.format, o->dump, o->dump_arg);
           files[i] = NULL;
         }
+        if (!files[i])
+          continue;
         for (size_t j = 0; j < num_partitions; j++) {
           ac_pool_clear(w->pool);
           char *filename =
@@ -710,6 +718,7 @@ static void scan_output(ac_worker_t *w, char **files, size_t num_files) {
           if (match_filename(files[i], filename)) {
             dump_file(w, files[i], o->options.format, o->dump, o->dump_arg);
             files[i] = NULL;
+            break;
           }
         }
       }
@@ -1458,6 +1467,7 @@ void list_selected_tasks(void *arg) {
   t->bh = ac_buffer_init(200);
   ac_pool_t *tmp_pool = ac_pool_init(65536);
   ac_buffer_t *bh = ac_buffer_init(1024);
+  bool show_files = t->scheduler->parsed_args.show_files;
   while (!t->scheduler->done) {
     ac_pool_clear(t->pool);
     ac_worker_t *w = get_next_worker(t);
@@ -1489,9 +1499,11 @@ void list_selected_tasks(void *arg) {
           for (size_t i = 0; i < num_ins; i++) {
             ac_worker_input_t *n = transforms->inputs[i];
             printf("      input[%lu]: %s (%lu)\n", i, n->name, n->num_files);
-            for (size_t j = 0; j < n->num_files; j++)
-              printf("        %s (%lu)\n", n->files[j].filename,
-                     n->files[j].size);
+            if (show_files) {
+              for (size_t j = 0; j < n->num_files; j++)
+                printf("        %s (%lu)\n", n->files[j].filename,
+                       n->files[j].size);
+            }
           }
           for (size_t i = 0; i < num_outs; i++) {
             ac_worker_output_t *n = transforms->outputs[i];
@@ -1509,6 +1521,24 @@ void list_selected_tasks(void *arg) {
                 d = d->next;
               }
               printf("\n");
+            }
+            if (show_files) {
+              char *base_name = ac_worker_output_base(w, n);
+              size_t num_partitions = 0;
+              if ((n->flags & AC_OUTPUT_SPLIT) && n->ext_options.partition) {
+                if (n->destinations)
+                  num_partitions = n->destinations->task->num_partitions;
+                else
+                  num_partitions = n->task->scheduler->num_partitions;
+              }
+              if (!num_partitions)
+                printf("        %s\n", base_name);
+              char *filename =
+                  (char *)ac_pool_alloc(w->pool, strlen(base_name) + 20);
+              for (size_t j = 0; j < num_partitions; j++) {
+                ac_out_partition_filename(filename, base_name, j);
+                printf("        %s\n", filename);
+              }
             }
           }
           transforms = transforms->next;
@@ -1677,7 +1707,7 @@ static void schedule_usage(ac_schedule_t *h) {
   printf("-d|--dump <filename1,[filename2],...> dump the contents of files\n");
   printf(
       "-p|--prefix <filename1,[filename2],...> dump the contents of files\n");
-  printf("    and prefix each line with the filename and line number\n");
+  printf("    and prefix each line with the line number\n");
   printf("-l|--list list details of execution (the plan)\n");
   printf("-s|--show-files similar to list, except input and output files\n");
   printf("     are also displayed.\n");

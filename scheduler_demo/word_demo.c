@@ -3,7 +3,7 @@
 size_t num_inputs = 0;
 ac_io_file_info_t *inputs = NULL;
 
-#define USE_CHAIN
+//#define USE_CHAIN
 
 /* By defining the filenames, it is easier to change them as needed.  Also,
    if .lz4 or .gz file extensions are used, the files will be compressed as
