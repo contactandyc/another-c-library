@@ -11,10 +11,54 @@ The allocator provides an alternative to malloc, calloc, realloc, strdup, and fr
 ```c
 #include "ac_allocator.h"
 
+/* ac_malloc allocates length uninitialized bytes and returns it.  If length
+   bytes is not available (the system is out of RAM or doesn't have enough to
+   satisfy the request), NULL is returned. */
 void *ac_malloc(size_t length);
+
+/* ac_calloc similar to ac_malloc, except returned bytes are all set to zero.
+   I did alter the prototype for calloc to accept a single parameter instead
+   of 2.  I believe this makes application code more readable. */
 void *ac_calloc(size_t length);
+
+/* ac_realloc attempt to grow or shrink previously allocated memory to be
+   equal to length bytes.  Typically, this will involve allocating a new
+   block of memory and copying the contents of the previously allocated
+   memory (up to length bytes).  It is possible that the block of memory
+   will remain the same, but with a new size. */
 void *ac_realloc(void *p, size_t length);
+
+/* ac_strdup returns a newly allocated block of memory that has a copy of the string
+   passed into it. */
 char *ac_strdup(const char *p);
+
+/* ac_strdupf allocates a copy of the formatted string p. */
+char *ac_strdupf(const char *p, ...);
+
+/* ac_strdupvf similar to ac_strdupf, except that it uses va_list
+   args.  For example, ac_strdupf is implemented using this method as
+   follows.
+
+      char *ac_strdupf(const char *fmt, ...) {
+        va_list args;
+        va_start(args, fmt);
+        char *r = ac_strdupvf(fmt, args);
+        va_end(args);
+        return r;
+      }
+
+   You can implement your own strdupf like functions in a similar manner for
+   other objects.
+*/
+char *ac_strdupvf(const char *p, va_list args);
+
+/* split a string into N pieces using delimiter.  The array that is returned
+   will be NULL if no splits are returned, otherwise, it will be a NULL
+   terminated list. num_splits can be NULL if the number of returning pieces
+   is not desired. */
+char **ac_split(size_t *num_splits, char delim, const char *s);
+
+/* ac_free frees memory allocated from functions above. */
 void ac_free(void *p);
 ```
 
@@ -28,22 +72,7 @@ ac_common.h
 
 ## Documentation
 
-These functions work identically to the functions found in stdlib.h and string.h without the ac_ prefix.  
-
-void \*ac_malloc(size_t length);<br/>
-Allocates length uninitialized bytes and returns it.  If length bytes is not available (the system is out of RAM or doesn't have enough to satisfy the request), NULL is returned.
-
-void \*ac_calloc(size_t length);<br/>
-Similar to ac_malloc, except returned bytes are all set to zero.
-
-void \*ac_realloc(void \*p, size_t length);<br/>
-Attempt to grow or shrink previously allocated memory to be equal to length bytes.  Typically, this will involve allocating a new block of memory and copying the contents of the previously allocated memory (up to length bytes).  It is possible that the block of memory will remain the same, but with a new size.
-
-char \*ac_strdup(const char \*p);<br/>
-Returns a newly allocated block of memory that has a copy of the string passed into it.
-
-void ac_free(void \*p);<br/>
-Free memory allocated using ac_malloc, ac_calloc, ac_realloc, and ac_strdup.
+malloc, calloc, realloc, strdup, and free functions work identically to the functions found in stdlib.h and string.h without the ac_ prefix.  
 
 Additional documentation for [malloc,calloc,realloc,free](https://linux.die.net/man/3/malloc) and [strdup](https://linux.die.net/man/3/strdup) exists.  
 

@@ -1710,30 +1710,32 @@ static void schedule_usage(ac_schedule_t *h) {
   printf("The scheduler is meant to aid in running tasks in parallel.\n");
   printf("At the moment, it operates on a single host - but I'm planning\n");
   printf("on improving it to support multiple computers.\n");
-  printf("\n");
-  printf("-f|--force rerun selected tasks\n");
+  printf("\n\n");
+  printf("-f|--force rerun selected tasks even if they don't need run\n\n");
   printf("-t <task[:partitions]>[<task[:partitions]], select tasks and\n");
   printf("   optionally partitions.  tasks are separated by vertical bars\n");
-  printf("   (|)\n");
-  printf("   and partitions are sub-selected by placing a colon and then\n");
+  printf(
+      "   (|) and partitions are sub-selected by placing a colon and then\n");
   printf("   the partitions.  The partitions can be a single partition\n");
   printf("   number, arange separated by a - (1-3), or a list of single\n");
-  printf("   partitions or ranges separated by commas.\n");
-  printf("   To select partitions 1, 3, 4, and 5 of task named first_task\n");
-  printf("   -t first_task:1,3-5\n");
+  printf(
+      "   partitions or ranges separated by commas.  To select partitions\n");
+  printf("   1, 3, 4, and 5 of task named first_task\n");
+  printf("   -t first_task:1,3-5\n\n");
   printf("-o  Normally, all tasks that are needed to run to complete\n");
   printf("    selected task will run.  This will override that behavior\n");
-  printf("    and only run selected tasks\n");
-  printf("-d|--dump <filename1,[filename2],...> dump the contents of files\n");
+  printf("    and only run selected tasks\n\n");
+  printf(
+      "-d|--dump <filename1,[filename2],...> dump the contents of files\n\n");
   printf(
       "-p|--prefix <filename1,[filename2],...> dump the contents of files\n");
-  printf("    and prefix each line with the line number\n");
-  printf("-l|--list list details of execution (the plan)\n");
+  printf("    and prefix each line with the line number\n\n");
+  printf("-l|--list list details of execution (the plan)\n\n");
   printf("-s|--show-files similar to list, except input and output files\n");
-  printf("     are also displayed.\n");
-  printf("-c|--cpus <num_cpus> overrides default number of cpus\n");
-  printf("-r|--ram <ram MB> overrides default ram usage\n");
-  printf("-h|--help show this help message\n");
+  printf("     are also displayed.\n\n");
+  printf("-c|--cpus <num_cpus> overrides default number of cpus\n\n");
+  printf("-r|--ram <ram MB> overrides default ram usage\n\n");
+  printf("-h|--help show this help message\n\n");
 }
 
 void parse_args(ac_schedule_t *h) {

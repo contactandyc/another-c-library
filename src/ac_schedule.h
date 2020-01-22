@@ -310,6 +310,10 @@ struct ac_worker_output_s {
   ac_out_options_t options;
   ac_out_ext_options_t ext_options;
 
+  bool cleaned_up;
+  /* this can be num_partitions * dest num_partitions if split */
+  bool *cleaned_up_parts;
+
   ac_task_t *task;
   ac_worker_output_t *next;
 };
