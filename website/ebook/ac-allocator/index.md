@@ -229,7 +229,7 @@ ac_free frees memory allocated from functions above.
 
 The ac_allocator is a lightweight allocator (in debug mode) and identical to the methods which is based upon when not in debug mode.  In debug mode, allocations are tracked which allows one to easily catch memory leaks and some common errors.
 
-Two macros control memory debugging.  If \_AC\_DEBUG\_MEMORY\_ is undefined, the ac\_ methods will work exactly like their C counterparts.  To enable memory debuging, \_AC\_DEBUG\_MEMORY\_ should be defined as NULL (-D\_AC\_DEBUG\_MEMORY\_=NULL) to write output to standard error or as a filename ('-D\_AC\_DEBUG\_MEMORY_="memory.log"') to write output to files.  If a filename is used, \_AC_DEBUG\_MEMORY\_SPEED\_ can be defined to an interval and the filename will serve as a base name with snapshots taken periodically.  These parameters can be compiled in or set in ac_common.h.
+Two macros control memory debugging.  If \_AC\_DEBUG\_MEMORY\_ is undefined, the ac\_ methods will work exactly like their C counterparts.  To enable memory debuging, \_AC\_DEBUG\_MEMORY\_ should be defined as NULL (-D\_AC\_DEBUG\_MEMORY\_=NULL) to write output to standard error or as a filename ('-D\_AC\_DEBUG\_MEMORY\_="memory.log"') to write output to files.  If a filename is used, \_AC\_DEBUG\_MEMORY\_SPEED\_ can be defined to an interval and the filename will serve as a base name with snapshots taken periodically.  These parameters can be compiled in or set in ac_common.h.
 
 ## Detecting Memory Loss
 
@@ -346,7 +346,7 @@ The ac_free call is called with a pointer that is advanced 2 bytes beyond the or
 
 ## Tracking Memory Loss Over Time
 
-We could alternatively define \_AC_DEBUG_MEMORY_ as "memory.log" and set the refresh speed to 5 second with another example.
+We could alternatively define \_AC\_DEBUG\_MEMORY\_ as "memory.log" and set the refresh speed to 5 second with another example.
 
 demo1b.c
 ```c
