@@ -17,4 +17,3 @@ node_modules
 *.la
 libtool
 *.tar.gz
-website/public
