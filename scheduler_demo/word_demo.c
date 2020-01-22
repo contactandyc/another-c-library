@@ -3,7 +3,7 @@
 size_t num_inputs = 0;
 ac_io_file_info_t *inputs = NULL;
 
-// #define USE_CHAIN
+#define USE_CHAIN
 
 /* By defining the filenames, it is easier to change them as needed.  Also,
    if .lz4 or .gz file extensions are used, the files will be compressed as
@@ -91,9 +91,10 @@ bool reduce_word_count(ac_io_record_t *res, const ac_io_record_t *r,
 size_t hash_offs = 4;
 
 /* In order to debug, dump the contents of word count record to a line. */
-void dump_word_count(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh) {
-  ac_buffer_setf(bh, "%u\t%s", (*(uint32_t *)r->record),
-                 r->record + sizeof(uint32_t));
+void dump_word_count(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
+                     void *arg) {
+  ac_buffer_appendf(bh, "%u\t%s", (*(uint32_t *)r->record),
+                    r->record + sizeof(uint32_t));
 }
 
 /* split_words takes the raw input and transforms it to word count records.  If
@@ -226,10 +227,11 @@ bool check_file_extensions(const char *filename) {
 }
 
 int main(int argc, char *argv[]) {
-  fprintf(stderr, "Find all words ending in .h, .c, and .md and sort by\n");
-  fprintf(stderr, "frequency descending.\n\n");
-  fprintf(stderr, "Run ./word_demo -h for help\n");
-
+  if (argc == 1) {
+    fprintf(stderr, "Find all words ending in .h, .c, and .md and sort by\n");
+    fprintf(stderr, "frequency descending.\n\n");
+    fprintf(stderr, "Run ./word_demo -h for help\n");
+  }
   char *input_dir = "..";
   if (argc > 1 && argv[1][0] != '-') {
     input_dir = argv[1];

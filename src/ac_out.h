@@ -163,4 +163,7 @@ void ac_out_ext_options_use_extra_thread(ac_out_ext_options_t *h);
 /* Default tmp files are stored in lz4 format.  Disable this behavior. */
 void ac_out_ext_options_dont_compress_tmp(ac_out_ext_options_t *h);
 
+/* used to create a partitioned filename */
+void ac_out_partition_filename(char *dest, const char *filename, size_t id);
+
 #endif

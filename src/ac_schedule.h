@@ -30,9 +30,10 @@ typedef void *(*ac_worker_data_f)(ac_worker_t *w);
 typedef void (*ac_destroy_worker_data_f)(ac_worker_t *w, void *d);
 
 typedef void (*ac_task_dump_f)(ac_worker_t *w, ac_io_record_t *r,
-                               ac_buffer_t *bh);
+                               ac_buffer_t *bh, void *arg);
 
-void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh);
+void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
+                       void *arg);
 
 typedef void (*ac_runner_f)(ac_worker_t *w, ac_io_record_t *r, ac_out_t **out);
 typedef void (*ac_group_runner_f)(ac_worker_t *w, ac_io_record_t *r,

@@ -59,6 +59,7 @@ typedef struct {
   char **files;
   selected_task_t *tasks;
   size_t num_tasks;
+  size_t num_selected;
 } parsed_args_t;
 
 struct ac_schedule_s {
@@ -156,10 +157,18 @@ struct ac_task_s {
   void *local_arg;
   size_t local_size;
 
+  bool *selected;
+
   ac_task_state_link_t *state_linkage;
 
   ac_task_t *next;
 };
+
+static bool is_worker_selected(ac_worker_t *w) {
+  if (w->task->selected && w->task->selected[w->partition])
+    return true;
+  return false;
+}
 
 ac_worker_input_t *ac_task_find_input(ac_task_t *task, const char *name) {
   ac_worker_input_t *n = task->inputs;
@@ -376,13 +385,6 @@ ac_schedule_t *ac_schedule_init(int argc, char **args, size_t num_partitions,
   pthread_mutex_init(&(h->mutex), NULL);
   pthread_cond_init(&(h->cond), NULL);
 
-  h->threads = (ac_schedule_thread_t *)ac_pool_calloc(
-      pool, sizeof(ac_schedule_thread_t) * cpus);
-  for (size_t i = 0; i < cpus; i++) {
-    ac_schedule_thread_t *a = h->threads + i;
-    a->thread_id = i;
-    a->scheduler = h;
-  }
   h->started_threads = false;
   h->num_partitions = num_partitions;
   h->state = (ac_task_state_t *)(h + 1);
@@ -629,6 +631,93 @@ ac_task_link_t *get_task_list(ac_task_t *task, const char *name,
   }
 }
 
+bool match_filename(const char *a, const char *b) {
+  if (!strcmp(a, b))
+    return true;
+  size_t l1 = strlen(a);
+  size_t l2 = strlen(b);
+  if (l2 > l1)
+    a += (l2 - l1);
+  if (!strcmp(a, b))
+    return true;
+  return false;
+}
+
+static void dump_file(ac_worker_t *w, const char *filename,
+                      ac_io_format_t format, ac_task_dump_f dump,
+                      void *dump_arg) {
+  ac_in_options_t opts;
+  ac_in_options_init(&opts);
+  ac_in_options_format(&opts, format);
+  ac_in_t *in = ac_in_init(filename, &opts);
+  ac_io_record_t *r;
+  ac_buffer_t *bh = ac_buffer_init(1000);
+  while ((r = ac_in_advance(in)) != NULL) {
+    ac_buffer_clear(bh);
+    dump(w, r, bh, dump_arg);
+    if (ac_buffer_length(bh))
+      printf("%s\n", ac_buffer_data(bh));
+  }
+  ac_buffer_destroy(bh);
+  ac_in_destroy(in);
+}
+
+static void scan_output(ac_worker_t *w, char **files, size_t num_files) {
+  ac_worker_input_t *inp = w->inputs;
+  while (inp) {
+    if (inp->dump) {
+      for (size_t i = 0; i < num_files; i++) {
+        if (!files[i])
+          continue;
+        for (size_t j = 0; j < inp->num_files; j++) {
+          if (match_filename(files[i], inp->files[j].filename)) {
+            ac_pool_clear(w->pool);
+            dump_file(w, files[i], inp->options.format, inp->dump,
+                      inp->dump_arg);
+            files[i] = NULL;
+            break;
+          }
+        }
+      }
+    }
+    inp = inp->next;
+  }
+
+  ac_worker_output_t *o = w->outputs;
+  while (o) {
+    if (o->dump) {
+      char *base_name = ac_worker_output_base(w, o);
+      size_t num_partitions = 0;
+      if ((o->flags & AC_OUTPUT_SPLIT) && o->ext_options.partition) {
+        if (o->destinations)
+          num_partitions = o->destinations->task->num_partitions;
+        else
+          num_partitions = o->task->scheduler->num_partitions;
+      }
+      for (size_t i = 0; i < num_files; i++) {
+        if (!files[i])
+          continue;
+        if (!num_partitions && match_filename(files[i], base_name)) {
+          ac_pool_clear(w->pool);
+          dump_file(w, files[i], o->options.format, o->dump, o->dump_arg);
+          files[i] = NULL;
+        }
+        for (size_t j = 0; j < num_partitions; j++) {
+          ac_pool_clear(w->pool);
+          char *filename =
+              (char *)ac_pool_alloc(w->pool, strlen(base_name) + 20);
+          ac_out_partition_filename(filename, base_name, j);
+          if (match_filename(files[i], filename)) {
+            dump_file(w, files[i], o->options.format, o->dump, o->dump_arg);
+            files[i] = NULL;
+          }
+        }
+      }
+    }
+    o = o->next;
+  }
+}
+
 void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
                     double out_ram_pct, double in_ram_pct, size_t flags) {
   ac_schedule_t *scheduler = task->scheduler;
@@ -717,8 +806,9 @@ void ac_task_output_partition(ac_task_t *task, ac_io_partition_f part,
   ac_out_ext_options_partition(&(task->current_output->ext_options), part, arg);
 }
 
-void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh) {
-  ac_buffer_sets(bh, r->record);
+void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
+                       void *arg) {
+  ac_buffer_appends(bh, r->record);
 }
 
 void ac_task_output_dump(ac_task_t *task, ac_task_dump_f dump, void *arg) {
@@ -727,6 +817,8 @@ void ac_task_output_dump(ac_task_t *task, ac_task_dump_f dump, void *arg) {
 
   task->current_output->dump = dump;
   task->current_output->dump_arg = arg;
+
+  // ac_task_input_dump(task, dump, arg);
 }
 
 void ac_task_output_compare(ac_task_t *task, ac_io_compare_f compare,
@@ -999,7 +1091,17 @@ static bool task_available(ac_task_t *task, size_t partition) {
   return false;
 }
 
+static bool is_schedule_running(ac_worker_t *w) {
+  parsed_args_t *p = &(w->task->scheduler->parsed_args);
+  if (p->dump || p->list || p->help)
+    return false;
+  return true;
+}
+
 static void write_ack(ac_worker_t *w) {
+  if (!is_schedule_running(w))
+    return;
+
   char *filename = ac_pool_strdupf(w->schedule_thread->pool, "%s/%s_%lu",
                                    w->task->scheduler->ack_dir,
                                    w->task->task_name, w->partition);
@@ -1020,16 +1122,22 @@ static void get_ack_time(ac_worker_t *w) {
 }
 
 static ac_worker_t *worker_complete(ac_worker_t *w, time_t when) {
-  if (when > w->ack_time)
+  if (when > w->ack_time && when > 1)
     write_ack(w);
+
   // ac_worker_t *next = NULL;
   ac_schedule_t *scheduler = w->task->scheduler;
   pthread_mutex_lock(&(scheduler->mutex));
   size_t num_available = scheduler->num_available;
+  if (is_worker_selected(w)) {
+    scheduler->parsed_args.num_selected--;
+    if (!scheduler->parsed_args.num_selected)
+      scheduler->done = true;
+  }
   mark_task_complete(w->__link, w->partition, when);
   // if (w->next_task && take_available(w->next_task, w->partition))
   //  next = take_worker(w->next_task, w->partition);
-  if (!num_available && scheduler->num_available)
+  if ((!num_available && scheduler->num_available) || scheduler->done)
     pthread_cond_broadcast(&scheduler->cond);
   pthread_mutex_unlock(&(scheduler->mutex));
   return NULL;
@@ -1041,6 +1149,10 @@ static ac_worker_t *get_next_worker(ac_schedule_thread_t *t) {
   ac_schedule_t *scheduler = t->scheduler;
   // printf("Attempting to get task for %lu\n", t->thread_id);
   pthread_mutex_lock(&(scheduler->mutex));
+  if (scheduler->done) {
+    pthread_mutex_unlock(&(scheduler->mutex));
+    return NULL;
+  }
   scheduler->num_running--;
   while (!scheduler->done && !scheduler->num_available &&
          scheduler->num_tasks_to_run)
@@ -1087,12 +1199,34 @@ time_t get_ack_time_for_task_and_partition(ac_task_t *task, size_t partition) {
   return task->state_linkage[partition].ack_time;
 }
 
+static bool task_run_per_args(ac_worker_t *w) {
+  ac_schedule_t *scheduler = w->task->scheduler;
+  if (scheduler->parsed_args.only_run_selected) {
+    if (scheduler->parsed_args.select_all)
+      return true;
+    if (w->task->selected && w->task->selected[w->partition])
+      return true;
+    return false;
+  }
+  if (!scheduler->parsed_args.select_all &&
+      !scheduler->parsed_args.num_selected)
+    return false;
+  return true;
+}
+
 static bool worker_needs_to_run(ac_worker_t *w) {
   if (w->ack_time == 0)
     return true;
 
   if (w->task->run_everytime)
     return true;
+
+  if (w->task->scheduler->parsed_args.force) {
+    if (w->task->scheduler->parsed_args.select_all)
+      return true;
+    if (w->task->selected && w->task->selected[w->partition])
+      return true;
+  }
 
   ac_task_t *task = w->task;
   ac_task_link_t *link = task->reverse_dependencies;
@@ -1290,21 +1424,25 @@ void *schedule_thread(void *arg) {
     fill_inputs(w);
 
     if (worker_needs_to_run(w)) {
-      setup_worker(w);
-      if (!run_worker(w)) {
-        destroy_worker(w);
-        break;
-      }
-      if (t->scheduler->on_complete) {
-        if (!t->scheduler->on_complete(w)) {
+      if (!task_run_per_args(w)) {
+        worker_complete(w, w->ack_time ? w->ack_time : 1);
+      } else {
+        setup_worker(w);
+        if (!run_worker(w)) {
           destroy_worker(w);
           break;
         }
+        if (t->scheduler->on_complete) {
+          if (!t->scheduler->on_complete(w)) {
+            destroy_worker(w);
+            break;
+          }
+        }
+        worker_complete(w, time(NULL));
+        destroy_worker(w);
       }
-      worker_complete(w, time(NULL));
-      destroy_worker(w);
     } else
-      worker_complete(w, w->ack_time);
+      worker_complete(w, w->ack_time ? w->ack_time : 1);
   }
   ac_pool_destroy(t->pool);
   ac_pool_destroy(tmp_pool);
@@ -1312,6 +1450,117 @@ void *schedule_thread(void *arg) {
   ac_buffer_destroy(t->bh);
   mark_as_done(t->scheduler);
   return NULL;
+}
+
+void list_selected_tasks(void *arg) {
+  ac_schedule_thread_t *t = (ac_schedule_thread_t *)arg;
+  t->pool = ac_pool_init(65536);
+  t->bh = ac_buffer_init(200);
+  ac_pool_t *tmp_pool = ac_pool_init(65536);
+  ac_buffer_t *bh = ac_buffer_init(1024);
+  while (!t->scheduler->done) {
+    ac_pool_clear(t->pool);
+    ac_worker_t *w = get_next_worker(t);
+    if (!w)
+      break;
+
+    w->worker_pool = t->pool;
+    ac_pool_clear(tmp_pool);
+    w->pool = tmp_pool;
+    ac_buffer_clear(bh);
+    w->bh = bh;
+
+    get_ack_time(w);
+    if (w->task->scheduler->parsed_args.select_all ||
+        (w->task->selected && w->task->selected[w->partition])) {
+      clone_inputs_and_outputs(w);
+      fill_inputs(w);
+      printf("task: %s [%lu/%lu]\n", w->task->task_name, w->partition,
+             w->task->num_partitions);
+      if (w->task->runner == in_out_runner) {
+        size_t id = 0;
+        printf("  in_out_runner\n");
+        ac_transform_t *transforms = (ac_transform_t *)w->data;
+        while (transforms) {
+          printf("    transform: %lu\n", id);
+          id++;
+          size_t num_outs = transforms->num_outputs;
+          size_t num_ins = transforms->num_inputs;
+          for (size_t i = 0; i < num_ins; i++) {
+            ac_worker_input_t *n = transforms->inputs[i];
+            printf("      input[%lu]: %s (%lu)\n", i, n->name, n->num_files);
+            for (size_t j = 0; j < n->num_files; j++)
+              printf("        %s (%lu)\n", n->files[j].filename,
+                     n->files[j].size);
+          }
+          for (size_t i = 0; i < num_outs; i++) {
+            ac_worker_output_t *n = transforms->outputs[i];
+            printf("      output[%lu]: %s %s%s%s\n", i, n->name,
+                   n->flags & AC_OUTPUT_SPLIT ? "split" : "",
+                   n->flags & AC_OUTPUT_PARTITION ? "partition" : "",
+                   (n->flags & (AC_OUTPUT_SPLIT | AC_OUTPUT_PARTITION))
+                       ? ""
+                       : "normal");
+            ac_task_link_t *d = n->destinations;
+            if (d) {
+              printf("        destinations:");
+              while (d) {
+                printf(" %s[%lu]", d->task->task_name, d->task->num_partitions);
+                d = d->next;
+              }
+              printf("\n");
+            }
+          }
+          transforms = transforms->next;
+        }
+      }
+    }
+
+    worker_complete(w, time(NULL));
+  }
+  ac_pool_destroy(t->pool);
+  ac_pool_destroy(tmp_pool);
+  ac_buffer_destroy(bh);
+  ac_buffer_destroy(t->bh);
+  mark_as_done(t->scheduler);
+}
+
+void dump_selected_tasks(void *arg) {
+  ac_schedule_thread_t *t = (ac_schedule_thread_t *)arg;
+  t->pool = ac_pool_init(65536);
+  t->bh = ac_buffer_init(200);
+  ac_pool_t *tmp_pool = ac_pool_init(65536);
+  ac_buffer_t *bh = ac_buffer_init(1024);
+  char **files = t->scheduler->parsed_args.files;
+  size_t num_files = 0;
+  for (size_t i = 0; files[i] != NULL; i++)
+    num_files++;
+  if (!num_files)
+    return;
+
+  while (!t->scheduler->done) {
+    ac_pool_clear(t->pool);
+    ac_worker_t *w = get_next_worker(t);
+    if (!w)
+      break;
+
+    w->worker_pool = t->pool;
+    ac_pool_clear(tmp_pool);
+    w->pool = tmp_pool;
+    ac_buffer_clear(bh);
+    w->bh = bh;
+
+    get_ack_time(w);
+    clone_inputs_and_outputs(w);
+    fill_inputs(w);
+    scan_output(w, files, num_files);
+    worker_complete(w, time(NULL));
+  }
+  ac_pool_destroy(t->pool);
+  ac_pool_destroy(tmp_pool);
+  ac_buffer_destroy(bh);
+  ac_buffer_destroy(t->bh);
+  mark_as_done(t->scheduler);
 }
 
 static bool in_out_runner(ac_worker_t *w) {
@@ -1422,16 +1671,13 @@ static void schedule_usage(ac_schedule_t *h) {
   printf("   partitions or ranges separated by commas.\n");
   printf("   To select partitions 1, 3, 4, and 5 of task named first_task\n");
   printf("   -t first_task:1,3-5\n");
-  printf("-a|--all select all tasks and partitions.  This is the default\n");
-  printf("   behavior when -t isn\'t specified.\n");
   printf("-o  Normally, all tasks that are needed to run to complete\n");
   printf("    selected task will run.  This will override that behavior\n");
   printf("    and only run selected tasks\n");
-  printf("-d|--dump dump the contents of files in the selected tasks\n");
-  printf("-p|--prefix dump the contents of files in the selected tasks\n");
-  printf("    and prefix each line with the task, partition number, and\n");
-  printf("    filename of the line\n");
-  printf("--file <filename1,[filename2],...> select files to dump.\n");
+  printf("-d|--dump <filename1,[filename2],...> dump the contents of files\n");
+  printf(
+      "-p|--prefix <filename1,[filename2],...> dump the contents of files\n");
+  printf("    and prefix each line with the filename and line number\n");
   printf("-l|--list list details of execution (the plan)\n");
   printf("-s|--show-files similar to list, except input and output files\n");
   printf("     are also displayed.\n");
@@ -1450,25 +1696,11 @@ void parse_args(ac_schedule_t *h) {
   char **p = h->args;
   char **ep = p + h->argc;
   while (p < ep) {
-    if (!strcmp(*p, "-d") || !(strcmp(*p, "--dump"))) {
-      at.list = false;
-      at.show_files = false;
-      at.dump = true;
-      p++;
-    } else if (!strcmp(*p, "-f") || !(strcmp(*p, "--force"))) {
+    if (!strcmp(*p, "-f") || !(strcmp(*p, "--force"))) {
       at.force = true;
-      p++;
-    } else if (!strcmp(*p, "-a") || !(strcmp(*p, "--all"))) {
-      at.select_all = true;
       p++;
     } else if (!strcmp(*p, "-o")) {
       at.only_run_selected = true;
-      p++;
-    } else if (!strcmp(*p, "-p") || !(strcmp(*p, "--prefix"))) {
-      at.list = false;
-      at.show_files = false;
-      at.dump = true;
-      at.prefix = true;
       p++;
     } else if (!strcmp(*p, "-l") || !(strcmp(*p, "--list"))) {
       at.list = true;
@@ -1484,7 +1716,14 @@ void parse_args(ac_schedule_t *h) {
     } else if (!strcmp(*p, "-h") || !(strcmp(*p, "--help"))) {
       at.help = true;
       p++;
-    } else if (!strcmp(*p, "--file")) {
+    } else if (!strcmp(*p, "-d") || !(strcmp(*p, "--dump")) ||
+               !strcmp(*p, "-p") || !(strcmp(*p, "--prefix"))) {
+      at.list = false;
+      at.show_files = false;
+      at.dump = true;
+      char *ptr = *p;
+      if (ptr[1] == 'p' || (ptr[1] == '-' && ptr[2] == 'p'))
+        at.prefix = true;
       p++;
       if (p == ep)
         at.help = true;
@@ -1526,8 +1765,11 @@ void parse_args(ac_schedule_t *h) {
       p = ep;
     }
   }
+  at.num_selected = 0;
+  at.select_all = true;
   at.files = ac_pool_split(h->pool, NULL, ',', filenames);
-  if (!at.help && tasks && !at.select_all) {
+  if (!at.help && tasks) {
+    at.select_all = false;
     size_t num_t = 0;
     char **t = ac_pool_split(h->pool, &num_t, '|', tasks);
     if (num_t) {
@@ -1547,8 +1789,7 @@ void parse_args(ac_schedule_t *h) {
         }
         size_t num_partitions = selected[i].task->num_partitions;
         selected[i].partitions =
-            p ? (bool *)ac_pool_calloc(h->pool, sizeof(bool) * num_partitions)
-              : NULL;
+            (bool *)ac_pool_calloc(h->pool, sizeof(bool) * num_partitions);
         if (p) {
           char **parts = &p;
           char **eparts = parts + 1;
@@ -1569,7 +1810,10 @@ void parse_args(ac_schedule_t *h) {
                 break;
               } else {
                 while (p1 <= p2) {
-                  selected[i].partitions[p1] = true;
+                  if (!selected[i].partitions[p1]) {
+                    selected[i].partitions[p1] = true;
+                    at.num_selected++;
+                  }
                   p1++;
                 }
               }
@@ -1579,14 +1823,28 @@ void parse_args(ac_schedule_t *h) {
                 at.help = true;
                 break;
               } else {
-                selected[i].partitions[p1] = true;
+                if (!selected[i].partitions[p1]) {
+                  selected[i].partitions[p1] = true;
+                  at.num_selected++;
+                }
                 p1++;
               }
+            }
+          }
+        } else {
+          for (size_t p1 = 0; p1 < num_partitions; p1++) {
+            if (!selected[i].partitions[p1]) {
+              selected[i].partitions[p1] = true;
+              at.num_selected++;
             }
           }
         }
       }
     }
+  }
+  if (!at.help && at.tasks) {
+    for (size_t i = 0; i < at.num_tasks; i++)
+      at.tasks[i].task->selected = at.tasks[i].partitions;
   }
   h->parsed_args = at;
 }
@@ -1597,19 +1855,36 @@ void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete) {
   if (h->parsed_args.cpus) {
     h->cpus = h->parsed_args.cpus;
     // TODO: fix this so that you can have more cpus
-    if (h->cpus > h->num_partitions)
-      h->cpus = h->num_partitions;
+    // if (h->cpus > h->num_partitions)
+    //   h->cpus = h->num_partitions;
   }
   if (h->parsed_args.ram)
     h->ram = h->parsed_args.ram * 1024;
+
+  if (h->parsed_args.help || h->parsed_args.dump || h->parsed_args.list)
+    h->cpus = 1;
+
+  h->threads = (ac_schedule_thread_t *)ac_pool_calloc(
+      h->pool, sizeof(ac_schedule_thread_t) * h->cpus);
+  for (size_t i = 0; i < h->cpus; i++) {
+    ac_schedule_thread_t *a = h->threads + i;
+    a->thread_id = i;
+    a->scheduler = h;
+  }
 
   if (h->parsed_args.help) {
     schedule_usage(h);
     return;
   } else if (h->parsed_args.dump) {
-    printf("Not yet implemented\n");
+    h->num_running = h->cpus;
+    h->on_complete = NULL;
+    h->done = false;
+    dump_selected_tasks(h->threads);
   } else if (h->parsed_args.list) {
-    printf("Not yet implemented\n");
+    h->num_running = h->cpus;
+    h->on_complete = NULL;
+    h->done = false;
+    list_selected_tasks(h->threads);
   } else {
     h->num_running = h->cpus;
     h->on_complete = on_complete;

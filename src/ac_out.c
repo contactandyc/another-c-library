@@ -806,6 +806,11 @@ static void suffix_filename_with_id(char *dest, const char *filename, size_t id,
   }
 }
 
+/* used to create a partitioned filename */
+void ac_out_partition_filename(char *dest, const char *filename, size_t id) {
+  suffix_filename_with_id(dest, filename, id, NULL, false);
+}
+
 /** ac_out_partitioned_t **/
 typedef struct {
   int type;
