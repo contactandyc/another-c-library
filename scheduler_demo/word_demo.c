@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
      a user customizable usage statement for parameters that are not in
      conflict with the scheduler. Specify how many partitions, default
      number of cpus, default MB of RAM. */
-  ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 16, 16, 1000);
+  ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 4, 4, 1000);
 
   /* Define each of the tasks with a callback to finish defining the tasks.
      The third parameter indicates whether the task is partitioned or not.
