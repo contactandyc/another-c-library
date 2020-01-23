@@ -193,7 +193,7 @@ int main( int argc, char *argv[]) {
 ```c
 char *ac_strdupvf(const char *p, va_list args);
 ```
-ac\_strdupvf similar to ac_strdupf, except that it uses va_list args.  For example, ac_strdupf is implemented using this method as follows.
+ac\_strdupvf similar to ac\_strdupf, except that it uses va\_list args.  For example, ac\_strdupf is implemented using this method as follows.
 
 ```c
 char *ac_strdupf(const char *fmt, ...) {
