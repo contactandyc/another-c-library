@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "../ac_map.h"
 #include "../ac_search.h"
 #include "../ac_sort.h"
 
@@ -29,6 +30,27 @@ limitations under the License.
 #define AC_JSON_NUMBER 8
 #define AC_JSON_DECIMAL 9
 #define AC_JSON_TRUE 10
+
+struct ac_json_s {
+  uint32_t type;
+  uint32_t length;
+  ac_json_t *parent;
+  char *value;
+};
+
+struct ac_jsona_s {
+  ac_json_t *value;
+  ac_jsona_t *next;
+  ac_jsona_t *previous;
+};
+
+struct ac_jsono_s {
+  ac_map_t map;
+  char *key;
+  ac_json_t *value;
+  ac_jsono_t *next;
+  ac_jsono_t *previous;
+};
 
 static inline ac_json_t *ac_json_binary(ac_pool_t *pool, char *s,
                                         size_t length) {

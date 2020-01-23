@@ -18,7 +18,6 @@ limitations under the License.
 #define _ac_json_H
 
 #include "ac_buffer.h"
-#include "ac_map.h"
 #include "ac_pool.h"
 
 #include <inttypes.h>
@@ -33,27 +32,6 @@ struct ac_jsona_s;
 typedef struct ac_jsona_s ac_jsona_t;
 struct ac_jsono_s;
 typedef struct ac_jsono_s ac_jsono_t;
-
-struct ac_json_s {
-  uint32_t type;
-  uint32_t length;
-  ac_json_t *parent;
-  char *value;
-};
-
-typedef struct ac_jsona_s {
-  ac_json_t *value;
-  ac_jsona_t *next;
-  ac_jsona_t *previous;
-} ac_jsona_t;
-
-typedef struct ac_jsono_s {
-  ac_map_t map;
-  char *key;
-  ac_json_t *value;
-  ac_jsono_t *next;
-  ac_jsono_t *previous;
-} ac_jsono_t;
 
 /* This is the core function for parsing json.  This parser is not fully
  * compliant in that keys are expected to not include encodings (or if they do,
