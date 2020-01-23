@@ -4,6 +4,8 @@ ac_buffer_init
 ac_buffer_pool_init
 ac_buffer_clear
 ac_buffer_destroy
+ac_buffer_data
+ac_buffer_length
 ac_buffer_resize
 ac_buffer_shrink_by
 ac_buffer_alloc

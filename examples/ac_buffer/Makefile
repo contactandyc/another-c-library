@@ -3,6 +3,7 @@ include $(ROOT)/src/Makefile.include
 
 FLAGS += -D_AC_DEBUG_MEMORY_=NULL -lz
 PROGRAMS = ac_buffer_init ac_buffer_pool_init ac_buffer_clear ac_buffer_destroy
+PROGRAMS += ac_buffer_data ac_buffer_length
 PROGRAMS += ac_buffer_resize ac_buffer_shrink_by
 PROGRAMS += ac_buffer_alloc ac_buffer_append_ualloc
 PROGRAMS += ac_buffer_append ac_buffer_appendc ac_buffer_appendf
@@ -23,6 +24,10 @@ examples: $(PROGRAMS)
 	./ac_buffer_pool_init
 	@echo
 	./ac_buffer_clear
+	@echo
+	./ac_buffer_data
+	@echo
+	./ac_buffer_length
 	@echo
 	./ac_buffer_destroy
 	@echo
