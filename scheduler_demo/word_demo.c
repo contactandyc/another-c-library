@@ -58,17 +58,6 @@ int compare_words(ac_io_record_t *p1, ac_io_record_t *p2, void *arg) {
   return strcmp(a, b);
 }
 
-/* To sort words by descending frequency. */
-int compare_word_freq(ac_io_record_t *p1, ac_io_record_t *p2, void *arg) {
-  uint32_t f1 = (*(uint32_t *)p1->record);
-  uint32_t f2 = (*(uint32_t *)p2->record);
-  if (f1 != f2)
-    return (f1 < f2) ? 1 : -1;
-  char *a = p1->record + sizeof(uint32_t);
-  char *b = p2->record + sizeof(uint32_t);
-  return strcmp(a, b);
-}
-
 /* To accumulate totals for each word.  It should be noted that this may be
    called more than once for a given word (and the number associated with
    each record may be greater than one).
@@ -83,6 +72,17 @@ bool reduce_word_count(ac_io_record_t *res, const ac_io_record_t *r,
   }
   (*(uint32_t *)r[0].record) = total;
   return true;
+}
+
+/* To sort words by descending frequency. */
+int compare_word_freq(ac_io_record_t *p1, ac_io_record_t *p2, void *arg) {
+  uint32_t f1 = (*(uint32_t *)p1->record);
+  uint32_t f2 = (*(uint32_t *)p2->record);
+  if (f1 != f2)
+    return (f1 < f2) ? 1 : -1;
+  char *a = p1->record + sizeof(uint32_t);
+  char *b = p2->record + sizeof(uint32_t);
+  return strcmp(a, b);
 }
 
 /* The default ac_io_hash_partition allows an offset into the record to be
