@@ -1,0 +1,9 @@
+*~
+*.dSYM
+ac_malloc
+ac_calloc
+ac_memdup
+ac_strdup
+ac_strdupa
+ac_strdupa2
+ac_strdupan

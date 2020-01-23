@@ -2,9 +2,9 @@ ROOT=../..
 include $(ROOT)/src/Makefile.include
 
 FLAGS += -D_AC_DEBUG_MEMORY_=NULL -lz
-PROGRAMS=ac_malloc ac_calloc ac_strdup ac_strdupa ac_strdupa2 ac_strdupan
+PROGRAMS=ac_malloc ac_calloc ac_memdup ac_strdup ac_strdupa ac_strdupa2 ac_strdupan
 
-all: $(PROGRAMS) examples
+all: $(PROGRAMS) examples gitignore
 
 $(PROGRAMS): %: %.c $(OBJECTS) $(HEADER_FILES)
 	gcc $(FLAGS) $(OBJECTS) $< -o $@
@@ -14,6 +14,8 @@ examples: $(PROGRAMS)
 	./ac_malloc
 	@echo
 	./ac_calloc
+	@echo
+	./ac_memdup
 	@echo
 	./ac_strdup this is a test
 	@echo
@@ -26,3 +28,10 @@ examples: $(PROGRAMS)
 
 clean:
 	rm -rf *~ *.dSYM $(PROGRAMS)
+
+gitignore:
+	@echo "*~" > .gitignore
+	@echo "*.dSYM" >> .gitignore
+	@for prog in $(PROGRAMS) ; do \
+		echo $$prog >> .gitignore; \
+	done
