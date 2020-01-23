@@ -12,3 +12,9 @@ ac_strdupa2
 ac_strdupan
 ac_split.1
 ac_split.2
+detecting_memory_loss
+detecting_memory_loss_fix
+double_free
+double_free_fix
+free_wrong_memory
+free_wrong_memory_fix

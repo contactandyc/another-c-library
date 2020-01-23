@@ -400,7 +400,7 @@ Two macros control memory debugging.  If \_AC\_DEBUG\_MEMORY\_ is undefined, the
 
 A common mistake that I've made is to forget to free memory that was previously allocated.  The ac_... allocation methods assist developers in making sure that allocations are cleaned up.
 
-demo1.c
+detecting_memory_loss.c
 ```c
 #include "ac_allocator.h"
 
@@ -416,17 +416,17 @@ int main(int argc, char *argv[]) {
 ```
 
 ```
-$ gcc demo1b.c ../src/ac_allocator.c -I../src -D_AC_DEBUG_MEMORY_=NULL -o demo1
-$ ./demo1
+$ make detecting_memory_loss
+$ ./detecting_memory_loss
 Demo to show how allocations are tracked
-./demo1
-8 byte(s) allocated in 1 allocations (40 byte(s) overhead)
-demo1.c:7: 8
+./detecting_memory_loss
+24 byte(s) allocated in 1 allocations (40 byte(s) overhead)
+detecting_memory_loss.c:7: 24
 ```
 
-The above example, allocates 8 bytes (demo1.c is 7 bytes + the \0 terminator).  When demo1 exits, it shows how many allocations have not been freed and each filename:line along with the number of bytes allocated (and not freed).  Modifying demo1.c by uncommenting the ac_free call should eliminate the memory leak.
+The above example, allocates 8 bytes (detecting_memory_loss.c is 7 bytes + the \0 terminator).  When detecting_memory_loss exits, it shows how many allocations have not been freed and each filename:line along with the number of bytes allocated (and not freed).  Modifying detecting_memory_loss.c by uncommenting the ac_free call should eliminate the memory leak.
 
-demo1.c
+detecting_memory_loss_fix.c
 ```c
 #include "ac_allocator.h"
 
@@ -441,12 +441,11 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-
 ```
-$ gcc demo1.c ac_allocator.c -D_AC_DEBUG_MEMORY_=NULL -o demo1
-$ ./demo1
+$ make detecting_memory_loss_fix
+$ ./detecting_memory_loss_fix
 Demo to show how allocations are tracked
-./demo1
+./detecting_memory_loss_fix
 ```
 
 With the memory leak fixed, nothing is printed to stderr.
@@ -455,7 +454,7 @@ With the memory leak fixed, nothing is printed to stderr.
 
 A common mistake I've made many times is to free memory twice resulting in a corrupt state and possibly crashing the program.  The ac_... allocation methods will detect freeing memory more than once.
 
-demo1b.c
+double_free.c
 ```c
 #include "ac_allocator.h"
 
@@ -472,19 +471,20 @@ int main(int argc, char *argv[]) {
 ```
 
 ```
-$ ./demo1b
+$ make double_free
+$ ./double_free
 Demo to show how allocations are tracked
-demo1b.c:10: 0 ac_free is invalid (double free?)
+double_free.c:10: 0 ac_free is invalid (double free?)
 Abort trap: 6
 ```
 
-Line 10 of demo1b.c frees the memory a second time.
+Line 10 of double_free.c frees the memory a second time.
 
 ## Freeing the Wrong Memory
 
 malloc, calloc, realloc, and strdup all return pointers.  Those pointers must be retained to be freed later.  If you alter the pointer (by adding or subtracting from it) and then call free with the altered pointer, your program will probably crash.  The ac_... functions will attempt to find the memory meant to be freed.
 
-demo1c.c
+free_wrong_memory.c
 ```c
 #include "ac_allocator.h"
 
@@ -500,14 +500,15 @@ int main(int argc, char *argv[]) {
 ```
 
 ```
-$ ./demo1c
+$ make free_wrong_memory
+$ ./free_wrong_memory
 Demo to show invalid free
-demo1c.c:7: 9 is closest allocation and is 2 bytes ahead of original allocation
-demo1c.c:9: 0 ac_free is invalid (double free?)
+free_wrong_memory.c:7: 9 is closest allocation and is 2 bytes ahead of original allocation
+free_wrong_memory.c:9: 0 ac_free is invalid (double free?)
 Abort trap: 6
 ```
 
-The ac_free call is called with a pointer that is advanced 2 bytes beyond the original allocation at line 7 of demo1c.c.
+The ac_free call is called with a pointer that is advanced 2 bytes beyond the original allocation at line 7 of free_wrong_memory.c.
 
 ## Tracking Memory Loss Over Time
 
