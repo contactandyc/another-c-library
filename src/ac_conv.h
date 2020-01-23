@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/*
+  ac_conv is a collection of conversion functions to convert strings (const
+  char *) to various types.
+*/
+
 #ifndef _ac_conv_H
 #define _ac_conv_H
 

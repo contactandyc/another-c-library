@@ -14,6 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/*
+  Memory errors are common in C applications.  The ac_allocator attempts to
+  mitigate a few of the most common ones such as freeing the wrong address,
+  freeing memory more than once, and forgetting to free memory.  If the
+  allocator is used in debug mode, allocations will be tracked.  In release
+  mode, the functions all compile down to the system equivalents.
+*/
+
 #ifndef _ac_allocator_H
 #define _ac_allocator_H
 

@@ -1777,22 +1777,26 @@ void parse_args(ac_schedule_t *h) {
       if (ptr[1] == 'p' || (ptr[1] == '-' && ptr[2] == 'p'))
         at.prefix = true;
       p++;
-      if (p == ep)
+      if (p == ep || (*p)[0] == '-')
         at.help = true;
       else {
-        filenames =
-            ac_pool_strdupf(h->pool, "%s%s%s", filenames ? filenames : "",
-                            filenames ? "," : "", *p);
-        p++;
+        while (p < ep && (*p)[0] != '-') {
+          filenames =
+              ac_pool_strdupf(h->pool, "%s%s%s", filenames ? filenames : "",
+                              filenames ? "," : "", *p);
+          p++;
+        }
       }
     } else if (!strcmp(*p, "-t") || !(strcmp(*p, "--task"))) {
       p++;
-      if (p == ep)
+      if (p == ep || (*p)[0] == '-')
         at.help = true;
       else {
-        tasks = ac_pool_strdupf(h->pool, "%s%s%s", tasks ? tasks : "",
-                                tasks ? "|" : "", *p);
-        p++;
+        while (p < ep && (*p)[0] != '-') {
+          tasks = ac_pool_strdupf(h->pool, "%s%s%s", tasks ? tasks : "",
+                                  tasks ? "|" : "", *p);
+          p++;
+        }
       }
     } else if (!strcmp(*p, "-r") || !strcmp(*p, "--ram")) {
       p++;

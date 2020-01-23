@@ -14,6 +14,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/*
+  The ac_pool provides an api similar to malloc, calloc, strdup, along with many
+  other useful common allocation patterns with the exception of free.  The pool
+  must be cleared (ac_pool_clear) or destroyed (ac_pool_destroy) to reclaim
+  memory allocated.
+
+  C doesn't have garbage collection.  Many C developers prefer to stay away from
+  languages which have it as it can cause performance issues.  The pool provides
+  a way for allocations to happen without them being tracked.  Collection is not
+  automatic.  The pool must be cleared or destroyed for memory to be reclaimed.
+  This affords the end user significant performance advantages in that each pool
+  can be cleared independently.  Pools can be created per thread and at various
+  scopes providing a mechanism to mostly (if not completely) eliminate memory
+  fragmentation.  The pool object isn't thread safe.  In general, locks cause
+  problems and if code can be designed to be thread safe without locking, it
+  will perform better.  Many of the objects within the ac_ collection will use
+  the pool for allocation for all of the reasons mentioned above.
+
+  Clearing the pool generally consists of resetting a pointer.  Memory is only
+  freed if the memory used by the pool exceeded the initial size assigned to it
+  during initialization.  In this case, the extra blocks will be freed before
+  the counter is reset.  It is normally best to set the initial size so that
+  overflowing doesn't happen, except in rare circumstances.  The memory that was
+  previously allocated prior to a clear will still possibly be valid, but
+  shouldn't be relied upon.
+*/
+
 #ifndef _ac_pool_H
 #define _ac_pool_H
 

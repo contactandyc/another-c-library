@@ -7,8 +7,12 @@ title: "ac_pool"
 
 # ac_pool
 
-The ac_pool provides an api similar to malloc, calloc, strdup, along with many other useful common allocation patterns.  The pool uses an allocate and clear approach.  There is no free method.  The clear call clears all of the memory that has been previously allocated from the pool. Internally, a counter is to zero to clear and the counter is incremented to allocate (most of the time), so it is very efficient.  The pool should be initialized with a size such that
-it doesn't need to grow most of the time prior to clearing.  There can be a slight advantage to using a size that is a multiple of 4096 when selecting a size (do this instead of selecting 3800 or something close to 4096).
+The ac_pool provides an api similar to malloc, calloc, strdup, along with many other useful common allocation patterns with the exception of free.  The pool must be cleared (ac_pool_clear) or destroyed (ac_pool_destroy) to reclaim  memory allocated.
+
+C doesn't have garbage collection.  Many C developers prefer to stay away from languages which have it as it can cause performance issues.  The pool provides a way for allocations to happen without them being tracked.  Collection is not automatic.  The pool must be cleared or destroyed for memory to be reclaimed.  This affords the end user significant performance advantages in that each pool can be cleared independently.  Pools can be created per thread and at various scopes providing a mechanism to mostly (if not completely) eliminate memory fragmentation.  The pool object isn't thread safe.  In general, locks cause problems and if code can be designed to be thread safe without locking, it will perform better.  Many of the objects within the ac_ collection will use the pool for allocation for all of the reasons mentioned above.
+
+Clearing the pool generally consists of resetting a pointer.  Memory is only freed if the memory used by the pool exceeded the initial size assigned to it during initialization.  In this case, the extra blocks will be freed before the counter is reset.  It is normally best to set the initial size so that overflowing doesn't happen, except in rare circumstances.  The memory that was previously allocated prior to a clear will still possibly be valid, but shouldn't be relied upon.
+
 
 ### Commonly used functions
 ```c

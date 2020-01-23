@@ -23,6 +23,10 @@ limitations under the License.
 extern "C" {
 #endif
 
+/*
+  cgi is commonly used within URLs.  This object is meant to aid in parsing
+  URLs and finding the values of cgi arguments.
+*/
 
 struct ac_cgi_s;
 typedef struct ac_cgi_s ac_cgi_t;
@@ -37,8 +41,7 @@ const char *ac_cgi_query(ac_cgi_t *h);
 char **ac_cgi_strs(ac_cgi_t *h, const char *key);
 
 /* get the first decoded string from key as a string */
-const char *ac_cgi_str(ac_cgi_t *h, const char *key,
-                         const char *default_value);
+const char *ac_cgi_str(ac_cgi_t *h, const char *key, const char *default_value);
 
 /* get the first decoded string from key as a bool */
 bool ac_cgi_bool(ac_cgi_t *h, const char *key, bool default_value);
@@ -56,15 +59,13 @@ double ac_cgi_double(ac_cgi_t *h, const char *key, double default_value);
 int32_t ac_cgi_int32_t(ac_cgi_t *h, const char *key, int32_t default_value);
 
 /* returns uint32_t if value is not NULL and valid, otherwise default_value */
-uint32_t ac_cgi_uint32_t(ac_cgi_t *h, const char *key,
-                           uint32_t default_value);
+uint32_t ac_cgi_uint32_t(ac_cgi_t *h, const char *key, uint32_t default_value);
 
 /* returns int64_t if value is not NULL and valid, otherwise default_value */
 int64_t ac_cgi_int64_t(ac_cgi_t *h, const char *key, int64_t default_value);
 
 /* returns uint64_t if value is not NULL and valid, otherwise default_value */
-uint64_t ac_cgi_uint64_t(ac_cgi_t *h, const char *key,
-                           uint64_t default_value);
+uint64_t ac_cgi_uint64_t(ac_cgi_t *h, const char *key, uint64_t default_value);
 
 /* decode cgi text */
 char *ac_cgi_decode(ac_pool_t *pool, char *s);
