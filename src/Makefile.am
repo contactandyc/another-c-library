@@ -30,7 +30,6 @@ libac_a_HEADERS = ac_allocator.h\
 			ac_pool.h\
 			ac_search.h\
 			ac_sort.h\
-			ac_sortl.h\
 			ac_threaded_pipe.h\
 			ac_timer.h\
 			llhttp/llhttp.h\
@@ -40,4 +39,3 @@ libac_a_HEADERS = ac_allocator.h\
 			impl/ac_pool.h\
 			impl/ac_search.h\
 			impl/ac_sort.h\
-			impl/ac_sortl.h
