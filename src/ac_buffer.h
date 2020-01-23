@@ -125,6 +125,9 @@ static inline void *ac_buffer_shrink_by(ac_buffer_t *h, size_t length);
    will retain the original data in the buffer for up to length bytes. */
 static inline void *ac_buffer_append_alloc(ac_buffer_t *h, size_t length);
 
+/* same as append_alloc except memory is not necessarily aligned */
+static inline void *ac_buffer_append_ualloc(ac_buffer_t *h, size_t length);
+
 /* resize the buffer and return a pointer to the beginning of the buffer.  This
    will NOT retain the original data in the buffer for up to length bytes. */
 static inline void *ac_buffer_alloc(ac_buffer_t *h, size_t length);

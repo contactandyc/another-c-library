@@ -102,6 +102,19 @@ static inline void *ac_buffer_append_alloc(ac_buffer_t *h, size_t length) {
   return r;
 }
 
+static inline void *ac_buffer_append_ualloc(ac_buffer_t *h, size_t length) {
+  if (length + h->length > h->size)
+    _ac_buffer_grow(h, length + h->length);
+  char *r = h->data + h->length;
+  h->length += length;
+  r[length] = 0;
+#ifdef _AC_DEBUG_MEMORY_
+  if (h->length > h->max_length)
+    h->max_length = h->length;
+#endif
+  return r;
+}
+
 void _ac_buffer_append(ac_buffer_t *h, const void *data, size_t length);
 
 static inline void ac_buffer_append(ac_buffer_t *h, const void *data,
