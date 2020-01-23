@@ -2,7 +2,7 @@ ROOT=../..
 include $(ROOT)/src/Makefile.include
 
 FLAGS += -D_AC_DEBUG_MEMORY_=NULL -lz
-PROGRAMS=ac_malloc ac_calloc
+PROGRAMS=ac_malloc ac_calloc ac_strdup
 
 all: $(PROGRAMS) examples
 
@@ -14,6 +14,8 @@ examples: $(PROGRAMS)
 	./ac_malloc
 	@echo
 	./ac_calloc
+	@echo
+	./ac_strdup this is a test
 	@echo
 
 clean:
