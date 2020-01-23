@@ -7,6 +7,8 @@ PROGRAMS += ac_strdupvf ac_strdupa ac_strdupa2 ac_strdupan ac_split.1 ac_split.2
 PROGRAMS += detecting_memory_loss detecting_memory_loss_fix
 PROGRAMS += double_free double_free_fix
 PROGRAMS += free_wrong_memory free_wrong_memory_fix
+PROGRAMS += track_over_time
+PROGRAMS += track_objects track_objects_fix
 
 all: $(PROGRAMS) examples gitignore
 
@@ -50,6 +52,10 @@ examples: $(PROGRAMS)
 	-./free_wrong_memory
 	@echo
 	./free_wrong_memory_fix
+	@echo
+	./track_objects
+	@echo
+	./track_objects_fix
 
 clean:
 	rm -rf *~ *.dSYM $(PROGRAMS)

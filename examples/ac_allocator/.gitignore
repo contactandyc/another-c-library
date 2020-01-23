@@ -18,3 +18,6 @@ double_free
 double_free_fix
 free_wrong_memory
 free_wrong_memory_fix
+track_over_time
+track_objects
+track_objects_fix

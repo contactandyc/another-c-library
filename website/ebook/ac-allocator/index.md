@@ -402,7 +402,7 @@ Two macros control memory debugging.  If \_AC\_DEBUG\_MEMORY\_ is undefined, the
 
 A common mistake that I've made is to forget to free memory that was previously allocated.  The ac_... allocation methods assist developers in making sure that allocations are cleaned up.
 
-detecting_memory_loss.c
+detecting\_memory\_loss.c
 ```c
 #include "ac_allocator.h"
 
@@ -426,9 +426,9 @@ Demo to show how allocations are tracked
 detecting_memory_loss.c:7: 24
 ```
 
-The above example, allocates 8 bytes (detecting_memory_loss.c is 7 bytes + the \0 terminator).  When detecting_memory_loss exits, it shows how many allocations have not been freed and each filename:line along with the number of bytes allocated (and not freed).  Modifying detecting_memory_loss.c by uncommenting the ac_free call should eliminate the memory leak.
+The above example, allocates 8 bytes (detecting\_memory\_loss.c is 7 bytes + the \0 terminator).  When detecting\_memory\_loss exits, it shows how many allocations have not been freed and each filename:line along with the number of bytes allocated (and not freed).  Modifying detecting\_memory\_loss.c by uncommenting the ac_free call should eliminate the memory leak.
 
-detecting_memory_loss_fix.c
+detecting\_memory\_loss\_fix.c
 ```c
 #include "ac_allocator.h"
 
@@ -456,7 +456,7 @@ With the memory leak fixed, nothing is printed to stderr.
 
 A common mistake I've made many times is to free memory twice resulting in a corrupt state and possibly crashing the program.  The ac_... allocation methods will detect freeing memory more than once.
 
-double_free.c
+double\_free.c
 ```c
 #include "ac_allocator.h"
 
@@ -480,13 +480,13 @@ double_free.c:10: 0 ac_free is invalid (double free?)
 Abort trap: 6
 ```
 
-Line 10 of double_free.c frees the memory a second time.
+Line 10 of double\_free.c frees the memory a second time.
 
 ## Freeing the Wrong Memory
 
 malloc, calloc, realloc, and strdup all return pointers.  Those pointers must be retained to be freed later.  If you alter the pointer (by adding or subtracting from it) and then call free with the altered pointer, your program will probably crash.  The ac_... functions will attempt to find the memory meant to be freed.
 
-free_wrong_memory.c
+free\_wrong\_memory.c
 ```c
 #include "ac_allocator.h"
 
@@ -510,13 +510,13 @@ free_wrong_memory.c:9: 0 ac_free is invalid (double free?)
 Abort trap: 6
 ```
 
-The ac_free call is called with a pointer that is advanced 2 bytes beyond the original allocation at line 7 of free_wrong_memory.c.
+The ac\_free call is called with a pointer that is advanced 2 bytes beyond the original allocation at line 7 of free\_wrong\_memory.c.
 
 ## Tracking Memory Loss Over Time
 
 We could alternatively define \_AC\_DEBUG\_MEMORY\_ as "memory.log" and set the refresh speed to 5 second with another example.
 
-demo1b.c
+track\_over\_time.c
 ```c
 #include "ac_allocator.h"
 
@@ -542,8 +542,8 @@ int main(int argc, char *argv[]) {
 ```
 
 ```
-$ gcc demo1b.c ../src/ac_allocator.c -I../src -o demo1b '-D_AC_DEBUG_MEMORY_="memory.log"' -D_AC_DEBUG_MEMORY_SPEED_=5
-$ ./demo1b
+$ make track_over_time
+$ ./track_over_time
 Demo to show how allocations are tracked
 Cleaning up - intentionally leaving a small leak
 $ ls -lT memory.log*
@@ -568,10 +568,10 @@ $ diff memory.log.1 memory.log.2
 > Mon Dec 30 08:49:44 2019
 > 752 byte(s) allocated in 32 allocations (1280 byte(s) overhead)
 35d34
-< demo1b.c:13: 32
+< track_over_time.c:13: 32
 ```
 
-From above, it can be seen that memory.log.1 has one extra allocation for 32 bytes at line 13 of demo1b.c.
+From above, it can be seen that memory.log.1 has one extra allocation for 32 bytes at line 13 of track\_over\_time.c.
 
 When the program exits, it will write a final memory.log file.
 
@@ -579,16 +579,16 @@ When the program exits, it will write a final memory.log file.
 $ cat memory.log
 Mon Dec 30 08:50:04 2019
 256 byte(s) allocated in 1 allocations (40 byte(s) overhead)
-demo1b.c:11: 256
+track_over_time.c:11: 256
 ```
 
-The array of pointers (256 bytes) is not freed at line 11 in demo1b.c.  Uncommenting ac_free(a); just before the return 0; would have fixed this.
+The array of pointers (256 bytes) is not freed at line 11 in track\_over\_time.c.  Uncommenting ac_free(a); just before the return 0; would have fixed this.
 
 ## Advanced Usage
 
 The ac_... objects have been implemented to allow tracking of the allocation of the objects themselves.  If this functionality didn't exist, the allocation errors would show up in the object instead of where the object was created.
 
-demo2.c
+track\_objects.c
 ```c
 #include "ac_pool.h"
 
@@ -605,23 +605,23 @@ int main(int argc, char *argv[]) {
 ```
 
 ```
-$ make demo2
-$ ./demo2
+$ make track_objects
+$ ./track_objects
 Demo to show how objects are tracked
 1024 byte(s) allocated in 1 allocations (40 byte(s) overhead)
-demo2.c:7 [ac_pool] size: 8, max_size: 8, initial_size: 1024 used: 1112
+track_objects.c:7 [ac_pool] size: 8, max_size: 8, initial_size: 1024 used: 1112
 ```
 
-Line 7 of demo2.c
+Line 7 of track\_objects.c
 ```c
   ac_pool_t *pool = ac_pool_init(1024);
 ```
 
-This is the ac_pool_init method which is expected to be destroyed at some later point via ac_pool_destroy.  If the object tracking didn't exist, the error would have reported something like..
+This is the ac\_pool\_init method which is expected to be destroyed at some later point via ac_pool_destroy.  If the object tracking didn't exist, the error would have reported something like..
 
 ```
 1024 byte(s) allocated in 1 allocations (40 byte(s) overhead)
-pool.c:65: 1024
+ac_pool.c:65: 1024
 ```
 
-Hopefully, it is clear that the first error indicating line 7 of demo2.c is much more informative than the second.  This is explained in greater detail in [The Global Allocator Object](../../docs/7-allocator/index.md) or in the [ac_pool usage guide](ac_pool/index.md).
+Hopefully, it is clear that the first error indicating line 7 of track_objects.c is much more informative than the second.  This is explained in greater detail in [The Global Allocator Object](../../docs/7-allocator/index.md) or in the [ac_pool usage guide](ac_pool/index.md).
