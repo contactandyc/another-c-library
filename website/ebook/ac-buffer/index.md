@@ -26,7 +26,7 @@ ac_common.h
 
 All of the example code is found in examples/ac_buffer.  
 
-## ac_buffer_init
+## ac\_buffer\_init
 
 ```c
 ac_buffer_t *ac_buffer_init(size_t size);
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_pool_init
+## ac\_buffer\_pool\_init
 
 ```c
 ac_buffer_t *ac_buffer_pool_init(ac_pool_t *pool, size_t size);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_clear
+## ac\_buffer\_clear
 
 ```c
 void ac_buffer_clear(ac_buffer_t *h);
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_destroy
+## ac\_buffer\_destroy
 
 ```c
 void ac_buffer_destroy(ac_buffer_t *h);
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_data
+## ac\_buffer\_data
 
 ```c
 char *ac_buffer_data(ac_buffer_t *h);
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_length
+## ac\_buffer\_length
 
 ```c
 size_t ac_buffer_length(ac_buffer_t *h);
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_append
+## ac\_buffer\_append
 
 ```c
 void ac_buffer_append(ac_buffer_t *h, const void *data, size_t length);
@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_appends
+## ac\_buffer\_appends
 
 ```c
 void ac_buffer_appends(ac_buffer_t *h, const char *s);
@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_appendc
+## ac\_buffer\_appendc
 
 ```c
 void ac_buffer_appendc(ac_buffer_t *h, char ch);
@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
 ```
 
 
-## ac_buffer_appendn
+## ac\_buffer\_appendn
 
 ```c
 void ac_buffer_appendn(ac_buffer_t *h, char ch, ssize_t n);
@@ -259,7 +259,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_appendf
+## ac\_buffer\_appendf
 
 ```c
 void ac_buffer_appendf(ac_buffer_t *h, const char *fmt, ...);
@@ -280,7 +280,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_appendvf
+## ac\_buffer\_appendvf
 
 ```c
 void ac_buffer_appendvf(ac_buffer_t *h, const char *fmt, va_list args);
@@ -309,7 +309,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_set
+## ac\_buffer\_set
 
 ```c
 void ac_buffer_set(ac_buffer_t *h, const void *data, size_t length);
@@ -329,7 +329,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_sets
+## ac\_buffer\_sets
 
 ```c
 void ac_buffer_sets(ac_buffer_t *h, const char *s);
@@ -349,7 +349,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_setc
+## ac\_buffer\_setc
 
 ```c
 void ac_buffer_setc(ac_buffer_t *h, char ch);
@@ -369,7 +369,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_setn
+## ac\_buffer\_setn
 
 ```c
 void ac_buffer_setn(ac_buffer_t *h, char ch, ssize_t n);
@@ -389,7 +389,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_setf
+## ac\_buffer\_setf
 
 ```c
 void ac_buffer_setf(ac_buffer_t *h, const char *fmt, ...);
@@ -409,7 +409,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_setvf
+## ac\_buffer\_setvf
 
 ```c
 void ac_buffer_setvf(ac_buffer_t *h, const char *fmt, va_list args);
@@ -436,7 +436,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_resize
+## ac\_buffer\_resize
 
 ```c
 void *ac_buffer_resize(ac_buffer_t *h, size_t length);
@@ -457,7 +457,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_shrink_by
+## ac\_buffer\_shrink\_by
 
 ```c
 void *ac_buffer_shrink_by(ac_buffer_t *h, size_t length);
@@ -478,7 +478,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## ac_buffer_append_alloc
+## ac\_buffer\_append\_alloc
 
 ```c
 void *ac_buffer_append_alloc(ac_buffer_t *h, size_t length);
@@ -486,7 +486,7 @@ void *ac_buffer_append_alloc(ac_buffer_t *h, size_t length);
 ac\_buffer\_append\_alloc will grow the buffer by length bytes and return pointer to the new memory.  This will retain the original data in the buffer for up to length bytes. This function will return aligned memory (and pad the end of the buffer to make the memory aligned).  This function is rarely used.  ac\_buffer\_append\_ualloc allocates without padding and may not be aligned.
 
 
-## ac_buffer_append_ualloc
+## ac\_buffer\_append\_ualloc
 
 ```c
 void *ac_buffer_append_ualloc(ac_buffer_t *h, size_t length);
