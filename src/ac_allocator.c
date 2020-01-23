@@ -308,12 +308,9 @@ char *_ac_strdupf(const char *fmt, ...) {
 
 char **_ac_split_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
                    char delim, const char *s) {
-  static char *nil = NULL;
-  if (!s) {
-    if (num_splits)
-      *num_splits = 0;
-    return &nil;
-  }
+  if (!s)
+    return NULL;
+
   const char *p = s;
   size_t num = 1;
   while (*p != 0) {
@@ -349,21 +346,14 @@ char **_ac_split_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
 
 char **_ac_split2_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
                     char delim, const char *s) {
-  static char *nil = NULL;
-  if (!s) {
-    if (num_splits)
-      *num_splits = 0;
-    return &nil;
-  }
+  if (!s)
+    return NULL;
 
   const char *p = s;
   while (*p == delim)
     p++;
-  if (*p == 0) {
-    if (num_splits)
-      *num_splits = 0;
-    return &nil;
-  }
+  if (*p == 0)
+    return NULL;
   s = p;
   size_t num = 1;
   while (*p != 0) {
