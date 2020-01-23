@@ -2,8 +2,11 @@
 *.dSYM
 ac_malloc
 ac_calloc
+ac_realloc
 ac_memdup
 ac_strdup
+ac_strdupf
+ac_strdupvf
 ac_strdupa
 ac_strdupa2
 ac_strdupan
