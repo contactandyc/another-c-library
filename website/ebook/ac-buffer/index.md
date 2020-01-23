@@ -4,8 +4,6 @@ posttype: "docs"
 title: "ac_buffer"
 ---
 
-# ac_buffer
-
 ```c
 #include "ac_buffer.h"
 ```

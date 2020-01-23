@@ -4,8 +4,6 @@ posttype: "docs"
 title: "ac_allocator"
 ---
 
-# ac_allocator
-
 ```c
 #include "ac_allocator.h"
 ```
