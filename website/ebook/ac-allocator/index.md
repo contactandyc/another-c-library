@@ -24,7 +24,9 @@ malloc, calloc, realloc, strdup, and free functions work identically to the func
 
 Additional documentation for [malloc,calloc,realloc,free](https://linux.die.net/man/3/malloc) and [strdup](https://linux.die.net/man/3/strdup) exists.  
 
-Memory allocated using one of the ac\_ methods above, it must later be freed using ac\_free.  I did alter the prototype for calloc to accept a single parameter instead of 2.  I believe this makes application code more readable.   
+Memory allocated using one of the ac\_ methods above, it must later be freed using ac\_free.  I did alter the prototype for calloc to accept a single parameter instead of 2.  I believe this makes application code more readable.
+
+All of the example code is found in examples/ac_allocator.  
 
 ## ac_malloc
 ```c
