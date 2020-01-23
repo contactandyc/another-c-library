@@ -36,6 +36,7 @@ extern "C" {
 #define ac_strdupf(p, ...) _ac_strdupf_d(NULL, __AC_FILE_LINE__, p, __VA_ARGS__)
 #define ac_strdupvf(p, args) _ac_strdupvf_d(NULL, __AC_FILE_LINE__, p, args)
 #define ac_strdupa(p) _ac_strdupa_d(NULL, __AC_FILE_LINE__, p)
+#define ac_strdupan(p, n) _ac_strdupan_d(NULL, __AC_FILE_LINE__, p, n)
 #define ac_strdupa2(p) _ac_strdupa2_d(NULL, __AC_FILE_LINE__, p)
 #define ac_memdup(p, len) _ac_memdup_d(NULL, __AC_FILE_LINE__, p, len)
 #define ac_split(num_splits, delim, s)                                         \
@@ -51,6 +52,7 @@ extern "C" {
 #define ac_strdupf(p, ...) _ac_strdupf(p, __VA_ARGS__)
 #define ac_strdupvf(p, args) _ac_strdupvf(p, args)
 #define ac_strdupa(p) _ac_strdupa(p)
+#define ac_strdupan(p, n) _ac_strdupan(p, n)
 #define ac_strdupa2(p) _ac_strdupa2(p)
 #define ac_memdup(p, len) _ac_memdup(p, len)
 #define ac_split(num_splits, delim, s)                                         \
@@ -80,7 +82,10 @@ char *_ac_strdupvf_d(ac_allocator_t *a, const char *caller, const char *p,
 char *_ac_strdupvf(const char *p, va_list args);
 
 char **_ac_strdupa_d(ac_allocator_t *al, const char *caller, char **a);
+char **_ac_strdupan_d(ac_allocator_t *al, const char *caller, char **a,
+                      size_t n);
 char **_ac_strdupa(char **a);
+char **_ac_strdupan(char **a, size_t n);
 
 char **_ac_strdupa2_d(ac_allocator_t *al, const char *caller, char **a);
 char **_ac_strdupa2(char **a);

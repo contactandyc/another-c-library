@@ -415,6 +415,15 @@ static size_t count_bytes_in_array(char **a, size_t *n) {
   return len;
 }
 
+static size_t count_bytes_in_arrayn(char **a, size_t num) {
+  size_t len = (sizeof(char *) * (num + 1));
+  for (size_t i = 0; i < num; i++) {
+    len += strlen(*a) + 1;
+    a++;
+  }
+  return len;
+}
+
 char **_ac_strdupa2_d(ac_allocator_t *al, const char *caller, char **a) {
   if (!a)
     return NULL;
@@ -460,6 +469,27 @@ char **_ac_strdupa_d(ac_allocator_t *al, const char *caller, char **a) {
   return r;
 }
 
+char **_ac_strdupan_d(ac_allocator_t *al, const char *caller, char **a,
+                      size_t n) {
+  if (!a)
+    return NULL;
+
+  size_t len = count_bytes_in_arrayn(a, n);
+  char **r = (char **)_ac_malloc_d(al, caller, len, false);
+  char *m = (char *)(r + n + 1);
+  char **rp = r;
+  while (*a) {
+    *rp++ = m;
+    char *s = *a;
+    while (*s)
+      *m++ = *s++;
+    *m++ = 0;
+    a++;
+  }
+  *rp = NULL;
+  return r;
+}
+
 char **_ac_strdupa(char **a) {
   if (!a)
     return NULL;
@@ -468,6 +498,26 @@ char **_ac_strdupa(char **a) {
   size_t len = count_bytes_in_array(a, &n);
   char **r = (char **)malloc(len);
   char *m = (char *)(r + n);
+  char **rp = r;
+  while (*a) {
+    *rp++ = m;
+    char *s = *a;
+    while (*s)
+      *m++ = *s++;
+    *m++ = 0;
+    a++;
+  }
+  *rp = NULL;
+  return r;
+}
+
+char **_ac_strdupan(char **a, size_t n) {
+  if (!a)
+    return NULL;
+
+  size_t len = count_bytes_in_arrayn(a, n);
+  char **r = (char **)malloc(len);
+  char *m = (char *)(r + n + 1);
   char **rp = r;
   while (*a) {
     *rp++ = m;

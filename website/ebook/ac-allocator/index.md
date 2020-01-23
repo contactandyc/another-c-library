@@ -177,6 +177,61 @@ char *ac_strdupf(const char *fmt, ...) {
 
 You can implement your own strdupf like functions in a similar manner for other objects.
 
+## ac_strdupa
+```c
+char **ac_strdupa(char **a);
+```
+ac\_strdupa duplicates the NULL terminated pointer array along with all of the strings.
+
+## ac_strdupan
+```c
+char **ac_strdupan(char **a, size_t n);
+```
+ac\_strdupan returns a duplicates a pointer array of length n along with all of the strings.
+
+```c
+#include "ac_allocator.h"
+
+#include <stdio.h>
+
+void uppercase(char *s) {
+  while(*s) {
+    if(*s >= 'a' && *s <= 'z')
+      *s = *s - 'a' + 'A';
+    s++;
+  }
+}
+
+int main( int argc, char *argv[]) {
+  /* copy, uppercase, and print command line arguments */
+  char **s = ac_strdupan(argv, argc);
+  for( int i=0; i<argc; i++ ) {
+    uppercase(s[i]);
+    printf("%s", s[i]);
+    if(i+1 < argc)
+      printf( " " );
+    else
+      printf( "\n");
+  }
+  ac_free(s);
+  return 0;
+}
+```
+
+
+
+## ac_strdupa2
+```c
+char **ac_strdupa2(char **a);
+```
+ac\_strdupa duplicates the NULL terminated pointer array and references the original strings.
+
+## ac_memdup
+```c
+void *ac_memdup(void *d, size_t len);
+```
+ac\_memdup returns an allocated block of len bytes and duplicates d into it.
+
 ## ac_split
 ```c
 char **ac_split(size_t *num_splits, char delim, const char *s);
