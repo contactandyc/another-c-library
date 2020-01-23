@@ -1,6 +1,45 @@
 #ifndef _ac_in_H
 #define _ac_in_H
 
+/* The ac_in object is meant for reading input (generally files, but file
+   descriptors, sets of records, and blocks of memory can also be used).  The
+   object can be configured as a single input or a set of inputs and then act
+   as a single input.  This allows functions to be written that can operate
+   on a variety of inputs (one file, many files, files and buffers mixed, lists
+   of files, etc).  Sets of sorted files where each file is sorted can be
+   joined together as a single unit and remain sorted.  If the sorted files
+   are distinct internally, but not within the set, the join can be configured
+   to reduce the non-distinct elements.
+
+   Another useful feature supported by ac_in is built in compression.  Files
+   with an extension of .gz or .lz4 are automatically read from their
+   respective formats without the need to first decompress the files.
+
+   In general, the ac_in object is meant to iterate over one or more files of
+   records where the records are prefix formatted, delimiter formatted, or
+   fixed length.  Additional formats can be added as needed, but these three
+   cover most use cases.  The prefix format prefixes a 4 byte length at the
+   beginning of each record.  The delimiter format expects a delimiter such as
+   a newline.  The fixed length format expects all records to be a similar
+   size.
+
+   Because disks are slow and RAM is fast, buffering is built into the ac_in
+   object.  A buffer size can be defined to reduce IO (particularly seeks).
+
+   The ac_in object plays an important role in sorting files.  When large
+   files are sorted, tmp files are written to disk which are themselves
+   sorted.  To finally sort the data, the tmp files are joined and further
+   reduced if necessary as an ac_in object.  The ac_out object allows one
+   to call ac_out_in which can be used to avoid writing the final sort file
+   if desired.  Chaining sorts benefits from this in that the tmp files can
+   be piped directly into the next sort.
+
+   Because the ac_in (and the ac_out) objects can be configured, it makes it
+   possible to define pipelines of data with very little extra code.  The
+   ac_schedule object heavily uses the ac_in and ac_out objects to allow for
+   very large data transformations in a defined environment.
+*/
+
 #include "ac_in_base.h"
 
 #include "ac_common.h"
@@ -170,6 +209,8 @@ ac_io_record_t *ac_in_advance_group(ac_in_t *h, size_t *num_r,
 
 /* Destroy the input stream (or set of input streams) */
 void ac_in_destroy(ac_in_t *h);
+
+/* These are experimental and don't need documented yet */
 
 typedef void (*ac_in_out_f)(ac_out_t *out, ac_io_record_t *r, void *arg);
 typedef void (*ac_in_out2_f)(ac_out_t *out, ac_out_t *out2, ac_io_record_t *r,

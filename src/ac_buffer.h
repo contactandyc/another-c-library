@@ -17,6 +17,19 @@ limitations under the License.
 #ifndef _ac_buffer_H
 #define _ac_buffer_H
 
+/*
+  The ac_buffer object is much like the C++ string class in that it supports
+  a number of easy to use string methods and a buffer acts like a string in
+  that a buffer grows as needed to fit the contents of the string.  The object
+  is more than a string object in as much as it also equally allows for
+  binary data to be appended to or a combination of binary data and strings.
+  At it's core, it is simply a buffer that will auto-resize as needed.  The
+  pool object is different in that it is used for lots of smaller allocations.
+  The buffer generally is used to track "one thing".  That one thing might
+  consist of many parts, but they are generally all tracked together in a
+  contiguous space.
+*/
+
 #include "ac_allocator.h"
 #include "ac_pool.h"
 
@@ -31,7 +44,12 @@ extern "C" {
 struct ac_buffer_s;
 typedef struct ac_buffer_s ac_buffer_t;
 
-/* set the buffer to an initial size, buffer will grow as needed */
+/* ac_buffer_init creates a buffer with an initial size of size.  The buffer
+   will grow as needed, but if you know the size that is generally needed,
+   it may be more efficient to initialize it to that size.
+
+   ac_buffer_t *ac_buffer_init(size_t size);
+*/
 #ifdef _AC_DEBUG_MEMORY_
 #define ac_buffer_init(size)                                                   \
   _ac_buffer_init(size, AC_FILE_LINE_MACRO("ac_buffer"));
@@ -50,6 +68,7 @@ static inline void ac_buffer_clear(ac_buffer_t *h);
 
 /* get the contents of the buffer */
 static inline char *ac_buffer_data(ac_buffer_t *h);
+
 /* get the length of the buffer */
 static inline size_t ac_buffer_length(ac_buffer_t *h);
 

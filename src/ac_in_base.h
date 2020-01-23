@@ -9,6 +9,8 @@
 /*
    This is generally meant to be an internal object, but can be used
    externally if a need arises.  ac_in should be used instead.
+
+   This should not be documented for the website usage.
 */
 
 #include "impl/ac_in_base.h"

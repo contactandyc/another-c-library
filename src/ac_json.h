@@ -27,26 +27,33 @@ limitations under the License.
 //#define AC_JSON_FILL_TEST
 //#define AC_JSON_SORT_TEST
 
-typedef struct ac_json_s {
+struct ac_json_s;
+typedef struct ac_json_s ac_json_t;
+struct ac_jsona_s;
+typedef struct ac_jsona_s ac_jsona_t;
+struct ac_jsono_s;
+typedef struct ac_jsono_s ac_jsono_t;
+
+struct ac_json_s {
   uint32_t type;
   uint32_t length;
-  struct ac_json_s *parent;
+  ac_json_t *parent;
   char *value;
-} ac_json_t;
+};
 
-typedef struct ac_json_array_node_s {
+typedef struct ac_jsona_s {
   ac_json_t *value;
-  struct ac_json_array_node_s *next;
-  struct ac_json_array_node_s *previous;
-} ac_json_array_node_t;
+  ac_jsona_t *next;
+  ac_jsona_t *previous;
+} ac_jsona_t;
 
-typedef struct ac_json_object_node_s {
+typedef struct ac_jsono_s {
   ac_map_t map;
   char *key;
   ac_json_t *value;
-  struct ac_json_object_node_s *next;
-  struct ac_json_object_node_s *previous;
-} ac_json_object_node_t;
+  ac_jsono_t *next;
+  ac_jsono_t *previous;
+} ac_jsono_t;
 
 /* This is the core function for parsing json.  This parser is not fully
  * compliant in that keys are expected to not include encodings (or if they do,
@@ -75,8 +82,8 @@ char *ac_json_encode(ac_pool_t *pool, char *s, size_t length);
 static inline char *ac_json_decoded(ac_pool_t *pool, ac_json_t *j);
 static inline char *ac_json_value(ac_json_t *j);
 
-static inline ac_json_t *ac_json_object(ac_pool_t *pool);
-static inline ac_json_t *ac_json_array(ac_pool_t *pool);
+static inline ac_json_t *ac_jsono(ac_pool_t *pool);
+static inline ac_json_t *ac_jsona(ac_pool_t *pool);
 
 static inline ac_json_t *ac_json_binary(ac_pool_t *pool, char *s,
                                         size_t length);
@@ -96,61 +103,51 @@ static inline ac_json_t *ac_json_decimal_string(ac_pool_t *pool, char *s);
 static inline bool ac_json_is_object(ac_json_t *j);
 static inline bool ac_json_is_array(ac_json_t *j);
 
-static inline int ac_json_array_count(ac_json_t *j);
-static inline ac_json_t *ac_json_array_scan(ac_json_t *j, int nth);
+static inline int ac_jsona_count(ac_json_t *j);
+static inline ac_json_t *ac_jsona_scan(ac_json_t *j, int nth);
 
-static inline ac_json_array_node_t *ac_json_array_first(ac_json_t *j);
-static inline ac_json_array_node_t *ac_json_array_last(ac_json_t *j);
-static inline ac_json_array_node_t *ac_json_array_next(ac_json_array_node_t *j);
-static inline ac_json_array_node_t *
-ac_json_array_previous(ac_json_array_node_t *j);
+static inline ac_jsona_t *ac_jsona_first(ac_json_t *j);
+static inline ac_jsona_t *ac_jsona_last(ac_json_t *j);
+static inline ac_jsona_t *ac_jsona_next(ac_jsona_t *j);
+static inline ac_jsona_t *ac_jsona_previous(ac_jsona_t *j);
 
 /* These functions cause an internal direct access table to be created.  This
  * would be more efficient if accessing many different array elements.
- * ac_json_array_erase and ac_json_array_append will destroy the direct
+ * ac_jsona_erase and ac_jsona_append will destroy the direct
  * access table.  Care should be taken when calling append frequently and nth
  * or nth_node. */
-static inline ac_json_t *ac_json_array_nth(ac_json_t *j, int nth);
-static inline ac_json_array_node_t *ac_json_array_nth_node(ac_json_t *j,
-                                                           int nth);
-static inline void ac_json_array_erase(ac_json_array_node_t *n);
-static inline void ac_json_array_append(ac_json_t *j, ac_json_t *item);
+static inline ac_json_t *ac_jsona_nth(ac_json_t *j, int nth);
+static inline ac_jsona_t *ac_jsona_nth_node(ac_json_t *j, int nth);
+static inline void ac_jsona_erase(ac_jsona_t *n);
+static inline void ac_jsona_append(ac_json_t *j, ac_json_t *item);
 
-static inline int ac_json_object_count(ac_json_t *j);
-static inline ac_json_object_node_t *ac_json_object_first(ac_json_t *j);
-static inline ac_json_object_node_t *ac_json_object_last(ac_json_t *j);
-static inline ac_json_object_node_t *
-ac_json_object_next(ac_json_object_node_t *j);
-static inline ac_json_object_node_t *
-ac_json_object_previous(ac_json_object_node_t *j);
+static inline int ac_jsono_count(ac_json_t *j);
+static inline ac_jsono_t *ac_jsono_first(ac_json_t *j);
+static inline ac_jsono_t *ac_jsono_last(ac_json_t *j);
+static inline ac_jsono_t *ac_jsono_next(ac_jsono_t *j);
+static inline ac_jsono_t *ac_jsono_previous(ac_jsono_t *j);
 
 /* append doesn't lookup key prior to inserting, so it should be used with
  * caution.  It is more efficient because it doesn't need to lookup key or
  * maintain a tree. */
-static inline void ac_json_object_append(ac_json_t *j, const char *key,
-                                         ac_json_t *item, bool copy_key);
+static inline void ac_jsono_append(ac_json_t *j, const char *key,
+                                   ac_json_t *item, bool copy_key);
 
-static inline ac_json_object_node_t *ac_json_object_scan(ac_json_t *j,
-                                                         const char *key);
+static inline ac_jsono_t *ac_jsono_scan(ac_json_t *j, const char *key);
 
 /* use _get if json is meant to be read only and _find if not.
-  The ac_json_object_get method is faster than the ac_json_object_find
+  The ac_jsono_get method is faster than the ac_jsono_find
   method as it creates a sorted array vs a red black tree (or map).  The
   find/insert methods are useful if you need to lookup keys and insert.
 */
-static inline ac_json_object_node_t *ac_json_object_get(ac_json_t *j,
-                                                        const char *key);
-static inline ac_json_t *ac_json_object_get_value(ac_json_t *j,
-                                                  const char *key);
+static inline ac_jsono_t *ac_jsono_get(ac_json_t *j, const char *key);
+static inline ac_json_t *ac_jsono_get_value(ac_json_t *j, const char *key);
 
 /* in this case, don't use _get (only _find) */
-static inline void ac_json_object_erase(ac_json_object_node_t *n);
-static inline ac_json_object_node_t *ac_json_object_insert(ac_json_t *j,
-                                                           const char *key,
-                                                           ac_json_t *item,
-                                                           bool copy_key);
-static inline ac_json_object_node_t *ac_json_object_find(ac_json_t *j,
-                                                         const char *key);
+static inline void ac_jsono_erase(ac_jsono_t *n);
+static inline ac_jsono_t *ac_jsono_insert(ac_json_t *j, const char *key,
+                                          ac_json_t *item, bool copy_key);
+static inline ac_jsono_t *ac_jsono_find(ac_json_t *j, const char *key);
 
 #include "impl/ac_json.h"
 

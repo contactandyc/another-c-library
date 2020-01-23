@@ -79,7 +79,10 @@ time_t ac_io_modified(const char *filename);
 bool ac_io_directory(const char *filename);
 bool ac_io_file(const char *filename);
 
-/* char *ac_io_read_file(size_t *len, const char *filename); */
+/* Read the contents of filename into a buffer and return it's length.  The
+   buffer should be freed using ac_free.
+
+  char *ac_io_read_file(size_t *len, const char *filename); */
 
 #ifdef _AC_DEBUG_MEMORY_
 #define ac_io_read_file(len, filename)                                         \
@@ -110,6 +113,7 @@ bool ac_io_make_path_valid(char *filename);
 */
 bool ac_io_extension(const char *filename, const char *extension);
 
+/* Do not put on website - common comparison and split functions */
 static inline int ac_io_compare_uint64_t(ac_io_record_t *p1, ac_io_record_t *p2,
                                          void *tag) {
   uint64_t *a = (uint64_t *)p1->record;

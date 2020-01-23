@@ -100,8 +100,8 @@ limitations under the License.
 #define AC_JSON_DECIMAL_NUMBER goto decimal_number
 #endif
 
-static void ac_json_dump_object_to_buffer(ac_buffer_t *bh, ac_json_object_t *a);
-static void ac_json_dump_array_to_buffer(ac_buffer_t *bh, ac_json_array_t *a);
+static void ac_json_dump_object_to_buffer(ac_buffer_t *bh, _ac_jsono_t *a);
+static void ac_json_dump_array_to_buffer(ac_buffer_t *bh, _ac_jsona_t *a);
 
 void ac_json_dump_to_buffer(ac_buffer_t *bh, ac_json_t *a) {
   if (a->type >= AC_JSON_STRING) {
@@ -110,9 +110,9 @@ void ac_json_dump_to_buffer(ac_buffer_t *bh, ac_json_t *a) {
     else
       ac_buffer_append(bh, a->value, a->length);
   } else if (a->type == AC_JSON_OBJECT) {
-    ac_json_dump_object_to_buffer(bh, (ac_json_object_t *)a);
+    ac_json_dump_object_to_buffer(bh, (_ac_jsono_t *)a);
   } else if (a->type == AC_JSON_ARRAY) {
-    ac_json_dump_array_to_buffer(bh, (ac_json_array_t *)a);
+    ac_json_dump_array_to_buffer(bh, (_ac_jsona_t *)a);
   } else if (a->type == AC_JSON_BINARY) {
     ac_buffer_append(bh, "nb", 2);
     uint32_t len = a->length;
@@ -121,12 +121,11 @@ void ac_json_dump_to_buffer(ac_buffer_t *bh, ac_json_t *a) {
   }
 }
 
-static void ac_json_dump_object_to_buffer(ac_buffer_t *bh,
-                                          ac_json_object_t *a) {
+static void ac_json_dump_object_to_buffer(ac_buffer_t *bh, _ac_jsono_t *a) {
   ac_buffer_appendc(bh, '{');
-  ac_json_object_node_t *n = a->head;
+  ac_jsono_t *n = a->head;
   while (n) {
-    ac_json_object_node_t *next = n->next;
+    ac_jsono_t *next = n->next;
     while (next && next->value == NULL)
       next = next->next;
 
@@ -140,11 +139,11 @@ static void ac_json_dump_object_to_buffer(ac_buffer_t *bh,
   ac_buffer_appendc(bh, '}');
 }
 
-static void ac_json_dump_array_to_buffer(ac_buffer_t *bh, ac_json_array_t *a) {
+static void ac_json_dump_array_to_buffer(ac_buffer_t *bh, _ac_jsona_t *a) {
   ac_buffer_appendc(bh, '[');
-  ac_json_array_node_t *n = a->head;
+  ac_jsona_t *n = a->head;
   while (n) {
-    ac_json_array_node_t *next = n->next;
+    ac_jsona_t *next = n->next;
     while (next && next->value == NULL)
       next = next->next;
     ac_json_dump_to_buffer(bh, n->value);
@@ -155,8 +154,8 @@ static void ac_json_dump_array_to_buffer(ac_buffer_t *bh, ac_json_array_t *a) {
   ac_buffer_appendc(bh, ']');
 }
 
-static void ac_json_dump_object(FILE *out, ac_json_object_t *a);
-static void ac_json_dump_array(FILE *out, ac_json_array_t *a);
+static void ac_json_dump_object(FILE *out, _ac_jsono_t *a);
+static void ac_json_dump_array(FILE *out, _ac_jsona_t *a);
 
 void ac_json_dump(FILE *out, ac_json_t *a) {
   if (a->type >= AC_JSON_STRING) {
@@ -165,9 +164,9 @@ void ac_json_dump(FILE *out, ac_json_t *a) {
     else
       fprintf(out, "%s", a->value);
   } else if (a->type == AC_JSON_OBJECT) {
-    ac_json_dump_object(out, (ac_json_object_t *)a);
+    ac_json_dump_object(out, (_ac_jsono_t *)a);
   } else if (a->type == AC_JSON_ARRAY) {
-    ac_json_dump_array(out, (ac_json_array_t *)a);
+    ac_json_dump_array(out, (_ac_jsona_t *)a);
   } else if (a->type == AC_JSON_BINARY) {
     fprintf(out, "b");
     uint32_t len = a->length;
@@ -176,11 +175,11 @@ void ac_json_dump(FILE *out, ac_json_t *a) {
   }
 }
 
-static void ac_json_dump_object(FILE *out, ac_json_object_t *a) {
+static void ac_json_dump_object(FILE *out, _ac_jsono_t *a) {
   fprintf(out, "{");
-  ac_json_object_node_t *n = a->head;
+  ac_jsono_t *n = a->head;
   while (n) {
-    ac_json_object_node_t *next = n->next;
+    ac_jsono_t *next = n->next;
     while (next && next->value == NULL)
       next = next->next;
 
@@ -194,11 +193,11 @@ static void ac_json_dump_object(FILE *out, ac_json_object_t *a) {
   fprintf(out, "}");
 }
 
-static void ac_json_dump_array(FILE *out, ac_json_array_t *a) {
+static void ac_json_dump_array(FILE *out, _ac_jsona_t *a) {
   fprintf(out, "[");
-  ac_json_array_node_t *n = a->head;
+  ac_jsona_t *n = a->head;
   while (n) {
-    ac_json_array_node_t *next = n->next;
+    ac_jsona_t *next = n->next;
     while (next && next->value == NULL)
       next = next->next;
 
@@ -548,19 +547,19 @@ ac_json_t *ac_json_parse(ac_pool_t *pool, char *p, char *ep) {
   char ch;
   char *key = NULL;
   char *stringp = NULL;
-  ac_json_array_node_t *anode;
-  ac_json_object_t *obj;
-  ac_json_array_t *arr = NULL, *arr2;
+  ac_jsona_t *anode;
+  _ac_jsono_t *obj;
+  _ac_jsona_t *arr = NULL, *arr2;
   ac_json_t *j;
   ac_json_t *res = NULL;
-  ac_json_object_t *root = NULL;
+  _ac_jsono_t *root = NULL;
 
   int data_type;
   uint32_t string_length;
 
   if (*p != '{')
     goto start_value;
-  root = (ac_json_object_t *)ac_pool_calloc(pool, sizeof(ac_json_object_t));
+  root = (_ac_jsono_t *)ac_pool_calloc(pool, sizeof(_ac_jsono_t));
   root->type = AC_JSON_OBJECT;
   root->pool = pool;
   p++;
@@ -581,12 +580,12 @@ start_key:;
     // if (mode == AC_JSON_RDONLY)
 #ifdef AC_JSON_FILL_TEST
 #ifdef AC_JSON_SORT_TEST
-    _ac_json_object_fill(root);
+    _ac_jsono_fill(root);
 #else
-    _ac_json_object_fill_tree(root);
+    _ac_jsono_fill_tree(root);
 #endif
 #endif
-    root = (ac_json_object_t *)root->parent;
+    root = (_ac_jsono_t *)root->parent;
     if (!root)
       return res;
 
@@ -594,7 +593,7 @@ start_key:;
     if (root->type == AC_JSON_OBJECT) {
       goto look_for_key;
     } else {
-      arr = (ac_json_array_t *)root;
+      arr = (_ac_jsona_t *)root;
       goto look_for_next_object;
     }
   default:
@@ -629,21 +628,21 @@ start_key_object:;
   case AC_JSON_SPACE_CASE:
     goto start_key_object;
   case '{':
-    obj = (ac_json_object_t *)ac_pool_calloc(pool, sizeof(ac_json_object_t));
+    obj = (_ac_jsono_t *)ac_pool_calloc(pool, sizeof(_ac_jsono_t));
     obj->type = AC_JSON_OBJECT;
     obj->pool = pool;
     // obj->parent = (ac_json_t *)root;
-    ac_json_object_append((ac_json_t *)root, key, (ac_json_t *)obj, false);
+    ac_jsono_append((ac_json_t *)root, key, (ac_json_t *)obj, false);
 
     root = obj;
     AC_JSON_START_KEY;
   case '[':
-    arr = (ac_json_array_t *)ac_pool_calloc(pool, sizeof(ac_json_array_t));
+    arr = (_ac_jsona_t *)ac_pool_calloc(pool, sizeof(_ac_jsona_t));
     arr->type = AC_JSON_ARRAY;
     arr->pool = pool;
     // arr->parent = (ac_json_t *)root;
-    ac_json_object_append((ac_json_t *)root, key, (ac_json_t *)arr, false);
-    root = (ac_json_object_t *)arr;
+    ac_jsono_append((ac_json_t *)root, key, (ac_json_t *)arr, false);
+    root = (_ac_jsono_t *)arr;
     AC_JSON_START_VALUE;
   case '-':
     stringp = p - 1;
@@ -803,7 +802,7 @@ keyed_add_string:;
   j->value = stringp;
 #endif
   j->length = string_length;
-  ac_json_object_append((ac_json_t *)root, key, j, false);
+  ac_jsono_append((ac_json_t *)root, key, j, false);
 
 look_for_key:;
   switch (ch) {
@@ -817,12 +816,12 @@ look_for_key:;
 // if (mode == AC_JSON_RDONLY)
 #ifdef AC_JSON_FILL_TEST
 #ifdef AC_JSON_SORT_TEST
-    _ac_json_object_fill(root);
+    _ac_jsono_fill(root);
 #else
-    _ac_json_object_fill_tree(root);
+    _ac_jsono_fill_tree(root);
 #endif
 #endif
-    root = (ac_json_object_t *)root->parent;
+    root = (_ac_jsono_t *)root->parent;
     if (!root)
       return res;
 
@@ -831,7 +830,7 @@ look_for_key:;
     if (root->type == AC_JSON_OBJECT) {
       goto look_for_key;
     } else {
-      arr = (ac_json_array_t *)root;
+      arr = (_ac_jsona_t *)root;
       goto look_for_next_object;
     }
 
@@ -885,9 +884,9 @@ start_value:;
   case AC_JSON_SPACE_CASE:
     AC_JSON_START_VALUE;
   case '{':
-    anode = (ac_json_array_node_t *)ac_pool_calloc(
-        pool, sizeof(ac_json_array_node_t) + sizeof(ac_json_object_t));
-    obj = (ac_json_object_t *)(anode + 1);
+    anode = (ac_jsona_t *)ac_pool_calloc(pool, sizeof(ac_jsona_t) +
+                                                   sizeof(_ac_jsono_t));
+    obj = (_ac_jsono_t *)(anode + 1);
     anode->value = (ac_json_t *)obj;
     if (arr) {
       arr->num_entries++;
@@ -907,9 +906,9 @@ start_value:;
     root = obj;
     AC_JSON_START_KEY;
   case '[':
-    anode = (ac_json_array_node_t *)ac_pool_calloc(
-        pool, sizeof(ac_json_array_node_t) + sizeof(ac_json_array_t));
-    arr2 = (ac_json_array_t *)(anode + 1);
+    anode = (ac_jsona_t *)ac_pool_calloc(pool, sizeof(ac_jsona_t) +
+                                                   sizeof(_ac_jsona_t));
+    arr2 = (_ac_jsona_t *)(anode + 1);
     anode->value = (ac_json_t *)arr2;
     if (arr) {
       arr->num_entries++;
@@ -926,21 +925,21 @@ start_value:;
     arr2->pool = pool;
     arr2->parent = (ac_json_t *)arr;
     arr = arr2;
-    root = (ac_json_object_t *)arr;
+    root = (_ac_jsono_t *)arr;
     AC_JSON_START_VALUE;
   case ']':
 // if (mode == AC_JSON_RDONLY)
 #ifdef AC_JSON_FILL_TEST
-    _ac_json_array_fill(arr);
+    _ac_jsona_fill(arr);
 #endif
-    root = (ac_json_object_t *)arr->parent;
+    root = (_ac_jsono_t *)arr->parent;
     if (!root)
       return res;
     ch = *p;
     if (root->type == AC_JSON_OBJECT) {
       goto look_for_key;
     } else {
-      arr = (ac_json_array_t *)root;
+      arr = (_ac_jsona_t *)root;
       goto look_for_next_object;
     }
   case '-':
@@ -1087,8 +1086,8 @@ start_string:;
   ch = *p;
 
 add_string:;
-  anode = (ac_json_array_node_t *)ac_pool_calloc(
-      pool, sizeof(ac_json_array_node_t) + sizeof(ac_json_t));
+  anode = (ac_jsona_t *)ac_pool_calloc(pool,
+                                       sizeof(ac_jsona_t) + sizeof(ac_json_t));
   j = anode->value = (ac_json_t *)(anode + 1);
   j->type = data_type;
 #ifdef AC_JSON_DECODE_TEST
@@ -1125,9 +1124,9 @@ look_for_next_object:;
   case ']':
 // if (mode == AC_JSON_RDONLY)
 #ifdef AC_JSON_FILL_TEST
-    _ac_json_array_fill(arr);
+    _ac_jsona_fill(arr);
 #endif
-    root = (ac_json_object_t *)arr->parent;
+    root = (_ac_jsono_t *)arr->parent;
     if (!root)
       return res;
     p++;
@@ -1135,7 +1134,7 @@ look_for_next_object:;
     if (root->type == AC_JSON_OBJECT) {
       goto look_for_key;
     } else {
-      arr = (ac_json_array_t *)root;
+      arr = (_ac_jsona_t *)root;
       goto look_for_next_object;
     }
   case AC_JSON_SPACE_CASE:
@@ -1191,19 +1190,18 @@ bad_character:;
   return (ac_json_t *)err;
 }
 
-static inline int ac_json_compare(ac_json_object_node_t **a,
-                                  ac_json_object_node_t **b) {
+static inline int ac_json_compare(ac_jsono_t **a, ac_jsono_t **b) {
   return strcmp((*a)->key, (*b)->key);
 }
 
-ac_sort_m(__ac_json_sort, ac_json_object_node_t *, ac_json_compare);
+ac_sort_m(__ac_json_sort, ac_jsono_t *, ac_json_compare);
 
-void _ac_json_object_fill(ac_json_object_t *o) {
+void _ac_jsono_fill(_ac_jsono_t *o) {
   o->root = (ac_map_t *)ac_pool_alloc(
-      o->pool, (sizeof(ac_json_object_node_t *) * (o->num_entries + 1)));
-  ac_json_object_node_t **base = (ac_json_object_node_t **)o->root;
-  ac_json_object_node_t **awp = base;
-  ac_json_object_node_t *n = o->head;
+      o->pool, (sizeof(ac_jsono_t *) * (o->num_entries + 1)));
+  ac_jsono_t **base = (ac_jsono_t **)o->root;
+  ac_jsono_t **awp = base;
+  ac_jsono_t *n = o->head;
   while (n) {
     *awp++ = n;
     n = n->next;
