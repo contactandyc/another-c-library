@@ -19,8 +19,10 @@ ac_allocator.h
 ac_allocator.c
 ac_pool.h
 ac_pool.c
+impl/ac_pool.h
 ac_buffer.h
 ac_buffer.c
+impl/ac_buffer.h
 ac_common.h
 ```
 
