@@ -38,6 +38,10 @@ struct ac_json_s {
   char *value;
 };
 
+static inline ac_json_type_t ac_json_type(ac_json_t *j) {
+  return (ac_json_type_t)(j->type);
+}
+
 struct ac_jsona_s {
   ac_json_t *value;
   ac_jsona_t *next;
@@ -161,6 +165,14 @@ static inline char *ac_json_decoded(ac_pool_t *pool, ac_json_t *j) {
   else if (j->type > AC_JSON_STRING)
     return j->value;
   else
+    return NULL;
+}
+
+static inline char *ac_json_bvalue(ac_json_t *j, size_t *length) {
+  if (j && j->type >= AC_JSON_BINARY) {
+    *length = j->length;
+    return j->value;
+  } else
     return NULL;
 }
 

@@ -46,6 +46,29 @@ static inline bool ac_json_is_error(ac_json_t *j);
 void ac_json_dump_error(FILE *out, ac_json_t *j);
 void ac_json_dump_error_to_buffer(ac_buffer_t *bh, ac_json_t *j);
 
+/* null, bool_false (to not conflict with keyword false), and zero are all
+   grouped together on purpose as they all respresent false like values.
+   number, decimal, and bool_true are grouped because they all respresent
+   true like values.  The string and binary type may also represent true and
+   false values (if one were considering t=true, f=false for example). */
+typedef enum {
+  error = 0,
+  object = 1,
+  array = 2,
+  binary = 3,
+  string = 4,
+  null = 5,
+  bool_false = 6,
+  zero = 7,
+  number = 8,
+  decimal = 9,
+  bool_true = 10
+} ac_json_type_t;
+
+/* Depending upon the task, it may be handy to know what type the json is.
+   Internally, all json is stored as strings and converted on demand. */
+static inline ac_json_type_t ac_json_type(ac_json_t *j);
+
 /* Dump the json to a file or to a buffer */
 void ac_json_dump(FILE *out, ac_json_t *a);
 void ac_json_dump_to_buffer(ac_buffer_t *bh, ac_json_t *a);
@@ -59,6 +82,7 @@ char *ac_json_encode(ac_pool_t *pool, char *s, size_t length);
 /* returns NULL if object, array, or error */
 static inline char *ac_json_decoded(ac_pool_t *pool, ac_json_t *j);
 static inline char *ac_json_value(ac_json_t *j);
+static inline char *ac_json_bvalue(ac_json_t *j, size_t *length);
 
 static inline ac_json_t *ac_jsono(ac_pool_t *pool);
 static inline ac_json_t *ac_jsona(ac_pool_t *pool);
