@@ -131,7 +131,7 @@ typedef unsigned int number_t;
 number_t a = 100;
 ```
 
-Every data type in C has a size.  The size of a pointer is always the same (it is the same as the size_t type). The `sizeof()` operator determines the size of a type or variable. `sizeof(number_t)` finds the size of the `number_t` type (and return four since unsigned int is four bytes). `sizeof(void)` is not allowed as that does not make sense.
+Every data type in C has a size.  The size of a pointer is always the same (it is the same as the size\_t type). The sizeof() operator determines the size of a type or variable. sizeof(number\_t) finds the size of the number\_t type (and return four since unsigned int is four bytes). sizeof(void) is not allowed as that does not make sense.
 
 A variable can be cast from one type to another, either implicitly or explicitly.  Imagine you want to convert an int to a double or vice versa.
 
@@ -744,7 +744,7 @@ long time_spent = test_t2-test_t1;
 overall_time += time_spent;
 ```
 
-After timing the reverse_string call, printf is used to print the string on the terminal before it was reversed and the new form of the string (s).  Printf allows for format specifiers to match arguments after the first parameter (also known as the format string).  `%s` indicates that there must be a string for the given argument.  `%0.4f` expects a floating-point number and prints four decimal places.  test_t2 and test_t1 are both measured in microseconds.  Multiplying the difference by 1000 will change the unit type to nanoseconds.  Since the test was repeated 1 million times, the overall time needs to be divided by 1 million.  By multiplying or dividing a number by a decimal, it converts the type to a decimal.
+After timing the reverse\_string call, printf is used to print the string on the terminal before it was reversed and the new form of the string (s).  Printf allows for format specifiers to match arguments after the first parameter (also known as the format string).  `%s` indicates that there must be a string for the given argument.  `%0.4f` expects a floating-point number and prints four decimal places.  test\_t2 and test\_t1 are both measured in microseconds.  Multiplying the difference by 1000 will change the unit type to nanoseconds.  Since the test was repeated 1 million times, the overall time needs to be divided by 1 million.  By multiplying or dividing a number by a decimal, it converts the type to a decimal.
 
 ```c
     printf("%s => %s\n", argv[i], s);
@@ -888,7 +888,7 @@ Examples:
 	./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
 ```
 
-The lines of code after test_timer will run if the file called test_timer is older than the files after the colon.  If you edit test_timer.c, the program will be built using the following line of code.  The output is test_timer.
+The lines of code after test\_timer will run if the file called test\_timer is older than the files after the colon.  If you edit test\_timer.c, the program will be built using the following line of code.  The output is test\_timer.
 ```Makefile
 gcc test_timer.c -o test_timer
 ```
@@ -903,7 +903,7 @@ The examples block will run every time because it does not have any dependencies
 
 ## More accurately timing code
 
-In the last section, we explored how to time the reverse_string function.  In this section, we will explore how to time the function better.  One thing you may have noticed is that there are a million calls to both `reverse_string` and `strcpy`.  There is also the overhead of the loop.  To do the timing correctly, we should have timed the `strcpy` and the loop and subtracted that from the loop, which has the reverse_string function called.
+In the last section, we explored how to time the reverse\_string function.  In this section, we will explore how to time the function better.  One thing you may have noticed is that there are a million calls to both `reverse_string` and `strcpy`.  There is also the overhead of the loop.  To do the timing correctly, we should have timed the `strcpy` and the loop and subtracted that from the loop, which has the reverse\_string function called.
 
 The timing for the work in <i>illustrations/2_timing/2_timer</i> was:
 
@@ -948,7 +948,7 @@ $ diff test_timer.c ../1_timer/test_timer.c
 >     long time_spent = test_t2-test_t1;
 ```
 
-The less than symbols mean that the change is in the file in the first parameter (test_timer.c).  The greater than symbol indicates that the change is in the file in the second parameter (../1_timer/test_timer.c).  You should also notice three dashes (---) between the two lines indicating time_spent.  The 30,35d29 means that the lines were added after line 29 as lines 30-35.  The 42c36 means that line 42 in test_timer.c was compared with line 36 in ../1_timer/test_timer.c.
+The less than symbols mean that the change is in the file in the first parameter (test\_timer.c).  The greater than symbol indicates that the change is in the file in the second parameter (../1\_timer/test\_timer.c).  You should also notice three dashes (---) between the two lines indicating time\_spent.  The 30,35d29 means that the lines were added after line 29 as lines 30-35.  The 42c36 means that line 42 in test\_timer.c was compared with line 36 in ../1\_timer/test\_timer.c.
 
 As shown above, there are two changes.  The first times everything but reverse_string.
 ```c
@@ -966,7 +966,7 @@ long time_spent = (test_t2-test_t1) - (copy_t2-copy_t1);
 
 ### Doing a better job of timing continued
 
-In the last section, we eliminated the cost of the strcpy and loop from the timing.  Another thing to do is to reconsider our reverse_string function.  The reverse_string calls strlen to get the length of the string s.  We could try and just pass the length of s into the call.  We can get the length of the argument outside of the repeated and timed test.  For completeness, we will compare the timing of 2_timer with 3_timer.
+In the last section, we eliminated the cost of the strcpy and loop from the timing.  Another thing to do is to reconsider our reverse\_string function.  The reverse\_string calls strlen to get the length of the string s.  We could try and just pass the length of s into the call.  We can get the length of the argument outside of the repeated and timed test.  For completeness, we will compare the timing of 2\_timer with 3\_timer.
 
 The timing for the work in <i>illustrations/2_timing/2_timer</i> was...
 ```

@@ -13,24 +13,44 @@ function MdPages({ data }) {
   const currPage = data.markdownRemark;
   const currTitle = data.markdownRemark.frontmatter.title;
   const allPages = data.allMarkdownRemark;
-  const currPos = parseInt(currTitle);
-
-  allPages.edges.sort(function(a, b) {
-    let ai = parseInt(a.node.frontmatter.title);
-    let bi = parseInt(b.node.frontmatter.title);
-    return ai - bi;
-  });
 
   let prev = { node: { frontmatter: { title: "Home", path: "/" }}};
   let next = { node: { frontmatter: { title: "Home", path: "/" }}};
+  let currPos = parseInt(currTitle);
 
-  if (currPos + 2 < allPages.edges.length && currPos > 1) {
-    next = allPages.edges[currPos + 2];
-    prev = allPages.edges[currPos];
-  } else if (currPos <= 1) {
-    next = allPages.edges[currPos + 2];
-  } else if (currPos + 2 >= allPages.edges.length) {
-    prev = allPages.edges[currPos];
+  if (Number.isNaN(currPos)) {
+    let obj = allPages.edges.find((elm, i) => {
+      currPos = i;
+      return elm.node.frontmatter.title === currTitle;
+    });
+
+    if (currPos >= 21) {
+      next = { node: { frontmatter: { title: "Home", path: "/" }}};
+      prev = allPages.edges[currPos - 2];
+    } else if (currPos === 15) {
+      next = allPages.edges[currPos + 1];
+      prev = { node: { frontmatter: { title: "Home", path: "/" }}};
+    } else {
+      next = allPages.edges[currPos + 1];
+      prev = allPages.edges[currPos - 2];
+    }
+  } else {
+    allPages.edges.sort(function(a, b) {
+      let ai = parseInt(a.node.frontmatter.title);
+      let bi = parseInt(b.node.frontmatter.title);
+      return ai - bi;
+    });
+    console.log(currPos)
+    if (currPos >= 15) {
+      next = { node: { frontmatter: { title: "Home", path: "/" }}};
+      prev = allPages.edges[currPos - 2];
+    } else if (currPos === 1) {
+      next = allPages.edges[currPos + 1];
+      prev = { node: { frontmatter: { title: "Home", path: "/" }}};
+    } else {
+      next = allPages.edges[currPos];
+      prev = allPages.edges[currPos - 2];
+    }
   }
 
   return (

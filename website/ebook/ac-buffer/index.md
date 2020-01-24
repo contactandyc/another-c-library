@@ -24,14 +24,14 @@ impl/ac_buffer.h
 ac_common.h
 ```
 
-All of the example code is found in examples/ac_buffer.  
+All of the example code is found in examples/ac\_buffer.  
 
 ## ac\_buffer\_init
 
 ```c
 ac_buffer_t *ac_buffer_init(size_t size);
 ```
-ac_buffer_init creates a buffer with an initial size of size.  The buffer will grow as needed, but if you know the size that is generally needed, it may be more efficient to initialize it to that size.
+ac\_buffer\_init creates a buffer with an initial size of size.  The buffer will grow as needed, but if you know the size that is generally needed, it may be more efficient to initialize it to that size.
 
 ```c
 #include "ac_buffer.h"
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
 ```c
 char *ac_buffer_data(ac_buffer_t *h);
 ```
-ac_buffer_data gets the contents of the buffer.
+ac\_buffer\_data gets the contents of the buffer.
 
 ```c
 #include "ac_buffer.h"
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 ```c
 size_t ac_buffer_length(ac_buffer_t *h);
 ```
-ac_buffer_length returns the length of the buffer
+ac\_buffer\_length returns the length of the buffer
 
 ```c
 #include "ac_buffer.h"
@@ -491,7 +491,7 @@ ac\_buffer\_append\_alloc will grow the buffer by length bytes and return pointe
 ```c
 void *ac_buffer_append_ualloc(ac_buffer_t *h, size_t length);
 ```
-ac\_buffer\_append\_ualloc is the same as ac_buffer_append_alloc except memory is not necessarily aligned.
+ac\_buffer\_append\_ualloc is the same as ac\_buffer\_append\_alloc except memory is not necessarily aligned.
 
 ```c
 #include "ac_buffer.h"

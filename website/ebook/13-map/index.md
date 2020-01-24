@@ -6,9 +6,9 @@ title: "13. The Map Object"
 
 - Turning the red black tree into a map
 
-*This and the src/ac_map.h/c files were started on Monday 9/23/19 and are still a work in progress.*
+*This and the src/ac\_map.h/c files were started on Monday 9/23/19 and are still a work in progress.*
 
-The code for this section is found in <i>illustrations/13_map/1_map</i>
+The code for this section is found in <i>illustrations/13\_map/1\_map</i>
 ```
 cd $ac/illustrations/13_map/1_map
 ```
@@ -194,7 +194,7 @@ void ac_map_fix_insert(ac_map_node_t *node,
 #endif
 ```
 
-The code in ac_map.c is largely not new.  The functions have been prefixed with ac_map_.  The node_t structure has been renamed to ac_map_node_t.  The internal knowledge of the value type (char key) has been eliminated from the code.  Finally, the ac_map_node_t structure is exposed in the header file.
+The code in ac\_map.c is largely not new.  The functions have been prefixed with ac\_map\_.  The node\_t structure has been renamed to ac\_map\_node\_t.  The internal knowledge of the value type (char key) has been eliminated from the code.  Finally, the ac\_map\_node\_t structure is exposed in the header file.
 
 ```c
 typedef struct ac_map_node_s {
@@ -206,7 +206,7 @@ typedef struct ac_map_node_s {
 
 is similar to the node_t structure before, except it doesn't have *char key*.
 
-To use the ac_map, this structure will be added to the custom structure.  test_data_structure.c defines the node_t structure as it was defined before (with a char key).  Most of the time, you will be able to make the *ac_map_node_t map* be the first member of your structure.  This makes it easy to cast between your structure and the ac_map_node_t structure since they both have the same memory address.  Having the map not be the first member will be explored later (including having multiple map members in a single structure).
+To use the ac_map, this structure will be added to the custom structure.  test\_data\_structure.c defines the node\_t structure as it was defined before (with a char key).  Most of the time, you will be able to make the *ac\_map\_node\_t map* be the first member of your structure.  This makes it easy to cast between your structure and the ac\_map\_node\_t structure since they both have the same memory address.  Having the map not be the first member will be explored later (including having multiple map members in a single structure).
 ```c
 typedef struct {
   ac_map_node_t map;
@@ -222,7 +222,7 @@ ac_map_node_t * ac_map_next( ac_map_node_t *n );
 ac_map_node_t * ac_map_previous( ac_map_node_t *n );
 ```
 
-If your structure is called node_t, you can call these functions as
+If your structure is called node\_t, you can call these functions as
 ```c
 void print_using_iteration(ac_map_node_t *root) {
   node_t *n = (node_t *)ac_map_first(root);
@@ -247,22 +247,22 @@ void print_using_iteration(ac_map_node_t *root) {
 }
 ```
 
-Both approaches are equivalent, assuming that the map is the first member of the node_t structure.
+Both approaches are equivalent, assuming that the map is the first member of the node\_t structure.
 
-The node_first_to_erase and node_next_to_erase have been renamed.
+The node\_first\_to\_erase and node\_next\_to\_erase have been renamed.
 ```c
 ac_map_node_t * ac_map_postorder_first( ac_map_node_t *n );
 ac_map_node_t * ac_map_postorder_next( ac_map_node_t *n );
 ```
 
-ac_map_copy_node_f is a callback meant to be used with ac_map_copy to copy one map to another given a root node.  The tag will typically be an allocator, such as the pool.  ac_map_copy will make a complete copy of a map (or red-black tree) and return a pointer to it.  I like to suffix function typedefs with a *_f*.
+ac\_map\_copy\_node\_f is a callback meant to be used with ac\_map\_copy to copy one map to another given a root node.  The tag will typically be an allocator, such as the pool.  ac\_map\_copy will make a complete copy of a map (or red-black tree) and return a pointer to it.  I like to suffix function typedefs with a *\_f*.
 ```c
 typedef ac_map_node_t * (*ac_map_copy_node_f)( ac_map_node_t *n, void *tag );
 
 ac_map_node_t * ac_map_copy( ac_map_node_t *root, ac_map_copy_node_f copy, void *tag);
 ```
 
-ac_map_copy could be used in the following way...
+ac\_map\_copy could be used in the following way...
 ```c
 ac_map_node_t * copy_node( ac_map_node_t *n, void *tag ) {
   ac_pool_t *pool = (ac_pool_t *)tag;
@@ -275,13 +275,13 @@ ac_map_node_t *root = /* a valid map with zero or more entries */;
 ac_map_node_t *copy_of_root = ac_map_copy(root, copy_node, pool);
 ```
 
-print_node_to_string_f is a callback meant to print the value of the node n.  There is an expectation that the value will be printed on a single line.  Printing the internal representation of the tree is used for testing and printing the tree and doesn't need to be complete.  It generally doesn't have practical use within applications.
+print\_node\_to\_string\_f is a callback meant to print the value of the node n.  There is an expectation that the value will be printed on a single line.  Printing the internal representation of the tree is used for testing and printing the tree and doesn't need to be complete.  It generally doesn't have practical use within applications.
 
 ```c
 typedef char * (*print_node_to_string_f)(ac_pool_t *pool, ac_map_node_t *n);
 ```
 
-For debugging, it is often nice to be able just to print something to the terminal.  Sometimes, it is also nice to print to a buffer and then have the output directed to some other location.  I provide both mechanisms below.  The first prints errors in the map (red-black violations) to a buffer and returns false if there are any errors.  The second function is like the first, except it outputs directly to the screen.  Both of these functions require the root of the tree and a pointer to a print_node_to_string_f function.
+For debugging, it is often nice to be able just to print something to the terminal.  Sometimes, it is also nice to print to a buffer and then have the output directed to some other location.  I provide both mechanisms below.  The first prints errors in the map (red-black violations) to a buffer and returns false if there are any errors.  The second function is like the first, except it outputs directly to the screen.  Both of these functions require the root of the tree and a pointer to a print\_node\_to\_string\_f function.
 ```c
 bool ac_map_valid_to_buffer(ac_buffer_t *bh, ac_pool_t *pool,
                               ac_map_node_t *root, print_node_to_string_f print_node );
@@ -291,7 +291,7 @@ bool ac_map_valid(ac_pool_t *pool,
                     print_node_to_string_f print_node);
 ```
 
-ac_map_valid checks if the map is valid.  ac_map_print dumps the contents of a map in a tree-like manner.  It takes additional parameter flags, which would typically be zero unless you with to not print red nodes in the color red and/or you don't want the black height of a node suffixed in the print.  The flags are bit-oriented and can be or'ed together.
+ac\_map\_valid checks if the map is valid.  ac\_map\_print dumps the contents of a map in a tree-like manner.  It takes additional parameter flags, which would typically be zero unless you with to not print red nodes in the color red and/or you don't want the black height of a node suffixed in the print.  The flags are bit-oriented and can be or'ed together.
 ```c
 #define AC_MAP_DONT_PRINT_RED 1
 #define AC_MAP_DONT_PRINT_BLACK_HEIGHT 2
@@ -306,7 +306,7 @@ void ac_map_print(ac_pool_t *pool, ac_map_node_t *node,
                     int flags );
 ```
 
-ac_map_erase unlinks node from the given map.  The node is expected to be a valid node within the tree (typically found via a find method).  ac_map_erase does not destroy the node (it simply unlinks it from the map).
+ac\_map\_erase unlinks node from the given map.  The node is expected to be a valid node within the tree (typically found via a find method).  ac\_map\_erase does not destroy the node (it simply unlinks it from the map).
 ```c
 bool ac_map_erase(ac_map_node_t *node, ac_map_node_t **root);
 ```

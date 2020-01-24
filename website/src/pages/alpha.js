@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "gatsby";
 import { FaArrowRight } from "react-icons/fa";
-import { Redirect } from "@reach/router";
 
 import Layout from "../components/layout";
 import SEO from "../components/seo";
