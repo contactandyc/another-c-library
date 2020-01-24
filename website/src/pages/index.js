@@ -29,7 +29,7 @@ function IndexPage() {
           <h2 className="Index-h2-alt">Improving Quicksort</h2>
           <h3 className="Index-h3-alt">AC's quicksort algorithm is up to 650% faster
           than other quicksort methods on random, sorted, and reversed data.</h3>
-          <Link to="">Start Sorting <FaArrowRight style={{ height: "12px" }}/></Link>
+          <Link to="/docs/improving-quicksort">Start Sorting <FaArrowRight style={{ height: "12px" }}/></Link>
         </div>
         <div className="Index-cd-alt">
           user demo % ./quicksort_demo A 1000<br /><br />
@@ -78,7 +78,7 @@ function IndexPage() {
           <h2 className="Index-h2-alt">JSON Parsing...Parsed.</h2>
           <h3 className="Index-h3-alt">Build lightning-fast services with AC's
           JSON parser that can parse thousands of records in milliseconds.</h3>
-          <Link to="">Start Parsing <FaArrowRight style={{ height: "12px" }}/></Link>
+          <Link to="/docs/ac-buffer">Read More <FaArrowRight style={{ height: "12px" }}/></Link>
         </div>
       </div>
 
