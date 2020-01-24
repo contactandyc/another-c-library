@@ -1,6 +1,6 @@
 ---
 path: "/tips"
-posttype: "docs"
+posttype: "tutorial"
 title: "Helpful Tips"
 ---
 
