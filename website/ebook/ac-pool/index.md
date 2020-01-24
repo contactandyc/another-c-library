@@ -133,21 +133,21 @@ ac\_pool\_udup allocates a copy of the data.  The memory will be unaligned.
 ```c
 char **ac_pool_strdupa(ac_pool_t *pool, char **a);
 ```
-ac\_pool\_strdupa duplicates all of the strings in the array #a# AND the NULL terminated pointer array.
+ac\_pool\_strdupa duplicates all of the strings in the array **a** AND the NULL terminated pointer array.
 
 ## ac\_pool\_strdupan
 
 ```c
 char **ac_pool_strdupan(ac_pool_t *pool, char **a, size_t num);
 ```
-ac\_pool\_strdupan duplicates all of the strings in the array #a# AND the pointer array which has num elements in it.  The duplicated copy will also be NULL terminated.
+ac\_pool\_strdupan duplicates all of the strings in the array **a** AND the pointer array which has num elements in it.  The duplicated copy will also be NULL terminated.
 
 ## ac\_pool\_strdupa2
 
 ```c
 char **ac_pool_strdupa2(ac_pool_t *pool, char **a);
 ```
-ac\_pool\_strdupa2 duplicates the NULL terminated pointer array.  All of the referenced strings in the array #a# are referenced in the returned result.
+ac\_pool\_strdupa2 duplicates the NULL terminated pointer array.  All of the referenced strings in the array **a** are referenced in the returned result.
 
 ## ac\_pool\_tokenize
 
