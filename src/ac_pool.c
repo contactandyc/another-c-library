@@ -237,7 +237,7 @@ char **ac_pool_strdupa2(ac_pool_t *pool, char **a) {
     p++;
 
   p++;
-  return ac_pool_dup(pool, a, (p - a) * sizeof(char *));
+  return (char **)ac_pool_dup(pool, a, (p - a) * sizeof(char *));
 }
 
 static inline void setup_tokenize(uint64_t *bits, const char *delim) {

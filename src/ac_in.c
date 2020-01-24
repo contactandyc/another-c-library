@@ -489,7 +489,7 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
     if (options->gz)
       abort();
 
-    base = ac_in_base_init_from_buffer(buf, buf_len, can_free);
+    base = ac_in_base_init_from_buffer((char *)buf, buf_len, can_free);
   } else {
     if ((!filename && options->gz) || ac_io_extension(filename, ".gz"))
       base = ac_in_base_init_gz(filename, fd, can_close, options->buffer_size);

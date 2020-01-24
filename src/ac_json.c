@@ -105,9 +105,11 @@ static void ac_json_dump_array_to_buffer(ac_buffer_t *bh, _ac_jsona_t *a);
 
 void ac_json_dump_to_buffer(ac_buffer_t *bh, ac_json_t *a) {
   if (a->type >= AC_JSON_STRING) {
-    if (a->type == AC_JSON_STRING)
-      ac_buffer_appendf(bh, "\"%s\"", a->value);
-    else
+    if (a->type == AC_JSON_STRING) {
+      ac_buffer_appendc(bh, '\"');
+      ac_buffer_append(bh, a->value, a->length);
+      ac_buffer_appendc(bh, '\"');
+    } else
       ac_buffer_append(bh, a->value, a->length);
   } else if (a->type == AC_JSON_OBJECT) {
     ac_json_dump_object_to_buffer(bh, (_ac_jsono_t *)a);
@@ -128,8 +130,9 @@ static void ac_json_dump_object_to_buffer(ac_buffer_t *bh, _ac_jsono_t *a) {
     ac_jsono_t *next = n->next;
     while (next && next->value == NULL)
       next = next->next;
-
-    ac_buffer_appendf(bh, "\"%s\":", n->key);
+    ac_buffer_appendc(bh, '\"');
+    ac_buffer_appends(bh, n->key);
+    ac_buffer_append(bh, "\":", 2);
     ac_json_dump_to_buffer(bh, n->value);
     if (next)
       ac_buffer_appendc(bh, ',');
@@ -540,10 +543,6 @@ ac_json_t *ac_json_parse(ac_pool_t *pool, char *p, char *ep) {
   int line, line2 = 0;
 #endif
   char *sp = p;
-  if (p >= ep) {
-    p++;
-    AC_JSON_BAD_CHARACTER;
-  }
   char ch;
   char *key = NULL;
   char *stringp = NULL;
@@ -556,6 +555,11 @@ ac_json_t *ac_json_parse(ac_pool_t *pool, char *p, char *ep) {
 
   int data_type;
   uint32_t string_length;
+
+  if (p >= ep) {
+    p++;
+    AC_JSON_BAD_CHARACTER;
+  }
 
   if (*p != '{')
     goto start_value;

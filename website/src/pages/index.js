@@ -62,17 +62,29 @@ function IndexPage() {
 
       <div className="Flex Index-mn">
         <div className="Index-cd-alt">
-        user demo % ./demo6 twitter.json 1000<br />
-        json_parse: 257 MB/sec, 2.342ms<br />
-        json_dump: 163 MB/sec, 2.723ms<br /><br />
-
-        user demo % ./demo6 canada.json 1000<br />
-        json_parse: 245 MB/sec, 8.755ms<br />
-        json_dump: 549 MB/sec, 3.907ms<br /><br />
-
-        user demo % ./demo6 citm_catalog.json 1000<br />
-        json_parse: 219 MB/sec, 7.511ms<br />
-        json_dump: 109 MB/sec, 4.357ms
+        demo/json $ make<br/>
+        Testing ac_json<br/>
+        ./ac_json_test --web 500 *.json<br/>
+        parsing canada.json(2251051): 1451 MB/sec<br/>
+        dumping canada.json(2251027): 1241 MB/sec<br/>
+        parsing citm_catalog.json(1727204): 1268 MB/sec<br/>
+        dumping citm_catalog.json(500299): 617 MB/sec<br/>
+        parsing twitter.json(631514): 1026 MB/sec<br/>
+        dumping twitter.json(466906): 1093 MB/sec<br/>
+        overall parse speed: 1306.384MB/sec<br/>
+        overall dump speed: 1054.435MB/sec<br/>
+        <br/>
+        Testing RapidJSON<br/>
+        ./rapidjson_test --web 500 *.json<br/>
+        parsing canada.json: 394 MB/sec<br/>
+        dumping canada.json: 189 MB/sec<br/>
+        parsing citm_catalog.json: 934 MB/sec<br/>
+        dumping citm_catalog.json: 359 MB/sec<br/>
+        parsing twitter.json: 547 MB/sec<br/>
+        dumping twitter.json: 456 MB/sec<br/>
+        overall parse speed: 528.975MB/sec<br/>
+        overall dump speed: 227.614MB/sec<br/>
+        <br/>
         </div>
         <div className="Index-mn-cnt">
           <h2 className="Index-h2-alt">JSON Parsing...Parsed.</h2>

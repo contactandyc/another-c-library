@@ -423,7 +423,7 @@ char **_ac_strdupa2_d(ac_allocator_t *al, const char *caller, char **a) {
     p++;
 
   p++;
-  return _ac_memdup_d(al, caller, a, (p - a) * sizeof(char *));
+  return (char **)_ac_memdup_d(al, caller, a, (p - a) * sizeof(char *));
 }
 
 char **_ac_strdupa2(char **a) {
@@ -435,7 +435,7 @@ char **_ac_strdupa2(char **a) {
     p++;
 
   p++;
-  return _ac_memdup(a, (p - a) * sizeof(char *));
+  return (char **)_ac_memdup(a, (p - a) * sizeof(char *));
 }
 
 char **_ac_strdupa_d(ac_allocator_t *al, const char *caller, char **a) {

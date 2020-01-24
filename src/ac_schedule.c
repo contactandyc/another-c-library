@@ -610,7 +610,8 @@ ac_task_link_t *get_task_list(ac_task_t *task, const char *name,
                task->task_name, name);
         abort();
       }
-      ac_task_link_t *tl = ac_pool_alloc(h->pool, sizeof(*tl));
+      ac_task_link_t *tl =
+          (ac_task_link_t *)ac_pool_alloc(h->pool, sizeof(*tl));
       tl->task = node;
       tl->next = r;
       r = tl;
@@ -624,7 +625,7 @@ ac_task_link_t *get_task_list(ac_task_t *task, const char *name,
       abort();
     }
 
-    ac_task_link_t *tl = ac_pool_alloc(h->pool, sizeof(*tl));
+    ac_task_link_t *tl = (ac_task_link_t *)ac_pool_alloc(h->pool, sizeof(*tl));
     tl->task = node;
     tl->next = NULL;
     return tl;
@@ -1375,14 +1376,15 @@ ac_transform_t *clone_transforms(ac_worker_t *w) {
   ac_transform_t *n = w->task->transforms;
   while (n) {
     if (!head)
-      head = tail = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+      head = tail =
+          (ac_transform_t *)ac_pool_dup(w->worker_pool, n, sizeof(*n));
     else {
-      tail->next = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+      tail->next = (ac_transform_t *)ac_pool_dup(w->worker_pool, n, sizeof(*n));
       tail = tail->next;
     }
     if (tail->inputs) {
-      tail->inputs = ac_pool_alloc(w->worker_pool, sizeof(ac_worker_input_t *) *
-                                                       tail->num_inputs);
+      tail->inputs = (ac_worker_input_t **)ac_pool_alloc(
+          w->worker_pool, sizeof(ac_worker_input_t *) * tail->num_inputs);
       for (size_t i = 0; i < tail->num_inputs; i++)
         tail->inputs[i] = ac_worker_input(w, n->inputs[i]->id);
     }
@@ -1398,9 +1400,11 @@ void clone_inputs_and_outputs(ac_worker_t *w) {
   ac_worker_input_t *n = w->task->inputs;
   while (n) {
     if (!head)
-      head = tail = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+      head = tail =
+          (ac_worker_input_t *)ac_pool_dup(w->worker_pool, n, sizeof(*n));
     else {
-      tail->next = ac_pool_dup(w->worker_pool, n, sizeof(*n));
+      tail->next =
+          (ac_worker_input_t *)ac_pool_dup(w->worker_pool, n, sizeof(*n));
       tail = tail->next;
     }
     tail->next = NULL;
