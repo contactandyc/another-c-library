@@ -25,7 +25,7 @@ My additional rules for clarification which are based upon the first 5 rules.
 - A red-black tree often will have many more black nodes than red nodes.  This is okay and expected.  The red node is an indication that the tree may be somehow out of balance.  It is possible to have more red nodes than black nodes, but it isn't typical.
 - A red-black tree has a worst case of a 2logN depth but is likely to maintain a logN depth or be very close to it.
 
-The red-black tree is balanced through rotations and changing colors, which were discussed in [Balancing Binary Search Trees](../11-balancing-binary-search-trees/index.md).  Make sure the tree_operations tool is built from the last section if you want to follow along.
+The red-black tree is balanced through rotations and changing colors, which were discussed in [Balancing Binary Search Trees](../11-balancing-binary-search-trees/index.md).  Make sure the tree\_operations tool is built from the last section if you want to follow along.
 
 ```
 cd $ac/illustrations/11_balancing_binary_search_trees/2_tree_operations
@@ -47,13 +47,13 @@ q
 
 To make sure that it is working.
 
-The code for this section is found in <i>illustrations/12_red_black_tree/1_red_black_tree</i>
+The code for this section is found in <i>illustrations/12\_red\_black\_tree/1\_red\_black\_tree</i>
 ```
 cd $ac/illustrations/12_red_black_tree/1_red_black_tree
 make
 ```
 
-Most of the code is in red_black_tree.c
+Most of the code is in red\_black\_tree.c
 
 ## Testing the red-black tree properties
 
@@ -153,9 +153,9 @@ bool test_red_black_rules(ac_pool_t *pool, node_t *root) {
 
 ## Insert
 
-The red-black tree functions in many ways are similar to the binary search tree.  Iterating and finding are the same.  Erasing and inserting are done in virtually the same way, except once an item is inserted or erased, the color must be fixed.  The difference between the binary search tree and red-black tree node_insert is shown below.
+The red-black tree functions in many ways are similar to the binary search tree.  Iterating and finding are the same.  Erasing and inserting are done in virtually the same way, except once an item is inserted or erased, the color must be fixed.  The difference between the binary search tree and red-black tree node\_insert is shown below.
 
-binary_search_tree.c
+binary\_search\_tree.c
 ```c
 bool node_insert(node_t *node_to_insert, node_t **root) {
   node_t **n = root, *parent = NULL;
@@ -176,7 +176,7 @@ bool node_insert(node_t *node_to_insert, node_t **root) {
 }
 ```
 
-red_black_tree.c
+red\_black\_tree.c
 ```c
 void red_black_insert(node_t *node, node_t **root);
 
@@ -202,7 +202,7 @@ bool node_insert(node_t *node_to_insert, node_t **root) {
 
 The difference is:
 
-red_black_tree.c
+red\_black\_tree.c
 ```c
 void red_black_insert(node_t *node, node_t **root);
 ...
@@ -603,7 +603,7 @@ To recap
 
 Erasing nodes in a red black tree is more complex than insertion.  In writing this and trying to visualize what is happening, I needed to keep reminding myself of the importance of maintaining black height and to a lesser extent, the other rules (particularly that a node with only one child must have a red child).  Like insertion, node_erase calls a function to fix the balance of the tree once the node is removed.  A key difference is that the color doesn't always have to be fixed.  Another difference is that what fixed is either the parent or the successor.
 
-The function replace_node_with_child sets the child color to the node that it is replacing's color.
+The function replace\_node\_with\_child sets the child color to the node that it is replacing's color.
 ```c
 child->color = node->color;
 ```
@@ -637,7 +637,7 @@ bool node_erase(node_t *node, node_t **root) {
 
 If you consider the following examples, it should be clear why erasing a red leaf is never a problem or a node with one child.
 
-The tree_operations has a -q feature which is less verbose (you don't get the menu or the list of operations that lead to a successful red-black tree structure).
+The tree\_operations has a -q feature which is less verbose (you don't get the menu or the list of operations that lead to a successful red-black tree structure).
 
 ```
 $ $ac/bin/tree_operations -q ABC
@@ -1054,7 +1054,7 @@ static void fix_color_for_erase(node_t *parent, node_t *node, node_t **root) {
 }
 ```
 
-The fix_color_for_erase function is large but can split into sections that largely mirror each other.
+The fix\_color\_for\_erase function is large but can split into sections that largely mirror each other.
 
 ```c
 static void fix_color_for_erase(node_t *parent, node_t *node, node_t **root) {
@@ -1164,13 +1164,13 @@ EXAMPLE
 
 ## Packing color into the parent node
 
-The code for this section is found in <i>illustrations/12_red_black_tree/2_red_black_tree</i>
+The code for this section is found in <i>illustrations/12\_red\_black\_tree/2\_red\_black\_tree</i>
 ```
 cd $ac/illustrations/12_red_black_tree/2_red_black_tree
 make
 ```
 
-The red_black_tree code above used the following node data structure.
+The red\_black\_tree code above used the following node data structure.
 
 ```c
 struct node_s {
@@ -1214,7 +1214,7 @@ The rest of the change involves converting code, which accesses the parent point
 diff red_black_tree.c ../1_red_black_tree/red_black_tree.c | less
 ```
 
-rb_parent
+rb\_parent
 ```c
 n = n->parent;
 ```
@@ -1225,7 +1225,7 @@ n = rb_parent(n);
 <br/>
 <br/>
 
-rb_set_red
+rb\_set\_red
 ```c
 n->color = RED;
 ```
@@ -1236,7 +1236,7 @@ rb_set_red(n);
 <br/>
 <br/>
 
-rb_is_red
+rb\_is\_red
 ```c
 if(n->color == RED)
 ```
@@ -1247,7 +1247,7 @@ if(rb_is_red(n))
 <br/>
 <br/>
 
-rb_clear_black
+rb\_clear\_black
 ```c
 n->parent = NULL;
 n->color = BLACK;
