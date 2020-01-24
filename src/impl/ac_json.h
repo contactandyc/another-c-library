@@ -413,6 +413,7 @@ static inline void ac_jsono_erase(ac_jsono_t *n) {
 
 void _ac_jsono_fill(_ac_jsono_t *o);
 
+/*
 static inline ac_jsono_t *ac_jsono_get(ac_json_t *j, const char *key) {
   _ac_jsono_t *o = (_ac_jsono_t *)j;
   if (!o->root) {
@@ -427,6 +428,9 @@ static inline ac_jsono_t *ac_jsono_get(ac_json_t *j, const char *key) {
 }
 
 static inline ac_json_t *ac_jsono_get_value(ac_json_t *j, const char *key) {
+*/
+
+static inline ac_json_t *ac_jsono_get(ac_json_t *j, const char *key) {
   _ac_jsono_t *o = (_ac_jsono_t *)j;
   if (!o->root) {
     if (o->head)

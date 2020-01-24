@@ -142,8 +142,7 @@ static inline ac_jsono_t *ac_jsono_scan(ac_json_t *j, const char *key);
   method as it creates a sorted array vs a red black tree (or map).  The
   find/insert methods are useful if you need to lookup keys and insert.
 */
-static inline ac_jsono_t *ac_jsono_get(ac_json_t *j, const char *key);
-static inline ac_json_t *ac_jsono_get_value(ac_json_t *j, const char *key);
+static inline ac_json_t *ac_jsono_get(ac_json_t *j, const char *key);
 
 /* in this case, don't use _get (only _find) */
 static inline void ac_jsono_erase(ac_jsono_t *n);
