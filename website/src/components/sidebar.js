@@ -31,12 +31,13 @@ function Sidebar(props) {
     sidebar: {
       fontFamily: `-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen',
       'Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif`,
-      height: `100vh`,
+      height: `100%`,
       padding: `15px`,
       color: `#1E4E8C`,
       position: `sticky`,
       top: `62px`,
-      borderLeft: `solid 1px #EDF2F7`
+      borderLeft: `solid 1px #EDF2F7`,
+      overflowY: `scroll`
     },
     activeLink: {
       color: `#1A202C`,
