@@ -77,6 +77,12 @@ pre {
 }
 
 .Flex {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.Grid {
   display: grid;
   grid-template-columns: auto auto;
   grid-column-gap: 50px;
@@ -91,8 +97,11 @@ pre {
   nav, .Footer {
     flex-direction: column;
   }
-  .Flex {
+  .Grid {
     grid-template-columns: auto;
+  }
+  .Flex {
+    flex-direction: column;
   }
   .Sidebar {
     display: none;
@@ -135,8 +144,8 @@ pre {
 /* index.js */
 .Index-mn {
   max-width: 1200px;
-  margin: 80px auto;
-  padding: 10px;
+  margin: auto;
+  padding: 80px 10px;
 }
 
 .Index-hr {
@@ -200,6 +209,19 @@ pre {
   margin-top: 8px;
 }
 
+.Index-mn-cnt {
+  max-width: 500px;
+  margin: 20px;
+}
+
+@keyframes crsr {
+    0% { background: rgb(10, 13, 17); }
+    50% { background: rgb(10, 13, 17); }
+    51% { background: transparent; }
+    99% { background: transparent; }
+    100% { background: rgb(10, 13, 17); }
+}
+
 .Index-url {
   position: absolute;
   right: -70px;
@@ -210,12 +232,25 @@ pre {
   margin: 0;
 }
 
-@keyframes crsr {
-    0% { background: rgb(10, 13, 17); }
-    50% { background: rgb(10, 13, 17); }
-    51% { background: transparent; }
-    99% { background: transparent; }
-    100% { background: rgb(10, 13, 17); }
+.Index-cd-alt {
+  background: rgb(50, 56, 64);
+  border-radius: 15px;
+  width: 500px;
+  height: 300px;
+  overflow-x: scroll;
+  color: white;
+  padding: 15px;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.Index-h2-alt {
+  color: #38A169;
+  border-bottom: none;
+  margin: 0;
+}
+
+.Index-h3-alt {
+  margin-top: 0;
 }
 
 /* md-page.js */
@@ -229,6 +264,7 @@ pre {
   color: black;
   margin: 0;
   padding: 20px;
+  max-width: 850px;
 }
 
 .Md-actv-lnk {
@@ -257,6 +293,7 @@ pre {
 .Tutorial-cntnt {
   color: black;
   margin: 0;
+  max-width: 850px;
   padding: 20px;
 }
 
