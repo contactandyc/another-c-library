@@ -1,5 +1,4 @@
 import React from "react";
-import { FaExternalLinkAlt } from "react-icons/fa";
 import { Link } from "gatsby";
 
 import Layout from "../components/layout";
