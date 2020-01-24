@@ -134,7 +134,7 @@ drwxr-xr-x   9 ac  staff  288 Aug 31 23:23 11_block_allocator
 drwxr-xr-x   9 ac  staff  288 Aug 31 23:23 12_io
 ```
 
-For each chapter, there will be a number and name that corresponds to the chapter in this book.  For example, within <i>1_getting_started</i>, there is a folder named <i>1_test_setup</i>.
+For each chapter, there will be a number and name that corresponds to the chapter in this book.  For example, within <i>1\_getting\_started</i>, there is a folder named <i>1\_test\_setup</i>.
 ```
 ls -l 1_getting_started
 ```

@@ -35,7 +35,7 @@ ac\_in\_init creates an input stream based upon a filename and options.  The fil
 ```c
 ac_in_t *ac_in_init_with_fd(int fd, bool can_close, ac_in_options_t *options);
 ```
-ac\_in\_init\_with\_fd creates an input stream based upon a file descriptor.  If the input stream is compressed, that should be set through ac\_in\_options\_gz or ac\_in\_options\_lz4.  Otherwise, if options are NULL, defaults will be used.  can_close should normally be true meaning that when the ac_in object is destroyed, the file should be closed.
+ac\_in\_init\_with\_fd creates an input stream based upon a file descriptor.  If the input stream is compressed, that should be set through ac\_in\_options\_gz or ac\_in\_options\_lz4.  Otherwise, if options are NULL, defaults will be used.  can\_close should normally be true meaning that when the ac_in object is destroyed, the file should be closed.
 
 ## ac\_in\_init\_with\_buffer
 
@@ -43,7 +43,7 @@ ac\_in\_init\_with\_fd creates an input stream based upon a file descriptor.  If
 ac_in_t *ac_in_init_with_buffer(void *buf, size_t len, bool can_free,
                                 ac_in_options_t *options);
 ```
-ac\_in\_init\_with\_buffer creates a stream from a buffer. If the input stream is compressed, that should be set through ac\_in\_options\_gz or ac\_in\_options\_lz4.  Otherwise, if options are NULL, defaults will be used.  can_free should normally be true meaning that when the ac_in object is destroyed, the buffer should be freed.
+ac\_in\_init\_with\_buffer creates a stream from a buffer. If the input stream is compressed, that should be set through ac\_in\_options\_gz or ac\_in\_options\_lz4.  Otherwise, if options are NULL, defaults will be used.  can\_free should normally be true meaning that when the ac_in object is destroyed, the buffer should be freed.
 
 ## ac\_in\_records\_init
 
@@ -110,7 +110,7 @@ ac\_in\_ext\_reducer reduces equal records across multiple input streams.
 ```c
 void ac_in_ext_add(ac_in_t *h, ac_in_t *in, int tag);
 ```
-ac\_in\_ext\_add The tag can be options->tag from init of in if that makes sense.  Otherwise, this can be useful to distinguish different input sources. The first param h must be initialized with ac_in_init_compare.
+ac\_in\_ext\_add The tag can be options->tag from init of in if that makes sense.  Otherwise, this can be useful to distinguish different input sources. The first param h must be initialized with ac\_in\_init\_compare.
 
 ## ac\_in\_count
 
@@ -132,7 +132,7 @@ ac\_in\_advance advances to the next record and returns it.
 ac_io_record_t *ac_in_current(ac_in_t *h);
 ```
 ac\_in\_current returns the current record (this will be NULL if advance hasn't been called or
-ac_in_reset was called).
+ac\_in\_reset was called).
 
 ## ac\_in\_reset
 
@@ -146,7 +146,7 @@ ac\_in\_reset makes the next call to advance return the same record as the curre
 ```c
 ac_io_record_t *ac_in_advance_unique(ac_in_t *h, size_t *num_r);
 ```
-ac\_in\_advance\_unique returns the next equal record across all of the streams.  num_r will be the number of streams containing the next record.  It is assumed that each stream will have exactly one equal record. If there is only one stream, num_r will always be 1 until the stream is finished.
+ac\_in\_advance\_unique returns the next equal record across all of the streams.  num\_r will be the number of streams containing the next record.  It is assumed that each stream will have exactly one equal record. If there is only one stream, num\_r will always be 1 until the stream is finished.
 
 ## ac\_in\_advance\_group
 
@@ -177,7 +177,7 @@ ac\_in\_options\_init initializes h to default values.  ac\_in\_options\_t is de
 ```c
 void ac_in_options_buffer_size(ac_in_options_t *h, size_t buffer_size);
 ```
-ac\_in\_options\_buffer\_size sets the buffer size for reading input from files.  If the input is compressed, the buffer_size here is for the uncompressed content.  Ideally, this would be large enough to support any record in the input.  If an individual record is larger than the buffer_size, a temporary buffer will be created to hold the given record.  The temporary buffer should happen as the exception (if at all).
+ac\_in\_options\_buffer\_size sets the buffer size for reading input from files.  If the input is compressed, the buffer\_size here is for the uncompressed content.  Ideally, this would be large enough to support any record in the input.  If an individual record is larger than the buffer\_size, a temporary buffer will be created to hold the given record.  The temporary buffer should happen as the exception (if at all).
 
 ## ac\_in\_options\_format
 
@@ -261,7 +261,7 @@ ac\_in\_options\_lz4 indicates that the contents of the input are lz4 compressed
 void ac_in_options_compressed_buffer_size(ac_in_options_t *h,
                                           size_t buffer_size);
 ```
-ac\_in\_options\_compressed\_buffer\_size sets the compressed buffer size.  The buffer_size is the size to buffer compressed content which will default to buffer_size.
+ac\_in\_options\_compressed\_buffer\_size sets the compressed buffer size.  The buffer\_size is the size to buffer compressed content which will default to buffer\_size.
 
 ## ac\_in\_options\_reducer
 
