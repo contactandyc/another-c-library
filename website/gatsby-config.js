@@ -30,13 +30,6 @@ module.exports = {
       },
     },
     {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        path: `${__dirname}/usage`,
-        name: "usage",
-      },
-    },
-    {
       resolve: "gatsby-transformer-remark",
       options: {
         plugins: [
