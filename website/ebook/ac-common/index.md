@@ -8,7 +8,7 @@ title: "ac_common"
 #include "ac_common.h"
 ```
 
-ac_common is meant to help normalize platforms by including platform specific header files.  It also includes commonly used types like stddef (for size_t), stdbool (for bool), and inttypes (for intXX_t like types).
+ac\_common is meant to help normalize platforms by including platform specific header files.  It also includes commonly used types like stddef (for size\_t), stdbool (for bool), and inttypes (for intXX\_t like types).
 
 ## \_\_AC\_FILE\_LINE\_\_
 
