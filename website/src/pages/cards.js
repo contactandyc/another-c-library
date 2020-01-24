@@ -143,7 +143,7 @@ function CardList() {
         </Droppable>
       </DragDropContext>
 
-      /*
+      {/*
         Highlight active step. Apply rules based on steps.
         1.  starts: when input box === ""
             function: update pivot number
@@ -164,7 +164,7 @@ function CardList() {
             function: return right and left of pivot
                       choose either right or left
                       repeat 1, 2a, 2b
-      */
+      */}
 
       <div style={{ margin: "20px" }}>
         <input placeholder="Pivot" value={pivot} onChange={(e) => updatePivot(e)}></input><br />
