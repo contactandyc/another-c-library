@@ -210,7 +210,7 @@ pre {
 }
 
 .Index-mn-cnt {
-  max-width: 500px;
+  max-width: 550px;
   margin: 20px;
 }
 
@@ -235,7 +235,7 @@ pre {
 .Index-cd-alt {
   background: rgb(50, 56, 64);
   border-radius: 15px;
-  width: 600px;
+  width: 550px;
   height: 500px;
   overflow-x: scroll;
   color: white;
