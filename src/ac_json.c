@@ -1194,7 +1194,7 @@ bad_character:;
   return (ac_json_t *)err;
 }
 
-static inline int ac_json_compare(ac_jsono_t **a, ac_jsono_t **b) {
+static inline int ac_json_compare(const ac_jsono_t **a, const ac_jsono_t **b) {
   return strcmp((*a)->key, (*b)->key);
 }
 

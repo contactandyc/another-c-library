@@ -63,12 +63,12 @@ limitations under the License.
 
 #define ac_sort_test_compare_def(name, type)                                   \
   void name(char *func_line, type *base, ssize_t num_elements,                 \
-            int (*compare)(type * a, type * b),                                \
+            int (*compare)(const type *a, const type *b),                      \
             void (*print_element)(type * el));
 
 #define ac_sort_test_compare_arg_def(name, type)                               \
   void name(char *func_line, type *base, ssize_t num_elements,                 \
-            int (*compare)(type * a, type * b, void *arg),                     \
+            int (*compare)(const type *a, const type *b, void *arg),           \
             void (*print_element)(type * el, void *arg), void *arg);
 
 #define ac_sort_test_m(name, compare, type)                                    \
@@ -78,7 +78,7 @@ limitations under the License.
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
-      n = compare(base - 1, base);                                             \
+      n = compare((const type *)base - 1, (const type *)base);                 \
       if (n > 0) {                                                             \
         if (func_line)                                                         \
           printf("%s ", func_line);                                            \
@@ -99,7 +99,7 @@ limitations under the License.
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
-      n = compare(base - 1, base, arg);                                        \
+      n = compare((const type *)base - 1, (const type *)base, arg);            \
       if (n > 0) {                                                             \
         if (func_line)                                                         \
           printf("%s ", func_line);                                            \
@@ -115,13 +115,13 @@ limitations under the License.
 
 #define ac_sort_test_compare_m(name, type)                                     \
   void name(char *func_line, type *base, ssize_t num_elements,                 \
-            int (*compare)(type * a, type * b),                                \
+            int (*compare)(const type *a, const type *b),                      \
             void (*print_element)(type * el)) {                                \
     type *ep = base + num_elements;                                            \
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
-      n = compare(base - 1, base);                                             \
+      n = compare((const type *)base - 1, (const type *)base);                 \
       if (n > 0) {                                                             \
         if (func_line)                                                         \
           printf("%s ", func_line);                                            \
@@ -137,13 +137,13 @@ limitations under the License.
 
 #define ac_sort_test_compare_arg_m(name, type)                                 \
   void name(char *func_line, type *base, ssize_t num_elements,                 \
-            int (*compare)(type * a, type * b, void *arg),                     \
+            int (*compare)(const type *a, const type *b, void *arg),           \
             void (*print_element)(type * el, void *arg), void *arg) {          \
     type *ep = base + num_elements;                                            \
     base++;                                                                    \
     int n;                                                                     \
     while (base < ep) {                                                        \
-      n = compare(base - 1, base, arg);                                        \
+      n = compare((const type *)base - 1, (const type *)base, arg);            \
       if (n > 0) {                                                             \
         if (func_line)                                                         \
           printf("%s ", func_line);                                            \

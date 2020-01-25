@@ -183,7 +183,7 @@ static inline char *ac_json_value(ac_json_t *j) {
     return NULL;
 }
 
-static inline int ac_jsono_compare(char *key, ac_jsono_t **o) {
+static inline int ac_jsono_compare(const char *key, const ac_jsono_t **o) {
   return strcmp(key, (*o)->key);
 }
 
@@ -191,7 +191,8 @@ static inline int ac_jsono_compare2(const char *key, const ac_jsono_t *o) {
   return strcmp(key, o->key);
 }
 
-static inline int ac_jsono_insert_compare(ac_jsono_t *a, ac_jsono_t *b) {
+static inline int ac_jsono_insert_compare(const ac_jsono_t *a,
+                                          const ac_jsono_t *b) {
   return strcmp(a->key, b->key);
 }
 
@@ -439,7 +440,7 @@ static inline ac_json_t *ac_jsono_get(ac_json_t *j, const char *key) {
       return NULL;
   }
   ac_jsono_t **res =
-      __ac_json_search((char *)key, (ac_jsono_t **)o->root, o->num_entries);
+      __ac_json_search(key, (const ac_jsono_t **)o->root, o->num_entries);
   if (res) {
     ac_jsono_t *r = *res;
     if (r)

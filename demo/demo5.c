@@ -46,7 +46,7 @@ static inline int compare_name_partial(const char *a, const name_t *b) {
 ac_map_lower_bound_m(name_lower_bound, char, name_t, compare_name_partial);
 ac_map_upper_bound_m(name_upper_bound, char, name_t, compare_name_partial);
 
-static inline int compare_name_for_sort(name_t **a, name_t **b) {
+static inline int compare_name_for_sort(const name_t **a, const name_t **b) {
   return strcmp(get_name(*a), get_name(*b));
 }
 
@@ -58,17 +58,19 @@ You can alternatively use a macro for ac_sort_m if needed
 ac_sort_m(name_sort, name_t *, compare_name_defined);
 */
 
-static inline int reverse_compare_name_for_sort(name_t **a, name_t **b) {
+static inline int reverse_compare_name_for_sort(const name_t **a,
+                                                const name_t **b) {
   return -strcmp(get_name(*a), get_name(*b));
 }
 
 ac_sort_m(name_reverse, name_t *, reverse_compare_name_for_sort);
 
-static inline int compare_name_for_search(char *a, name_t **b) {
+static inline int compare_name_for_search(const char *a, const name_t **b) {
   return strcmp(a, get_name(*b));
 }
 
-static inline int compare_partial_name_for_search(char *a, name_t **b) {
+static inline int compare_partial_name_for_search(const char *a,
+                                                  const name_t **b) {
   return strncmp(a, get_name(*b), strlen(a));
 }
 
@@ -276,27 +278,27 @@ int main(int argc, char *argv[]) {
 
   for (int i = 1; i < argc; i++) {
     printf("ac_search_m: %s\n", argv[i]);
-    name_t **n = name_search(argv[i], names, num_names);
+    name_t **n = name_search(argv[i], (const name_t **)names, num_names);
     if (n)
       print_search_context(n, names, num_names);
 
     printf("ac_search_least_m: %s\n", argv[i]);
-    n = name_search_least(argv[i], names, num_names);
+    n = name_search_least(argv[i], (const name_t **)names, num_names);
     if (n)
       print_search_context(n, names, num_names);
 
     printf("ac_search_greatest_m: %s\n", argv[i]);
-    n = name_search_greatest(argv[i], names, num_names);
+    n = name_search_greatest(argv[i], (const name_t **)names, num_names);
     if (n)
       print_search_context(n, names, num_names);
 
     printf("ac_search_lower_bound_m: %s\n", argv[i]);
-    n = name_search_lower_bound(argv[i], names, num_names);
+    n = name_search_lower_bound(argv[i], (const name_t **)names, num_names);
     if (n)
       print_search_context(n, names, num_names);
 
     printf("ac_search_upper_bound_m: %s\n", argv[i]);
-    n = name_search_upper_bound(argv[i], names, num_names);
+    n = name_search_upper_bound(argv[i], (const name_t **)names, num_names);
     if (n)
       print_search_context(n, names, num_names);
   }

@@ -8,7 +8,8 @@
 #include <string.h>
 #include <unistd.h>
 
-int compare_strings(ac_io_record_t *a, ac_io_record_t *b, void *tag) {
+int compare_strings(const ac_io_record_t *a, const ac_io_record_t *b,
+                    void *tag) {
   return strcmp(a->record, b->record);
 }
 

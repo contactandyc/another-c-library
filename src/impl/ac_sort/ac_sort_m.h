@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#define ac_sort_def(name, type) void name(type *base, size_t num_elements);
+
 // extra space
 #define ac_sort_m(name, type, compare)                                         \
   void name(type *base, size_t num_elements) {                                 \
@@ -35,7 +37,7 @@ limitations under the License.
       high = e = base + num_elements - 1;                                      \
       pivot = num_elements >> 1;                                               \
       c = a + pivot;                                                           \
-      if (compare(e, a) < 0) {                                                 \
+      if (compare((const type *)e, (const type *)a) < 0) {                     \
         b = a;                                                                 \
         a = e;                                                                 \
         e = b;                                                                 \
@@ -50,46 +52,48 @@ limitations under the License.
         pivot = 1;                                                             \
       }                                                                        \
                                                                                \
-      if (compare(d, c) < 0) {                                                 \
+      if (compare((const type *)d, (const type *)c) < 0) {                     \
         pivot = 0;                                                             \
-        if (compare(e, d) < 0) {                                               \
+        if (compare((const type *)e, (const type *)d) < 0) {                   \
           sort_swap(c, e);                                                     \
         } else {                                                               \
           sort_swap(c, d);                                                     \
         }                                                                      \
-      } else if (compare(e, c) < 0) {                                          \
+      } else if (compare((const type *)e, (const type *)c) < 0) {              \
         pivot = 0;                                                             \
         sort_swap(c, e);                                                       \
       }                                                                        \
-      if (compare(c, a) < 0) {                                                 \
+      if (compare((const type *)c, (const type *)a) < 0) {                     \
         pivot = 0;                                                             \
         sort_swap(a, c);                                                       \
-        if (compare(d, c) < 0) {                                               \
-          if (compare(e, d) < 0) {                                             \
+        if (compare((const type *)d, (const type *)c) < 0) {                   \
+          if (compare((const type *)e, (const type *)d) < 0) {                 \
             sort_swap(c, e);                                                   \
           } else {                                                             \
             sort_swap(c, d);                                                   \
           }                                                                    \
-        } else if (compare(e, c) < 0) {                                        \
+        } else if (compare((const type *)e, (const type *)c) < 0) {            \
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
-      if (compare(c, b) < 0) {                                                 \
+      if (compare((const type *)c, (const type *)b) < 0) {                     \
         pivot = 0;                                                             \
         sort_swap(b, c);                                                       \
-        if (compare(d, c) < 0) {                                               \
-          if (compare(e, d) < 0) {                                             \
+        if (compare((const type *)d, (const type *)c) < 0) {                   \
+          if (compare((const type *)e, (const type *)d) < 0) {                 \
             sort_swap(c, e);                                                   \
           } else {                                                             \
             sort_swap(c, d);                                                   \
           }                                                                    \
-        } else if (compare(e, c) < 0) {                                        \
+        } else if (compare((const type *)e, (const type *)c) < 0) {            \
           sort_swap(c, e);                                                     \
         }                                                                      \
       }                                                                        \
                                                                                \
-      if (!pivot || compare(b, a) < 0 || compare(c, b) < 0 ||                  \
-          compare(d, c) < 0 || compare(e, d) < 0) {                            \
+      if (!pivot || compare((const type *)b, (const type *)a) < 0 ||           \
+          compare((const type *)c, (const type *)b) < 0 ||                     \
+          compare((const type *)d, (const type *)c) < 0 ||                     \
+          compare((const type *)e, (const type *)d) < 0) {                     \
         if (e < a) {                                                           \
           mid = a;                                                             \
           a = e;                                                               \
@@ -108,7 +112,7 @@ limitations under the License.
         if (pivot == 1) {                                                      \
           mid = a + 1;                                                         \
           while (a < e) {                                                      \
-            if (compare(mid, a) < 0)                                           \
+            if (compare((const type *)mid, (const type *)a) < 0)               \
               break;                                                           \
             a++;                                                               \
             mid++;                                                             \
@@ -117,7 +121,7 @@ limitations under the License.
             return;                                                            \
           sort_swap(a, mid);                                                   \
           if (a < c) {                                                         \
-            if (compare(c, a) < 0) {                                           \
+            if (compare((const type *)c, (const type *)a) < 0) {               \
               sort_swap(c, a);                                                 \
             }                                                                  \
             sort_swap(d, e - 1);                                               \
@@ -141,7 +145,7 @@ limitations under the License.
           mid = e - 1;                                                         \
           high = e;                                                            \
           while (mid > a) {                                                    \
-            if (compare(mid, high) < 0)                                        \
+            if (compare((const type *)mid, (const type *)high) < 0)            \
               break;                                                           \
             high--;                                                            \
             mid--;                                                             \
@@ -167,9 +171,9 @@ limitations under the License.
                                                                                \
       e = c;                                                                   \
       while (1) {                                                              \
-        while (compare(b, c) < 0)                                              \
+        while (compare((const type *)b, (const type *)c) < 0)                  \
           b++;                                                                 \
-        while (compare(c, d) < 0)                                              \
+        while (compare((const type *)c, (const type *)d) < 0)                  \
           d--;                                                                 \
         if (b < d) {                                                           \
           sort_swap(b, d);                                                     \
@@ -194,9 +198,10 @@ limitations under the License.
         pivot = c - a;                                                         \
       }                                                                        \
       if ((pivot << 1) < num_elements) {                                       \
-        if (pivot == 0 && !(compare(base, base + 1))) {                        \
+        if (pivot == 0 &&                                                      \
+            !(compare((const type *)base, (const type *)base + 1))) {          \
           a = base + 2;                                                        \
-          while (a <= high && !(compare(base, a)))                             \
+          while (a <= high && !(compare((const type *)base, (const type *)a))) \
             a++;                                                               \
           num_elements -= (a - base);                                          \
           base = a;                                                            \
@@ -219,41 +224,44 @@ limitations under the License.
       if (num_elements < 40) {                                                 \
         if (num_elements < 6) {                                                \
           if (num_elements == 2) {                                             \
-            if (compare(base + 1, base) < 0) {                                 \
+            if (compare((const type *)base + 1, (const type *)base) < 0) {     \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
           } else if (num_elements == 3) {                                      \
-            if (compare(base + 1, base) < 0) {                                 \
+            if (compare((const type *)base + 1, (const type *)base) < 0) {     \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
-            if (compare(base + 2, base + 1) < 0) {                             \
+            if (compare((const type *)base + 2, (const type *)base + 1) < 0) { \
               sort_swap(base + 1, base + 2);                                   \
-              if (compare(base + 1, base) < 0) {                               \
+              if (compare((const type *)base + 1, (const type *)base) < 0) {   \
                 sort_swap(base, base + 1);                                     \
               }                                                                \
             }                                                                  \
           } else if (num_elements == 4) {                                      \
-            if (compare(base + 1, base) < 0) {                                 \
+            if (compare((const type *)base + 1, (const type *)base) < 0) {     \
               sort_swap(base, base + 1);                                       \
             }                                                                  \
-            if (compare(base + 3, base + 2) < 0) {                             \
+            if (compare((const type *)base + 3, (const type *)base + 2) < 0) { \
               sort_swap(base + 2, base + 3);                                   \
             }                                                                  \
-            if (compare(base + 2, base) < 0) {                                 \
-              if (compare(base + 3, base) < 0) {                               \
+            if (compare((const type *)base + 2, (const type *)base) < 0) {     \
+              if (compare((const type *)base + 3, (const type *)base) < 0) {   \
                 sort_swap(base, base + 2);                                     \
                 sort_swap(base + 1, base + 3);                                 \
               } else {                                                         \
                 sort_swap(base, base + 1);                                     \
                 sort_swap(base + 0, base + 2);                                 \
-                if (compare(base + 3, base + 2) < 0) {                         \
+                if (compare((const type *)base + 3, (const type *)base + 2) <  \
+                    0) {                                                       \
                   sort_swap(base + 2, base + 3);                               \
                 }                                                              \
               }                                                                \
             } else {                                                           \
-              if (compare(base + 2, base + 1) < 0) {                           \
+              if (compare((const type *)base + 2, (const type *)base + 1) <    \
+                  0) {                                                         \
                 sort_swap(base + 1, base + 2);                                 \
-                if (compare(base + 3, base + 2) < 0) {                         \
+                if (compare((const type *)base + 3, (const type *)base + 2) <  \
+                    0) {                                                       \
                   sort_swap(base + 2, base + 3);                               \
                 }                                                              \
               }                                                                \
@@ -265,48 +273,48 @@ limitations under the License.
             d = c + 1;                                                         \
             e = d + 1;                                                         \
                                                                                \
-            if (compare(d, c) < 0) {                                           \
+            if (compare((const type *)d, (const type *)c) < 0) {               \
               pivot = 0;                                                       \
-              if (compare(e, d) < 0) {                                         \
+              if (compare((const type *)e, (const type *)d) < 0) {             \
                 sort_swap(c, e);                                               \
               } else {                                                         \
                 sort_swap(c, d);                                               \
               }                                                                \
-            } else if (compare(e, c) < 0) {                                    \
+            } else if (compare((const type *)e, (const type *)c) < 0) {        \
               pivot = 0;                                                       \
               sort_swap(c, e);                                                 \
             }                                                                  \
-            if (compare(c, a) < 0) {                                           \
+            if (compare((const type *)c, (const type *)a) < 0) {               \
               pivot = 0;                                                       \
               sort_swap(a, c);                                                 \
-              if (compare(d, c) < 0) {                                         \
-                if (compare(e, d) < 0) {                                       \
+              if (compare((const type *)d, (const type *)c) < 0) {             \
+                if (compare((const type *)e, (const type *)d) < 0) {           \
                   sort_swap(c, e);                                             \
                 } else {                                                       \
                   sort_swap(c, d);                                             \
                 }                                                              \
-              } else if (compare(e, c) < 0) {                                  \
+              } else if (compare((const type *)e, (const type *)c) < 0) {      \
                 sort_swap(c, e);                                               \
               }                                                                \
             }                                                                  \
-            if (compare(c, b) < 0) {                                           \
+            if (compare((const type *)c, (const type *)b) < 0) {               \
               pivot = 0;                                                       \
               sort_swap(b, c);                                                 \
-              if (compare(d, c) < 0) {                                         \
-                if (compare(e, d) < 0) {                                       \
+              if (compare((const type *)d, (const type *)c) < 0) {             \
+                if (compare((const type *)e, (const type *)d) < 0) {           \
                   sort_swap(c, e);                                             \
                 } else {                                                       \
                   sort_swap(c, d);                                             \
                 }                                                              \
-              } else if (compare(e, c) < 0) {                                  \
+              } else if (compare((const type *)e, (const type *)c) < 0) {      \
                 sort_swap(c, e);                                               \
               }                                                                \
             }                                                                  \
                                                                                \
-            if (compare(b, a) < 0) {                                           \
+            if (compare((const type *)b, (const type *)a) < 0) {               \
               sort_swap(a, b);                                                 \
             }                                                                  \
-            if (compare(e, d) < 0) {                                           \
+            if (compare((const type *)e, (const type *)d) < 0) {               \
               sort_swap(d, e);                                                 \
             }                                                                  \
           }                                                                    \
@@ -318,11 +326,11 @@ limitations under the License.
         } else {                                                               \
           mid = base + (num_elements >> 1);                                    \
           high = base + (num_elements - 1);                                    \
-          if (compare(mid, base) < 0) {                                        \
+          if (compare((const type *)mid, (const type *)base) < 0) {            \
             sort_swap(base, mid);                                              \
           }                                                                    \
-          if (compare(high, mid) < 0) {                                        \
-            if (compare(high, base) < 0) {                                     \
+          if (compare((const type *)high, (const type *)mid) < 0) {            \
+            if (compare((const type *)high, (const type *)base) < 0) {         \
               sort_swap(base, high);                                           \
             }                                                                  \
           } else {                                                             \
@@ -330,7 +338,7 @@ limitations under the License.
           }                                                                    \
           a = b = base;                                                        \
           while (a < high) {                                                   \
-            if (compare(a, high) < 0) {                                        \
+            if (compare((const type *)a, (const type *)high) < 0) {            \
               sort_swap(a, b);                                                 \
               b++;                                                             \
             }                                                                  \
@@ -339,9 +347,11 @@ limitations under the License.
           sort_swap(b, high);                                                  \
           pivot = b - base;                                                    \
           if ((pivot << 1) < num_elements) {                                   \
-            if (pivot == 0 && !(compare(base, base + 1))) {                    \
+            if (pivot == 0 &&                                                  \
+                !(compare((const type *)base, (const type *)base + 1))) {      \
               a = base + 2;                                                    \
-              while (a <= high && !(compare(base, a)))                         \
+              while (a <= high &&                                              \
+                     !(compare((const type *)base, (const type *)a)))          \
                 a++;                                                           \
               num_elements -= (a - base);                                      \
               base = a;                                                        \
@@ -364,12 +374,12 @@ limitations under the License.
         high = e = base + num_elements - 1;                                    \
         pivot = num_elements >> 1;                                             \
         c = a + pivot;                                                         \
-        if (compare(c, a) < 0) {                                               \
+        if (compare((const type *)c, (const type *)a) < 0) {                   \
           sort_swap(c, a);                                                     \
         }                                                                      \
-        if (compare(e, c) < 0) {                                               \
+        if (compare((const type *)e, (const type *)c) < 0) {                   \
           sort_swap(e, c);                                                     \
-          if (compare(c, a) < 0) {                                             \
+          if (compare((const type *)c, (const type *)a) < 0) {                 \
             sort_swap(c, a);                                                   \
           }                                                                    \
         }                                                                      \
@@ -378,9 +388,9 @@ limitations under the License.
         d = e - 1;                                                             \
         e = c;                                                                 \
         while (1) {                                                            \
-          while (compare(b, c) < 0)                                            \
+          while (compare((const type *)b, (const type *)c) < 0)                \
             b++;                                                               \
-          while (compare(c, d) < 0)                                            \
+          while (compare((const type *)c, (const type *)d) < 0)                \
             d--;                                                               \
           if (b < d) {                                                         \
             sort_swap(b, d);                                                   \
@@ -405,9 +415,11 @@ limitations under the License.
           pivot = c - a;                                                       \
         }                                                                      \
         if ((pivot << 1) < num_elements) {                                     \
-          if (pivot == 0 && !(compare(base, base + 1))) {                      \
+          if (pivot == 0 &&                                                    \
+              !(compare((const type *)base, (const type *)base + 1))) {        \
             a = base + 2;                                                      \
-            while (a <= high && !(compare(base, a)))                           \
+            while (a <= high &&                                                \
+                   !(compare((const type *)base, (const type *)a)))            \
               a++;                                                             \
             num_elements -= (a - base);                                        \
             base = a;                                                          \

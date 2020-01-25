@@ -48,7 +48,8 @@ ac_sort_compare_arg_def(ac_io_sort_records, ac_io_record_t);
 typedef bool (*ac_io_reducer_f)(ac_io_record_t *res, const ac_io_record_t *r,
                                 size_t num_r, ac_buffer_t *bh, void *tag);
 
-typedef int (*ac_io_compare_f)(ac_io_record_t *, ac_io_record_t *, void *tag);
+typedef int (*ac_io_compare_f)(const ac_io_record_t *, const ac_io_record_t *,
+                               void *tag);
 
 typedef size_t (*ac_io_partition_f)(const ac_io_record_t *r, size_t num_part,
                                     void *tag);

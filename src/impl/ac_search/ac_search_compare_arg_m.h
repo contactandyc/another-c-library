@@ -15,20 +15,22 @@ limitations under the License.
 */
 
 #define ac_search_compare_arg_def(name, keytype, datatype)                     \
-  datatype *name(keytype *p, datatype *base, size_t num_elements,              \
-                 int compare(keytype *key, datatype *value, void *arg),        \
-                 void *arg);
+  datatype *name(                                                              \
+      const keytype *p, const datatype *base, size_t num_elements,             \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg);
 
-#define ac_search_compare_arg_m(name, keytype, datatype, compare)              \
-  datatype *name(keytype *p, datatype *base, size_t num_elements,              \
-                 int compare(keytype *key, datatype *value, void *arg),        \
-                 void *arg) {                                                  \
-    datatype *low = base;                                                      \
-    datatype *high = base + num_elements;                                      \
+#define ac_search_compare_arg_m(name, keytype, datatype)                       \
+  datatype *name(                                                              \
+      const keytype *p, const datatype *base, size_t num_elements,             \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
+    datatype *low = (datatype *)base;                                          \
+    datatype *high = (datatype *)base + num_elements;                          \
     datatype *mid;                                                             \
     while (low < high) {                                                       \
       mid = low + ((high - low) >> 1);                                         \
-      int n = compare(p, mid, arg);                                            \
+      int n = compare((const keytype *)p, (const datatype *)mid, arg);         \
       if (n > 0)                                                               \
         low = mid + 1;                                                         \
       else if (n < 0)                                                          \
@@ -39,41 +41,43 @@ limitations under the License.
     return NULL;                                                               \
   }
 
-#define ac_search_least_compare_arg_m(name, keytype, datatype, compare)        \
-  datatype *name(keytype *p, datatype *base, size_t num_elements,              \
-                 int compare(keytype *key, datatype *value, void *arg),        \
-                 void *arg) {                                                  \
+#define ac_search_least_compare_arg_m(name, keytype, datatype)                 \
+  datatype *name(                                                              \
+      const keytype *p, const datatype *base, size_t num_elements,             \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     if (!num_elements)                                                         \
       return NULL;                                                             \
-    datatype *low = base;                                                      \
-    datatype *high = base + num_elements;                                      \
+    datatype *low = (datatype *)base;                                          \
+    datatype *high = (datatype *)base + num_elements;                          \
     datatype *mid;                                                             \
     while (low < high) {                                                       \
       mid = low + ((high - low) >> 1);                                         \
-      int n = compare(p, mid, arg);                                            \
+      int n = compare((const keytype *)p, (const datatype *)mid, arg);         \
       if (n > 0)                                                               \
         low = mid + 1;                                                         \
       else                                                                     \
         high = mid;                                                            \
     }                                                                          \
-    if (!compare(p, low, arg))                                                 \
+    if (!compare((const keytype *)p, (const datatype *)low, arg))              \
       return low;                                                              \
     return NULL;                                                               \
   }
 
-#define ac_search_greatest_compare_arg_m(name, keytype, datatype, compare)     \
-  datatype *name(keytype *p, datatype *base, size_t num_elements,              \
-                 int compare(keytype *key, datatype *value, void *arg),        \
-                 void *arg) {                                                  \
+#define ac_search_greatest_compare_arg_m(name, keytype, datatype)              \
+  datatype *name(                                                              \
+      const keytype *p, const datatype *base, size_t num_elements,             \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
     if (!num_elements)                                                         \
       return NULL;                                                             \
-    datatype *low = base;                                                      \
-    datatype *high = base + num_elements;                                      \
+    datatype *low = (datatype *)base;                                          \
+    datatype *high = (datatype *)base + num_elements;                          \
     datatype *mid;                                                             \
     datatype *res = low;                                                       \
     while (low < high) {                                                       \
       mid = low + ((high - low) >> 1);                                         \
-      int n = compare(p, mid, arg);                                            \
+      int n = compare((const keytype *)p, (const datatype *)mid, arg);         \
       if (n < 0)                                                               \
         high = mid;                                                            \
       else {                                                                   \
@@ -81,21 +85,22 @@ limitations under the License.
         low = mid + 1;                                                         \
       }                                                                        \
     }                                                                          \
-    if (!compare(p, res, arg))                                                 \
+    if (!compare((const keytype *)p, (const datatype *)res, arg))              \
       return res;                                                              \
     return NULL;                                                               \
   }
 
-#define ac_search_lower_bound_compare_arg_m(name, keytype, datatype, compare)  \
-  datatype *name(keytype *p, datatype *base, size_t num_elements,              \
-                 int compare(keytype *key, datatype *value, void *arg),        \
-                 void *arg) {                                                  \
-    datatype *low = base;                                                      \
-    datatype *high = base + num_elements;                                      \
+#define ac_search_lower_bound_compare_arg_m(name, keytype, datatype)           \
+  datatype *name(                                                              \
+      const keytype *p, const datatype *base, size_t num_elements,             \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
+    datatype *low = (datatype *)base;                                          \
+    datatype *high = (datatype *)base + num_elements;                          \
     datatype *mid;                                                             \
     while (low < high) {                                                       \
       mid = low + ((high - low) >> 1);                                         \
-      int n = compare(p, mid, arg);                                            \
+      int n = compare((const keytype *)p, (const datatype *)mid, arg);         \
       if (n > 0)                                                               \
         low = mid + 1;                                                         \
       else                                                                     \
@@ -104,16 +109,17 @@ limitations under the License.
     return low;                                                                \
   }
 
-#define ac_search_upper_bound_compare_arg_m(name, keytype, datatype, compare)  \
-  datatype *name(keytype *p, datatype *base, size_t num_elements,              \
-                 int compare(keytype *key, datatype *value, void *arg),        \
-                 void *arg) {                                                  \
-    datatype *low = base;                                                      \
-    datatype *high = base + num_elements;                                      \
+#define ac_search_upper_bound_compare_arg_m(name, keytype, datatype)           \
+  datatype *name(                                                              \
+      const keytype *p, const datatype *base, size_t num_elements,             \
+      int compare(const keytype *key, const datatype *value, void *arg),       \
+      void *arg) {                                                             \
+    datatype *low = (datatype *)base;                                          \
+    datatype *high = (datatype *)base + num_elements;                          \
     datatype *mid;                                                             \
     while (low < high) {                                                       \
       mid = low + ((high - low) >> 1);                                         \
-      int n = compare(p, mid, arg);                                            \
+      int n = compare((const keytype *)p, (const datatype *)mid, arg);         \
       if (n < 0)                                                               \
         high = mid;                                                            \
       else                                                                     \

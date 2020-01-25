@@ -29,19 +29,6 @@ typedef struct {
   ssize_t num_elements;
 } sort_stack_t;
 
-#define ac_sort_def(name, type) void name(type *base, size_t num_elements);
-
-#define ac_sort_arg_def(name, type)                                            \
-  void name(type *base, size_t num_elements, void *arg);
-
-#define ac_sort_compare_def(name, type)                                        \
-  void name(type *base, size_t num_elements,                                   \
-            int (*compare)(type * a, type * b));
-
-#define ac_sort_compare_arg_def(name, type)                                    \
-  void name(type *base, size_t num_elements,                                   \
-            int (*compare)(type * a, type * b, void *arg), void *arg);
-
 #include "ac_sort/ac_sort_arg_m.h"
 #include "ac_sort/ac_sort_compare_arg_m.h"
 #include "ac_sort/ac_sort_compare_m.h"

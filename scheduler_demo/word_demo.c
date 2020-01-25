@@ -52,7 +52,8 @@ void write_words(ac_worker_t *w, ac_io_record_t *r, ac_out_t **outs) {
 }
 
 /* In order to find word frequency, words need to be first sorted together. */
-int compare_words(ac_io_record_t *p1, ac_io_record_t *p2, void *arg) {
+int compare_words(const ac_io_record_t *p1, const ac_io_record_t *p2,
+                  void *arg) {
   char *a = p1->record + sizeof(uint32_t);
   char *b = p2->record + sizeof(uint32_t);
   return strcmp(a, b);
@@ -75,7 +76,8 @@ bool reduce_word_count(ac_io_record_t *res, const ac_io_record_t *r,
 }
 
 /* To sort words by descending frequency. */
-int compare_word_freq(ac_io_record_t *p1, ac_io_record_t *p2, void *arg) {
+int compare_word_freq(const ac_io_record_t *p1, const ac_io_record_t *p2,
+                      void *arg) {
   uint32_t f1 = (*(uint32_t *)p1->record);
   uint32_t f2 = (*(uint32_t *)p2->record);
   if (f1 != f2)
