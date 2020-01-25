@@ -38,9 +38,10 @@ int main(int argc, char *argv[]) {
 
   double speed =
       ((parse_total_bytes * 1.0) / parse_total_seconds) / (1024.0 * 1024.0);
-  printf("overall parse speed: %0.3fMB/sec\n", speed);
-  speed = ((dump_total_bytes * 1.0) / dump_total_seconds) / (1024.0 * 1024.0);
-  printf("overall dump speed: %0.3fMB/sec\n", speed);
+  double speed2 = ((dump_total_bytes * 1.0) / dump_total_seconds) / (1024.0 * 1024.0);
+  printf("aParse Speed (MB/sec)\tzoverall\trapidjson\t%0.0f\n", speed);
+  printf("bDump Speed (MB/sec)\tzoverall\trapidjson\t%0.0f\n", speed);
+  // printf("overall\t%0.3fMB/sec\t%0.3fMB/sec\n", speed, speed2);
   return 0;
 }
 
@@ -82,10 +83,13 @@ bool do_test(size_t repeat, const char *filename) {
   parse_total_bytes = parse_total_bytes + bytes;
 
   if (repeat > 1) {
-    if(for_web)
-      printf("parsing %s: %0.0f MB/sec\n",
+    if(for_web) {
+      printf("aParse Speed (MB/sec)\ta%s\trapidjson\t%0.0f\n", filename, bytes_per_second / (1024.0*1024.0));
+
+      /*printf("%s\t%0.0f MB/sec",
              filename,
-             bytes_per_second / (1024.0 * 1024.0));
+             bytes_per_second / (1024.0 * 1024.0));*/
+    }
     else {
       printf("parsing %s(%lu): %0.0f MB/sec, %0.3fms per parse\n",
              filename, bytes,
@@ -121,10 +125,12 @@ bool do_test(size_t repeat, const char *filename) {
   dump_total_bytes = dump_total_bytes + buffer.GetSize();
 
   if (repeat > 1) {
-    if(for_web)
-      printf("dumping %s: %0.0f MB/sec\n",
-             filename,
-             bytes_per_second / (1024.0 * 1024.0));
+    if(for_web) {
+      printf("bDump Speed (MB/sec)\ta%s\trapidjson\t%0.0f\n", filename, bytes_per_second / (1024.0*1024.0));
+
+    //  printf("\t%0.0f MB/sec\n",
+    //         bytes_per_second / (1024.0 * 1024.0));
+    }
     else
       printf("dumping %s(%lu): %0.0f MB/sec, %0.3fms per dump\n",
              filename, buffer.GetSize(),

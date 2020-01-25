@@ -44,9 +44,10 @@ int main(int argc, char *argv[]) {
     do_test(repeat, argv[i]);
   double speed =
       ((parse_total_bytes * 1.0) / parse_total_seconds) / (1024.0 * 1024.0);
-  printf("overall parse speed: %0.3fMB/sec\n", speed);
-  speed = ((dump_total_bytes * 1.0) / dump_total_seconds) / (1024.0 * 1024.0);
-  printf("overall dump speed: %0.3fMB/sec\n", speed);
+  double speed2 =
+      ((dump_total_bytes * 1.0) / dump_total_seconds) / (1024.0 * 1024.0);
+  printf("aParse Speed (MB/sec)\tzoverall\tac_json\t%0.0f\n", speed);
+  printf("bDump Speed (MB/sec)\tzoverall\tac_json\t%0.0f\n", speed);
   return 0;
 }
 
@@ -91,7 +92,7 @@ bool do_test(size_t repeat, const char *filename) {
 
   if (repeat > 1) {
     if (for_web)
-      printf("parsing %s(%lu): %0.0f MB/sec\n", filename, bytes,
+      printf("aParse Speed (MB/sec)\ta%s\tac_json\t%0.0f\n", filename,
              bytes_per_second / (1024.0 * 1024.0));
     else
       printf("parsing %s(%lu): %0.0f MB/sec, %0.3fms per parse\n", filename,
@@ -118,7 +119,7 @@ bool do_test(size_t repeat, const char *filename) {
 
   if (repeat > 1) {
     if (for_web)
-      printf("dumping %s(%lu): %0.0f MB/sec\n", filename, ac_buffer_length(bh),
+      printf("bDump Speed (MB/sec)\ta%s\tac_json\t%0.0f\n", filename,
              bytes_per_second / (1024.0 * 1024.0));
     else
       printf("dumping %s(%lu): %0.0f MB/sec, %0.3fms per dump\n", filename,

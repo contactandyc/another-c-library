@@ -62,29 +62,18 @@ function IndexPage() {
       <div className="Flex Index-mn">
         <div className="Index-cd-alt">
         demo/json $ make<br/>
-        Testing ac_json<br/>
-        ./ac_json_test --web 500 *.json<br/>
-        parsing canada.json(2251051): 1451 MB/sec<br/>
-        dumping canada.json(2251027): 1241 MB/sec<br/>
-        parsing citm_catalog.json(1727204): 1268 MB/sec<br/>
-        dumping citm_catalog.json(500299): 617 MB/sec<br/>
-        parsing twitter.json(631514): 1026 MB/sec<br/>
-        dumping twitter.json(466906): 1093 MB/sec<br/>
-        overall parse speed: 1306.384MB/sec<br/>
-        overall dump speed: 1054.435MB/sec<br/>
+        Parse Speed (MB/sec)   ac_json  rapidjson   % gain<br/>
+        canada.json               1222        374  226.738%<br/>
+        citm_catalog.json         1145        943  21.421%<br/>
+        twitter.json              1000        543  84.162%<br/>
+        overall                   1158        511  126.614%<br/>
         <br/>
-        Testing RapidJSON<br/>
-        ./rapidjson_test --web 500 *.json<br/>
-        parsing canada.json: 394 MB/sec<br/>
-        dumping canada.json: 189 MB/sec<br/>
-        parsing citm_catalog.json: 934 MB/sec<br/>
-        dumping citm_catalog.json: 359 MB/sec<br/>
-        parsing twitter.json: 547 MB/sec<br/>
-        dumping twitter.json: 456 MB/sec<br/>
-        overall parse speed: 528.975MB/sec<br/>
-        overall dump speed: 227.614MB/sec<br/>
-        <br/>
-        </div>
+        Dump Speed (MB/sec)    ac_json  rapidjson   % gain<br/>
+        canada.json               1192        187  537.433%<br/>
+        citm_catalog.json          591        338  74.852%<br/>
+        twitter.json              1094        462  136.797%<br/>
+        overall                   1158        511  126.614%<br/>
+                </div>
         <div className="Index-mn-cnt">
           <h2 className="Index-h2-alt">JSON Parsing...Parsed.</h2>
           <h3 className="Index-h3-alt">Build lightning-fast services with AC's

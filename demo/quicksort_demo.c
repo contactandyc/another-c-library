@@ -121,22 +121,6 @@ int main(int argc, char *argv[]) {
   run_test("Reverse test...", base, num_elements, type);
 
   for (i = 0; i < num_elements; i++)
-    base[i] = i;
-  pos = (num_elements >> 3);
-  tmp = base[pos];
-  base[pos] = base[pos + 1];
-  base[pos + 1] = tmp;
-  run_test("Slightly out of ordered test1...", base, num_elements, type);
-
-  for (i = 0; i < num_elements; i++)
-    base[i] = i;
-  pos = (num_elements >> 3) * 2;
-  tmp = base[pos];
-  base[pos] = base[pos + 1];
-  base[pos + 1] = tmp;
-  run_test("Slightly out of ordered test2...", base, num_elements, type);
-
-  for (i = 0; i < num_elements; i++)
     base[i] = rand();
   run_test("Random test...", base, num_elements, type);
   return 0;
