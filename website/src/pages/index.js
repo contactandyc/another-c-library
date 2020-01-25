@@ -33,10 +33,10 @@ function IndexPage() {
         <div className="Index-cd-alt">
         demo/sort $ make<br/>
         Ordered test (time in microseconds)<br/>
-        items &nbsp; &nbsp; &nbsp;ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; % gain<br/>
-         &nbsp; &nbsp; 100 &nbsp; &nbsp; &nbsp; 0.059 &nbsp; &nbsp; &nbsp; 0.472 &nbsp; 700.000%<br/>
-         &nbsp; 10000 &nbsp; &nbsp; &nbsp; 4.693 &nbsp; &nbsp; &nbsp;38.601 &nbsp; 722.523%<br/>
-        1000000 &nbsp; &nbsp; 573.590 &nbsp; &nbsp;3929.820 &nbsp; 585.127%<br/>
+        items &nbsp; &nbsp; &nbsp; &nbsp;ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; % gain<br/>
+         &nbsp; &nbsp; &nbsp;&nbsp;100 &nbsp; &nbsp; &nbsp; 0.059 &nbsp; &nbsp; &nbsp; 0.472 &nbsp; 700.000%<br/>
+         &nbsp; &nbsp;10,000 &nbsp; &nbsp; &nbsp; 4.693 &nbsp; &nbsp; &nbsp;38.601 &nbsp; 722.523%<br/>
+        1,000,000 &nbsp; &nbsp; 573.590 &nbsp; &nbsp;3929.820 &nbsp; 585.127%<br/>
         <br/>
         Equal test (time in microseconds)<br/>
         items &nbsp; &nbsp; &nbsp;ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; % gain<br/>
