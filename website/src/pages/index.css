@@ -94,7 +94,7 @@ pre {
 }
 
 @media only screen and (max-width: 800px) {
-  nav, .Footer {
+  .Footer {
     flex-direction: column;
   }
   .Grid {
@@ -128,17 +128,13 @@ pre {
   max-width: 1200px;
 }
 
-.Header-a {
-  font-size: 1.25rem;
-  padding: 1rem 1.5rem;
+.Header-a, .Header-p {
+  font-size: calc(1vw + 5px);
+  margin: 2vh 2vw;
 }
 
 .Header-a-actv {
   color: #38A169;
-}
-
-.Header-p {
-  margin: 1rem 1.5rem;
 }
 
 /* index.js */
@@ -204,7 +200,7 @@ pre {
 
 .Index-crsr {
   width: 15px;
-  height: 30px;
+  height: calc(20px + .7vw);
   animation: crsr 1.2s infinite;
   margin-top: 8px;
 }
