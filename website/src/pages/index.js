@@ -27,7 +27,7 @@ function IndexPage() {
         <div className="Index-mn-cnt">
           <h2 className="Index-h2-alt">Quicker Sorting</h2>
           <h3 className="Index-h3-alt">AC's sort algorithm is significantly faster than the standard qsort and the c++ implementation on my mac.  The sort includes an improvement to the algorithm that detects if records are sorted, equal, or reversed at little to no computational cost.  It also takes advantage of hand-unrolling of heap sorts for small arrays. </h3>
-          <Link to="/docs/improving-quicksort">Read More<FaArrowRight style={{ height: "12px" }}/></Link> or &nbsp;
+          <Link to="/docs/ac-sort">Read More<FaArrowRight style={{ height: "12px" }}/></Link> or &nbsp;
           <Link to="/docs/improving-quicksort">See Article on LinkedIn<FaArrowRight style={{ height: "12px" }}/></Link>
         </div>
         <div className="Index-cd-alt">
