@@ -33,27 +33,27 @@ function IndexPage() {
         <div className="Index-cd-alt">
         demo/sort $ make<br/>
         Ordered test (time in microseconds)<br/>
-        items &nbsp; &nbsp; ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; &nbsp; % gain<br/>
-         &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; 0.059 &nbsp; &nbsp; &nbsp; 0.472 &nbsp; 700.000%<br/>
-         &nbsp;10000 &nbsp; &nbsp; &nbsp; 4.693 &nbsp; &nbsp; &nbsp;38.601 &nbsp; 722.523%<br/>
+        items &nbsp; &nbsp; &nbsp;ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; % gain<br/>
+         &nbsp; &nbsp; 100 &nbsp; &nbsp; &nbsp; 0.059 &nbsp; &nbsp; &nbsp; 0.472 &nbsp; 700.000%<br/>
+         &nbsp; 10000 &nbsp; &nbsp; &nbsp; 4.693 &nbsp; &nbsp; &nbsp;38.601 &nbsp; 722.523%<br/>
         1000000 &nbsp; &nbsp; 573.590 &nbsp; &nbsp;3929.820 &nbsp; 585.127%<br/>
         <br/>
         Equal test (time in microseconds)<br/>
-        items &nbsp; &nbsp; ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; &nbsp; % gain<br/>
-         &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; 0.055 &nbsp; &nbsp; &nbsp; 0.287 &nbsp; 421.818%<br/>
-         &nbsp;10000 &nbsp; &nbsp; &nbsp; 4.748 &nbsp; &nbsp; &nbsp;23.796 &nbsp; 401.179%<br/>
+        items &nbsp; &nbsp; &nbsp;ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; % gain<br/>
+         &nbsp; &nbsp; 100 &nbsp; &nbsp; &nbsp; 0.055 &nbsp; &nbsp; &nbsp; 0.287 &nbsp; 421.818%<br/>
+         &nbsp; 10000 &nbsp; &nbsp; &nbsp; 4.748 &nbsp; &nbsp; &nbsp;23.796 &nbsp; 401.179%<br/>
         1000000 &nbsp; &nbsp; 561.310 &nbsp; &nbsp;2630.060 &nbsp; 368.557%<br/>
         <br/>
         Reverse test (time in microseconds)<br/>
-        items &nbsp; &nbsp; ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; &nbsp; % gain<br/>
-         &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; 0.067 &nbsp; &nbsp; &nbsp; 2.021 &nbsp;2916.418%<br/>
-         &nbsp;10000 &nbsp; &nbsp; &nbsp; 5.432 &nbsp; &nbsp; 197.901 &nbsp;3543.244%<br/>
+        items &nbsp; &nbsp; &nbsp;ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; % gain<br/>
+         &nbsp; &nbsp; 100 &nbsp; &nbsp; &nbsp; 0.067 &nbsp; &nbsp; &nbsp; 2.021 &nbsp;2916.418%<br/>
+         &nbsp; 10000 &nbsp; &nbsp; &nbsp; 5.432 &nbsp; &nbsp; 197.901 &nbsp;3543.244%<br/>
         1000000 &nbsp; &nbsp; 881.230 &nbsp; 20139.130 &nbsp;2185.343%<br/>
         <br/>
         Random test (time in microseconds)<br/>
-        items &nbsp; &nbsp; ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; &nbsp; % gain<br/>
-         &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; 0.378 &nbsp; &nbsp; &nbsp; 1.745 &nbsp; 361.640%<br/>
-         &nbsp;10000 &nbsp; &nbsp; 419.474 &nbsp; &nbsp; 789.762 &nbsp; &nbsp;88.274%<br/>
+        items &nbsp; &nbsp; &nbsp;ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; % gain<br/>
+         &nbsp; &nbsp; 100 &nbsp; &nbsp; &nbsp; 0.378 &nbsp; &nbsp; &nbsp; 1.745 &nbsp; 361.640%<br/>
+         &nbsp; 10000 &nbsp; &nbsp; 419.474 &nbsp; &nbsp; 789.762 &nbsp; &nbsp;88.274%<br/>
         1000000 &nbsp; 61285.210 &nbsp;111149.170 &nbsp; &nbsp;81.364%<br/>
         </div>
       </div>
