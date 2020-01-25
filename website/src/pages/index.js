@@ -45,10 +45,10 @@ function IndexPage() {
         1,000,000 &nbsp; &nbsp; 561.310 &nbsp; &nbsp;2,630.060 &nbsp; 368.557%<br/>
         <br/>
         Reverse test (time in microseconds)<br/>
-        items &nbsp; &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; % gain<br/>
-         &nbsp; &nbsp; &nbsp; 100 &nbsp; &nbsp; &nbsp; 0.067 &nbsp; &nbsp; &nbsp; &nbsp;2.021 &nbsp;2916.418%<br/>
-         &nbsp; &nbsp;10000 &nbsp; &nbsp; &nbsp; 5.432 &nbsp; &nbsp; &nbsp;197.901 &nbsp;3543.244%<br/>
-        1,000,000 &nbsp; &nbsp; 881.230 &nbsp; 20,139.130 &nbsp;2185.343%<br/>
+        items &nbsp; &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; &nbsp;% gain<br/>
+         &nbsp; &nbsp; &nbsp; 100 &nbsp; &nbsp; &nbsp; 0.067 &nbsp; &nbsp; &nbsp; &nbsp;2.021 &nbsp;2,916.418%<br/>
+         &nbsp; &nbsp;10000 &nbsp; &nbsp; &nbsp; 5.432 &nbsp; &nbsp; &nbsp;197.901 &nbsp;3,543.244%<br/>
+        1,000,000 &nbsp; &nbsp; 881.230 &nbsp; 20,139.130 &nbsp;2,185.343%<br/>
         <br/>
         Random test (time in microseconds)<br/>
         items &nbsp; &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp;qsort &nbsp; &nbsp; &nbsp; % gain<br/>
