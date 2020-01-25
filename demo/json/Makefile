@@ -23,27 +23,20 @@ twitter.json:
 citm_catalog.json:
 	curl -s "https://raw.githubusercontent.com/serde-rs/json-benchmark/master/data/citm_catalog.json" -o citm_catalog.json
 
-demo: canada.json twitter.json citm_catalog.json
-	@echo Testing ac_json
-	./ac_json_test 500 *.json
-	@echo
-	@echo
-	@echo Testing RapidJSON
-	./rapidjson_test 500 *.json
-	@echo
-	@echo
+demo: ../tools/side_by_side canada.json twitter.json citm_catalog.json
+	@./ac_json_test 500 *.json > ac_json.out
+	@./rapidjson_test 500 *.json > rapidjson.out
+	../tools/side_by_side ac_json.out rapidjson.out
 
-web: canada.json twitter.json citm_catalog.json
-	@echo Testing ac_json
-	./ac_json_test --web 500 *.json
-	@echo
-	@echo Testing RapidJSON
-	./rapidjson_test --web 500 *.json
-	@echo
+../tools/side_by_side: ../tools/side_by_side.c
+	cd ../tools && make && cd -
+
+web:
+	@../tools/side_by_side ac_json.out rapidjson.out | ../tools/webify.sh
 
 
 clean:
-	rm -rf *~ *.dSYM rapidjson_test ac_json_test
+	rm -rf *~ *.dSYM rapidjson_test ac_json_test *.out
 
 distclean: clean
 	rm -rf rapidjson canada.json twitter.json citm_catalog.json

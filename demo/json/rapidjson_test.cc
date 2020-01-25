@@ -21,15 +21,7 @@ size_t dump_total_bytes = 0;
 double parse_total_seconds = 0.0;
 double dump_total_seconds = 0.0;
 
-bool for_web = false;
-
 int main(int argc, char *argv[]) {
-  if(argc > 1 && !strcmp(argv[1], "--web")) {
-    for_web = true;
-    argc--;
-    argv++;
-  }
-
   size_t repeat = 1;
   if (argc < 2 || sscanf(argv[1], "%lu", &repeat) != 1)
     repeat = 1;
@@ -39,8 +31,8 @@ int main(int argc, char *argv[]) {
   double speed =
       ((parse_total_bytes * 1.0) / parse_total_seconds) / (1024.0 * 1024.0);
   double speed2 = ((dump_total_bytes * 1.0) / dump_total_seconds) / (1024.0 * 1024.0);
-  printf("aParse Speed (MB/sec)\tzoverall\trapidjson\t%0.0f\n", speed);
-  printf("bDump Speed (MB/sec)\tzoverall\trapidjson\t%0.0f\n", speed);
+  printf("\taParse Speed (MB/sec)\tzoverall\trapidjson\t%0.0f\n", speed);
+  printf("\tbDump Speed (MB/sec)\tzoverall\trapidjson\t%0.0f\n", speed2);
   // printf("overall\t%0.3fMB/sec\t%0.3fMB/sec\n", speed, speed2);
   return 0;
 }
@@ -83,18 +75,8 @@ bool do_test(size_t repeat, const char *filename) {
   parse_total_bytes = parse_total_bytes + bytes;
 
   if (repeat > 1) {
-    if(for_web) {
-      printf("aParse Speed (MB/sec)\ta%s\trapidjson\t%0.0f\n", filename, bytes_per_second / (1024.0*1024.0));
-
-      /*printf("%s\t%0.0f MB/sec",
-             filename,
-             bytes_per_second / (1024.0 * 1024.0));*/
-    }
-    else {
-      printf("parsing %s(%lu): %0.0f MB/sec, %0.3fms per parse\n",
-             filename, bytes,
-             bytes_per_second / (1024.0 * 1024.0), ac_timer_ms(t2));
-    }
+    printf("\taParse Speed (MB/sec)\ta%s\trapidjson\t%0.0f\n", filename, bytes_per_second / (1024.0*1024.0));
+    printf("-\tcms per parse\ta%s\trapidjson\t%0.3f\n", filename, ac_timer_ms(t2));
   }
 
   ac_timer_destroy(t1);
@@ -125,16 +107,8 @@ bool do_test(size_t repeat, const char *filename) {
   dump_total_bytes = dump_total_bytes + buffer.GetSize();
 
   if (repeat > 1) {
-    if(for_web) {
-      printf("bDump Speed (MB/sec)\ta%s\trapidjson\t%0.0f\n", filename, bytes_per_second / (1024.0*1024.0));
-
-    //  printf("\t%0.0f MB/sec\n",
-    //         bytes_per_second / (1024.0 * 1024.0));
-    }
-    else
-      printf("dumping %s(%lu): %0.0f MB/sec, %0.3fms per dump\n",
-             filename, buffer.GetSize(),
-             bytes_per_second / (1024.0 * 1024.0), ac_timer_ms(t1));
+    printf("\tbDump Speed (MB/sec)\ta%s\trapidjson\t%0.0f\n", filename, bytes_per_second / (1024.0*1024.0));
+    printf("-\tdms per dump\ta%s\trapidjson\t%0.3f\n", filename, ac_timer_ms(t1));
   }
   ac_timer_destroy(t1);
 
