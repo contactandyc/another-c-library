@@ -61,20 +61,18 @@ function IndexPage() {
 
       <div className="Flex Index-mn">
         <div className="Index-cd-alt">
-<pre>
-demo/json $ make
-Parse Speed (MB/sec)   ac_json  rapidjson   % gain
-canada.json               1222        374  226.738%
-citm_catalog.json         1145        943  21.421%
-twitter.json              1000        543  84.162%
-overall                   1158        511  126.614%
+demo/json $ make<br/>
+Parse Speed (MB/sec) &nbsp; ac_json &nbsp;rapidjson &nbsp; % gain<br/>
+canada.json &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1222 &nbsp; &nbsp; &nbsp; &nbsp;374 &nbsp;226.738%<br/>
+citm_catalog.json &nbsp; &nbsp; &nbsp; &nbsp; 1145 &nbsp; &nbsp; &nbsp; &nbsp;943 &nbsp;21.421%<br/>
+twitter.json &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1000 &nbsp; &nbsp; &nbsp; &nbsp;543 &nbsp;84.162%<br/>
+overall &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1158 &nbsp; &nbsp; &nbsp; &nbsp;511 &nbsp;126.614%<br/>
 <br/>
-Dump Speed (MB/sec)    ac_json  rapidjson   % gain
-canada.json               1192        187  537.433%
-citm_catalog.json          591        338  74.852%
-twitter.json              1094        462  136.797%
-overall                   1158        511  126.614%
-</pre>
+Dump Speed (MB/sec) &nbsp; &nbsp;ac_json &nbsp;rapidjson &nbsp; % gain<br/>
+canada.json &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1192 &nbsp; &nbsp; &nbsp; &nbsp;187 &nbsp;537.433%<br/>
+citm_catalog.json &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;591 &nbsp; &nbsp; &nbsp; &nbsp;338 &nbsp;74.852%<br/>
+twitter.json &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1094 &nbsp; &nbsp; &nbsp; &nbsp;462 &nbsp;136.797%<br/>
+overall &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1158 &nbsp; &nbsp; &nbsp; &nbsp;511 &nbsp;126.614%<br/>
                 </div>
         <div className="Index-mn-cnt">
           <h2 className="Index-h2-alt">JSON Parsing...Parsed.</h2>
