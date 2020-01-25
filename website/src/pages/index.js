@@ -31,57 +31,57 @@ function IndexPage() {
           <Link to="/docs/improving-quicksort">See Article on LinkedIn<FaArrowRight style={{ height: "12px" }}/></Link>
         </div>
         <div className="Index-cd-alt">
-        demo/sort $ make<br/>
-        ac_sort vs std::sort<br/>
-        Ordered test (time in microseconds)<br/>
-        items &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp; std::sort &nbsp; &nbsp; &nbsp; % gain &nbsp;<br/>
-         &nbsp; &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; &nbsp;0.050 &nbsp; &nbsp; &nbsp; 0.392 &nbsp; &nbsp; &nbsp;684.000%<br/>
-         &nbsp; 10,000 &nbsp; &nbsp; &nbsp; &nbsp;3.257 &nbsp; &nbsp; &nbsp;29.778 &nbsp; &nbsp; &nbsp;814.277%<br/>
-        1,000,000 &nbsp; &nbsp; &nbsp;402.610 &nbsp; 3,130.790 &nbsp; &nbsp; &nbsp;677.624%<br/>
-        <br/>
-        Equal test (time in microseconds)<br/>
-        items &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp; std::sort &nbsp; &nbsp; &nbsp; % gain &nbsp;<br/>
-         &nbsp; &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; &nbsp;0.049 &nbsp; &nbsp; &nbsp; 0.295 &nbsp; &nbsp; &nbsp;502.041%<br/>
-         &nbsp; 10,000 &nbsp; &nbsp; &nbsp; &nbsp;3.770 &nbsp; &nbsp; &nbsp;26.870 &nbsp; &nbsp; &nbsp;612.732%<br/>
-        1,000,000 &nbsp; &nbsp; &nbsp;388.910 &nbsp; 3,051.270 &nbsp; &nbsp; &nbsp;684.570%<br/>
-        <br/>
-        Reverse test (time in microseconds)<br/>
-        items &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp; std::sort &nbsp; &nbsp; &nbsp; % gain &nbsp;<br/>
-         &nbsp; &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; &nbsp;0.067 &nbsp; &nbsp; &nbsp; 0.473 &nbsp; &nbsp; &nbsp;605.970%<br/>
-         &nbsp; 10,000 &nbsp; &nbsp; &nbsp; &nbsp;5.495 &nbsp; &nbsp; &nbsp;57.292 &nbsp; &nbsp; &nbsp;942.621%<br/>
-        1,000,000 &nbsp; &nbsp; &nbsp;823.680 &nbsp; 5,955.980 &nbsp; &nbsp; &nbsp;623.094%<br/>
-        <br/>
-        Random test (time in microseconds)<br/>
-        items &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp; std::sort &nbsp; &nbsp; &nbsp; % gain &nbsp;<br/>
-         &nbsp; &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; &nbsp;0.337 &nbsp; &nbsp; &nbsp; 1.545 &nbsp; &nbsp; &nbsp;358.457%<br/>
-         &nbsp; 10,000 &nbsp; &nbsp; &nbsp;409.976 &nbsp; &nbsp; 511.444 &nbsp; &nbsp; &nbsp; 24.750%<br/>
-        1,000,000 &nbsp; 60,723.800 &nbsp;77,476.470 &nbsp; &nbsp; &nbsp; 27.588%<br/>
-        <br/>
-        ac_sort vs qsort<br/>
-        Ordered test (time in microseconds)<br/>
-        items &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp; qsort &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;% gain &nbsp;<br/>
-         &nbsp; &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; &nbsp;0.050 &nbsp; &nbsp; &nbsp; &nbsp;0.511 &nbsp; &nbsp; &nbsp;922.000%<br/>
-         &nbsp; 10,000 &nbsp; &nbsp; &nbsp; &nbsp;3.257 &nbsp; &nbsp; &nbsp; 41.735 &nbsp; &nbsp; 1181.394%<br/>
-        1,000,000 &nbsp; &nbsp; &nbsp;402.610 &nbsp; &nbsp;4,530.900 &nbsp; &nbsp; 1025.382%<br/>
-        <br/>
-        Equal test (time in microseconds)<br/>
-        items &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp; qsort &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;% gain &nbsp;<br/>
-         &nbsp; &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; &nbsp;0.049 &nbsp; &nbsp; &nbsp; &nbsp;0.295 &nbsp; &nbsp; &nbsp;502.041%<br/>
-         &nbsp; 10,000 &nbsp; &nbsp; &nbsp; &nbsp;3.770 &nbsp; &nbsp; &nbsp; 31.206 &nbsp; &nbsp; &nbsp;727.745%<br/>
-        1,000,000 &nbsp; &nbsp; &nbsp;388.910 &nbsp; &nbsp;2,808.020 &nbsp; &nbsp; &nbsp;622.023%<br/>
-        <br/>
-        Reverse test (time in microseconds)<br/>
-        items &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp; qsort &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;% gain &nbsp;<br/>
-         &nbsp; &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; &nbsp;0.067 &nbsp; &nbsp; &nbsp; &nbsp;2.274 &nbsp; &nbsp; 3294.030%<br/>
-         &nbsp; 10,000 &nbsp; &nbsp; &nbsp; &nbsp;5.495 &nbsp; &nbsp; &nbsp;215.620 &nbsp; &nbsp; 3823.931%<br/>
-        1,000,000 &nbsp; &nbsp; &nbsp;823.680 &nbsp; 22,169.190 &nbsp; &nbsp; 2591.481%<br/>
-        <br/>
-        Random test (time in microseconds)<br/>
-        items &nbsp; &nbsp; &nbsp; ac_sort &nbsp; &nbsp; qsort &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;% gain &nbsp;<br/>
-         &nbsp; &nbsp; &nbsp;100 &nbsp; &nbsp; &nbsp; &nbsp;0.337 &nbsp; &nbsp; &nbsp; &nbsp;1.894 &nbsp; &nbsp; &nbsp;462.018%<br/>
-         &nbsp; 10,000 &nbsp; &nbsp; &nbsp;409.976 &nbsp; &nbsp; &nbsp;779.805 &nbsp; &nbsp; &nbsp; 90.207%<br/>
-        1,000,000 &nbsp; 60,723.800 &nbsp;110,392.940 &nbsp; &nbsp; &nbsp; 81.795%<br/>
-                </div>
+demo/sort $ make<br/>
+ac_sort vs std::sort<br/>
+Ordered test (time in microseconds)<br/>
+items&nbsp; &nbsp; &nbsp;  ac_sort&nbsp; &nbsp;  std::sort&nbsp; &nbsp; &nbsp;  % gain&nbsp; <br/>
+&nbsp; &nbsp; &nbsp; 100&nbsp; &nbsp; &nbsp; &nbsp; 0.043&nbsp; &nbsp; &nbsp;  0.341&nbsp; &nbsp; &nbsp; 693.023%<br/>
+&nbsp;  10,000&nbsp; &nbsp; &nbsp; &nbsp; 3.228&nbsp; &nbsp; &nbsp; 29.921&nbsp; &nbsp; &nbsp; 826.921%<br/>
+1,000,000&nbsp; &nbsp; &nbsp; 393.470&nbsp;  3,315.230&nbsp; &nbsp; &nbsp; 742.562%<br/>
+<br/>
+Equal test (time in microseconds)<br/>
+items&nbsp; &nbsp; &nbsp;  ac_sort&nbsp; &nbsp;  std::sort&nbsp; &nbsp; &nbsp;  % gain&nbsp; <br/>
+&nbsp; &nbsp; &nbsp; 100&nbsp; &nbsp; &nbsp; &nbsp; 0.045&nbsp; &nbsp; &nbsp;  0.304&nbsp; &nbsp; &nbsp; 575.556%<br/>
+&nbsp;  10,000&nbsp; &nbsp; &nbsp; &nbsp; 3.154&nbsp; &nbsp; &nbsp; 25.942&nbsp; &nbsp; &nbsp; 722.511%<br/>
+1,000,000&nbsp; &nbsp; &nbsp; 384.580&nbsp;  3,202.080&nbsp; &nbsp; &nbsp; 732.617%<br/>
+<br/>
+Reverse test (time in microseconds)<br/>
+items&nbsp; &nbsp; &nbsp;  ac_sort&nbsp; &nbsp;  std::sort&nbsp; &nbsp; &nbsp;  % gain&nbsp; <br/>
+&nbsp; &nbsp; &nbsp; 100&nbsp; &nbsp; &nbsp; &nbsp; 0.084&nbsp; &nbsp; &nbsp;  0.536&nbsp; &nbsp; &nbsp; 538.095%<br/>
+&nbsp;  10,000&nbsp; &nbsp; &nbsp; &nbsp; 6.197&nbsp; &nbsp; &nbsp; 56.242&nbsp; &nbsp; &nbsp; 807.568%<br/>
+1,000,000&nbsp; &nbsp; &nbsp; 963.120&nbsp;  5,984.830&nbsp; &nbsp; &nbsp; 521.400%<br/>
+<br/>
+Random test (time in microseconds)<br/>
+items&nbsp; &nbsp; &nbsp;  ac_sort&nbsp; &nbsp;  std::sort&nbsp; &nbsp; &nbsp;  % gain&nbsp; <br/>
+&nbsp; &nbsp; &nbsp; 100&nbsp; &nbsp; &nbsp; &nbsp; 0.388&nbsp; &nbsp; &nbsp;  1.576&nbsp; &nbsp; &nbsp; 306.186%<br/>
+&nbsp;  10,000&nbsp; &nbsp; &nbsp; 411.915&nbsp; &nbsp;  506.590&nbsp; &nbsp; &nbsp;  22.984%<br/>
+1,000,000&nbsp;  60,816.670&nbsp; 77,113.870&nbsp; &nbsp; &nbsp;  26.797%<br/>
+<br/>
+ac_sort vs qsort<br/>
+Ordered test (time in microseconds)<br/>
+items&nbsp; &nbsp; &nbsp;  ac_sort&nbsp; &nbsp;  qsort&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; % gain&nbsp; <br/>
+&nbsp; &nbsp; &nbsp; 100&nbsp; &nbsp; &nbsp; &nbsp; 0.043&nbsp; &nbsp; &nbsp; &nbsp; 0.486&nbsp; &nbsp;  1030.233%<br/>
+&nbsp;  10,000&nbsp; &nbsp; &nbsp; &nbsp; 3.228&nbsp; &nbsp; &nbsp;  40.842&nbsp; &nbsp;  1165.242%<br/>
+1,000,000&nbsp; &nbsp; &nbsp; 393.470&nbsp; &nbsp; 4,379.690&nbsp; &nbsp;  1013.094%<br/>
+<br/>
+Equal test (time in microseconds)<br/>
+items&nbsp; &nbsp; &nbsp;  ac_sort&nbsp; &nbsp;  qsort&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; % gain&nbsp; <br/>
+&nbsp; &nbsp; &nbsp; 100&nbsp; &nbsp; &nbsp; &nbsp; 0.045&nbsp; &nbsp; &nbsp; &nbsp; 0.294&nbsp; &nbsp; &nbsp; 553.333%<br/>
+&nbsp;  10,000&nbsp; &nbsp; &nbsp; &nbsp; 3.154&nbsp; &nbsp; &nbsp;  28.190&nbsp; &nbsp; &nbsp; 793.786%<br/>
+1,000,000&nbsp; &nbsp; &nbsp; 384.580&nbsp; &nbsp; 2,784.150&nbsp; &nbsp; &nbsp; 623.946%<br/>
+<br/>
+Reverse test (time in microseconds)<br/>
+items&nbsp; &nbsp; &nbsp;  ac_sort&nbsp; &nbsp;  qsort&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; % gain&nbsp; <br/>
+&nbsp; &nbsp; &nbsp; 100&nbsp; &nbsp; &nbsp; &nbsp; 0.084&nbsp; &nbsp; &nbsp; &nbsp; 2.212&nbsp; &nbsp;  2533.333%<br/>
+&nbsp;  10,000&nbsp; &nbsp; &nbsp; &nbsp; 6.197&nbsp; &nbsp; &nbsp; 216.290&nbsp; &nbsp;  3390.237%<br/>
+1,000,000&nbsp; &nbsp; &nbsp; 963.120&nbsp;  22,208.090&nbsp; &nbsp;  2205.849%<br/>
+<br/>
+Random test (time in microseconds)<br/>
+items&nbsp; &nbsp; &nbsp;  ac_sort&nbsp; &nbsp;  qsort&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; % gain&nbsp; <br/>
+&nbsp; &nbsp; &nbsp; 100&nbsp; &nbsp; &nbsp; &nbsp; 0.388&nbsp; &nbsp; &nbsp; &nbsp; 1.952&nbsp; &nbsp; &nbsp; 403.093%<br/>
+&nbsp;  10,000&nbsp; &nbsp; &nbsp; 411.915&nbsp; &nbsp; &nbsp; 777.368&nbsp; &nbsp; &nbsp;  88.720%<br/>
+1,000,000&nbsp;  60,816.670&nbsp; 111,768.980&nbsp; &nbsp; &nbsp;  83.780%<br/>
+        </div>
       </div>
 
       <div className="Flex Index-mn">
