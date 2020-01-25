@@ -195,7 +195,7 @@ pre {
   padding: 8px 16px;
   display: flex;
   cursor: pointer;
-  margin: 20px auto;
+  margin: auto;
 }
 
 .Index-crsr {
@@ -231,12 +231,13 @@ pre {
 .Index-cd-alt {
   background: rgb(50, 56, 64);
   border-radius: 15px;
-  width: 550px;
+  max-width: 550px;
   height: 400px;
   overflow-x: scroll;
   color: white;
   padding: 15px;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: calc(.5vw + 5px);
 }
 
 .Index-h2-alt {
@@ -246,7 +247,7 @@ pre {
 }
 
 .Index-h3-alt {
-  margin-top: 0;
+  margin-top: 10px;
 }
 
 /* md-page.js */
