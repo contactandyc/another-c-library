@@ -61,18 +61,20 @@ function IndexPage() {
 
       <div className="Flex Index-mn">
         <div className="Index-cd-alt">
-        demo/json $ make<br/>
-        Parse Speed (MB/sec)   ac_json  rapidjson   % gain<br/>
-        canada.json               1222        374  226.738%<br/>
-        citm_catalog.json         1145        943  21.421%<br/>
-        twitter.json              1000        543  84.162%<br/>
-        overall                   1158        511  126.614%<br/>
-        <br/>
-        Dump Speed (MB/sec)    ac_json  rapidjson   % gain<br/>
-        canada.json               1192        187  537.433%<br/>
-        citm_catalog.json          591        338  74.852%<br/>
-        twitter.json              1094        462  136.797%<br/>
-        overall                   1158        511  126.614%<br/>
+<pre>
+demo/json $ make
+Parse Speed (MB/sec)   ac_json  rapidjson   % gain
+canada.json               1222        374  226.738%
+citm_catalog.json         1145        943  21.421%
+twitter.json              1000        543  84.162%
+overall                   1158        511  126.614%
+<br/>
+Dump Speed (MB/sec)    ac_json  rapidjson   % gain
+canada.json               1192        187  537.433%
+citm_catalog.json          591        338  74.852%
+twitter.json              1094        462  136.797%
+overall                   1158        511  126.614%
+</pre>
                 </div>
         <div className="Index-mn-cnt">
           <h2 className="Index-h2-alt">JSON Parsing...Parsed.</h2>
