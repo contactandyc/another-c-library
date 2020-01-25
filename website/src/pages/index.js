@@ -75,9 +75,9 @@ twitter.json &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1094 &nbsp; &nbsp; 
 overall &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1158 &nbsp; &nbsp; &nbsp; &nbsp;511 &nbsp;126.614%<br/>
                 </div>
         <div className="Index-mn-cnt">
-          <h2 className="Index-h2-alt">JSON Parsing...Parsed.</h2>
+          <h2 className="Index-h2-alt">JSON Parsing.</h2>
           <h3 className="Index-h3-alt">Build lightning-fast services with AC's
-          JSON parser that can parse thousands of records in milliseconds.</h3>
+          JSON parser that can parse over 1GB of json per second.</h3>
           <Link to="/docs/ac-buffer">Read More <FaArrowRight style={{ height: "12px" }}/></Link>
         </div>
       </div>
