@@ -7,17 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+// #include <bits/stdc++.h>
+#include <algorithm>
+
 #define sort_t size_t
 
-static inline int compare_sort(const void *p1, const void *p2) {
-  const sort_t *a = (const sort_t *)p1;
-  const sort_t *b = (const sort_t *)p2;
-  if (*a != *b)
-    return (*a < *b) ? -1 : 1;
-  return 0;
-}
-
-//     qsort(base + num_elements, num_elements, sizeof(sort_t), compare_sort);
+static inline bool compare(sort_t i, sort_t j) { return i < j; }
 
 void run_test(const char *test_name, sort_t *base, size_t num_elements,
               char order) {
@@ -36,11 +31,11 @@ void run_test(const char *test_name, sort_t *base, size_t num_elements,
   ac_timer_start(sort_timer);
   for (int i = 0; i < repeat; i++) {
     memcpy(base + num_elements, base, num_elements * sizeof(sort_t));
-    qsort(base + num_elements, num_elements, sizeof(sort_t), compare_sort);
+    std::sort(base + num_elements, base + num_elements + num_elements, compare);
   }
   ac_timer_stop(sort_timer);
 
-  printf("-%c%s (time in microseconds)\taitems\ta%'9lu\tqsort\t%'0.3f\n", order,
+  printf("-%c%s (time in microseconds)\taitems\ta%'9lu\tstd::sort\t%'0.3f\n", order,
          test_name, num_elements, ac_timer_us(sort_timer));
 
   ac_timer_destroy(sort_timer);
@@ -49,6 +44,7 @@ void run_test(const char *test_name, sort_t *base, size_t num_elements,
 
 int main(int argc, char *argv[]) {
   setlocale(LC_NUMERIC, "");
+
   sort_t *base = (sort_t *)ac_malloc(1000000 * sizeof(sort_t) * 3);
   int i, pos;
   sort_t tmp;

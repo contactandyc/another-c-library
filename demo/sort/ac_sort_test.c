@@ -36,14 +36,15 @@ void run_test(const char *test_name, sort_t *base, size_t num_elements,
   }
   ac_timer_stop(sort_timer);
 
-  printf("-%c%s (time in microseconds)\taitems\ta%7lu\tac_sort\t%0.3f\n", order,
-         test_name, num_elements, ac_timer_us(sort_timer));
+  printf("-%c%s (time in microseconds)\taitems\ta%'9lu\tac_sort\t%'0.3f\n",
+         order, test_name, num_elements, ac_timer_us(sort_timer));
 
   ac_timer_destroy(sort_timer);
   ac_timer_destroy(copy_timer);
 }
 
 int main(int argc, char *argv[]) {
+  setlocale(LC_NUMERIC, "");
   sort_t *base = (sort_t *)ac_malloc(1000000 * sizeof(sort_t) * 3);
   int i, pos;
   sort_t tmp;

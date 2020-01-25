@@ -18,7 +18,7 @@ int *column_widths(ac_pool_t *pool, int num_cols, node_t *n, size_t num_n) {
   node_t *np = n;
   node_t *ep = n + num_n;
   int *res = (int *)ac_pool_calloc(pool, sizeof(int) * (num_cols + 1));
-  res[num_cols] = 9;
+  res[num_cols] = 12;
   while (np < ep) {
     node_t *cur = np;
     int max_length = strlen(np->key);
@@ -79,18 +79,21 @@ void append_node(ac_buffer_t *bh, char **a, int column) {
 }
 
 void print_left_string(int width, char *s, int pad) {
+  // return;
   char fmt[20];
   sprintf(fmt, "%%%ds%%-%ds", pad, width - pad);
   printf(fmt, "", s);
 }
 
 void print_right_string(int width, char *s, int pad) {
+  // return;
   char fmt[20];
   sprintf(fmt, "%%%ds%%%ds", width - pad, pad);
   printf(fmt, s, "");
 }
 
 void print_header(int *widths, int num_cols, node_t *n, node_t *ep) {
+  // return;
   if (n->header[0] && n->header[1])
     printf("%s\n", n->header + 1);
   print_left_string(widths[0], n->key + 1, 0);
@@ -107,8 +110,25 @@ void print_header(int *widths, int num_cols, node_t *n, node_t *ep) {
       print_left_string(widths[i], "", 0);
   }
   if (num_cols == 3)
-    printf("  %% gain");
+    print_right_string(widths[num_cols], "% gain", 2);
   printf("\n");
+}
+
+bool extract_double(const char *s, double *r) {
+  char tmp[30];
+  const char *p = s;
+  char *wp = tmp;
+  while (*p) {
+    if (*p != ',')
+      *wp++ = *p++;
+    else
+      p++;
+  }
+  *wp = 0;
+  // printf("%s\n", tmp);
+  if (sscanf(tmp, "%lf", r) == 1)
+    return true;
+  return false;
 }
 
 void print_rows(int *widths, int num_cols, node_t *n, node_t *ep) {
@@ -119,9 +139,9 @@ void print_rows(int *widths, int num_cols, node_t *n, node_t *ep) {
     node_t *np = n;
     while (np < ep) {
       if (np->column == i) {
-        if (i == 1 && sscanf(np->value, "%lf", &a) == 1)
+        if (i == 1 && extract_double(np->value, &a))
           a_found = true;
-        else if (i == 2 && sscanf(np->value, "%lf", &b) == 1)
+        else if (i == 2 && extract_double(np->value, &b))
           b_found = true;
         print_right_string(widths[i], np->value, 2);
         break;
@@ -134,9 +154,9 @@ void print_rows(int *widths, int num_cols, node_t *n, node_t *ep) {
   if (a_found && b_found && num_cols == 3) {
     char tmp[20];
     if (a > b)
-      sprintf(tmp, "%s%0.3f%%", n->reversed ? "-" : "", ((a / b) - 1) * 100.0);
+      sprintf(tmp, "%s%'0.3f%%", n->reversed ? "-" : "", ((a / b) - 1) * 100.0);
     else
-      sprintf(tmp, "%s%0.3f%%", n->reversed ? "" : "-", ((b / a) - 1) * 100.0);
+      sprintf(tmp, "%s%'0.3f%%", n->reversed ? "" : "-", ((b / a) - 1) * 100.0);
     print_right_string(widths[num_cols], tmp, 0);
   }
   printf("\n");

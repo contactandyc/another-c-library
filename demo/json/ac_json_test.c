@@ -29,6 +29,7 @@ double parse_total_seconds = 0.0;
 double dump_total_seconds = 0.0;
 
 int main(int argc, char *argv[]) {
+  setlocale(LC_NUMERIC, "");
   size_t repeat = 1;
   if (argc < 2 || sscanf(argv[1], "%lu", &repeat) != 1)
     repeat = 1;
@@ -38,8 +39,8 @@ int main(int argc, char *argv[]) {
       ((parse_total_bytes * 1.0) / parse_total_seconds) / (1024.0 * 1024.0);
   double speed2 =
       ((dump_total_bytes * 1.0) / dump_total_seconds) / (1024.0 * 1024.0);
-  printf("\taParse Speed (MB/sec)\tzoverall\tac_json\t%0.0f\n", speed);
-  printf("\tbDump Speed (MB/sec)\tzoverall\tac_json\t%0.0f\n", speed2);
+  printf("\taParse Speed (MB/sec)\tzoverall\tac_json\t%'0.0f\n", speed);
+  printf("\tbDump Speed (MB/sec)\tzoverall\tac_json\t%'0.0f\n", speed2);
   return 0;
 }
 
@@ -83,9 +84,9 @@ bool do_test(size_t repeat, const char *filename) {
   parse_total_bytes = parse_total_bytes + bytes;
 
   if (repeat > 1) {
-    printf("\taParse Speed (MB/sec)\ta%s\tac_json\t%0.0f\n", filename,
+    printf("\taParse Speed (MB/sec)\ta%s\tac_json\t%'0.0f\n", filename,
            bytes_per_second / (1024.0 * 1024.0));
-    printf("-\tcms per parse\ta%s\tac_json\t%0.3f\n", filename,
+    printf("-\tcms per parse\ta%s\tac_json\t%'0.3f\n", filename,
            ac_timer_ms(t2));
   }
 
@@ -108,9 +109,10 @@ bool do_test(size_t repeat, const char *filename) {
   dump_total_bytes = dump_total_bytes + ac_buffer_length(bh);
 
   if (repeat > 1) {
-    printf("\tbDump Speed (MB/sec)\ta%s\tac_json\t%0.0f\n", filename,
+    printf("\tbDump Speed (MB/sec)\ta%s\tac_json\t%'0.0f\n", filename,
            bytes_per_second / (1024.0 * 1024.0));
-    printf("-\tdms per dump\ta%s\tac_json\t%0.3f\n", filename, ac_timer_ms(t1));
+    printf("-\tdms per dump\ta%s\tac_json\t%'0.3f\n", filename,
+           ac_timer_ms(t1));
   }
   ac_timer_destroy(t1);
 

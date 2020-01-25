@@ -21,6 +21,7 @@ limitations under the License.
 #include <stddef.h>
 /* because I like to use true, false, and bool */
 #include <inttypes.h>
+#include <locale.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
