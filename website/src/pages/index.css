@@ -112,6 +112,9 @@ pre {
   .Index-url {
     display: none;
   }
+  .Index-cd-alt {
+    max-width: 550px;
+  }
 }
 
 /* header.js */
@@ -129,7 +132,7 @@ pre {
 }
 
 .Header-a, .Header-p {
-  font-size: calc(1vw + 5px);
+  font-size: calc(1vw + 4px);
   margin: 2vh 2vw;
 }
 
@@ -231,7 +234,7 @@ pre {
 .Index-cd-alt {
   background: rgb(50, 56, 64);
   border-radius: 15px;
-  max-width: 550px;
+  width: 550px;
   height: 400px;
   overflow-x: scroll;
   color: white;
