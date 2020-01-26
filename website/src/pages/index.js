@@ -114,7 +114,7 @@ overall &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1158 &nbs
           <h2 className="Index-h2-alt">Faster JSON Parsing</h2>
           <h3 className="Index-h3-alt">Build lightning-fast services with AC's
           JSON parser that can parse over 1GB of json per second per CPU.</h3>
-          <Link to="/docs/">
+          <Link to="/docs/ac-json">
             <button className="Index-btn" style={{ fontSize: "16px", margin: 0 }}>
               Documentation
             </button>
