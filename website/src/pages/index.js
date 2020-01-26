@@ -137,7 +137,7 @@ overall &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1158 &nbs
         <div className="Index-cd-alt">
 #include &quot;ac_allocator.h&quot;<br/>
 <br/>
-#include <stdio.h><br/>
+#include &lt;stdio.h&gt;<br/>
 <br/>
 int main(int argc, char *argv[]) {<br/>
 &nbsp; printf(&quot;Demo to show how allocations are tracked\n&quot;);<br/>
