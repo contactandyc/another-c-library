@@ -1,3 +1,5 @@
 *~
 *.dSYM
 ac_json_parse
+ac_json_dump_error
+ac_json_dump_error_to_buffer

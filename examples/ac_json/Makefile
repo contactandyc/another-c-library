@@ -2,7 +2,7 @@ ROOT=../..
 include $(ROOT)/src/Makefile.include
 
 FLAGS += -D_AC_DEBUG_MEMORY_=NULL -lz
-PROGRAMS = ac_json_parse
+PROGRAMS = ac_json_parse ac_json_dump_error ac_json_dump_error_to_buffer
 
 all: $(PROGRAMS) examples gitignore
 
@@ -13,6 +13,10 @@ examples: $(PROGRAMS)
 	@echo Running the examples
 	@echo
 	./ac_json_parse
+	@echo
+	./ac_json_dump_error
+	@echo
+	./ac_json_dump_error_to_buffer
 
 clean:
 	rm -rf *~ *.dSYM $(PROGRAMS)
