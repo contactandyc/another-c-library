@@ -1210,7 +1210,9 @@ void _ac_jsono_fill(_ac_jsono_t *o) {
     *awp++ = n;
     n = n->next;
   }
-  o->num_entries = awp - base;
-  if (o->num_entries)
-    __ac_json_sort(base, o->num_entries);
+  o->num_sorted_entries = awp - base;
+  if (o->num_sorted_entries)
+    __ac_json_sort(base, o->num_sorted_entries);
+  else
+    o->root = NULL;
 }

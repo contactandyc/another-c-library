@@ -157,7 +157,7 @@ static inline ac_json_t *ac_json_decimal_string(ac_pool_t *pool, char *s) {
   return j;
 }
 
-static inline char *ac_json_decoded(ac_pool_t *pool, ac_json_t *j) {
+static inline char *ac_jsond(ac_pool_t *pool, ac_json_t *j) {
   if (!j)
     return NULL;
   else if (j->type == AC_JSON_STRING)
@@ -168,7 +168,7 @@ static inline char *ac_json_decoded(ac_pool_t *pool, ac_json_t *j) {
     return NULL;
 }
 
-static inline char *ac_json_bvalue(ac_json_t *j, size_t *length) {
+static inline char *ac_jsonb(ac_json_t *j, size_t *length) {
   if (j && j->type >= AC_JSON_BINARY) {
     *length = j->length;
     return j->value;
@@ -176,7 +176,7 @@ static inline char *ac_json_bvalue(ac_json_t *j, size_t *length) {
     return NULL;
 }
 
-static inline char *ac_json_value(ac_json_t *j) {
+static inline char *ac_jsonv(ac_json_t *j) {
   if (j && j->type >= AC_JSON_STRING)
     return j->value;
   else
@@ -237,7 +237,7 @@ struct _ac_jsono_s {
   uint32_t num_entries;
   ac_json_t *parent;
   ac_map_t *root;
-  ac_jsono_t **array;
+  size_t num_sorted_entries;
   ac_jsono_t *head;
   ac_jsono_t *tail;
   ac_pool_t *pool;
@@ -301,12 +301,23 @@ static inline ac_json_t *ac_jsona_scan(ac_json_t *j, int nth) {
   _ac_jsona_t *arr = (_ac_jsona_t *)j;
   if (nth >= arr->num_entries)
     return NULL;
-  ac_jsona_t *n = arr->head;
-  while (nth) {
+  if ((nth << 1) > arr->num_entries) {
+    nth = arr->num_entries - nth;
     nth--;
-    n = n->next;
+    ac_jsona_t *n = arr->tail;
+    while (nth) {
+      nth--;
+      n = n->previous;
+    }
+    return n->value;
+  } else {
+    ac_jsona_t *n = arr->head;
+    while (nth) {
+      nth--;
+      n = n->next;
+    }
+    return n->value;
   }
-  return n->value;
 }
 
 static inline void ac_jsona_append(ac_json_t *j, ac_json_t *item) {
@@ -396,7 +407,13 @@ static inline ac_jsono_t *ac_jsono_previous(ac_jsono_t *j) {
 static inline void ac_jsono_erase(ac_jsono_t *n) {
   _ac_jsono_t *o = (_ac_jsono_t *)(n->value->parent);
   o->num_entries--;
-  ac_map_erase((ac_map_t *)n, &o->root);
+  if (o->root) {
+    if (o->num_sorted_entries) {
+      o->root = NULL;
+      o->num_sorted_entries = 0;
+    } else
+      ac_map_erase((ac_map_t *)n, &o->root);
+  }
   if (n->previous) {
     n->previous->next = n->next;
     if (n->next) {
@@ -414,8 +431,7 @@ static inline void ac_jsono_erase(ac_jsono_t *n) {
 
 void _ac_jsono_fill(_ac_jsono_t *o);
 
-/*
-static inline ac_jsono_t *ac_jsono_get(ac_json_t *j, const char *key) {
+static inline ac_jsono_t *ac_jsono_get_node(ac_json_t *j, const char *key) {
   _ac_jsono_t *o = (_ac_jsono_t *)j;
   if (!o->root) {
     if (o->head)
@@ -423,13 +439,10 @@ static inline ac_jsono_t *ac_jsono_get(ac_json_t *j, const char *key) {
     else
       return NULL;
   }
-  ac_jsono_t **res =
-      __ac_json_search((char *)key, (ac_jsono_t **)o->root, o->num_entries);
+  ac_jsono_t **res = __ac_json_search((char *)key, (const ac_jsono_t **)o->root,
+                                      o->num_sorted_entries);
   return *res;
 }
-
-static inline ac_json_t *ac_jsono_get_value(ac_json_t *j, const char *key) {
-*/
 
 static inline ac_json_t *ac_jsono_get(ac_json_t *j, const char *key) {
   _ac_jsono_t *o = (_ac_jsono_t *)j;
@@ -439,8 +452,8 @@ static inline ac_json_t *ac_jsono_get(ac_json_t *j, const char *key) {
     else
       return NULL;
   }
-  ac_jsono_t **res =
-      __ac_json_search(key, (const ac_jsono_t **)o->root, o->num_entries);
+  ac_jsono_t **res = __ac_json_search(key, (const ac_jsono_t **)o->root,
+                                      o->num_sorted_entries);
   if (res) {
     ac_jsono_t *r = *res;
     if (r)
@@ -449,12 +462,27 @@ static inline ac_json_t *ac_jsono_get(ac_json_t *j, const char *key) {
   return NULL;
 }
 
-static inline ac_jsono_t *ac_jsono_scan(ac_json_t *j, const char *key) {
+static inline ac_json_t *ac_jsono_scanr(ac_json_t *j, const char *key) {
+  if (!j || j->type != AC_JSON_OBJECT)
+    return NULL;
+  _ac_jsono_t *o = (_ac_jsono_t *)j;
+  ac_jsono_t *r = o->tail;
+  while (r) {
+    if (!strcmp(r->key, key))
+      return r->value;
+    r = r->previous;
+  }
+  return NULL;
+}
+
+static inline ac_json_t *ac_jsono_scan(ac_json_t *j, const char *key) {
+  if (!j || j->type != AC_JSON_OBJECT)
+    return NULL;
   _ac_jsono_t *o = (_ac_jsono_t *)j;
   ac_jsono_t *r = o->head;
   while (r) {
     if (!strcmp(r->key, key))
-      return r;
+      return r->value;
     r = r->next;
   }
   return NULL;
@@ -462,6 +490,8 @@ static inline ac_jsono_t *ac_jsono_scan(ac_json_t *j, const char *key) {
 
 static inline void _ac_jsono_fill_tree(_ac_jsono_t *o) {
   ac_jsono_t *r = o->head;
+  o->root = NULL;
+  o->num_sorted_entries = 0;
   while (r) {
     __ac_json_insert(r, &(o->root));
     r = r->next;
@@ -470,7 +500,7 @@ static inline void _ac_jsono_fill_tree(_ac_jsono_t *o) {
 
 static inline ac_jsono_t *ac_jsono_find(ac_json_t *j, const char *key) {
   _ac_jsono_t *o = (_ac_jsono_t *)j;
-  if (!o->root) {
+  if (!o->root || o->num_sorted_entries) {
     if (o->head)
       _ac_jsono_fill_tree(o);
     else

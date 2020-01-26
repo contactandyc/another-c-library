@@ -80,9 +80,9 @@ char *ac_json_decode(ac_pool_t *pool, char *s, size_t length);
 char *ac_json_encode(ac_pool_t *pool, char *s, size_t length);
 
 /* returns NULL if object, array, or error */
-static inline char *ac_json_decoded(ac_pool_t *pool, ac_json_t *j);
-static inline char *ac_json_value(ac_json_t *j);
-static inline char *ac_json_bvalue(ac_json_t *j, size_t *length);
+static inline char *ac_jsond(ac_pool_t *pool, ac_json_t *j);
+static inline char *ac_jsonv(ac_json_t *j);
+static inline char *ac_jsonb(ac_json_t *j, size_t *length);
 
 static inline ac_json_t *ac_jsono(ac_pool_t *pool);
 static inline ac_json_t *ac_jsona(ac_pool_t *pool);
@@ -135,14 +135,18 @@ static inline ac_jsono_t *ac_jsono_previous(ac_jsono_t *j);
 static inline void ac_jsono_append(ac_json_t *j, const char *key,
                                    ac_json_t *item, bool copy_key);
 
-static inline ac_jsono_t *ac_jsono_scan(ac_json_t *j, const char *key);
+static inline ac_json_t *ac_jsono_scan(ac_json_t *j, const char *key);
+static inline ac_json_t *ac_jsono_scanr(ac_json_t *j, const char *key);
 
 /* use _get if json is meant to be read only and _find if not.
   The ac_jsono_get method is faster than the ac_jsono_find
   method as it creates a sorted array vs a red black tree (or map).  The
   find/insert methods are useful if you need to lookup keys and insert.
+
+  ac_jsono_get/get_node/find will not find items which are appended.
 */
 static inline ac_json_t *ac_jsono_get(ac_json_t *j, const char *key);
+static inline ac_jsono_t *ac_jsono_get_node(ac_json_t *j, const char *key);
 
 /* in this case, don't use _get (only _find) */
 static inline void ac_jsono_erase(ac_jsono_t *n);
