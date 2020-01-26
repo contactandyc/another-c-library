@@ -31,7 +31,7 @@ function IndexPage() {
           <div className="Flex">
             <Link to="/docs/ac-sort">
               <button className="Index-btn" style={{ fontSize: "16px", margin: "10px 10px 10px 0" }}>
-                ac_sort Docs
+                Documentation
               </button>
             </Link>
             <Link to="/docs/improving-quicksort">
@@ -129,7 +129,7 @@ overall &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1158 &nbs
           <div className="Flex">
             <Link to="/docs/ac-allocator">
               <button className="Index-btn" style={{ fontSize: "16px", margin: "10px 10px 10px 0" }}>
-                ac_allocator Docs
+                Documentation
               </button>
             </Link>
           </div>
@@ -152,6 +152,40 @@ Demo to show how allocations are tracked<br/>
 detecting_memory_loss.c:7: 24 <br/>
         </div>
       </div>
+
+      <div className="Flex Index-mn">
+        <div className="Index-cd-alt">
+#include &quot;ac_buffer.h&quot;<br/>
+#include &quot;ac_pool.h&quot;<br/>
+<br/>
+#include &lt;stdio.h&gt;<br/>
+<br/>
+int main(int argc, char *argv[]) &#123;<br/>
+&nbsp; ac_pool_t *pool = ac_pool_init(65536);<br/>
+&nbsp; char *cmd = ac_pool_strdupf(pool, &quot;CMD: %s&quot;, argv[0]);<br/>
+&nbsp; printf(&quot;%s\n&quot;, cmd);<br/>
+&nbsp; ac_buffer_t *bh = ac_buffer_pool_init(pool, 256);<br/>
+&nbsp; ac_buffer_setf(bh, &quot;The buffer will be destroyed when pool is destroyed!&quot;);<br/>
+&nbsp; printf(&quot;%s\n&quot;, ac_buffer_data(bh));<br/>
+&nbsp; ac_pool_destroy(pool);<br/>
+&nbsp; return 0;<br/>
+}<br/>
+<br/>
+$ ./pool_demo<br/>
+CMD: ./pool_demo<br/>
+The buffer will be destroyed when pool is destroyed!<br/>
+                </div>
+        <div className="Index-mn-cnt">
+          <h2 className="Index-h2-alt">Garbage Collection on Your Terms</h2>
+          <h3 className="Index-h3-alt">The JSON parser performance can partially be attributed to the ac_pool object.  The pool object removes the need to track allocations and lets you decide when memory should be collected.  The pool makes it easy to handle allocation!</h3>
+          <Link to="/docs/ac-pool">
+            <button className="Index-btn" style={{ fontSize: "16px", margin: 0 }}>
+              Documentation
+            </button>
+          </Link>
+        </div>
+      </div>
+
 
       {/*<div className="Flex Index-mn">
         <div className="Index-mn-cnt">
