@@ -1,10 +1,10 @@
-import React from "react"
+import React, { useState } from "react"
 import { Link } from "gatsby"
 
 function Headings(props) {
   if (props.title === props.curr) {
     return (
-      <ul style={props.style.ul}>
+      <ul style={{ paddingLeft: 0, listStyle: `none`, display: props.expand }}>
         {props.arr.map(({ value: val }) => {
           let id = val.replace(/\s+/g, '-').toLowerCase();
           return (
@@ -27,7 +27,10 @@ function Headings(props) {
 }
 
 function Sidebar(props) {
-  const styles = {
+  const [expand, setExpand] = useState("");
+  const updateExpand = () => setExpand("none");
+
+  let styles = {
     sidebar: {
       fontFamily: `-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen',
       'Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif`,
@@ -70,7 +73,8 @@ function Sidebar(props) {
               <div key={i}>
                 <Link
                   to={`/${props.type}${val.node.frontmatter.path}`}
-                  activeStyle={styles.activeLink}>
+                  activeStyle={styles.activeLink}
+                  onClick={updateExpand}>
                     {val.node.frontmatter.title}
                 </Link>
                 <Headings
@@ -79,7 +83,8 @@ function Sidebar(props) {
                   title={val.node.frontmatter.title}
                   style={styles}
                   type={props.type}
-                  path={val.node.frontmatter.path} />
+                  path={val.node.frontmatter.path}
+                  expand={expand} />
               </div>
           );
         })}

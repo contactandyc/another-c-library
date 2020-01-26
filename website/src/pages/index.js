@@ -26,9 +26,20 @@ function IndexPage() {
       <div className="Flex Index-mn">
         <div className="Index-mn-cnt">
           <h2 className="Index-h2-alt">Quicker Sorting</h2>
-          <h3 className="Index-h3-alt">AC's sort algorithm is significantly faster than the standard qsort and the c++ implementation on my mac.  The sort includes an improvement to the algorithm that detects if records are sorted, equal, or reversed at little to no computational cost.  It also takes advantage of hand-unrolling of heap sorts for small arrays. </h3>
-          <Link to="/docs/ac-sort">Read More<FaArrowRight style={{ height: "12px" }}/></Link> or &nbsp;
-          <Link to="/docs/improving-quicksort">See Article on LinkedIn<FaArrowRight style={{ height: "12px" }}/></Link>
+          <h3 className="Index-h3-alt">AC’s sort algorithm is significantly faster than the standard qsort and C++’s implementation.</h3>
+          <p>This is accomplished through improved detection for sorted, equal, and reversed records at little to no computational cost, and hand-unrolling heap sorts for small arrays.</p>
+          <div className="Flex">
+            <Link to="/docs/ac-sort">
+              <button className="Index-btn" style={{ fontSize: "16px", margin: "10px 10px 10px 0" }}>
+                ac_sort Docs
+              </button>
+            </Link>
+            <Link to="/docs/improving-quicksort">
+              <button className="Index-btn" style={{ fontSize: "16px" }}>
+                Read Article
+              </button>
+            </Link>
+          </div>
         </div>
         <div className="Index-cd-alt">
 demo/sort $ make<br/>
@@ -103,7 +114,11 @@ overall &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1158 &nbs
           <h2 className="Index-h2-alt">Faster JSON Parsing</h2>
           <h3 className="Index-h3-alt">Build lightning-fast services with AC's
           JSON parser that can parse over 1GB of json per second per CPU.</h3>
-          <Link to="/docs/ac-buffer">Read More <FaArrowRight style={{ height: "12px" }}/></Link>
+          <Link to="/docs/">
+            <button className="Index-btn" style={{ fontSize: "16px", margin: 0 }}>
+              Documentation
+            </button>
+          </Link>
         </div>
       </div>
 
