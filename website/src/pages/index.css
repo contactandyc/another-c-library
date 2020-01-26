@@ -240,7 +240,7 @@ pre {
   color: white;
   padding: 15px;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: calc(.5vw + 5px);
+  font-size: calc(14px + (26 - 14) * ((100vw - 300px) / (1600 - 300)));
 }
 
 .Index-h2-alt {
