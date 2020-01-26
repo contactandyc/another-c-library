@@ -139,12 +139,12 @@ overall &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1158 &nbs
 <br/>
 #include &lt;stdio.h&gt;<br/>
 <br/>
-int main(int argc, char *argv[]) {<br/>
+int main(int argc, char *argv[]) &#123;<br/>
 &nbsp; printf(&quot;Demo to show how allocations are tracked\n&quot;);<br/>
 &nbsp; char *s = ac_strdup(argv[0]);<br/>
 &nbsp; // ac_free(s);<br/>
 &nbsp; return 0;<br/>
-}<br/>
+&#125;<br/>
 <br/>
 $ ./detecting_memory_loss<br/>
 Demo to show how allocations are tracked<br/>
