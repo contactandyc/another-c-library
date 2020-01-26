@@ -122,6 +122,37 @@ overall &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1158 &nbs
         </div>
       </div>
 
+      <div className="Flex Index-mn">
+        <div className="Index-mn-cnt">
+          <h2 className="Index-h2-alt">Reduce Memory Errors</h2>
+          <h3 className="Index-h3-alt">AC’s allocator aids in development as memory leaks, double frees, and incorrect frees are reported.  The allocation aids can be compiled out for production.  Often programs will run at 90-99% of the optimized speed with the allocation aids enabled.
+          <div className="Flex">
+            <Link to="/docs/ac-allocator">
+              <button className="Index-btn" style={{ fontSize: "16px", margin: "10px 10px 10px 0" }}>
+                ac_allocator Docs
+              </button>
+            </Link>
+          </div>
+        </div>
+        <div className="Index-cd-alt">
+#include &quot;ac_allocator.h&quot;<br/>
+<br/>
+#include <stdio.h><br/>
+<br/>
+int main(int argc, char *argv[]) {<br/>
+&nbsp; printf(&quot;Demo to show how allocations are tracked\n&quot;);<br/>
+&nbsp; char *s = ac_strdup(argv[0]);<br/>
+&nbsp; // ac_free(s);<br/>
+&nbsp; return 0;<br/>
+}<br/>
+<br/>
+$ ./detecting_memory_loss<br/>
+Demo to show how allocations are tracked<br/>
+24 byte(s) allocated in 1 allocations (40 byte(s) overhead)<br/>
+detecting_memory_loss.c:7: 24 <br/>
+        </div>
+      </div>
+
       {/*<div className="Flex Index-mn">
         <div className="Index-mn-cnt">
           <h2 className="Index-h2-alt">Improving Quicksort</h2>
