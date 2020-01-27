@@ -1069,7 +1069,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## Chaining sorts (sort by frequency)
+## Chaining sorts - sort by frequency
 
 In the last two sections, the result of the sort is printed to the screen and not saved anywhere.  The last section had each token being unique with a frequency.  Next, we will make changes to sort the token frequency pairs by frequency first descending and token next ascending.  In order to do this, first define a compare method.
 
