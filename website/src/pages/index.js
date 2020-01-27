@@ -25,7 +25,7 @@ function IndexPage() {
 
       <div className="Flex Index-mn">
       <div className="Index-mn-full">
-      <h2 className="Index-h2-alt">A Map/Reduce Framework in C</h2>
+      <h2 className="Index-h2-alt">A C Map/Reduce Framework</h2>
       <h3 className="Index-h3-alt">The speed of C mixed with the very useful map/reduce pattern</h3>
       <p>The AC map/reduce framework is a library and as such you maintain control of every layer of complexity.</p>
       <Link to="/docs/ac-mapreduce">
