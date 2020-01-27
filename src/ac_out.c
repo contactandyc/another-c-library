@@ -646,9 +646,9 @@ ac_out_t *_ac_out_init_(const char *filename, int fd, bool fd_owner,
     abort();
 
   ac_out_t *h;
-  if ((!filename && options->lz4) || ac_io_extension(filename, ".lz4"))
+  if ((!filename && options->lz4) || ac_io_extension(filename, "lz4"))
     h = _ac_out_init_lz4(filename, fd, fd_owner, options);
-  else if ((!filename && options->gz) || ac_io_extension(filename, ".gz"))
+  else if ((!filename && options->gz) || ac_io_extension(filename, "gz"))
     h = _ac_out_init_gz(filename, fd, fd_owner, options);
   else
     h = _ac_out_init(filename, fd, fd_owner, options);
@@ -786,10 +786,10 @@ void ac_out_destroy(ac_out_t *h) {
 static void suffix_filename_with_id(char *dest, const char *filename, size_t id,
                                     const char *extra, bool use_lz4) {
   strcpy(dest, filename);
-  if (ac_io_extension(filename, ".lz4"))
+  if (ac_io_extension(filename, "lz4"))
     sprintf(dest + strlen(dest) - 4, "%s%s_%lu.lz4", extra ? "_" : "",
             extra ? extra : "", id);
-  else if (ac_io_extension(filename, ".gz")) {
+  else if (ac_io_extension(filename, "gz")) {
     if (use_lz4)
       sprintf(dest + strlen(dest) - 3, "%s%s_%lu.lz4", extra ? "_" : "",
               extra ? extra : "", id);
@@ -1145,10 +1145,10 @@ ac_out_t *ac_out_sorted_init(const char *filename, ac_out_options_t *options,
   h->out_in_called = false;
 
   h->tmp_filename = h->filename + strlen(filename) + 1;
-  if (ac_io_extension(filename, ".lz4")) {
+  if (ac_io_extension(filename, "lz4")) {
     h->filename[strlen(filename) - 4] = 0;
     h->suffix = (char *)".lz4";
-  } else if (ac_io_extension(filename, ".gz")) {
+  } else if (ac_io_extension(filename, "gz")) {
     h->suffix = (char *)".gz";
     h->filename[strlen(filename) - 3] = 0;
   }
@@ -1333,7 +1333,7 @@ ac_in_t *_ac_out_sorted_in(ac_out_t *hp) {
     ac_in_ext_reducer(in, h->ext_options.reducer, h->ext_options.reducer_arg);
 
   const char *suffix = h->ext_options.lz4_tmp ? ".lz4" : "";
-  printf("%s num_written: %lu\n", h->filename, h->num_written);
+  // printf("%s num_written: %lu\n", h->filename, h->num_written);
   for (size_t i = 0; i < h->num_written; i++) {
     tmp_filename(h->tmp_filename, h->filename, i, suffix);
     ac_in_ext_add(in, ac_in_init(h->tmp_filename, &opts), i);

@@ -474,7 +474,7 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
 
   bool is_lz4 = false;
   if ((options->lz4 && (buf || !filename)) ||
-      ac_io_extension(filename, ".lz4")) {
+      ac_io_extension(filename, "lz4")) {
     if (!options->compressed_buffer_size) {
       options->compressed_buffer_size = options->buffer_size;
     }
@@ -491,7 +491,7 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
 
     base = ac_in_base_init_from_buffer((char *)buf, buf_len, can_free);
   } else {
-    if ((!filename && options->gz) || ac_io_extension(filename, ".gz"))
+    if ((!filename && options->gz) || ac_io_extension(filename, "gz"))
       base = ac_in_base_init_gz(filename, fd, can_close, options->buffer_size);
     else
       base = ac_in_base_init(filename, fd, can_close, options->buffer_size);

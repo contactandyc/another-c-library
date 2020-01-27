@@ -18,6 +18,21 @@ limitations under the License.
 
 #include <stdio.h>
 
+char *ac_date_time(char *dest, time_t ts) {
+  struct tm t;
+  gmtime_r(&ts, &t);
+  sprintf(dest, "%04d-%02d-%02d %02d:%02d:%02d", t.tm_year + 1900, t.tm_mon + 1,
+          t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
+  return dest;
+}
+
+char *ac_date(char *dest, time_t ts) {
+  struct tm t;
+  gmtime_r(&ts, &t);
+  sprintf(dest, "%04d-%02d-%02d", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday);
+  return dest;
+}
+
 const char *ac_str(const char *value, const char *default_value) {
   if (value)
     return value;

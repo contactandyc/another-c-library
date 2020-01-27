@@ -68,8 +68,9 @@ size_t ac_io_hash_partition(const ac_io_record_t *r, size_t num_part,
 
 bool ac_io_file_info(ac_io_file_info_t *fi);
 
-ac_io_file_info_t *ac_io_list(const char *path, size_t *num_files,
-                              bool (*file_valid)(const char *filename));
+ac_io_file_info_t *
+ac_io_list(const char *path, size_t *num_files,
+           bool (*file_valid)(const char *filename, void *arg), void *arg);
 
 bool ac_io_file_exists(const char *filename);
 
@@ -109,7 +110,7 @@ bool ac_io_make_directory(const char *path);
 bool ac_io_make_path_valid(char *filename);
 
 /*
-  test if filename has extension, extension is expected to have . (ex - ".lz4")
+  test if filename has extension, (ex - "lz4", "" if no extension expected)
   If filename is NULL, false will be returned.
 */
 bool ac_io_extension(const char *filename, const char *extension);

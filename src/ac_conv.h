@@ -25,6 +25,7 @@ limitations under the License.
 #include "ac_common.h"
 
 #include <inttypes.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,6 +57,14 @@ int64_t ac_int64_t(const char *value, int64_t default_value);
 
 /* returns uint64_t if value is not NULL and valid, otherwise default_value */
 uint64_t ac_uint64_t(const char *value, uint64_t default_value);
+
+/* fills dest with gmt time in format of YYYY-MM-DD hh:mm:ss and must be at
+ * least 20 bytes (19+0 terminator).  Returns a pointer to dest. */
+char *ac_date_time(char *dest, time_t ts);
+
+/* fills dest with gmt time in format of YYYY-MM-DD and must be at
+ * least 11 bytes (10+0 terminator).  Returns a pointer to dest. */
+char *ac_date(char *dest, time_t ts);
 
 #ifdef __cplusplus
 }

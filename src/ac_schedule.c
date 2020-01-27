@@ -1291,12 +1291,12 @@ static char *_ac_worker_output_base(ac_worker_t *w, ac_worker_output_t *outp,
   ac_buffer_setf(bh, "%s/%s_%lu/", w->task->scheduler->task_dir,
                  w->task->task_name, w->partition);
   const char *base = outp->name;
-  if (ac_io_extension(base, ".lz4")) {
+  if (ac_io_extension(base, "lz4")) {
     ac_buffer_append(bh, base, strlen(base) - 4);
     if (suffix)
       ac_buffer_appends(bh, suffix);
     ac_buffer_appendf(bh, "_%lu.lz4", w->partition);
-  } else if (ac_io_extension(base, ".gz")) {
+  } else if (ac_io_extension(base, "gz")) {
     ac_buffer_append(bh, base, strlen(base) - 3);
     if (suffix)
       ac_buffer_appends(bh, suffix);
@@ -1326,10 +1326,10 @@ char *ac_worker_input_name(ac_worker_t *w, ac_worker_input_t *inp,
   ac_buffer_setf(bh, "%s/%s_%lu/", w->task->scheduler->task_dir,
                  inp->src->task->task_name, partition);
   if (inp->src->flags & AC_OUTPUT_SPLIT) {
-    if (ac_io_extension(base, ".lz4")) {
+    if (ac_io_extension(base, "lz4")) {
       ac_buffer_append(bh, base, strlen(base) - 4);
       ac_buffer_appendf(bh, "_%lu_%lu.lz4", partition, w->partition);
-    } else if (ac_io_extension(base, ".gz")) {
+    } else if (ac_io_extension(base, "gz")) {
       ac_buffer_append(bh, base, strlen(base) - 3);
       ac_buffer_appendf(bh, "_%lu_%lu.gz", partition, w->partition);
     } else {
@@ -1337,10 +1337,10 @@ char *ac_worker_input_name(ac_worker_t *w, ac_worker_input_t *inp,
       ac_buffer_appendf(bh, "_%lu_%lu", partition, w->partition);
     }
   } else {
-    if (ac_io_extension(base, ".lz4")) {
+    if (ac_io_extension(base, "lz4")) {
       ac_buffer_append(bh, base, strlen(base) - 4);
       ac_buffer_appendf(bh, "_%lu.lz4", partition);
-    } else if (ac_io_extension(base, ".gz")) {
+    } else if (ac_io_extension(base, "gz")) {
       ac_buffer_append(bh, base, strlen(base) - 3);
       ac_buffer_appendf(bh, "_%lu.gz", partition);
     } else {

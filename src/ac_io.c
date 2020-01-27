@@ -47,10 +47,15 @@ size_t ac_io_hash_partition(const ac_io_record_t *r, size_t num_part,
 }
 
 bool ac_io_extension(const char *filename, const char *extension) {
-  if (filename && strlen(filename) > strlen(extension) &&
-      !strcmp(filename + strlen(filename) - strlen(extension), extension))
-    return true;
-  return false;
+  const char *r = strrchr(filename, '/');
+  if (r)
+    filename = r + 1;
+  r = strrchr(filename, '.');
+  if (!extension || extension[0] == 0)
+    return r ? false : true;
+  else if (!r)
+    return false;
+  return strcmp(r + 1, extension) ? false : true;
 }
 
 ac_io_format_t ac_io_delimiter(int delim) {
@@ -162,7 +167,9 @@ typedef struct {
 } ac_io_file_info_root_t;
 
 void _ac_io_list(ac_io_file_info_root_t *root, const char *path,
-                 ac_pool_t *pool, bool (*file_valid)(const char *filename)) {
+                 ac_pool_t *pool,
+                 bool (*file_valid)(const char *filename, void *arg),
+                 void *arg) {
   if (!path)
     path = "";
   DIR *dp = opendir(path[0] ? path : ".");
@@ -180,9 +187,9 @@ void _ac_io_list(ac_io_file_info_root_t *root, const char *path,
     fi.filename = filename;
     if (!ac_io_file_info(&fi)) {
       if (ac_io_directory(filename))
-        _ac_io_list(root, filename, pool, file_valid);
+        _ac_io_list(root, filename, pool, file_valid, arg);
     } else {
-      if (!file_valid || file_valid(filename)) {
+      if (!file_valid || file_valid(filename, arg)) {
         size_t len = strlen(filename) + 1 + sizeof(ac_io_file_info_link_t);
         ac_io_file_info_link_t *n;
         if (pool)
@@ -209,13 +216,14 @@ void _ac_io_list(ac_io_file_info_root_t *root, const char *path,
   (void)closedir(dp);
 }
 
-ac_io_file_info_t *ac_io_list(const char *path, size_t *num_files,
-                              bool (*file_valid)(const char *filename)) {
+ac_io_file_info_t *
+ac_io_list(const char *path, size_t *num_files,
+           bool (*file_valid)(const char *filename, void *arg), void *arg) {
   ac_io_file_info_root_t root;
   root.head = root.tail = NULL;
   root.num_files = root.bytes = 0;
   ac_pool_t *tmp_pool = ac_pool_init(4096);
-  _ac_io_list(&root, path, tmp_pool, file_valid);
+  _ac_io_list(&root, path, tmp_pool, file_valid, arg);
   *num_files = root.num_files;
   if (!root.num_files)
     return NULL;
