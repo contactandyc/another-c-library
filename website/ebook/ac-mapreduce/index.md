@@ -71,7 +71,7 @@ $ find . -name "*.md" -exec ls {} \; | wc -l
       35
 ```
 
-There are approximately 51k lines of code in 223 files and 15k lines of documentation in 35 files.  For our routine, we will use the AC library to locate those files based upon a directory, read the files a line at a time, lowercase each line, tokenize each line, sort the tokens alphabetically, reduce the frequencies, and finally sort by frequency descending followed by a secondary sort of tokens ascending.  The AC library is as a library a major goal of it is to make the components separable.  It's important that users can include parts that matter to them and improve upon them.  Of course, my hope is that the whole library will be found useful.
+There are approximately 51k lines of code in 223 files and 15k lines of documentation in 35 files.  For our routine, we will use the AC library to locate those files based upon a directory, read the files a line at a time, lowercase each line, tokenize each line, sort the tokens alphabetically, reduce the frequencies, and finally sort by frequency descending followed by a secondary sort of tokens ascending.  A major goal of the AC library make the components separable.  It's important that users can include parts that matter to them and improve upon them.  Of course, my hope is that the whole library will be found useful.
 
 ## Listing the files
 
@@ -234,7 +234,7 @@ for (size_t i = 0; i < num_files; i++) {
 ```
 
 ```
-$ make dump_files
+$ make dump_files_1
 $ ./dump_files_1 . txt
 This is line 1
 This is line 2
@@ -347,9 +347,9 @@ int main(int argc, char *argv[]) {
 
 The ac\_pool object contains a naive tokenizer (ac\_pool\_tokenize) that takes in a string, a list of characters to break on, and returns the list of tokens found.
 
-Continuing from the dump_files.c in the previous section, the following modifications will be made to make lowercase\_and\_tokenize.c  
+Continuing from the dump\_files.c in the previous section, the following modifications will be made to make lowercase\_and\_tokenize.c  
 
-ac_pool must be included.
+ac\_pool must be included.
 ```c
 #include "ac_pool.h"
 ```
