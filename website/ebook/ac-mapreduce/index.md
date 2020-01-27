@@ -499,7 +499,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## Writing token frequency pairs to a sorted output.
+## Writing token frequency pairs to a sorted output
 
 The token frequency pairs will be written in the following format.
 
