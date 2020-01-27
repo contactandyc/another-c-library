@@ -4,7 +4,7 @@ include $(ROOT)/src/Makefile.include
 FLAGS += -g -D_AC_DEBUG_MEMORY_=NULL -lz
 PROGRAMS = list_files dump_files_1 dump_files lowercase_and_tokenize sort_tokens
 PROGRAMS += sort_tokens_and_display sort_tokens_reduce_and_display
-
+PROGRAMS += sort_tokens_reduce_sort_by_freq_and_display
 all: $(PROGRAMS) examples gitignore
 
 $(PROGRAMS): %: %.c $(OBJECTS) $(HEADER_FILES)
@@ -21,6 +21,8 @@ examples: $(PROGRAMS)
 	./sort_tokens_and_display ../.. c,h,md > sorted_tokens.txt
 	head sorted_tokens.txt
 	./sort_tokens_reduce_and_display ../.. c,h,md > sorted_tokens.txt
+	head sorted_tokens.txt
+	./sort_tokens_reduce_sort_by_freq_and_display ../.. c,h,md > sorted_tokens.txt
 	head sorted_tokens.txt
 	rm sorted_tokens.txt
 	

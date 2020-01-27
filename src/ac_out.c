@@ -536,10 +536,6 @@ void ac_out_ext_options_compare(ac_out_ext_options_t *h,
                                 ac_io_compare_f compare, void *arg) {
   h->compare = compare;
   h->compare_arg = arg;
-  if (!h->int_compare) {
-    h->int_compare = compare;
-    h->int_compare_arg = arg;
-  }
 }
 
 void ac_out_ext_options_intermediate_group_size(ac_out_ext_options_t *h,
@@ -559,10 +555,6 @@ void ac_out_ext_options_reducer(ac_out_ext_options_t *h,
                                 ac_io_reducer_f reducer, void *arg) {
   h->reducer = reducer;
   h->reducer_arg = arg;
-  if (!h->int_reducer) {
-    h->int_reducer = reducer;
-    h->int_reducer_arg = arg;
-  }
 }
 
 void ac_out_ext_options_intermediate_reducer(ac_out_ext_options_t *h,
@@ -1515,6 +1507,23 @@ static void ac_out_ext_destroy(ac_out_t *hp) {
 
 ac_out_t *ac_out_ext_init(const char *filename, ac_out_options_t *options,
                           ac_out_ext_options_t *ext_options) {
+  ac_out_ext_options_t eopts;
+  if (!ext_options)
+    ac_out_ext_options_init(&eopts);
+  else
+    eopts = *ext_options;
+
+  if (!eopts.int_compare) {
+    eopts.int_compare = eopts.compare;
+    eopts.int_compare_arg = eopts.compare_arg;
+  }
+  if (!eopts.int_reducer) {
+    eopts.int_reducer = eopts.reducer;
+    eopts.int_reducer_arg = eopts.reducer_arg;
+  }
+
+  ext_options = &eopts;
+
   if (ext_options->partition && !ext_options->sort_before_partitioning)
     return ac_out_partitioned_init(filename, options, ext_options);
   else if (ext_options->compare)
