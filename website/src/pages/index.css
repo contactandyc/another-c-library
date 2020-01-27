@@ -113,7 +113,7 @@ pre {
     display: none;
   }
   .Index-cd-alt {
-    max-width: 550px;
+    max-width: 500px;
   }
 }
 
@@ -209,9 +209,15 @@ pre {
 }
 
 .Index-mn-cnt {
-  max-width: 550px;
+  max-width: 500px;
   margin: 20px;
 }
+
+.Index-mn-full {
+  max-width: 1000px;
+  margin: 20px;
+}
+
 
 @keyframes crsr {
     0% { background: rgb(10, 13, 17); }
@@ -234,7 +240,7 @@ pre {
 .Index-cd-alt {
   background: rgb(50, 56, 64);
   border-radius: 15px;
-  width: 550px;
+  width: 500px;
   height: 400px;
   overflow-x: scroll;
   color: white;
