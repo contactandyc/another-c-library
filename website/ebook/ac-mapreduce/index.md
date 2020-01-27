@@ -936,7 +936,7 @@ $ head sorted_tokens.txt
 2	000ns
 ```
 
-Notice that the tokens are alphabetical, unique, and have frequencies!  Also lowercase_tokenize_and_write_tokens didn't actually change at all with this change.  Again, this shows how it is useful to separate opening output streams from the transformations.
+Notice that the tokens are alphabetical, unique, and have frequencies!  Also lowercase\_tokenize\_and\_write\_tokens didn't actually change at all with this change.  Again, this shows how it is useful to separate opening output streams from the transformations.
 
 
 examples/mapreduce/sort\_tokens\_reduce\_and\_display.c:
@@ -1084,7 +1084,7 @@ int compare_tokens_by_frequency(const ac_io_record_t *r1, const ac_io_record_t *
 }
 ```
 
-Next, we will setup an output stream using the extended options.  We can reuse the previous out_ext_opts from before and then create the output stream.  This will be done right after the ac_out_in call.  The following lines will change from...
+Next, we will setup an output stream using the extended options.  We can reuse the previous out\_ext\_opts from before and then create the output stream.  This will be done right after the ac\_out\_in call.  The following lines will change from...
 ```c
 in = ac_out_in(out);
 display_token_frequencies(in);
@@ -1107,9 +1107,9 @@ display_token_frequencies(in);
 ac_in_destroy(in);
 ```
 
-Even though the final sorted output isn't written to disk.  Temp files may be written.  Because of this, it is important to make sure that the names are not the same.  Notice that I use "sorted_tokens_final" in the second call to ac_out_ext_init.
+Even though the final sorted output isn't written to disk.  Temp files may be written.  Because of this, it is important to make sure that the names are not the same.  Notice that I use "sorted\_tokens\_final" in the second call to ac\_out\_ext\_init.
 
-The following three lines are so common that there is a helper function in ac_in.h named ac_in_out.
+The following three lines are so common that there is a helper function in ac\_in.h named ac\_in\_out.
 
 ```c
 ac_io_record_t *r;
@@ -1136,7 +1136,7 @@ display_token_frequencies(in);
 ac_in_destroy(in);
 ```
 
-This is all there is to chaining sorts in the in/out library.  Notice that the last 3 lines of the change are the same as the original lines.  Again, display_token_frequencies doesn't care about the order of the input, so it all just works!
+This is all there is to chaining sorts in the in/out library.  Notice that the last 3 lines of the change are the same as the original lines.  Again, display\_token\_frequencies doesn't care about the order of the input, so it all just works!
 
 ```
 $ make sort_tokens_reduce_sort_by_freq_and_display
@@ -1154,7 +1154,7 @@ $ head sorted_tokens.txt
 3473	const
 ```
 
-examples/mapreduce/sort_tokens_reduce_sort_by_freq_and_display.c
+examples/mapreduce/sort\_tokens\_reduce\_sort\_by\_freq\_and\_display.c
 ```c
 #include "ac_allocator.h"
 #include "ac_conv.h"
@@ -1301,6 +1301,6 @@ int main(int argc, char *argv[]) {
 ```
 
 
-## Introducing ac_schedule
+## Introducing ac\_schedule
 
-While the previous code is efficient, my macbook has 16 threaded cores and a lot of RAM.  The code above is single threaded.  ac_schedule should make more sense if you first walked through the examples above.  ac_schedule let's you break up your work into smaller pieces, connect the work together, and it handles all of the execution.
+While the previous code is efficient, my macbook has 16 threaded cores and a lot of RAM.  The code above is single threaded.  ac\_schedule should make more sense if you first walked through the examples above.  ac\_schedule let's you break up your work into smaller pieces, connect the work together, and it handles all of the execution.
