@@ -24,6 +24,16 @@ function IndexPage() {
       </div>
 
       <div className="Flex Index-mn">
+      <h2 className="Index-h2-alt">A Map/Reduce Framework in C</h2>
+      <h3 className="Index-h3-alt">The speed of C mixed with the very useful map/reduce pattern</h3>
+      <p>The AC map/reduce framework is a library and as such you maintain control of every layer of complexity.</p>
+      <Link to="/docs/ac-mapreduce">
+        <button className="Index-btn" style={{ fontSize: "16px", margin: "10px 10px 10px 0" }}>
+          Read More
+        </button>
+      </Link>
+      </div>
+      <div className="Flex Index-mn">
         <div className="Index-mn-cnt">
           <h2 className="Index-h2-alt">Quicker Sorting</h2>
           <h3 className="Index-h3-alt">AC’s sort algorithm is significantly faster than the standard qsort and C++’s implementation.</h3>

@@ -32,7 +32,7 @@ function Header() {
           href="https://github.com/contactandyc/another-c-library">
           Github <FaExternalLinkAlt style={{ paddingTop: 5 }}/>
         </a>
-        <p className="Header-p">Beta version</p>
+        <p className="Header-p">In Active Development!</p>
       </nav>
     </header>
   );
