@@ -6,3 +6,4 @@ dump_files
 lowercase_and_tokenize
 sort_tokens
 sort_tokens_and_display
+sort_tokens_reduce_and_display

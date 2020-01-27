@@ -64,6 +64,16 @@ int compare_tokens(const ac_io_record_t *r1, const ac_io_record_t *r2,
   return strcmp(a, b);
 }
 
+bool reduce_frequency(ac_io_record_t *res, const ac_io_record_t *r,
+                      size_t num_r, ac_buffer_t *bh, void *arg) {
+  *res = r[0];
+  uint32_t total = 0;
+  for (size_t i = 0; i < num_r; i++)
+    total += (*(uint32_t *)r[i].record);
+  (*(uint32_t *)res->record) = total;
+  return true;
+}
+
 void display_token_frequencies(ac_in_t *in) {
   ac_io_record_t *r;
   while ((r = ac_in_advance(in)) != NULL) {
@@ -98,6 +108,7 @@ int main(int argc, char *argv[]) {
   ac_out_ext_options_t out_ext_opts;
   ac_out_ext_options_init(&out_ext_opts);
   ac_out_ext_options_compare(&out_ext_opts, compare_tokens, NULL);
+  ac_out_ext_options_reducer(&out_ext_opts, reduce_frequency, NULL);
 
   ac_out_t *out = ac_out_ext_init("sorted_tokens", &out_opts, &out_ext_opts);
   ac_in_t *in = ac_in_init_from_list(files, num_files, &opts);
