@@ -70,6 +70,11 @@ struct ac_schedule_s {
   char **args;
   int argc;
 
+  parse_args_f parse_args;
+  finish_args_f finish_args;
+  void *parse_args_arg;
+  void (*custom_usage)();
+
   char *ack_dir;
   char *task_dir;
 
@@ -373,6 +378,19 @@ static ac_task_state_link_t *completed_tasks(ac_schedule_t *h,
 static ac_task_state_link_t *tasks_to_finish(ac_schedule_t *h,
                                              size_t partition) {
   return h->state[partition].tasks_to_finish;
+}
+
+void ac_schedule_custom_args(ac_schedule_t *h, void (*custom_usage)(),
+                             parse_args_f parse_args, finish_args_f finish_args,
+                             void *arg) {
+  h->parse_args = parse_args;
+  h->finish_args = finish_args;
+  h->parse_args_arg = arg;
+  h->custom_usage = custom_usage;
+}
+
+void *ac_task_custom_arg(ac_task_t *task) {
+  return task->scheduler->parse_args_arg;
 }
 
 ac_schedule_t *ac_schedule_init(int argc, char **args, size_t num_partitions,
@@ -1711,6 +1729,10 @@ bool ac_worker_complete(ac_worker_t *w) {
 }
 
 static void schedule_usage(ac_schedule_t *h) {
+  if (h->custom_usage) {
+    h->custom_usage();
+    printf("\n----------------------------------------------------------\n\n");
+  }
   printf("The scheduler is meant to aid in running tasks in parallel.\n");
   printf("At the moment, it operates on a single host - but I'm planning\n");
   printf("on improving it to support multiple computers.\n");
@@ -1821,8 +1843,19 @@ void parse_args(ac_schedule_t *h) {
         p++;
       }
     } else {
-      at.help = true;
-      p = ep;
+      if (h->parse_args) {
+        int n = h->parse_args(ep - p, p, h->parse_args_arg);
+        if (n < 0) {
+          at.help = true;
+          p = ep;
+        } else if (!n)
+          p++;
+        else
+          p += n;
+      } else {
+        at.help = true;
+        p = ep;
+      }
     }
   }
   at.num_selected = 0;
@@ -1930,6 +1963,11 @@ void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete) {
     ac_schedule_thread_t *a = h->threads + i;
     a->thread_id = i;
     a->scheduler = h;
+  }
+
+  if (h->finish_args) {
+    if (!h->finish_args(h->argc, h->args, h->parse_args_arg))
+      h->parsed_args.help = true;
   }
 
   if (h->parsed_args.help) {

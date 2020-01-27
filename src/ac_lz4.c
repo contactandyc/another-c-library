@@ -163,8 +163,12 @@ int ac_lz4_decompress(ac_lz4_t *l, const void *src, uint32_t src_len,
       return -500;
     src_len -= 4;
   }
-  int r =
-      LZ4_decompress_safe((const char *)src, (char *)dest, src_len, dest_len);
+
+  int r = src_len;
+  if (compressed)
+    r = LZ4_decompress_safe((const char *)src, (char *)dest, src_len, dest_len);
+  else
+    memcpy(dest, src, src_len);
   if (r < 0)
     return r;
   if (l->content_checksum)

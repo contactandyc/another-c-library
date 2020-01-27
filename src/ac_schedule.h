@@ -46,6 +46,12 @@ typedef ac_io_file_info_t *(*ac_worker_file_info_f)(ac_worker_t *w,
                                                     size_t *num_files,
                                                     ac_worker_input_t *inp);
 
+/* This function should advance past used args and return < 0 on error.
+   Make sure it doesn't extend beyond argc. */
+typedef int (*parse_args_f)(int argc, char **argv, void *arg);
+
+typedef bool (*finish_args_f)(int argc, char **argv, void *arg);
+
 /**************************************************************************
 The following functions should be called to setup the scheduler.  Once all
 of the tasks are scheduled, call ac_schedule_run.  This will cause the setup
@@ -64,6 +70,16 @@ void ac_schedule_ack_dir(ac_schedule_t *h, const char *ack_dir);
 
 /* Define where the tasks directory should be output to (default is tasks) */
 void ac_schedule_task_dir(ac_schedule_t *h, const char *task_dir);
+
+/* Define custom usage - make sure your args don't conflict with ac_schedule.
+   The parse_args method will be called for every argument that isn't part of
+   ac_schedule's basic arguments.  If it returns NULL, there is an error.
+   parse_args will be called one last time after all arguments have been
+   parsed with a NULL first argument.  Make sure to return eargs if everything
+   is good.  Otherwise, return NULL. */
+void ac_schedule_custom_args(ac_schedule_t *h, void (*custom_usage)(),
+                             parse_args_f parse_args, finish_args_f finish_args,
+                             void *arg);
 
 /* Add a task to the scheduler with an associated name and define whether it
    is partitioned or not.  The setup function will further describe the task
@@ -84,6 +100,9 @@ void ac_schedule_destroy(ac_schedule_t *h);
 The following functions should be called from the setup callback methods
 specified by ac_schedule_task.
 ***************************************************************************/
+
+/* This retrieves the arg passed in via ac_schedule_custom_args */
+void *ac_task_custom_arg(ac_task_t *task);
 
 /* Define what should run for the given task */
 void ac_task_runner(ac_task_t *task, ac_worker_f runner);
