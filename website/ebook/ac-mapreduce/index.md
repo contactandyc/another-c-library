@@ -750,6 +750,24 @@ void display_token_frequencies(ac_in_t *in) {
 }
 ```
 
+```
+$ make sort_tokens_and_display
+$ ./sort_tokens_and_display ../.. c,h,md > sorted_tokens.txt
+$ head sorted_tokens.txt
+1	$
+1	$
+1	$
+1	$
+1	$
+1	$
+1	$
+1	$
+1	$
+1	$
+```
+
+As expected, the first tokens consist of a bunch of '$' tokens each with a frequency of 1.  If you were to continue looking through sorted\_tokens.txt, you would find that the tokens are sorted.
+
 examples/mapreduce/sort\_tokens\_and\_display.c:
 ```c
 #include "ac_allocator.h"
@@ -868,3 +886,15 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 ```
+
+
+## Reducing the frequencies
+
+In the last example, all of the tokens were shown to be sorted and have a frequency of 1.  This will show how to reduce the token/one pairs such that each token exists with a total frequency (and isn't repeated).  ac\_io.h defines a prototype for reducers as follows.
+
+```c
+bool reducer(ac_io_record_t *res, const ac_io_record_t *r, size_t num_r,
+             ac_buffer_t *bh, void *arg);
+```
+
+The reducer function is expected to set \*res and return true if the array of records reduced properly.  If false is returned, all of the records will be skipped.  It is very common that an ac\_buffer\_t object would be handy in constructing the final record, so it is passed into the reducer (but can be ignored).  The arg is user specified, but often is just NULL.  The AC map/reduce approach to reducing records is to call a reducer with an array of num_r records which are all equal according to the compare method.  It is often the case that the first record is all that is needed and because of that, ac_io defines a reducer named ac_io_keep_first.
