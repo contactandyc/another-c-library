@@ -1299,3 +1299,8 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 ```
+
+
+## Introducing ac_schedule
+
+While the previous code is efficient, my macbook has 16 threaded cores and a lot of RAM.  The code above is single threaded.  ac_schedule should make more sense if you first walked through the examples above.  ac_schedule let's you break up your work into smaller pieces, connect the work together, and it handles all of the execution.
