@@ -110,7 +110,7 @@ code[class*="language-"], pre[class*="language-"] {
   }
   .Preview-cd {
     max-width: 400px;
-    margin-left: 140px;
+    margin-left: 130px;
     overflow-x: scroll;
   }
 }
