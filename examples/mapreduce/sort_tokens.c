@@ -93,8 +93,8 @@ int main(int argc, char *argv[]) {
   ac_out_t *out = ac_out_ext_init("sorted_tokens", &out_opts, &out_ext_opts);
   ac_in_t *in = ac_in_init_from_list(files, num_files, &opts);
   lowercase_tokenize_and_sort_tokens_by_token(in, out);
-  ac_out_destroy(out);
   ac_in_destroy(in);
+  ac_out_destroy(out);
 
   if (extensions)
     ac_free(extensions);

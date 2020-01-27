@@ -415,7 +415,7 @@ lowercase\_and\_tokenize takes the ac\_in\_t object as an argument and iterates 
 
 The ac\_pool object is introduced in this example.  The ac\_pool\_tokenize method requires it to do the tokenization.  Memory is collected when ac\_pool\_clear or ac\_pool\_destroy is called.  The pool is initially setup to keep a reserve of 4096 bytes.  This should be plenty for the tokens in normal lines of text.  ac\_pool\_clear is an extremely cheap call to make, so I frequently will place it at the beginning of a loop.  This will ensure that it gets cleared if there happen to be continue statements throughout the loop.
 
-lowercase\_and\_tokenize.c
+examples/mapreduce/lowercase\_and\_tokenize.c
 ```c
 #include "ac_allocator.h"
 #include "ac_conv.h"
@@ -600,7 +600,7 @@ $ less sorted_tokens
 
 The data is binary and hard to read.  The binary seems to a 4 byte 5, a 4 byte 1, and a single byte '$' over and over again.  In the next section, the binary data will be displayed.  
 
-examples/mapreduce/sort_tokens.c:
+examples/mapreduce/sort\_tokens.c:
 ```c
 #include "ac_allocator.h"
 #include "ac_conv.h"
@@ -697,8 +697,8 @@ int main(int argc, char *argv[]) {
   ac_out_t *out = ac_out_ext_init("sorted_tokens", &out_opts, &out_ext_opts);
   ac_in_t *in = ac_in_init_from_list(files, num_files, &opts);
   sort_tokens_by_token(in, out);
-  ac_out_destroy(out);
   ac_in_destroy(in);
+  ac_out_destroy(out);
 
   if (extensions)
     ac_free(extensions);
@@ -709,3 +709,162 @@ int main(int argc, char *argv[]) {
 ```
 
 ## Displaying the sorted output
+
+In the last section, the data produced was binary.  In this section, we will print the sorted output just before the final sorted file is written (and avoid writing the final sorted file).
+
+The first change from sort\_tokens.c to sort\_tokens\_and\_display.c is to replace the ac\_out\_destroy with an ac\_out\_in call.  ac\_out\_in will take an output stream and convert it to an input stream.  After calling ac\_out\_in, there is no longer a need to destroy the output stream.  
+
+```c
+ac_out_destroy(out);
+```
+
+changes to
+```c
+in = ac_out_in(out);
+ac_io_record_t *r;
+while ((r = ac_in_advance(in)) != NULL) {
+  uint32_t frequency = (*(uint32_t *)(r->record));
+  char *token = r->record + sizeof(uint32_t);
+  printf("%u\t%s\n", frequency, token);
+}
+ac_in_destroy(in);
+```
+
+As before, we will move the print loop to a function called display\_token\_frequencies.
+
+```c
+in = ac_out_in(out);
+display_token_frequencies(in);
+ac_in_destroy(in);
+```
+
+and add the function above the main function.
+```c
+void display_token_frequencies(ac_in_t *in) {
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL) {
+    uint32_t frequency = (*(uint32_t *)(r->record));
+    char *token = r->record + sizeof(uint32_t);
+    printf("%u\t%s\n", frequency, token);
+  }
+}
+```
+
+examples/mapreduce/sort\_tokens\_and\_display.c:
+```c
+#include "ac_allocator.h"
+#include "ac_conv.h"
+#include "ac_in.h"
+#include "ac_io.h"
+#include "ac_out.h"
+#include "ac_pool.h"
+
+#include <locale.h>
+#include <stdio.h>
+
+bool file_ok(const char *filename, void *arg) {
+  char **extensions = (char **)arg;
+  char **p = extensions;
+  while (*p) {
+    if (ac_io_extension(filename, *p))
+      return true;
+    p++;
+  }
+  return false;
+}
+
+int usage(const char *prog) {
+  printf("%s <path> <extensions>\n", prog);
+  printf("extensions - a comma delimited list of valid extensions\n");
+  printf("\n");
+  return 0;
+}
+
+void lowercase(char *s) {
+  while (*s) {
+    if (*s >= 'A' && *s <= 'Z')
+      *s = *s - 'A' + 'a';
+    s++;
+  }
+}
+
+#define TO_SPLIT_ON "(*\"\',+-/\\| \t{});[].=&%<>!#`:"
+
+void lowercase_tokenize_and_sort_tokens_by_token(ac_in_t *in, ac_out_t *out) {
+  ac_pool_t *pool = ac_pool_init(4096);
+  ac_buffer_t *bh = ac_buffer_init(1000);
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL) {
+    ac_pool_clear(pool);
+    /* okay to change inline because this will be only use */
+    lowercase(r->record);
+    size_t num_tokens = 0;
+    char **tokens = ac_pool_tokenize(pool, &num_tokens, TO_SPLIT_ON, r->record);
+    uint32_t one = 1;
+    for (size_t i = 0; i < num_tokens; i++) {
+      ac_buffer_set(bh, &one, sizeof(one));
+      ac_buffer_appends(bh, tokens[i]);
+      ac_out_write_record(out, ac_buffer_data(bh), ac_buffer_length(bh));
+    }
+  }
+  ac_buffer_destroy(bh);
+  ac_pool_destroy(pool);
+}
+
+int compare_tokens(const ac_io_record_t *r1, const ac_io_record_t *r2,
+                   void *arg) {
+  char *a = r1->record + sizeof(uint32_t);
+  char *b = r2->record + sizeof(uint32_t);
+  return strcmp(a, b);
+}
+
+void display_token_frequencies(ac_in_t *in) {
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL) {
+    uint32_t frequency = (*(uint32_t *)(r->record));
+    char *token = r->record + sizeof(uint32_t);
+    printf("%u\t%s\n", frequency, token);
+  }
+}
+
+int main(int argc, char *argv[]) {
+  setlocale(LC_NUMERIC, "");
+
+  if (argc < 3)
+    return usage(argv[0]);
+
+  const char *path = argv[1];
+  const char *ext = argv[2];
+
+  char **extensions = ac_split(NULL, ',', ext);
+
+  size_t num_files = 0;
+  ac_io_file_info_t *files = ac_io_list(path, &num_files, file_ok, extensions);
+
+  ac_in_options_t opts;
+  ac_in_options_init(&opts);
+  ac_in_options_format(&opts, ac_io_delimiter('\n'));
+
+  ac_out_options_t out_opts;
+  ac_out_options_init(&out_opts);
+  ac_out_options_format(&out_opts, ac_io_prefix());
+
+  ac_out_ext_options_t out_ext_opts;
+  ac_out_ext_options_init(&out_ext_opts);
+  ac_out_ext_options_compare(&out_ext_opts, compare_tokens, NULL);
+
+  ac_out_t *out = ac_out_ext_init("sorted_tokens", &out_opts, &out_ext_opts);
+  ac_in_t *in = ac_in_init_from_list(files, num_files, &opts);
+  lowercase_tokenize_and_sort_tokens_by_token(in, out);
+  ac_in_destroy(in);
+  in = ac_out_in(out);
+  display_token_frequencies(in);
+  ac_in_destroy(in);
+
+  if (extensions)
+    ac_free(extensions);
+  if (files)
+    ac_free(files);
+  return 0;
+}
+```
