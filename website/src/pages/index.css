@@ -86,35 +86,6 @@ code[class*="language-"], pre[class*="language-"] {
   width: 72vw;
 }
 
-@media only screen and (max-width: 800px) {
-  .Footer {
-    flex-direction: column;
-  }
-  .Grid {
-    grid-template-columns: auto;
-  }
-  .Flex {
-    flex-direction: column;
-  }
-  .Flex-rvrs {
-    flex-direction: column-reverse;
-  }
-  .Sidebar {
-    display: none;
-  }
-  .Content {
-    width: 100%;
-  }
-  .Index-url {
-    display: none;
-  }
-  .Preview-cd {
-    max-width: 400px;
-    margin-left: 130px;
-    overflow-x: scroll;
-  }
-}
-
 /* header.js */
 .Header {
   position: sticky;
@@ -180,13 +151,13 @@ code[class*="language-"], pre[class*="language-"] {
 .Preview-cd {
   background: rgb(50, 56, 64);
   border-radius: 15px;
-  width: 500px;
+  max-width: 500px;
+  min-width: 500px;
   max-height: 400px;
-  overflow-x: scroll;
   color: white;
   padding: 15px;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: calc(.5vw + 6px);
+  font-size: calc(.4vw + 6px);
 }
 
 .Preview-h2 {
@@ -276,7 +247,7 @@ code[class*="language-"], pre[class*="language-"] {
   width: 15px;
   height: calc(20px + .7vw);
   animation: crsr 1.2s infinite;
-  margin-top: 8px;
+  margin-top: calc(.5vw);
 }
 
 .Index-mn-cnt {
@@ -389,4 +360,32 @@ code[class*="language-"], pre[class*="language-"] {
 
 .Footer-p {
   margin-bottom: 15px;
+}
+
+/* media query */
+@media only screen and (max-width: 800px) {
+  .Footer {
+    flex-direction: column;
+  }
+  .Grid {
+    grid-template-columns: auto;
+  }
+  .Flex {
+    flex-direction: column;
+  }
+  .Flex-rvrs {
+    flex-direction: column-reverse;
+  }
+  .Sidebar {
+    display: none;
+  }
+  .Content {
+    width: 100%;
+  }
+  .Index-url {
+    display: none;
+  }
+  .Preview-cd {
+    min-width: 300px;
+  }
 }
