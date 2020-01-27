@@ -1,6 +1,6 @@
-import { Link } from "gatsby"
-import React from "react"
-import { FaExternalLinkAlt } from "react-icons/fa"
+import { Link } from "gatsby";
+import React from "react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 function Header() {
   return (
@@ -32,7 +32,7 @@ function Header() {
           href="https://github.com/contactandyc/another-c-library">
           Github <FaExternalLinkAlt style={{ paddingTop: 5 }}/>
         </a>
-        <p className="Header-p">In Active Development!</p>
+        <p className="Header-p">Beta</p>
       </nav>
     </header>
   );
