@@ -130,8 +130,8 @@ code[class*="language-"], pre[class*="language-"] {
 }
 
 .Header-a, .Header-p {
-  font-size: calc(.8vw + 8px);
-  margin: 2vh 1.3vw;
+  font-size: calc(.8vw + 7px);
+  margin: 2vh 1.2vw;
 }
 
 .Header-a-actv {
