@@ -1154,6 +1154,24 @@ $ head sorted_tokens.txt
 3473	const
 ```
 
+If everything worked as expected, running this latest program against the "To be or not to be!" file found in sample should yield
+
+```
+2 be
+2 to
+1 not
+1 or
+```
+
+And it does!
+```
+$ ./sort_tokens_reduce_sort_by_freq_and_display sample tbontb
+2	be
+2	to
+1	not
+1	or
+```
+
 examples/mapreduce/sort\_tokens\_reduce\_sort\_by\_freq\_and\_display.c
 ```c
 #include "ac_allocator.h"
@@ -1300,26 +1318,8 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-If everything worked as expected, running this latest program against the "To be or not to be!" file found in sample should yield
-
-```
-2 be
-2 to
-1 not
-1 or
-```
-
-And it does!
-```
-$ ./sort_tokens_reduce_sort_by_freq_and_display sample tbontb
-2	be
-2	to
-1	not
-1	or
-```
-
 ## Final thoughts
 
-Hopefully, you've been able to see how the ac_in and ac_out objects can be helpful.  There was much that wasn't covered that can be found in the ac_in and ac_out documentation and the header files.
+Hopefully, you've been able to see how the ac\_in and ac\_out objects can be helpful.  There was much that wasn't covered that can be found in the ac\_in and ac\_out documentation and the header files.
 
-Understanding how ac_in and ac_out work is helpful for using ac_schedule (the next part of this documentation).  While this code is efficient, my macbook has 16 threaded cores and a lot of RAM.  The ac\_schedule is built to take advantage of multiple cores and lots (or a limited supply) of RAM.
+Understanding how ac\_in and ac\_out work is helpful for using ac\_schedule (the next part of this documentation).  While this code is efficient, my macbook has 16 threaded cores and a lot of RAM.  The ac\_schedule is built to take advantage of multiple cores and lots (or a limited supply) of RAM.
