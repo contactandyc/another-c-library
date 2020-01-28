@@ -2,9 +2,9 @@
   CSS Styling Guidelines:
   1. Search for file name to find component styling
   2. Global styles impact all elements, use sparingly
-  3. Avoid inline styling
+  3. Avoid inline styling when possible
   4. Class naming convention:
-      <Component name>-<element without vowels if possible>
+      <Component name>-<element without vowels when possible>
       i.e. for a Book component button the name would be "Book-btn"
 */
 
@@ -39,6 +39,15 @@ li {
   margin-bottom: 3px;
 }
 
+pre {
+  background: #f6f8fa;
+  font-size: 16px;
+  font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
+  line-height: 32px;
+  overflow: scroll;
+  text-shadow: none;
+}
+
 pre[class*="language"] {
   border-radius: 0;
   background: #f6f8fa; /* #1A202C */
@@ -60,22 +69,6 @@ code[class*="language-"], pre[class*="language-"] {
   text-shadow: none;
 }
 
-pre {
-  background: #f6f8fa;
-  font-size: 16px;
-  font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
-  line-height: 32px;
-  overflow: scroll;
-  text-shadow: none;
-}
-
-.Footer {
-  max-width: 1200px;
-  margin: 30px auto;
-  display: flex;
-  justify-content: space-between;
-}
-
 .Flex {
   height: 100%;
   display: flex;
@@ -93,30 +86,6 @@ pre {
   width: 72vw;
 }
 
-@media only screen and (max-width: 800px) {
-  .Footer {
-    flex-direction: column;
-  }
-  .Grid {
-    grid-template-columns: auto;
-  }
-  .Flex {
-    flex-direction: column;
-  }
-  .Sidebar {
-    display: none;
-  }
-  .Content {
-    width: 100%;
-  }
-  .Index-url {
-    display: none;
-  }
-  .Index-cd-alt {
-    max-width: 500px;
-  }
-}
-
 /* header.js */
 .Header {
   position: sticky;
@@ -132,12 +101,85 @@ pre {
 }
 
 .Header-a, .Header-p {
-  font-size: calc(1vw + 4px);
-  margin: 2vh 2vw;
+  font-size: calc(.8vw + 7px);
+  margin: 2vh 1.2vw;
 }
 
 .Header-a-actv {
   color: #38A169;
+}
+
+/* sidebar.js */
+.Sidebar {
+  font-family: `-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen',
+    'Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif`;
+  height: 100%;
+  padding: 15px;
+  position: sticky;
+  color: #1E4E8C;
+  top: 62px;
+  border-left: solid 1px #EDF2F7;
+  overflow-y: scroll;
+}
+
+.Sidebar-actv {
+  color: #1A202C;
+  font-weight: 700;
+}
+
+.Sidebar-ul {
+  padding-left: 0;
+  list-style: none;
+}
+
+.Sidebar-li {
+  margin-bottom: 0;
+}
+
+/* preview.js */
+.Preview {
+  max-width: 1200px;
+  margin: auto;
+  padding: 50px 0;
+}
+
+.Preview-cnt {
+  max-width: 500px;
+  margin: 20px;
+}
+
+.Preview-cd {
+  background: rgb(50, 56, 64);
+  border-radius: 15px;
+  max-width: 500px;
+  min-width: 500px;
+  max-height: 400px;
+  color: white;
+  padding: 15px;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: calc(.4vw + 6px);
+}
+
+.Preview-h2 {
+  color: #38A169;
+  border-bottom: none;
+  margin: 0;
+}
+
+.Preview-h3 {
+  margin-top: 10px;
+}
+
+.Preview-btn {
+  font-size: 16px;
+  background-color: #4A5568;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  display: flex;
+  cursor: pointer;
+  margin: 0;
 }
 
 /* index.js */
@@ -198,26 +240,20 @@ pre {
   padding: 8px 16px;
   display: flex;
   cursor: pointer;
-  margin: auto;
+  margin: 25px auto;
 }
 
 .Index-crsr {
   width: 15px;
   height: calc(20px + .7vw);
   animation: crsr 1.2s infinite;
-  margin-top: 8px;
+  margin-top: calc(.5vw);
 }
 
 .Index-mn-cnt {
   max-width: 500px;
   margin: 20px;
 }
-
-.Index-mn-full {
-  max-width: 1000px;
-  margin: 20px;
-}
-
 
 @keyframes crsr {
     0% { background: rgb(10, 13, 17); }
@@ -235,28 +271,6 @@ pre {
   background-color: #4A5568;
   padding: 10px;
   margin: 0;
-}
-
-.Index-cd-alt {
-  background: rgb(50, 56, 64);
-  border-radius: 15px;
-  width: 500px;
-  height: 400px;
-  overflow-x: scroll;
-  color: white;
-  padding: 15px;
-  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: calc(.5vw + 5px);
-}
-
-.Index-h2-alt {
-  color: #38A169;
-  border-bottom: none;
-  margin: 0;
-}
-
-.Index-h3-alt {
-  margin-top: 10px;
 }
 
 /* md-page.js */
@@ -289,7 +303,7 @@ pre {
   padding-top: 5px;
 }
 
-/* Tutorial.js, docs.js */
+/* tutorial.js, docs.js */
 .Tutorial-mn {
   margin: 0 auto;
   max-width: 1200px;
@@ -313,7 +327,7 @@ pre {
   top: 62px;
 }
 
-/* license.js, contact.js, contributing.js */
+/* license.js, contact.js, contributing.js, conduct.js */
 .License-mn {
   margin: 0 auto;
   max-width: 1200px;
@@ -322,6 +336,13 @@ pre {
 }
 
 /* footer.js */
+.Footer {
+  max-width: 1200px;
+  margin: 30px auto;
+  display: flex;
+  justify-content: space-between;
+}
+
 .Footer-ctr {
   background-color: rgb(10, 13, 17);
   padding: 10px;
@@ -339,4 +360,32 @@ pre {
 
 .Footer-p {
   margin-bottom: 15px;
+}
+
+/* media query */
+@media only screen and (max-width: 800px) {
+  .Footer {
+    flex-direction: column;
+  }
+  .Grid {
+    grid-template-columns: auto;
+  }
+  .Flex {
+    flex-direction: column;
+  }
+  .Flex-rvrs {
+    flex-direction: column-reverse;
+  }
+  .Sidebar {
+    display: none;
+  }
+  .Content {
+    width: 100%;
+  }
+  .Index-url {
+    display: none;
+  }
+  .Preview-cd {
+    min-width: 300px;
+  }
 }
