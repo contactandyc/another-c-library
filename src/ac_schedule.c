@@ -1304,6 +1304,8 @@ static void mark_as_done(ac_schedule_t *scheduler) {
 
 static char *_ac_worker_output_base(ac_worker_t *w, ac_worker_output_t *outp,
                                     const char *suffix) {
+  if (!outp)
+    return NULL;
   // base_<part><suffix>
   ac_buffer_t *bh = w->schedule_thread->bh;
   ac_buffer_setf(bh, "%s/%s_%lu/", w->task->scheduler->task_dir,
@@ -1330,6 +1332,46 @@ static char *_ac_worker_output_base(ac_worker_t *w, ac_worker_output_t *outp,
 
 char *ac_worker_output_base(ac_worker_t *w, ac_worker_output_t *outp) {
   return _ac_worker_output_base(w, outp, NULL);
+}
+
+char *ac_worker_input_params(ac_worker_t *w, size_t n) {
+  ac_worker_input_t *inp = ac_worker_input(w, n);
+  if (!inp)
+    return (char *)"";
+  if (inp->num_files == 1)
+    return inp->files[0].filename;
+
+  size_t len = 1;
+  for (size_t i = 0; i < inp->num_files; i++) {
+    len += strlen(inp->files[i].filename) + 1;
+  }
+  char *res = (char *)ac_pool_alloc(w->pool, len);
+  char *p = res;
+  for (size_t i = 0; i < inp->num_files; i++) {
+    strcpy(p, inp->files[i].filename);
+    p += strlen(inp->files[i].filename);
+    if (i + 1 < inp->num_files)
+      *p++ = ' ';
+  }
+  return res;
+}
+
+char *ac_worker_output_params(ac_worker_t *w, size_t n) {
+  ac_worker_output_t *outp = ac_worker_output(w, n);
+  if (!outp)
+    return NULL;
+
+  char *base = _ac_worker_output_base(w, outp, NULL);
+  if (outp->flags & AC_OUTPUT_SPLIT) {
+    size_t num_partitions = 0;
+    if (outp->destinations)
+      num_partitions = outp->destinations->task->num_partitions;
+    else
+      num_partitions = w->task->scheduler->num_partitions;
+
+    return ac_pool_strdupf(w->pool, "%s %lu", base, num_partitions);
+  } else
+    return base;
 }
 
 char *ac_worker_output_base2(ac_worker_t *w, ac_worker_output_t *outp,
@@ -1584,6 +1626,62 @@ void list_selected_tasks(void *arg) {
             }
           }
           transforms = transforms->next;
+        }
+      } else {
+        printf("  custom runner\n");
+        {
+          ac_worker_input_t *n = w->inputs;
+          size_t i = 0;
+          while (n) {
+            printf("      input[%lu]: %s (%lu)\n", i, n->name, n->num_files);
+            i++;
+            if (show_files) {
+              for (size_t j = 0; j < n->num_files; j++)
+                printf("        %s (%lu)\n", n->files[j].filename,
+                       n->files[j].size);
+            }
+            n = n->next;
+          }
+        }
+        {
+          ac_worker_output_t *n = w->outputs;
+          size_t i = 0;
+          while (n) {
+            printf("      output[%lu]: %s %s%s%s\n", i, n->name,
+                   n->flags & AC_OUTPUT_SPLIT ? "split" : "",
+                   n->flags & AC_OUTPUT_PARTITION ? "partition" : "",
+                   (n->flags & (AC_OUTPUT_SPLIT | AC_OUTPUT_PARTITION))
+                       ? ""
+                       : "normal");
+            ac_task_link_t *d = n->destinations;
+            if (d) {
+              printf("        destinations:");
+              while (d) {
+                printf(" %s[%lu]", d->task->task_name, d->task->num_partitions);
+                d = d->next;
+              }
+              printf("\n");
+            }
+            if (show_files) {
+              char *base_name = ac_worker_output_base(w, n);
+              size_t num_partitions = 0;
+              if ((n->flags & AC_OUTPUT_SPLIT) && n->ext_options.partition) {
+                if (n->destinations)
+                  num_partitions = n->destinations->task->num_partitions;
+                else
+                  num_partitions = n->task->scheduler->num_partitions;
+              }
+              if (!num_partitions)
+                printf("        %s\n", base_name);
+              char *filename =
+                  (char *)ac_pool_alloc(w->pool, strlen(base_name) + 20);
+              for (size_t j = 0; j < num_partitions; j++) {
+                ac_out_partition_filename(filename, base_name, j);
+                printf("        %s\n", filename);
+              }
+            }
+            n = n->next;
+          }
         }
       }
     }

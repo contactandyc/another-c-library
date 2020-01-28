@@ -1300,7 +1300,26 @@ int main(int argc, char *argv[]) {
 }
 ```
 
+If everything worked as expected, running this latest program against the "To be or not to be!" file found in sample should yield
 
-## Introducing ac\_schedule
+```
+2 be
+2 to
+1 not
+1 or
+```
 
-While the previous code is efficient, my macbook has 16 threaded cores and a lot of RAM.  The code above is single threaded.  ac\_schedule should make more sense if you first walked through the examples above.  ac\_schedule let's you break up your work into smaller pieces, connect the work together, and it handles all of the execution.
+And it does!
+```
+$ ./sort_tokens_reduce_sort_by_freq_and_display sample tbontb
+2	be
+2	to
+1	not
+1	or
+```
+
+## Final thoughts
+
+Hopefully, you've been able to see how the ac_in and ac_out objects can be helpful.  There was much that wasn't covered that can be found in the ac_in and ac_out documentation and the header files.
+
+Understanding how ac_in and ac_out work is helpful for using ac_schedule (the next part of this documentation).  While this code is efficient, my macbook has 16 threaded cores and a lot of RAM.  The ac\_schedule is built to take advantage of multiple cores and lots (or a limited supply) of RAM.

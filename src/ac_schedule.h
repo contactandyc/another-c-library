@@ -371,6 +371,12 @@ char *ac_worker_output_base(ac_worker_t *w, ac_worker_output_t *outp);
 char *ac_worker_output_base2(ac_worker_t *w, ac_worker_output_t *outp,
                              const char *suffix);
 
+/* Returns a name and number for split, otherwise just a name */
+char *ac_worker_output_params(ac_worker_t *w, size_t n);
+
+/* Returns the names of the input files as a string */
+char *ac_worker_input_params(ac_worker_t *w, size_t n);
+
 /* Returns NULL if no input from the given source partition.  Otherwise,
    this will return the name of the file that was output to this partition
    given the task/part, input, and source partition */
