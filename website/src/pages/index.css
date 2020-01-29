@@ -151,11 +151,12 @@ code[class*="language-"], pre[class*="language-"] {
 .Preview-cd {
   background: rgb(50, 56, 64);
   border-radius: 15px;
+  padding: 15px;
   max-width: 500px;
   min-width: 500px;
   max-height: 400px;
   color: white;
-  padding: 15px;
+  overflow-y: scroll;
   font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   font-size: calc(.4vw + 6px);
 }
@@ -386,7 +387,42 @@ code[class*="language-"], pre[class*="language-"] {
     display: none;
   }
   .Preview-cd {
-    min-width: 300px;
+    min-width: 400px;
     overflow-y: scroll;
+    font-size: calc(.7vw + 5px);
+    border-radius: 10px;
+    padding: 10px;
+  }
+}
+
+@media only screen and (max-width: 500px){
+  .Footer {
+    flex-direction: column;
+  }
+  .Grid {
+    grid-template-columns: auto;
+  }
+  .Flex {
+    flex-direction: column;
+  }
+  .Flex-rvrs {
+    flex-direction: column-reverse;
+  }
+  .Sidebar {
+    display: none;
+  }
+  .Content {
+    width: 100%;
+  }
+  .Index-url {
+    display: none;
+  }
+  .Preview-cd {
+    min-width: -webkit-fill-available;
+    max-width: 500px;
+    overflow-y: scroll;
+    font-size: calc(.85vw + 5px);
+    border-radius: 8px;
+    padding: 8px;
   }
 }
