@@ -387,5 +387,6 @@ code[class*="language-"], pre[class*="language-"] {
   }
   .Preview-cd {
     min-width: 300px;
+    overflow-y: scroll;
   }
 }
