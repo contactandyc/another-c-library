@@ -14,7 +14,7 @@ The ac\_in/ac\_out could easily be used to split up data manually and made to be
 
 ## Setting up ac\_schedule
 
-The ac\_schedule isn't particularly complicated, it just has a few parts to it.  The first thing to do is setup tasks.  These tasks are going to print the task name and the partition being worked on.
+The ac\_schedule isn't particularly complicated, it just has a few parts to it.  The first thing to do is setup tasks.  For now, these tasks will do nothing at all (other than return true indicating that they didn't fail).
 
 examples/mapreduce2/start.c
 ```c
@@ -146,6 +146,8 @@ Finished first[1] on thread 0 in 0.000ms
 Finished partition[1] on thread 1 in 0.000ms
 ```
 
+All of the tasks finish in 0.000ms which is expected because the tasks do nothing except return true.
+
 Notice that all of the tasks are run on threads.  There is a thread for each cpu specified in ac_schedule_init.  There are 5 tasks with [0] and 4 tasks with [1].  The split[0] doesn't have a corresponding split[1].  This is because split was defined as not being partitioned.
 
 Run start again...
@@ -256,7 +258,31 @@ Finished first[0] on thread 0 in 0.000ms
 Finished first[1] on thread 1 in 0.000ms
 ```
 
-The -d, -l, -s, and -p options will make sense in a bit.
+The -l option lists the tasks and information about the tasks.  At this point, there is very little information about each task.  The tasks have a name, partition information, and a custom runner.  The -s option is similar to -l, except it will show more information (if available).
+
+```
+$ ./start -l
+task: multi [0/2]
+  custom runner
+task: all [0/2]
+  custom runner
+task: first [0/2]
+  custom runner
+task: partition [0/2]
+  custom runner
+task: split [0/1]
+  custom runner
+task: multi [1/2]
+  custom runner
+task: all [1/2]
+  custom runner
+task: first [1/2]
+  custom runner
+task: partition [1/2]
+  custom runner
+```
+
+The -d, -s, and -p options will make sense in a bit.
 
 The -c option allows the number of cpus to be controlled.
 ```
@@ -285,3 +311,159 @@ bool setup_task(ac_task_t *task) {
   return true;
 }
 ```
+
+## Ordering the tasks
+
+In the last section, the tasks ran in a somewhat random order.  This would be okay if the tasks were in no way dependent upon each other, but that's rarely the case.  Let's consider the code that assigns tasks to the scheduler.
+
+```c
+ac_schedule_task(scheduler, "split", false, setup_task);
+ac_schedule_task(scheduler, "partition", true, setup_task);
+ac_schedule_task(scheduler, "first", true, setup_task);
+ac_schedule_task(scheduler, "all", true, setup_task);
+ac_schedule_task(scheduler, "multi", true, setup_task);
+```
+
+It may be desirable to have each task depend upon the previous task, except multi which will depend upon all of the tasks.  In order to do this, a setup function will have to be created for each task.
+
+```c
+ac_schedule_task(scheduler, "split", false, setup_split);
+ac_schedule_task(scheduler, "partition", true, setup_partition);
+ac_schedule_task(scheduler, "first", true, setup_first);
+ac_schedule_task(scheduler, "all", true, setup_all);
+ac_schedule_task(scheduler, "multi", true, setup_multi);
+```
+
+Next, each of those functions will have to be created.
+
+```c
+bool setup_split(ac_task_t *task) {
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_first(ac_task_t *task) {
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_partition(ac_task_t *task) {
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_all(ac_task_t *task) {
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_multi(ac_task_t *task) {
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+```
+
+For this example, we can continue with the do_nothing which just returns true.
+
+```c
+bool ac_task_dependency(ac_task_t *task, const char *dependency);
+bool ac_task_partial_dependency(ac_task_t *task, const char *dependency);
+```
+
+ac_task_dependency creates a full dependency upon listed tasks (const char *dependency is a vertical bar separated list of tasks).  ac_task_partial_dependency creates a dependency upon the previous task and the given partition (unless the previous task isn't partitioned, then it is the same as ac_task_dependency).
+
+The following will wire up the dependencies.  
+
+
+```c
+bool setup_split(ac_task_t *task) {
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_first(ac_task_t *task) {
+  ac_task_dependency(task, "split");
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_partition(ac_task_t *task) {
+  ac_task_dependency(task, "first");
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_all(ac_task_t *task) {
+  ac_task_partial_dependency(task, "partition");
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_multi(ac_task_t *task) {
+  ac_task_dependency(task, "all|partition|first|split");
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+```
+
+The code for this is found in examples/mapreduce2/order_tasks.c.  Deleting the tasks directory will cleanup all previous run information (from the last section for example).
+
+```
+$ rm -rf tasks
+$ make order_tasks
+$ ./order_tasks
+Finished split[0] on thread 2 in 0.000ms
+Finished first[0] on thread 2 in 0.001ms
+Finished first[1] on thread 1 in 0.000ms
+Finished partition[0] on thread 1 in 0.000ms
+Finished all[0] on thread 1 in 0.000ms
+Finished partition[1] on thread 2 in 0.000ms
+Finished all[1] on thread 2 in 0.000ms
+Finished multi[0] on thread 2 in 0.000ms
+Finished multi[1] on thread 3 in 0.000ms
+```
+
+Notice how all of the tasks are in order.  all and partition are ordered on a per partition basis.  all[0] runs after partition[0] and all[1] runs after partition[1].
+
+In the last section the -l option showed very little information.  Rerunning it now, will show more detail.
+
+```
+$ ./order_tasks -l
+task: split [0/1]
+  reverse dependencies:  multi[2] first[2]
+  custom runner
+task: first [0/2]
+  dependencies:  split[1]
+  reverse dependencies:  multi[2] partition[2]
+  custom runner
+task: first [1/2]
+  dependencies:  split[1]
+  reverse dependencies:  multi[2] partition[2]
+  custom runner
+task: partition [0/2]
+  dependencies:  first[2]
+  reverse dependencies:  multi[2]
+  reverse partial dependencies:  all[2]
+  custom runner
+task: all [0/2]
+  reverse dependencies:  multi[2]
+  partial dependencies:  partition[2]
+  custom runner
+task: partition [1/2]
+  dependencies:  first[2]
+  reverse dependencies:  multi[2]
+  reverse partial dependencies:  all[2]
+  custom runner
+task: all [1/2]
+  reverse dependencies:  multi[2]
+  partial dependencies:  partition[2]
+  custom runner
+task: multi [0/2]
+  dependencies:  split[1] first[2] partition[2] all[2]
+  custom runner
+task: multi [1/2]
+  dependencies:  split[1] first[2] partition[2] all[2]
+  custom runner
+```
+
+This shows that each multi partition depends upon split, first, partition, and all.  It shows that all has a reverse dependency of multi (multi depends upon all).  all also has a partial dependency of partition.  The scheduler makes sure that the dependencies are complete before a given task/partition can be run.

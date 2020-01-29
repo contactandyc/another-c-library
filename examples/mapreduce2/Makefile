@@ -2,7 +2,7 @@ ROOT=../..
 include $(ROOT)/src/Makefile.include
 
 FLAGS += -g -D_AC_DEBUG_MEMORY_=NULL -lz
-PROGRAMS = start
+PROGRAMS = start order_tasks
 
 all: $(PROGRAMS) examples gitignore
 
@@ -12,7 +12,11 @@ $(PROGRAMS): %: %.c $(OBJECTS) $(HEADER_FILES)
 examples: $(PROGRAMS)
 	@echo Running the examples
 	@echo
-	./start -f
+	rm -rf tasks
+	./start
+	@echo
+	rm -rf tasks
+	./order_tasks
 
 clean:
 	rm -rf *~ *.dSYM $(PROGRAMS)
