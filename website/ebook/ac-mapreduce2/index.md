@@ -62,7 +62,7 @@ ac_schedule_t *ac_schedule_init(int argc, char **args, size_t num_partitions,
                                 size_t cpus, size_t ram);
 ```
 
-ac_schedule_init is initialized with the command line arguments, number of partitions, number of cpus, and MB of ram.  The command line arguments are passed to ac_schedule_init to potentially allow arguments to control how processing will be done.  
+ac\_schedule\_init is initialized with the command line arguments, number of partitions, number of cpus, and MB of ram.  The command line arguments are passed to ac\_schedule\_init to potentially allow arguments to control how processing will be done.  
 
 ```c
 #include "ac_schedule.h"
@@ -80,7 +80,7 @@ ac_task_t *ac_schedule_task(ac_schedule_t *h, const char *task_name,
                             bool partitioned, ac_task_f setup);
 ```
 
-Once the scheduler is initialized via ac_schedule_init, at least one task must be assigned to it.  ac_schedule_task schedules a task by naming it, defining if it is partitioned or not, and specifying a setup function to finish setting the task up.  In our example, we've assigned 5 tasks (the first one (named split) is not partitioned).
+Once the scheduler is initialized via ac\_schedule\_init, at least one task must be assigned to it.  ac\_schedule\_task schedules a task by naming it, defining if it is partitioned or not, and specifying a setup function to finish setting the task up.  In our example, we've assigned 5 tasks (the first one (named split) is not partitioned).
 
 ```c
 ac_schedule_task(scheduler, "split", false, setup_task);
@@ -90,13 +90,13 @@ ac_schedule_task(scheduler, "all", true, setup_task);
 ac_schedule_task(scheduler, "multi", true, setup_task);
 ```
 
-Normally, each scheduled task would have a different setup function.  In this case, all of the functions do the same thing (print the task name and the partition), so setup_task can be shared.
+Normally, each scheduled task would have a different setup function.  In this case, all of the functions do the same thing (print the task name and the partition), so setup\_task can be shared.
 
 ```c
 void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete);
 ```
 
-ac_schedule_run calls all of the setup methods specified via ac_schedule_task, sets up how all of the tasks will ultimately run, and finally runs them.  If the on_complete call is not NULL, it will be called once a task completes.  ac_worker_complete is provided by ac_schedule.h/c (it provides basic information).
+ac\_schedule\_run calls all of the setup methods specified via ac\_schedule\_task, sets up how all of the tasks will ultimately run, and finally runs them.  If the on\_complete call is not NULL, it will be called once a task completes.  ac\_worker\_complete is provided by ac\_schedule.h/c (it provides basic information).
 
 ```c
   ac_schedule_run(scheduler, ac_worker_complete);
@@ -117,13 +117,13 @@ bool setup_task(ac_task_t *task) {
 }
 ```
 
-The setup_task method is used to setup all 5 of the tasks.  Typically, there would be one setup function for each task.  This sets the method to run each partition of the given task.  The do_nothing function returns true to indicate that the function succeeded.
+The setup\_task method is used to setup all 5 of the tasks.  Typically, there would be one setup function for each task.  This sets the method to run each partition of the given task.  The do\_nothing function returns true to indicate that the function succeeded.
 
 This is a very basic shell of a program.  Here is a quick recap...
 
 In the main function
-1. initialize the scheduler using ac_schedule_init
-2. add tasks to the scheduler using ac_schedule_task (each task will have a name, be partitioned or not, and have a setup function to be called later)
+1. initialize the scheduler using ac\_schedule\_init
+2. add tasks to the scheduler using ac\_schedule\_task (each task will have a name, be partitioned or not, and have a setup function to be called later)
 3. run the scheduler
 4. destroy the scheduler
 
@@ -148,7 +148,7 @@ Finished partition[1] on thread 1 in 0.000ms
 
 All of the tasks finish in 0.000ms which is expected because the tasks do nothing except return true.
 
-Notice that all of the tasks are run on threads.  There is a thread for each cpu specified in ac_schedule_init.  There are 5 tasks with [0] and 4 tasks with [1].  The split[0] doesn't have a corresponding split[1].  This is because split was defined as not being partitioned.
+Notice that all of the tasks are run on threads.  There is a thread for each cpu specified in ac\_schedule\_init.  There are 5 tasks with [0] and 4 tasks with [1].  The split[0] doesn't have a corresponding split[1].  This is because split was defined as not being partitioned.
 
 Run start again...
 ```
@@ -156,7 +156,7 @@ $ ./start
 $
 ```
 
-Nothing was output.  This is because ac_schedule will assume that the tasks don't need to rerun as there isn't anything to indicate that the tasks inputs have changed. Let's rerun again with a -h option.
+Nothing was output.  This is because ac\_schedule will assume that the tasks don't need to rerun as there isn't anything to indicate that the tasks inputs have changed. Let's rerun again with a -h option.
 
 ```
 $ ./start -h
@@ -233,7 +233,7 @@ Finished first[0] on thread 1 in 0.000ms
 Finished first[1] on thread 2 in 0.000ms
 ```
 
-By default the AC's scheduler will run all of the tasks if they haven't been run.  For example, if you were to remove the tasks folder and then try and only run first, the following would happen.
+By default the scheduler will run all of the tasks if they haven't been run.  For example, if you were to remove the tasks folder and then try and only run first, the following would happen.
 
 ```
 $ rm -rf tasks/
@@ -302,7 +302,7 @@ Notice that all threads run on once cpu.
 
 The -r option is similar to the -c option, except that it controls how much ram can be used.
 
-In the above example, it may have been desirable for a given task to run everytime and not have to use the -f option to run task over again.  ac_task_run_evertime is meant to be called from the setup function to do just that.
+In the above example, it may have been desirable for a given task to run everytime and not have to use the -f option to run task over again.  ac\_task\_run\_evertime is meant to be called from the setup function to do just that.
 
 ```c
 bool setup_task(ac_task_t *task) {
@@ -363,14 +363,14 @@ bool setup_multi(ac_task_t *task) {
 }
 ```
 
-For this example, we can continue with the do_nothing which just returns true.
+For this example, we can continue with the do\_nothing which just returns true.
 
 ```c
 bool ac_task_dependency(ac_task_t *task, const char *dependency);
 bool ac_task_partial_dependency(ac_task_t *task, const char *dependency);
 ```
 
-ac_task_dependency creates a full dependency upon listed tasks (const char *dependency is a vertical bar separated list of tasks).  ac_task_partial_dependency creates a dependency upon the previous task and the given partition (unless the previous task isn't partitioned, then it is the same as ac_task_dependency).
+ac\_task\_dependency creates a full dependency upon listed tasks (const char *dependency is a vertical bar separated list of tasks).  ac\_task\_partial\_dependency creates a dependency upon the previous task and the given partition (unless the previous task isn't partitioned, then it is the same as ac\_task\_dependency).
 
 The following will wire up the dependencies.  
 
@@ -406,7 +406,7 @@ bool setup_multi(ac_task_t *task) {
 }
 ```
 
-The code for this is found in examples/mapreduce2/order_tasks.c.  Deleting the tasks directory will cleanup all previous run information (from the last section for example).
+The code for this is found in examples/mapreduce2/order\_tasks.c.  Deleting the tasks directory will cleanup all previous run information (from the last section for example).
 
 ```
 $ rm -rf tasks
