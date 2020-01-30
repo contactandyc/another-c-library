@@ -312,12 +312,14 @@ char **_ac_split_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
     return NULL;
 
   const char *p = s;
-  size_t num = 1;
+  size_t num = 0;
   while (*p != 0) {
     if (*p == delim)
       num++;
     p++;
   }
+  if (s[0] != 0 && p[-1] != delim)
+    num++;
   if (num_splits)
     *num_splits = num;
   char **r = NULL;
@@ -335,6 +337,8 @@ char **_ac_split_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
     if (*sp == delim) {
       *sp = 0;
       sp++;
+      if (*sp == 0)
+        break;
       *wr = sp;
       wr++;
     } else
@@ -355,7 +359,7 @@ char **_ac_split2_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
   if (*p == 0)
     return NULL;
   s = p;
-  size_t num = 1;
+  size_t num = 0;
   while (*p != 0) {
     if (*p == delim) {
       num++;
@@ -365,6 +369,8 @@ char **_ac_split2_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
     } else
       p++;
   }
+  if (s[0] != 0 && p[-1] != delim)
+    num++;
   if (num_splits)
     *num_splits = num;
   char **r;
@@ -384,6 +390,8 @@ char **_ac_split2_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
       sp++;
       while (*sp == delim)
         sp++;
+      if (*sp == 0)
+        break;
       *wr = sp;
       wr++;
     } else

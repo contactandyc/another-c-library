@@ -374,12 +374,14 @@ char **_ac_pool_split(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
     return &nil;
   }
   char *p = s;
-  size_t num = 1;
+  size_t num = 0;
   while (*p != 0) {
     if (*p == delim)
       num++;
     p++;
   }
+  if (s[0] != 0 && p[-1] != delim)
+    num++;
   if (num_splits)
     *num_splits = num;
   char **r = (char **)ac_pool_alloc(h, sizeof(char *) * (num + 1));
@@ -390,6 +392,8 @@ char **_ac_pool_split(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
     if (*s == delim) {
       *s = 0;
       s++;
+      if (*s == 0)
+        break;
       *wr = s;
       wr++;
     } else
@@ -430,7 +434,7 @@ char **_ac_pool_split2(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
     return &nil;
   }
   s = p;
-  size_t num = 1;
+  size_t num = 0;
   while (*p != 0) {
     if (*p == delim) {
       num++;
@@ -440,6 +444,9 @@ char **_ac_pool_split2(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
     } else
       p++;
   }
+  if (s[0] != 0 && p[-1] != delim)
+    num++;
+
   if (num_splits)
     *num_splits = num;
   char **r = (char **)ac_pool_alloc(h, sizeof(char *) * (num + 1));
@@ -452,6 +459,8 @@ char **_ac_pool_split2(ac_pool_t *h, size_t *num_splits, char delim, char *s) {
       s++;
       while (*s == delim)
         s++;
+      if (*s == 0)
+        break;
       *wr = s;
       wr++;
     } else

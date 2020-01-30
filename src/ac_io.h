@@ -40,6 +40,7 @@ typedef struct ac_io_file_info_s {
   char *filename;
   size_t size;
   time_t last_modified;
+  uint64_t hash;
   int32_t tag;
 } ac_io_file_info_t;
 
@@ -71,6 +72,15 @@ bool ac_io_file_info(ac_io_file_info_t *fi);
 ac_io_file_info_t *
 ac_io_list(const char *path, size_t *num_files,
            bool (*file_valid)(const char *filename, void *arg), void *arg);
+
+ac_io_file_info_t *
+ac_pool_io_list(ac_pool_t *pool, const char *path, size_t *num_files,
+                bool (*file_valid)(const char *filename, void *arg), void *arg);
+
+ac_io_file_info_t *ac_io_select_file_info(ac_pool_t *pool, size_t *num_res,
+                                          ac_io_file_info_t *inputs,
+                                          size_t num_inputs, size_t partition,
+                                          size_t num_partitions);
 
 bool ac_io_file_exists(const char *filename);
 

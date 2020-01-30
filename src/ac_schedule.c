@@ -1043,6 +1043,18 @@ void ac_task_input_limit(ac_task_t *task, size_t limit) {
 
 static bool in_out_runner(ac_worker_t *w);
 
+static void get_ack_time_for_task(ac_task_t *task) {
+  for (size_t i = 0; i < task->num_partitions; i++) {
+    time_t *ack = &(task->state_linkage[i].ack_time);
+    if (*ack == -1) {
+      char *filename =
+          ac_pool_strdupf(task->scheduler->pool, "%s/%s_%lu",
+                          task->scheduler->ack_dir, task->task_name, i);
+      *ack = ac_io_modified(filename);
+    }
+  }
+}
+
 static void schedule_setup(ac_schedule_t *h) {
   if (!h->task_dir)
     h->task_dir = (char *)"tasks";
@@ -1053,6 +1065,7 @@ static void schedule_setup(ac_schedule_t *h) {
   ac_io_make_directory(h->ack_dir);
   ac_task_t *n = h->head;
   while (n) {
+    get_ack_time_for_task(n);
     if (n->setup) {
       n->setup(n);
       if (n->runner == in_out_runner && !n->transforms) {
@@ -1224,7 +1237,10 @@ static bool run_worker(ac_worker_t *w) {
 time_t get_ack_time_for_task_and_partition(ac_task_t *task, size_t partition) {
   if (partition >= task->num_partitions)
     return 0;
-  return task->state_linkage[partition].ack_time;
+  time_t ack_time = task->state_linkage[partition].ack_time;
+  time_t completed = task->state_linkage[partition].completed;
+
+  return ack_time > completed ? ack_time : completed;
 }
 
 static bool task_run_per_args(ac_worker_t *w) {
@@ -1257,7 +1273,7 @@ static bool worker_needs_to_run(ac_worker_t *w) {
   }
 
   ac_task_t *task = w->task;
-  ac_task_link_t *link = task->reverse_dependencies;
+  ac_task_link_t *link = task->dependencies;
   while (link) {
     for (size_t i = 0; i < link->task->num_partitions; i++) {
       time_t ack_time = get_ack_time_for_task_and_partition(link->task, i);
@@ -1266,7 +1282,7 @@ static bool worker_needs_to_run(ac_worker_t *w) {
     }
     link = link->next;
   }
-  link = task->reverse_partial_dependencies;
+  link = task->partial_dependencies;
   while (link) {
     time_t ack_time =
         get_ack_time_for_task_and_partition(link->task, w->partition);
@@ -1871,12 +1887,20 @@ void parse_args(ac_schedule_t *h) {
 
   char **p = h->args;
   char **ep = p + h->argc;
+  bool should_read_args = true;
+  char **custom_args =
+      (char **)ac_pool_calloc(h->pool, sizeof(char *) * (h->argc + 1));
+  size_t num_custom_args = 0;
+
   while (p < ep) {
     if (!strcmp(*p, "-f") || !(strcmp(*p, "--force"))) {
       at.force = true;
       p++;
     } else if (!strcmp(*p, "-o")) {
       at.only_run_selected = true;
+      p++;
+    } else if (!strcmp(*p, "--new-args")) {
+      should_read_args = false;
       p++;
     } else if (!strcmp(*p, "-l") || !(strcmp(*p, "--list"))) {
       at.list = true;
@@ -1901,9 +1925,11 @@ void parse_args(ac_schedule_t *h) {
       if (ptr[1] == 'p' || (ptr[1] == '-' && ptr[2] == 'p'))
         at.prefix = true;
       p++;
-      if (p == ep || (*p)[0] == '-')
+      if (p == ep || (*p)[0] == '-') {
+        printf("[ERROR] --dump and --prefix requires one or more files to be "
+               "listed after parameter\n\n");
         at.help = true;
-      else {
+      } else {
         while (p < ep && (*p)[0] != '-') {
           filenames =
               ac_pool_strdupf(h->pool, "%s%s%s", filenames ? filenames : "",
@@ -1913,9 +1939,11 @@ void parse_args(ac_schedule_t *h) {
       }
     } else if (!strcmp(*p, "-t") || !(strcmp(*p, "--task"))) {
       p++;
-      if (p == ep || (*p)[0] == '-')
+      if (p == ep || (*p)[0] == '-') {
+        printf("[ERROR] --task requires one or more tasks to be listed after "
+               "parameter\n\n");
         at.help = true;
-      else {
+      } else {
         while (p < ep && (*p)[0] != '-') {
           tasks = ac_pool_strdupf(h->pool, "%s%s%s", tasks ? tasks : "",
                                   tasks ? "|" : "", *p);
@@ -1924,18 +1952,21 @@ void parse_args(ac_schedule_t *h) {
       }
     } else if (!strcmp(*p, "-r") || !strcmp(*p, "--ram")) {
       p++;
-      if (p == ep)
+      if (p == ep) {
+        printf("[ERROR] --ram requires MB to be listed after parameter\n\n");
         at.help = true;
-      else {
+      } else {
         if (sscanf(*p, "%lu", &at.ram) != 1)
           at.help = true;
         p++;
       }
     } else if (!strcmp(*p, "-c") || !strcmp(*p, "--cpus")) {
       p++;
-      if (p == ep)
+      if (p == ep) {
+        printf("[ERROR] --cpus requires number of cpus to be listed after "
+               "parameter\n\n");
         at.help = true;
-      else {
+      } else {
         if (sscanf(*p, "%lu", &at.cpus) != 1)
           at.help = true;
         p++;
@@ -1943,19 +1974,96 @@ void parse_args(ac_schedule_t *h) {
     } else {
       if (h->parse_args) {
         int n = h->parse_args(ep - p, p, h->parse_args_arg);
-        if (n < 0) {
+        if (n <= 0) {
+          printf("[ERROR] Invalid custom argument %s\n\n", *p);
           at.help = true;
           p = ep;
-        } else if (!n)
-          p++;
-        else
-          p += n;
+        } else {
+          while (n) {
+            custom_args[num_custom_args] = *p;
+            p++;
+            num_custom_args++;
+            n--;
+          }
+        }
       } else {
+        printf("[ERROR] Invalid argument %s\n\n", *p);
         at.help = true;
         p = ep;
       }
     }
   }
+  if (h->parse_args) {
+    char *custom_args_file =
+        ac_pool_strdupf(h->pool, "%s/custom_args", h->task_dir);
+    char **old_args = NULL;
+    size_t num_old_args = 0;
+    if (should_read_args) {
+      size_t len;
+      char *buf = ac_io_read_file(&len, custom_args_file);
+      if (buf) {
+        old_args = ac_pool_split(h->pool, &num_old_args, '\n', buf);
+        ac_free(buf);
+      }
+    }
+
+    /* compare old args with new args */
+    if (!num_old_args) {
+      // go ahead and write new args
+      if (num_custom_args) {
+        FILE *out = fopen(custom_args_file, "wb");
+        for (size_t i = 0; i < num_custom_args; i++)
+          fprintf(out, "%s\n", custom_args[i]);
+        fclose(out);
+      }
+    } else if (!num_custom_args) {
+      custom_args = old_args;
+      num_custom_args = num_old_args;
+      p = custom_args;
+      ep = p + num_custom_args;
+      while (p < ep) {
+        int n = h->parse_args(ep - p, p, h->parse_args_arg);
+        if (n <= 0) {
+          printf("[ERROR] Invalid custom argument %s\n\n", *p);
+          at.help = true;
+          p = ep;
+        } else
+          p += n;
+      }
+    } else {
+      p = old_args;
+      ep = p + num_old_args;
+      char **p2 = custom_args;
+      char **ep2 = p2 + num_custom_args;
+      while (p < ep && p2 < ep2) {
+        if (strcmp(*p, *p2)) {
+          printf("[ERROR] Command line arguments don\'t match (%s != %s) - "
+                 "(use --new-args?)\n\n",
+                 *p, *p2);
+          at.help = true;
+          break;
+        }
+        p++;
+        p2++;
+      }
+      if (!at.help) {
+        if (p < ep) {
+          printf("[ERROR] Command line arguments don\'t match (more old args "
+                 "%s(%lu) "
+                 "than new (%lu)) - (use --new-args?)\n\n",
+                 *p, num_old_args, num_custom_args);
+          at.help = true;
+        } else if (p2 < ep2) {
+          printf("[ERROR] Command line arguments don\'t match (more new args "
+                 "%s(%lu) "
+                 "than old (%lu)) - (use --new-args?)\n\n",
+                 *p2, num_old_args, num_custom_args);
+          at.help = true;
+        }
+      }
+    }
+  }
+
   at.num_selected = 0;
   at.select_all = true;
   at.files = ac_pool_split(h->pool, NULL, ',', filenames);

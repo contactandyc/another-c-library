@@ -1,7 +1,7 @@
 ---
 path: "/ac-mapreduce"
 posttype: "docs"
-title: "AC's Map Reduce Framework"
+title: "AC's Map Reduce Part 1"
 ---
 
 The AC library has a number of useful objects.  As part of it, there are multiple ways to transform data.  To really understand it well and the rest of the ac library, I've created an example.  The example will take every line of code and text and count the tokens and then reorder the tokens by frequency descending. Before considering every line of code and text, we will start small - with "to be or not to be".

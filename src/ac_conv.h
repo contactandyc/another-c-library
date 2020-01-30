@@ -31,6 +31,9 @@ limitations under the License.
 extern "C" {
 #endif
 
+/* returns a 64 bit hash of data */
+uint64_t ac_hash64(const void *data, size_t len);
+
 /* returns value if value is not NULL, otherwise default_value */
 const char *ac_str(const char *value, const char *default_value);
 

@@ -106,6 +106,7 @@ bool ac_io_file_info(ac_io_file_info_t *fi) {
     return false;
   fi->last_modified = sb.st_mtime;
   fi->size = sb.st_size;
+  fi->hash = (uint64_t)XXH64(fi->filename, strlen(fi->filename), 0);
   return true;
 }
 
@@ -152,6 +153,35 @@ bool ac_io_file_exists(const char *filename) {
   if (stat(filename, &sb) == -1 || (sb.st_mode & S_IFMT) != S_IFREG)
     return false;
   return true;
+}
+
+ac_io_file_info_t *ac_io_select_file_info(ac_pool_t *pool, size_t *num_res,
+                                          ac_io_file_info_t *inputs,
+                                          size_t num_inputs, size_t partition,
+                                          size_t num_partitions) {
+  ac_io_file_info_t *p = inputs;
+  ac_io_file_info_t *ep = p + num_inputs;
+  size_t num_matching = 0;
+  while (p < ep) {
+    if ((p->hash % num_partitions) == partition)
+      num_matching++;
+    p++;
+  }
+  *num_res = num_matching;
+  if (!num_matching)
+    return NULL;
+  p = inputs;
+  ac_io_file_info_t *res = (ac_io_file_info_t *)ac_pool_alloc(
+      pool, sizeof(ac_io_file_info_t) * num_matching);
+  ac_io_file_info_t *wp = res;
+  while (p < ep) {
+    if ((p->hash % num_partitions) == partition) {
+      *wp = *p;
+      wp++;
+    }
+    p++;
+  }
+  return res;
 }
 
 typedef struct ac_io_file_info_link_s {
@@ -216,9 +246,9 @@ void _ac_io_list(ac_io_file_info_root_t *root, const char *path,
   (void)closedir(dp);
 }
 
-ac_io_file_info_t *
-ac_io_list(const char *path, size_t *num_files,
-           bool (*file_valid)(const char *filename, void *arg), void *arg) {
+static ac_io_file_info_t *
+__ac_io_list(ac_pool_t *pool, const char *path, size_t *num_files,
+             bool (*file_valid)(const char *filename, void *arg), void *arg) {
   ac_io_file_info_root_t root;
   root.head = root.tail = NULL;
   root.num_files = root.bytes = 0;
@@ -227,8 +257,13 @@ ac_io_list(const char *path, size_t *num_files,
   *num_files = root.num_files;
   if (!root.num_files)
     return NULL;
-  ac_io_file_info_t *res = (ac_io_file_info_t *)ac_calloc(
-      (sizeof(ac_io_file_info_t) * root.num_files) + root.bytes);
+  ac_io_file_info_t *res;
+  if (pool)
+    res = (ac_io_file_info_t *)ac_pool_calloc(
+        pool, (sizeof(ac_io_file_info_t) * root.num_files) + root.bytes);
+  else
+    res = (ac_io_file_info_t *)ac_calloc(
+        (sizeof(ac_io_file_info_t) * root.num_files) + root.bytes);
   char *mem = (char *)(res + root.num_files);
   ac_io_file_info_t *rp = res;
   ac_io_file_info_link_t *n = root.head;
@@ -242,6 +277,19 @@ ac_io_list(const char *path, size_t *num_files,
   }
   ac_pool_destroy(tmp_pool);
   return res;
+}
+
+ac_io_file_info_t *
+ac_io_list(const char *path, size_t *num_files,
+           bool (*file_valid)(const char *filename, void *arg), void *arg) {
+  return __ac_io_list(NULL, path, num_files, file_valid, arg);
+}
+
+ac_io_file_info_t *
+ac_pool_io_list(ac_pool_t *pool, const char *path, size_t *num_files,
+                bool (*file_valid)(const char *filename, void *arg),
+                void *arg) {
+  return __ac_io_list(pool, path, num_files, file_valid, arg);
 }
 
 #ifdef _AC_DEBUG_MEMORY_

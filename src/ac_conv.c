@@ -15,8 +15,13 @@ limitations under the License.
 */
 
 #include "ac_conv.h"
+#include "lz4/xxhash.h"
 
 #include <stdio.h>
+
+uint64_t ac_hash64(const void *s, size_t len) {
+  return (uint64_t)XXH64(s, len, 0);
+}
 
 char *ac_date_time(char *dest, time_t ts) {
   struct tm t;
