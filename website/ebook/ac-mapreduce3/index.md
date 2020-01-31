@@ -145,12 +145,12 @@ Both multi and first still depend upon split even though they don't call ac\_tas
         /       \                         /       \
 split_0_0.lz4   split_0_1.lz4    split_1_0.lz4    split_1_1.lz4
       |              |                 |               |
-   first[0]        first[1]          first[0]        first[1]
-   multi[0]        multi[1]          multi[0]        multi[1]
+   first[0]        first[1]           first[0]         first[1]
+   multi[0]       multi[1]          multi[0]        multi[1]
 
 split_0_0.lz4   split_1_0.lz4    split_0_1.lz4   split_1_1.lz4
         \       /                        \       /
-        first[0]                         first[1]
+        first[0]                          first[1]
         multi[0]                         multi[1]
 ```
 
@@ -349,12 +349,12 @@ AC\_OUTPUT\_SPLIT will have multiple outputs based upon the number of partitions
         /       \                         /       \
 split_0_0.lz4   split_0_1.lz4    split_1_0.lz4    split_1_1.lz4
       |              |                 |               |
-   first[0]        first[1]          first[0]        first[1]
-   multi[0]        multi[1]          multi[0]        multi[1]
+   first[0]        first[1]           first[0]         first[1]
+   multi[0]       multi[1]          multi[0]        multi[1]
 
 split_0_0.lz4   split_1_0.lz4    split_0_1.lz4   split_1_1.lz4
         \       /                        \       /
-        first[0]                         first[1]
+        first[0]                          first[1]
         multi[0]                         multi[1]
 ```
 
@@ -365,10 +365,10 @@ AC\_OUTPUT\_FIRST will have one output and only the data from the first partitio
            |                                 |
       first_0.lz4                         first_1.lz4
            |                                 |
-        partition[0]                   (null - unused)
-        partition[1]
-          multi[0]
-          multi[1]
+       partition[0]                    (null - unused)
+       partition[1]
+        multi[0]
+        multi[1]
 ```
 
 AC\_OUTPUT\_PARTITION will have one output and the data will go to the corresponding partition downstream.  Notice how all[0] and multi[0] can run immediately after partition[0] is complete (and before partition[1] is complete) and vice versa.
