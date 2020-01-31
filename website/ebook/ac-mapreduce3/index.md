@@ -430,7 +430,7 @@ task: multi [1/2]
 
 The input[0] and input[3] both have two inputs as expected and input[1] and input[2] have one input as expected.
 
-examples/mapreduce3/data_pipeline_3.c
+examples/mapreduce3/data\_pipeline\_2.c
 ```c
 #include "ac_schedule.h"
 
