@@ -1202,7 +1202,7 @@ all_0		all_1		first_0		first_1		multi_0		multi_1		partition_0	partition_1	split_
 
 Consider the partition:0 task/partition..
 ```
-$ ./input_data_2 -l -t partition:0
+$ ./input_data_3 -l -t partition:0
 task: partition [0/2]
   dependencies:  first[2]
   reverse dependencies:  multi[2]
@@ -1214,7 +1214,7 @@ There is a full reverse dependency of multi and a reverse partitioned dependency
 
 ```
 $ rm tasks/ack/partition_0
-$ ./input_data_2
+$ ./input_data_3
 Finished partition[0] on thread 1 in 0.000ms
 Finished all[0] on thread 1 in 0.000ms
 Finished multi[0] on thread 1 in 0.000ms
@@ -1225,14 +1225,112 @@ If instead of removing tasks/ack/partition\_0, it is touched, then all[0], multi
 
 ```
 $ touch tasks/ack/partition_0
-$ ./input_data_2
+$ ./input_data_3
 Finished all[0] on thread 0 in 0.000ms
 Finished multi[0] on thread 0 in 0.000ms
 Finished multi[1] on thread 1 in 0.000ms
 ```
 
-## Ordering tasks with a dataflow
+## Dumping the input files
 
-In the last section, tasks were ordered by using dependencies.  While this can be useful, a much more useful approach would be to order tasks based upon data dependencies.  The scheduler has a built in data pipeline that allows dependencies between tasks to be automatically determined.  If data changes within the pipeline, downstream tasks which were dependent upon that data will automatically be run.  
+The input files for the split task partition 0 can be shown as follows..
+```
+$ ./input_data_3 -s -t split:0
+task: split [0/2]
+  reverse dependencies:  multi[2] first[2]
+  custom runner
+      input[0]: split_input (28)
+        ../ac_buffer/ac_buffer_append.c (325)
+        ../ac_buffer/ac_buffer_appends.c (296)
+        ../ac_buffer/ac_buffer_clear.c (488)
+        ../ac_buffer/ac_buffer_init.c (287)
+        ../ac_buffer/ac_buffer_shrink_by.c (299)
+        ../ac_buffer/ac_buffer_appendn.c (583)
+        ../ac_buffer/ac_buffer_data.c (287)
+        ../ac_buffer/ac_buffer_setn.c (266)
+```
 
-Each task within the scheduler will typically have inputs and outputs and in general those inputs and outputs will be files.  Within a larger overall set of tasks, there will be inputs which originate outside the scheduler (content that has been produced from other systems).  Those should be the only inputs that need defined.  All other inputs should be artifacts and/or outputs from other tasks.
+If you run ./input_data_3 -h, the help shows the following two options..
+```
+$ ./input_data_3 -h
+
+   ...
+
+-d|--dump <filename1,[filename2],...> dump the contents of files
+
+-p|--prefix <filename1,[filename2],...> dump the contents of files
+    and prefix each line with the line number
+
+   ...
+```
+
+We can try to dump one of the input files...
+```
+$ ./input_data_3 -d ../ac_buffer/ac_buffer_setn.c
+$
+```
+
+and nothing happens.  This is because the scheduler doesn't know how to dump the input files.  In ac_schedule.h/c there is a function which dumps text and it is defined as.
+
+```c
+void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
+                       void *arg) {
+  ac_buffer_appends(bh, r->record);
+}
+```
+
+ac_task_dump_text is a very simple function which simply appends the contents of the record to the buffer.  If the format of input file is not plain text, then you will need to implement your own dump function which should dump text to the buffer.
+
+```
+bool setup_split(ac_task_t *task) {
+  ac_task_input_files(task, "split_input", 0.1, get_input_files);
+  ac_task_input_dump(task, ac_task_dump_text, NULL);
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+```
+
+The ac_task_dump_text must be called after the associated ac_task_input_files call and not before another one or an ac_task_output call (described later).
+
+```
+$ make input_data_4
+$ ./input_data_4 -d ../ac_buffer/ac_buffer_setn.c
+$
+```
+
+This still isn't enough.  The input record delimiter must be specified.  The format choices are delimited (records end in a given character such as a newline or a zero), fixed (the records are determined by a fixed length), and prefix (the records are determined by a 4 byte length prefix before each record).  The text files are newline delimited, so this must be specified (again after ac_task_input_files).
+
+```
+bool setup_split(ac_task_t *task) {
+  ac_task_input_files(task, "split_input", 0.1, get_input_files);
+  ac_task_input_format(task, ac_io_delimiter('\n'));
+  ac_task_input_dump(task, ac_task_dump_text, NULL);
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+```
+
+Trying again...
+```
+$ make input_data_4
+$ ./input_data_4 -d  ../ac_buffer/ac_buffer_setn.c
+#include "ac_buffer.h"
+int main(int argc, char *argv[]) {
+  ac_buffer_t *bh = ac_buffer_init(10);
+  ac_buffer_setn(bh, 'H', 20);
+  /* print HHHHHHHHHHHHHHHHHHHH followed with a newline */
+  printf("%s\n", ac_buffer_data(bh));
+  ac_buffer_destroy(bh);
+  return 0;
+}
+```
+
+And it works!
+
+The full source code is found in examples/mapreduce2/input_data_4.c.  I've ommitted the code as it only adds the following two lines to setup_split.
+```c
+ac_task_input_format(task, ac_io_delimiter('\n'));
+ac_task_input_dump(task, ac_task_dump_text, NULL);
+```
+
+The next part will discuss how to order tasks using a data pipeline.

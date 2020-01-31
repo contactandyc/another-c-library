@@ -3,7 +3,7 @@ include $(ROOT)/src/Makefile.include
 
 FLAGS += -g -D_AC_DEBUG_MEMORY_=NULL -lz
 PROGRAMS = start order_tasks
-PROGRAMS += input_data_1 input_data_2 input_data_3
+PROGRAMS += input_data_1 input_data_2 input_data_3 input_data_4
 
 all: $(PROGRAMS) examples gitignore
 
