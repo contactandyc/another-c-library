@@ -90,7 +90,7 @@ ac_schedule_task(scheduler, "all", true, setup_task);
 ac_schedule_task(scheduler, "multi", true, setup_task);
 ```
 
-Normally, each scheduled task would have a different setup function.  In this case, all of the functions do the same thing (print the task name and the partition), so setup\_task can be shared.
+Normally, each scheduled task would have a different setup function.  In this case, all of the functions do the same thing (nothing except return true), so setup\_task can be shared.
 
 ```c
 void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete);
