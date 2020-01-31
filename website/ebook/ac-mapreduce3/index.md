@@ -10,7 +10,7 @@ In the last post, tasks were ordered by using dependencies.  While this can be u
 
 Each task within the scheduler will typically have inputs and outputs and in general those inputs and outputs will be files.  Within a larger overall set of tasks, there will be inputs which originate outside the scheduler (content that has been produced from other systems).  Those should be the only inputs that need defined.  All other inputs should be artifacts and/or outputs from other tasks.
 
-In the last post, ac\_task\_input\_files was explored and connecting input from outside ac\_schedule.  To create a data pipeline, ac\_task\_output is used.
+In the last post, ac\_task\_input\_files was used to connect input from outside ac\_schedule.  To create a data pipeline, ac\_task\_output is used.  ac\_task\_output connects tasks together by outputting files from one task to another.  Those output files become input files for the destination task and that input creates a dependency on the task that output the files.
 
 ```c
 void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
@@ -281,4 +281,149 @@ int main(int argc, char *argv[]) {
   ac_schedule_destroy(scheduler);
   return 0;
 }
+```
+
+## Different ways to output
+
+To get started, all of the ac\_task\_dependency and ac\_task\_partial\_dependency calls will be replaced with ac\_task\_output calls.
+
+```c
+bool setup_first(ac_task_t *task) {
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_partition(ac_task_t *task) {
+  ac_task_dependency(task, "first");
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_all(ac_task_t *task) {
+  ac_task_partial_dependency(task, "partition");
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_multi(ac_task_t *task) {
+  ac_task_dependency(task, "all|partition|first");
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+```
+
+changes to
+```c
+bool setup_first(ac_task_t *task) {
+  ac_task_output(task, "first.lz4", "partition|multi", 0.9, 0.1,
+                 AC_OUTPUT_FIRST);
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_partition(ac_task_t *task) {
+  ac_task_output(task, "partition.lz4", "all|multi", 0.9, 0.1,
+                 AC_OUTPUT_PARTITION);
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_all(ac_task_t *task) {
+  ac_task_output(task, "all.lz4", "multi", 0.9, 0.1, AC_OUTPUT_NORMAL);
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+
+bool setup_multi(ac_task_t *task) {
+  ac_task_runner(task, do_nothing);
+  return true;
+}
+```
+
+In the last section, AC\_OUTPUT\_SPLIT was used.  AC\_OUTPUT\_SPLIT is the only output option that expects the given task/partition to write split data (data divided amongst N outputs).  AC\_OUTPUT\_FIRST, AC\_OUTPUT\_PARTITION, and AC\_OUTPUT\_NORMAL all will output the same file.  The difference occurs in how downstream tasks consume them as inputs.
+
+
+AC\_OUTPUT\_SPLIT will have multiple outputs based upon the number of partitions of the recipients.
+```
+        split[0]                          split[1]
+        /       \                         /       \
+split_0_0.lz4   split_0_1.lz4    split_1_0.lz4    split_1_1.lz4
+      |              |                 |               |
+   first[0]        first[1]          first[0]        first[1]
+   multi[0]        multi[1]          multi[0]        multi[1]
+
+split_0_0.lz4   split_1_0.lz4    split_0_1.lz4   split_1_1.lz4
+        \       /                        \       /
+        first[0]                         first[1]
+        multi[0]                         multi[1]
+```
+
+AC\_OUTPUT\_FIRST will have one output and only the data from the first partition will be used downstream.  The only partition that needs to finish before the downstreams can continue is the first partition (at the moment, all partitions execute).
+
+```
+        first[0]                          first[1]
+           |                                 |
+      first_0.lz4                         first_1.lz4
+           |                                 |
+        partition[0]                   (null - unused)
+        partition[1]
+          multi[0]
+          multi[1]
+```
+
+AC\_OUTPUT\_PARTITION will have one output and the data will go to the corresponding partition downstream.  Notice how all[0] and multi[0] can run immediately after partition[0] is complete (and before partition[1] is complete) and vice versa.
+
+```
+     partition[0]                 partition[1]
+         |                             |
+   partition_0.lz4              partition_1.lz4
+         |                             |
+       all[0]                        all[1]
+      multi[0]                      multi[1]
+```
+
+AC\_OUTPUT\_NORMAL will have one output and all of the data from all of the partitions will go to all of the downstream partitions of the destination tasks.
+
+```
+       all[0]                 all[1]
+         |                      |
+      all_0.lz4              all_1.lz4
+         |                      |
+      multi[0]                multi[0]
+      multi[1]                multi[1]
+```
+
+Running the -s option with the multi task will validate.
+
+```
+$ make data_pipeline_2
+$ ./data_pipeline_2 -s -t multi
+task: multi [0/2]
+  dependencies:  all[2] first[2] split[2]
+  partial dependencies:  partition[2]
+  custom runner
+      input[0]: split.lz4 (2)
+        tasks/split_0/split_0_0.lz4 (0)
+        tasks/split_1/split_1_0.lz4 (0)
+      input[1]: partition.lz4 (1)
+        tasks/partition_0/partition_0.lz4 (0)
+      input[2]: first.lz4 (1)
+        tasks/first_0/first_0.lz4 (0)
+      input[3]: all.lz4 (2)
+        tasks/all_0/all_0.lz4 (0)
+        tasks/all_1/all_1.lz4 (0)
+task: multi [1/2]
+  dependencies:  all[2] first[2] split[2]
+  partial dependencies:  partition[2]
+  custom runner
+      input[0]: split.lz4 (2)
+        tasks/split_0/split_0_1.lz4 (0)
+        tasks/split_1/split_1_1.lz4 (0)
+      input[1]: partition.lz4 (1)
+        tasks/partition_1/partition_1.lz4 (0)
+      input[2]: first.lz4 (1)
+        tasks/first_0/first_0.lz4 (0)
+      input[3]: all.lz4 (2)
+        tasks/all_0/all_0.lz4 (0)
+        tasks/all_1/all_1.lz4 (0)
 ```

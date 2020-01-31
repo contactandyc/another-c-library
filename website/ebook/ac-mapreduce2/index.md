@@ -1250,7 +1250,7 @@ task: split [0/2]
         ../ac_buffer/ac_buffer_setn.c (266)
 ```
 
-If you run ./input_data_3 -h, the help shows the following two options..
+If you run ./input\_data\_3 -h, the help shows the following two options..
 ```
 $ ./input_data_3 -h
 
@@ -1270,7 +1270,7 @@ $ ./input_data_3 -d ../ac_buffer/ac_buffer_setn.c
 $
 ```
 
-and nothing happens.  This is because the scheduler doesn't know how to dump the input files.  In ac_schedule.h/c there is a function which dumps text and it is defined as.
+and nothing happens.  This is because the scheduler doesn't know how to dump the input files.  In ac\_schedule.h/c there is a function which dumps text and it is defined as.
 
 ```c
 void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
@@ -1279,7 +1279,7 @@ void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
 }
 ```
 
-ac_task_dump_text is a very simple function which simply appends the contents of the record to the buffer.  If the format of input file is not plain text, then you will need to implement your own dump function which should dump text to the buffer.
+ac\_task\_dump\_text is a very simple function which simply appends the contents of the record to the buffer.  If the format of input file is not plain text, then you will need to implement your own dump function which should dump text to the buffer.
 
 ```
 bool setup_split(ac_task_t *task) {
@@ -1290,7 +1290,7 @@ bool setup_split(ac_task_t *task) {
 }
 ```
 
-The ac_task_dump_text must be called after the associated ac_task_input_files call and not before another one or an ac_task_output call (described later).
+The ac\_task\_dump\_text must be called after the associated ac\_task\_input\_files call and not before another one or an ac\_task\_output call (described later).
 
 ```
 $ make input_data_4
@@ -1298,7 +1298,7 @@ $ ./input_data_4 -d ../ac_buffer/ac_buffer_setn.c
 $
 ```
 
-This still isn't enough.  The input record delimiter must be specified.  The format choices are delimited (records end in a given character such as a newline or a zero), fixed (the records are determined by a fixed length), and prefix (the records are determined by a 4 byte length prefix before each record).  The text files are newline delimited, so this must be specified (again after ac_task_input_files).
+This still isn't enough.  The input record delimiter must be specified.  The format choices are delimited (records end in a given character such as a newline or a zero), fixed (the records are determined by a fixed length), and prefix (the records are determined by a 4 byte length prefix before each record).  The text files are newline delimited, so this must be specified (again after ac\_task\_input\_files).
 
 ```
 bool setup_split(ac_task_t *task) {
@@ -1327,7 +1327,7 @@ int main(int argc, char *argv[]) {
 
 And it works!
 
-The full source code is found in examples/mapreduce2/input_data_4.c.  I've ommitted the code as it only adds the following two lines to setup_split.
+The full source code is found in examples/mapreduce2/input\_data\_4.c.  I've ommitted the code as it only adds the following two lines to setup\_split.
 ```c
 ac_task_input_format(task, ac_io_delimiter('\n'));
 ac_task_input_dump(task, ac_task_dump_text, NULL);

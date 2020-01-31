@@ -154,7 +154,10 @@ static const size_t AC_OUTPUT_KEEP = 1;
    task produces an output to destination task, it is assumed that the output
    is meant for partition 3 of the destination task.
 */
+
+static const size_t AC_OUTPUT_NORMAL = 0;
 static const size_t AC_OUTPUT_USE_FIRST = 2;
+static const size_t AC_OUTPUT_FIRST = 2;
 static const size_t AC_OUTPUT_SPLIT = 4;
 static const size_t AC_OUTPUT_PARTITION = 8;
 

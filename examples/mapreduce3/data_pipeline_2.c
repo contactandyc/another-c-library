@@ -69,24 +69,26 @@ bool setup_split(ac_task_t *task) {
 }
 
 bool setup_first(ac_task_t *task) {
+  ac_task_output(task, "first.lz4", "partition|multi", 0.9, 0.1,
+                 AC_OUTPUT_FIRST);
   ac_task_runner(task, do_nothing);
   return true;
 }
 
 bool setup_partition(ac_task_t *task) {
-  ac_task_dependency(task, "first");
+  ac_task_output(task, "partition.lz4", "all|multi", 0.9, 0.1,
+                 AC_OUTPUT_PARTITION);
   ac_task_runner(task, do_nothing);
   return true;
 }
 
 bool setup_all(ac_task_t *task) {
-  ac_task_partial_dependency(task, "partition");
+  ac_task_output(task, "all.lz4", "multi", 0.9, 0.1, AC_OUTPUT_NORMAL);
   ac_task_runner(task, do_nothing);
   return true;
 }
 
 bool setup_multi(ac_task_t *task) {
-  ac_task_dependency(task, "all|partition|first");
   ac_task_runner(task, do_nothing);
   return true;
 }
