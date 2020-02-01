@@ -1127,4 +1127,430 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-## More to come...
+## Using the default runner
+
+Up to this point we have used ac\_task\_runner in our setup functions to do our work.  ac\_schedule defines another function named ac\_task\_default\_runner which is meant to replace common I/O related tasks.
+
+The first task's runner is below.
+```c
+bool text_to_tokens(ac_worker_t *w) {
+  ac_in_t *in = ac_worker_in(w, 0);
+  ac_out_t *out = ac_worker_out(w, 0);
+  ac_pool_t *pool = w->pool;
+  ac_buffer_t *bh = w->bh;
+
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL) {
+    ac_pool_clear(pool);
+    /* okay to change inline because this will be only use */
+    lowercase(r->record);
+    size_t num_tokens = 0;
+    char **tokens = ac_pool_tokenize(pool, &num_tokens, TO_SPLIT_ON, r->record);
+    uint32_t one = 1;
+    for (size_t i = 0; i < num_tokens; i++) {
+      ac_buffer_set(bh, &one, sizeof(one));
+      ac_buffer_appends(bh, tokens[i]);
+      ac_out_write_record(out, ac_buffer_data(bh), ac_buffer_length(bh));
+    }
+  }
+
+  ac_in_destroy(in);
+  ac_out_destroy(out);
+  return true;
+}
+
+bool setup_text_to_tokens(ac_task_t *task) {
+  ac_task_input_files(task, "split_input", 0.1, get_input_files);
+  ...
+
+  ac_task_output(task, "tokens.lz4", "token_aggregator", 0.9, 0.1,
+                 AC_OUTPUT_SPLIT);
+  ...
+
+  ac_task_runner(task, text_to_tokens);
+  return true;
+}
+```
+
+This function reads a record at a time from input and transforms it into output.  The default task runner expects one or more transformations to be defined.  If there is only one input file, then a callback function can be defined for each record, and most of the code above can be eliminated.
+
+```c
+void write_tokens(ac_worker_t *w, ac_io_record_t *r, ac_out_t **outs) {
+  ac_buffer_t *bh = w->bh;
+  lowercase(r->record);
+  size_t num_tokens = 0;
+  char **tokens = ac_pool_tokenize(w->pool, &num_tokens, TO_SPLIT_ON, r->record);
+  uint32_t one = 1;
+  for (size_t i = 0; i < num_tokens; i++) {
+    ac_buffer_set(bh, &one, sizeof(one));
+    ac_buffer_appends(bh, tokens[i]);
+    ac_out_write_record(outs[0], ac_buffer_data(bh), ac_buffer_length(bh));
+  }
+}
+
+bool setup_text_to_tokens(ac_task_t *task) {
+  ac_task_input_files(task, "split_input", 0.1, get_input_files);
+  ...
+
+  ac_task_output(task, "tokens.lz4", "token_aggregator", 0.9, 0.1,
+                 AC_OUTPUT_SPLIT);
+  ...
+
+  ac_task_default_runner(task);
+  ac_task_transform(task, "split_input", "tokens.lz4", write_tokens);
+  return true;
+}
+```
+
+For the second task, we can eliminate more code.
+
+```c
+bool token_aggregator(ac_worker_t *w) {
+  ac_in_t *in = ac_worker_in(w, 0);
+  ac_out_t *out = ac_worker_out(w, 0);
+
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL)
+    ac_out_write_record(out, r->record, r->length);
+
+  ac_in_destroy(in);
+  ac_out_destroy(out);
+  return true;
+}
+
+bool setup_token_aggregator(ac_task_t *task) {
+  ac_task_output(task, "tokens_by_frequency.lz4", "dump_tokens", 0.9, 0.1,
+                 AC_OUTPUT_NORMAL);
+  ...
+  ac_task_runner(task, token_aggregator);
+  return true;
+}
+```
+
+becomes
+```c
+bool setup_token_aggregator(ac_task_t *task) {
+  ac_task_output(task, "tokens_by_frequency.lz4", "dump_tokens", 0.9, 0.1,
+                 AC_OUTPUT_NORMAL);
+  ...
+  ac_task_default_runner(task);
+  ac_task_transform(task, "tokens.lz4", "tokens_by_frequency.lz4", NULL);
+  return true;
+}
+```
+
+For this transform, NULL was used as the callback (and token\_aggregator can be entirely removed)!  If NULL is specified and there is one input, the input will be written to all of the outputs specified.  Multiple inputs and outputs can be specified by separating them by vertical bars.
+
+For the last task, a little code can be removed.
+```c
+bool dump_tokens(ac_worker_t *w) {
+  ac_in_t *in = ac_worker_in(w, 0);
+
+  ac_io_record_t *r;
+  while ((r = ac_in_advance(in)) != NULL)
+    printf("%u\t%s\n", *(uint32_t *)(r->record), r->record + sizeof(uint32_t));
+  ac_in_destroy(in);
+  return true;
+}
+
+bool setup_dump_tokens(ac_task_t *task) {
+  ac_task_run_everytime(task);
+  ac_task_runner(task, dump_tokens);
+  return true;
+}
+```
+
+becomes
+```c
+void dump_token(ac_worker_t *w, ac_io_record_t *r, ac_out_t **outs) {
+  printf("%u\t%s\n", *(uint32_t *)(r->record), r->record + sizeof(uint32_t));
+}
+
+bool setup_dump_tokens(ac_task_t *task) {
+  ac_task_run_everytime(task);
+  ac_task_default_runner(task);
+  ac_task_transform(task, "tokens_by_frequency.lz4", NULL, dump_token);
+  return true;
+}
+```
+
+In this case, NULL was specified for outputs which means that no outputs are opened.  For each record in the input, dump_token is called.
+
+The program should work in a similar manner
+```c
+$ rm -rf tasks
+$ make part_1_12
+$ ./part_1_12 --dir ../.. --ext c,h,md | head
+Finished text_to_tokens[1] on thread 1 in 1208.007ms
+Finished text_to_tokens[0] on thread 0 in 1282.818ms
+Finished token_aggregator[0] on thread 2 in 5.741ms
+Finished token_aggregator[1] on thread 3 in 5.890ms
+91189	the
+60297	a
+56666	https
+51419	to
+47028	com
+42981	0
+36487	github
+35451	of
+34661	1
+31442	for
+```
+
+/examples/mapreduce3/part_1_12.c
+```c
+#include "ac_conv.h"
+#include "ac_schedule.h"
+
+typedef struct {
+  size_t num_inputs;
+  ac_io_file_info_t *inputs;
+  char *dir;
+  char *ext;
+  char **extensions;
+} custom_arg_t;
+
+bool file_ok(const char *filename, void *arg) {
+  custom_arg_t *ca = (custom_arg_t *)arg;
+  char **p = ca->extensions;
+  while (*p) {
+    if (ac_io_extension(filename, *p))
+      return true;
+    p++;
+  }
+  return false;
+}
+
+bool finish_custom_args(int argc, char **argv, void *arg) {
+  custom_arg_t *ca = (custom_arg_t *)arg;
+  if (!ca->dir)
+    ca->dir = (char *)"sample";
+  if (!ca->ext)
+    ca->ext = (char *)"tbontb";
+
+  ca->extensions = ac_split2(NULL, ',', ca->ext);
+  ca->inputs = ac_io_list(ca->dir, &ca->num_inputs, file_ok, ca);
+  if (ca->inputs)
+    return true;
+  return false;
+}
+
+int parse_custom_args(int argc, char **argv, void *arg) {
+  if (argc < 2)
+    return 0;
+
+  custom_arg_t *ca = (custom_arg_t *)arg;
+
+  if (!strcmp(argv[0], "--dir")) {
+    ca->dir = argv[1];
+    return 2;
+  } else if (!strcmp(argv[0], "--ext")) {
+    ca->ext = argv[1];
+    return 2;
+  }
+  return 0;
+}
+
+ac_io_file_info_t *get_input_files(ac_worker_t *w, size_t *num_files,
+                                   ac_worker_input_t *inp) {
+  custom_arg_t *ca = (custom_arg_t *)ac_task_custom_arg(w->task);
+  return ac_io_select_file_info(w->worker_pool, num_files, ca->inputs,
+                                ca->num_inputs, w->partition,
+                                w->num_partitions);
+}
+
+void lowercase(char *s) {
+  while (*s) {
+    if (*s >= 'A' && *s <= 'Z')
+      *s = *s - 'A' + 'a';
+    s++;
+  }
+}
+
+#define TO_SPLIT_ON "(*\"\',+-/\\| \t{});[].=&%<>!#`:"
+
+void write_tokens(ac_worker_t *w, ac_io_record_t *r, ac_out_t **outs) {
+  ac_buffer_t *bh = w->bh;
+  lowercase(r->record);
+  size_t num_tokens = 0;
+  char **tokens =
+      ac_pool_tokenize(w->pool, &num_tokens, TO_SPLIT_ON, r->record);
+  uint32_t one = 1;
+  for (size_t i = 0; i < num_tokens; i++) {
+    ac_buffer_set(bh, &one, sizeof(one));
+    ac_buffer_appends(bh, tokens[i]);
+    ac_out_write_record(outs[0], ac_buffer_data(bh), ac_buffer_length(bh));
+  }
+}
+
+void dump_token(ac_worker_t *w, ac_io_record_t *r, ac_out_t **outs) {
+  printf("%u\t%s\n", *(uint32_t *)(r->record), r->record + sizeof(uint32_t));
+}
+
+void dump_term_frequency(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
+                         void *arg) {
+  ac_buffer_appendf(bh, "%u\t%s", *(uint32_t *)(r->record),
+                    r->record + sizeof(uint32_t));
+}
+
+size_t partition_by_token(const ac_io_record_t *r, size_t num_part, void *tag) {
+  char *token = r->record + sizeof(uint32_t);
+  uint64_t hash = ac_hash64(token, r->length - sizeof(uint32_t));
+  return hash % num_part;
+}
+
+int compare_tokens(const ac_io_record_t *r1, const ac_io_record_t *r2,
+                   void *arg) {
+  char *a = r1->record + sizeof(uint32_t);
+  char *b = r2->record + sizeof(uint32_t);
+  return strcmp(a, b);
+}
+
+int compare_tokens_by_frequency(const ac_io_record_t *r1,
+                                const ac_io_record_t *r2, void *arg) {
+  uint32_t *a = (uint32_t *)r1->record;
+  uint32_t *b = (uint32_t *)r2->record;
+  if (*a != *b)
+    return (*a < *b) ? 1 : -1; // descending
+  return strcmp((char *)(a + 1), (char *)(b + 1));
+}
+
+bool reduce_frequency(ac_io_record_t *res, const ac_io_record_t *r,
+                      size_t num_r, ac_buffer_t *bh, void *arg) {
+  *res = r[0];
+  uint32_t total = 0;
+  for (size_t i = 0; i < num_r; i++)
+    total += (*(uint32_t *)r[i].record);
+  (*(uint32_t *)res->record) = total;
+  return true;
+}
+
+bool setup_text_to_tokens(ac_task_t *task) {
+  ac_task_input_files(task, "split_input", 0.1, get_input_files);
+  ac_task_input_format(task, ac_io_delimiter('\n'));
+  ac_task_input_dump(task, ac_task_dump_text, NULL);
+
+  ac_task_output(task, "tokens.lz4", "token_aggregator", 0.9, 0.1,
+                 AC_OUTPUT_SPLIT);
+  ac_task_output_format(task, ac_io_prefix());
+  ac_task_output_compare(task, compare_tokens, NULL);
+  ac_task_output_reducer(task, reduce_frequency, NULL);
+  ac_task_output_partition(task, partition_by_token, NULL);
+  ac_task_output_dump(task, dump_term_frequency, NULL);
+  ac_task_default_runner(task);
+  ac_task_transform(task, "split_input", "tokens.lz4", write_tokens);
+  return true;
+}
+
+bool setup_token_aggregator(ac_task_t *task) {
+  ac_task_output(task, "tokens_by_frequency.lz4", "dump_tokens", 0.9, 0.1,
+                 AC_OUTPUT_NORMAL);
+  ac_task_output_format(task, ac_io_prefix());
+  ac_task_output_compare(task, compare_tokens_by_frequency, NULL);
+  ac_task_output_dump(task, dump_term_frequency, NULL);
+  ac_task_input_limit(task, 10);
+  ac_task_default_runner(task);
+  ac_task_transform(task, "tokens.lz4", "tokens_by_frequency.lz4", NULL);
+  return true;
+}
+
+bool setup_dump_tokens(ac_task_t *task) {
+  ac_task_run_everytime(task);
+  ac_task_default_runner(task);
+  ac_task_transform(task, "tokens_by_frequency.lz4", NULL, dump_token);
+  return true;
+}
+
+void custom_usage() {
+  printf("Find all tokens ending in .h, .c, and .md and sort by\n");
+  printf("frequency descending.\n\n");
+  printf("--dir <dir> - directory to scan\n");
+  printf("--ext <extensions> - comma delimited list of file extensions to "
+         "consider");
+}
+
+int main(int argc, char *argv[]) {
+  ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 2, 4, 10);
+  custom_arg_t custom;
+  memset(&custom, 0, sizeof(custom));
+
+  ac_schedule_custom_args(scheduler, custom_usage, parse_custom_args,
+                          finish_custom_args, &custom);
+
+  ac_schedule_task(scheduler, "text_to_tokens", true, setup_text_to_tokens);
+  ac_schedule_task(scheduler, "token_aggregator", true, setup_token_aggregator);
+  ac_schedule_task(scheduler, "dump_tokens", false, setup_dump_tokens);
+
+  ac_schedule_run(scheduler, ac_worker_complete);
+
+  if (custom.inputs)
+    ac_free(custom.inputs);
+  if (custom.extensions)
+    ac_free(custom.extensions);
+
+  ac_schedule_destroy(scheduler);
+  return 0;
+}
+```
+
+## Increasing Partitions
+
+We can increase the number of partitions in the main function and see how our program runs.  If all is good, the output should be the same.
+
+```c
+ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 2, 4, 10);
+```
+
+gets changed to
+```c
+ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 16, 16, 10);
+```
+
+Which changes from using 2 partitions and 4 cpus to 16 partitions and 16 cpus.
+
+```
+$ make part_1_13
+$ ./part_1_13 --dir ../.. --ext c,h,md | head
+Finished text_to_tokens[7] on thread 5 in 229.493ms
+Finished text_to_tokens[8] on thread 3 in 232.452ms
+Finished text_to_tokens[10] on thread 11 in 234.440ms
+Finished text_to_tokens[15] on thread 14 in 241.641ms
+Finished text_to_tokens[11] on thread 7 in 243.947ms
+Finished text_to_tokens[14] on thread 15 in 243.971ms
+Finished text_to_tokens[3] on thread 6 in 246.909ms
+Finished text_to_tokens[6] on thread 10 in 249.808ms
+Finished text_to_tokens[0] on thread 0 in 255.357ms
+Finished text_to_tokens[13] on thread 13 in 264.330ms
+Finished text_to_tokens[1] on thread 1 in 271.022ms
+Finished text_to_tokens[2] on thread 8 in 271.306ms
+Finished text_to_tokens[5] on thread 2 in 275.768ms
+Finished text_to_tokens[9] on thread 9 in 279.335ms
+Finished text_to_tokens[4] on thread 4 in 298.948ms
+Finished text_to_tokens[12] on thread 12 in 384.969ms
+Finished token_aggregator[3] on thread 11 in 16.168ms
+Finished token_aggregator[6] on thread 15 in 17.610ms
+Finished token_aggregator[1] on thread 5 in 18.026ms
+Finished token_aggregator[2] on thread 3 in 18.426ms
+Finished token_aggregator[5] on thread 7 in 18.588ms
+Finished token_aggregator[7] on thread 10 in 18.561ms
+Finished token_aggregator[4] on thread 14 in 19.046ms
+Finished token_aggregator[14] on thread 9 in 19.623ms
+Finished token_aggregator[9] on thread 0 in 20.400ms
+Finished token_aggregator[10] on thread 13 in 20.864ms
+Finished token_aggregator[8] on thread 6 in 21.356ms
+Finished token_aggregator[12] on thread 8 in 21.423ms
+Finished token_aggregator[11] on thread 1 in 22.145ms
+Finished token_aggregator[13] on thread 2 in 22.307ms
+Finished token_aggregator[15] on thread 4 in 26.595ms
+Finished token_aggregator[0] on thread 12 in 31.597ms
+91190	 the
+60298	 a
+56667	 https
+51420	 to
+47028	 com
+42981	 0
+36488	 github
+35452	 of
+34661	 1
+31443	 for
+```

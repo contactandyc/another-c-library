@@ -183,6 +183,9 @@ char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, char delim,
     else {
       *rlen = (p - sp);
       b->pos += (*rlen) + 1;
+      if (b->pos > b->used)
+        abort();
+
       h->zerop = p;
       h->zero = *p;
       *p = 0;
@@ -204,13 +207,15 @@ char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, char delim,
     p = sp + b->used;
     // b->pos = b->used;
     fill_blocks(h, b);
-    char *ep = p + b->used;
+    char *ep = sp + b->used;
     while (p < ep) {
       if (*p != delim)
         p++;
       else {
         *rlen = (p - sp);
         b->pos += (*rlen) + 1;
+        if (b->pos > b->used)
+          abort();
         h->zerop = p;
         h->zero = *p;
         *p = 0;
@@ -241,6 +246,8 @@ char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, char delim,
       else {
         size_t length = (p - sp);
         b->pos += length + 1;
+        if (b->pos > b->used)
+          abort();
         ac_buffer_append(h->bh, b->buffer, length);
         *rlen = ac_buffer_length(h->bh);
         return ac_buffer_data(h->bh);
@@ -273,6 +280,8 @@ char *ac_in_base_readz(ac_in_base_t *h, int32_t *rlen, int32_t len) {
   char *p = b->buffer + b->pos;
   if (b->pos + len <= b->used) {
     b->pos += len;
+    if (b->pos > b->used)
+      abort();
     *rlen = len;
     char *ep = p + len;
     h->zero = *ep;
@@ -325,6 +334,8 @@ char *ac_in_base_readz(ac_in_base_t *h, int32_t *rlen, int32_t len) {
     if (len > b->used)
       len = b->used;
     b->pos = len;
+    if (b->pos > b->used)
+      abort();
     *rlen = len;
     char *ep = b->buffer + len;
     h->zero = *ep;
@@ -345,6 +356,8 @@ char *ac_in_base_read(ac_in_base_t *h, int32_t len) {
   char *p = b->buffer + b->pos;
   if (b->pos + len <= b->used) {
     b->pos += len;
+    if (b->pos > b->used)
+      abort();
     return p;
   } else {
     if (b->eof) {

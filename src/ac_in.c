@@ -536,8 +536,8 @@ ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
       base = ac_in_base_reinit(base, compressed_size + block_header_size + 4);
     }
     buffer_size = options->compressed_buffer_size;
-    if (buffer_size < block_size)
-      buffer_size = block_size;
+    if (buffer_size < (block_size * 2) + 100)
+      buffer_size = (block_size * 2) + 100;
 
     h = (ac_in_t *)ac_malloc(sizeof(ac_in_t) + buffer_size + 1);
     memset(h, 0, sizeof(*h));
@@ -837,7 +837,7 @@ char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, char delim,
     p = sp + b->used;
     b->pos = b->used;
     fill_blocks(h, b);
-    char *ep = p + b->used;
+    char *ep = sp + b->used;
     while (p < ep) {
       if (*p != delim)
         p++;
@@ -1386,6 +1386,9 @@ void ac_in_ext_add(ac_in_t *hp, ac_in_t *in, int tag) {
   if (!h || !in || h->type != AC_IN_EXT_TYPE)
     return;
 
+  // Adding this can aid in debugging as you can know record number of problem
+  // case.
+  // ac_in_limit(in, 100000000);
   ac_in_reset(in);
   if (!ac_in_advance(in)) {
     ac_in_destroy(in);

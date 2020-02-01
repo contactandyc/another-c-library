@@ -56,6 +56,11 @@ typedef struct {
   size_t ram;
   size_t cpus;
 
+  ac_task_t *debug_task;
+  size_t debug_partition;
+  char *debug_path;
+  bool debug_dump_input;
+
   char **files;
   selected_task_t *tasks;
   size_t num_tasks;
@@ -528,6 +533,17 @@ static ac_worker_t *take_worker(ac_schedule_t *scheduler, ac_pool_t *pool,
   return NULL;
 }
 
+static ac_worker_t *create_worker(ac_pool_t *pool, ac_task_t *task,
+                                  size_t partition) {
+  ac_worker_t *w = (ac_worker_t *)ac_pool_calloc(pool, sizeof(ac_worker_t));
+  w->task = task;
+  w->partition = partition;
+  w->num_partitions = task->num_partitions;
+  w->ack_time = -1;
+  w->__link = NULL;
+  return w;
+}
+
 static ac_worker_input_t *_ac_task_input(ac_task_t *task, const char *name,
                                          ac_worker_output_t *src, double pct,
                                          ac_worker_file_info_f file_info) {
@@ -679,11 +695,16 @@ static void dump_file(ac_worker_t *w, const char *filename,
   ac_buffer_t *bh = ac_buffer_init(1000);
   size_t line = 1;
   bool print_extra = w->task->scheduler->parsed_args.prefix;
+  const char *printed_name = filename;
+  const char *slash = strrchr(filename, '/');
+  if (slash)
+    printed_name = slash + 1;
+
   while ((r = ac_in_advance(in)) != NULL) {
     ac_buffer_clear(bh);
     dump(w, r, bh, dump_arg);
     if (print_extra) {
-      printf("%lu\t", line);
+      printf("%s:%lu\t", printed_name, line);
       line++;
     }
     if (ac_buffer_length(bh))
@@ -1330,8 +1351,18 @@ static char *_ac_worker_output_base(ac_worker_t *w, ac_worker_output_t *outp,
     return NULL;
   // base_<part><suffix>
   ac_buffer_t *bh = w->schedule_thread->bh;
-  ac_buffer_setf(bh, "%s/%s_%lu/", w->task->scheduler->task_dir,
-                 w->task->task_name, w->partition);
+  if (w->task->scheduler->parsed_args.debug_path) {
+    ac_buffer_sets(bh, w->task->scheduler->parsed_args.debug_path);
+    if (ac_buffer_length(bh) > 0 &&
+        ac_buffer_data(bh)[ac_buffer_length(bh) - 1] != '/')
+      ac_buffer_appendc(bh, '/');
+    if (ac_buffer_length(bh) == 0) {
+      printf("[ERROR] Debug path seems to be invalid!\n");
+      abort();
+    }
+  } else
+    ac_buffer_setf(bh, "%s/%s_%lu/", w->task->scheduler->task_dir,
+                   w->task->task_name, w->partition);
   const char *base = outp->name;
   if (ac_io_extension(base, "lz4")) {
     ac_buffer_append(bh, base, strlen(base) - 4);
@@ -1495,6 +1526,31 @@ void clone_inputs_and_outputs(ac_worker_t *w) {
   w->inputs = head;
   w->outputs = w->task->outputs;
   w->data = clone_transforms(w);
+}
+
+void debug_task(ac_schedule_thread_t *h) {
+  ac_pool_t *pool = ac_pool_init(65536);
+  h->bh = ac_buffer_init(200);
+  ac_pool_t *tmp_pool = ac_pool_init(65536);
+  ac_buffer_t *bh = ac_buffer_init(1024);
+  ac_worker_t *w = create_worker(pool, h->scheduler->parsed_args.debug_task,
+                                 h->scheduler->parsed_args.debug_partition);
+  w->running = 1;
+  w->worker_pool = pool;
+  w->pool = tmp_pool;
+  w->bh = bh;
+  w->schedule_thread = h;
+  get_ack_time(w);
+  clone_inputs_and_outputs(w);
+  fill_inputs(w);
+
+  setup_worker(w);
+  run_worker(w);
+  destroy_worker(w);
+  ac_pool_destroy(pool);
+  ac_pool_destroy(tmp_pool);
+  ac_buffer_destroy(h->bh);
+  ac_buffer_destroy(w->bh);
 }
 
 void *schedule_thread(void *arg) {
@@ -1730,29 +1786,45 @@ void dump_selected_tasks(void *arg) {
   if (!num_files)
     return;
 
-  while (!t->scheduler->done) {
-    ac_pool_clear(t->pool);
-    ac_worker_t *w = get_next_worker(t);
-    if (!w)
-      break;
-
+  if (t->scheduler->parsed_args.debug_task) {
+    ac_worker_t *w =
+        create_worker(t->pool, t->scheduler->parsed_args.debug_task,
+                      t->scheduler->parsed_args.debug_partition);
+    w->running = 1;
     w->worker_pool = t->pool;
-    ac_pool_clear(tmp_pool);
     w->pool = tmp_pool;
-    ac_buffer_clear(bh);
     w->bh = bh;
-
+    w->schedule_thread = t;
     get_ack_time(w);
     clone_inputs_and_outputs(w);
     fill_inputs(w);
     scan_output(w, files, num_files);
-    worker_complete(w, time(NULL));
+  } else {
+    while (!t->scheduler->done) {
+      ac_pool_clear(t->pool);
+      ac_worker_t *w = get_next_worker(t);
+      if (!w)
+        break;
+
+      w->worker_pool = t->pool;
+      ac_pool_clear(tmp_pool);
+      w->pool = tmp_pool;
+      ac_buffer_clear(bh);
+      w->bh = bh;
+
+      get_ack_time(w);
+      clone_inputs_and_outputs(w);
+      fill_inputs(w);
+      scan_output(w, files, num_files);
+      worker_complete(w, time(NULL));
+    }
   }
   ac_pool_destroy(t->pool);
   ac_pool_destroy(tmp_pool);
   ac_buffer_destroy(bh);
   ac_buffer_destroy(t->bh);
-  mark_as_done(t->scheduler);
+  if (!t->scheduler->parsed_args.debug_task)
+    mark_as_done(t->scheduler);
 }
 
 static bool in_out_runner(ac_worker_t *w) {
@@ -1762,6 +1834,7 @@ static bool in_out_runner(ac_worker_t *w) {
     size_t num_outs = transforms->num_outputs;
     size_t num_ins = transforms->num_inputs + (in ? 1 : 0);
     ac_in_t **ins = NULL;
+    ac_worker_input_t *inp = NULL;
     if (!num_ins) {
       ins = (ac_in_t **)ac_pool_calloc(w->worker_pool, sizeof(ac_in_t *));
       ins[0] = ac_in_empty();
@@ -1772,7 +1845,8 @@ static bool in_out_runner(ac_worker_t *w) {
       if (in) {
         ins[0] = in;
         ibase = 1;
-      }
+      } else
+        inp = ac_worker_input(w, transforms->inputs[0]->id);
       for (size_t i = ibase; i < num_ins; i++)
         ins[i] = ac_worker_in(w, transforms->inputs[i - ibase]->id);
     }
@@ -1809,9 +1883,23 @@ static bool in_out_runner(ac_worker_t *w) {
         transforms->io_runner(w, ins, num_ins, outs, num_outs);
       } else {
         ac_io_record_t *r;
-        while ((r = ac_in_advance(ins[0])) != NULL) {
-          for (size_t i = 0; i < num_outs; i++)
-            ac_out_write_record(outs[i], r->record, r->length);
+        if (inp && inp->src && inp->src->dump &&
+            w->task->scheduler->parsed_args.debug_dump_input) {
+          ac_buffer_t *bh = ac_buffer_init(1000);
+          while ((r = ac_in_advance(ins[0])) != NULL) {
+            ac_buffer_clear(bh);
+            inp->src->dump(w, r, bh, inp->dump_arg);
+            if (ac_buffer_length(bh))
+              printf("%s\n", ac_buffer_data(bh));
+            for (size_t i = 0; i < num_outs; i++)
+              ac_out_write_record(outs[i], r->record, r->length);
+          }
+          ac_buffer_destroy(bh);
+        } else {
+          while ((r = ac_in_advance(ins[0])) != NULL) {
+            for (size_t i = 0; i < num_outs; i++)
+              ac_out_write_record(outs[i], r->record, r->length);
+          }
         }
       }
     } else {
@@ -1861,6 +1949,8 @@ static void schedule_usage(ac_schedule_t *h) {
   printf("At the moment, it operates on a single host - but I'm planning\n");
   printf("on improving it to support multiple computers.\n");
   printf("\n\n");
+  printf("--debug <task:partition> <output path> - run a single task in\n");
+  printf("   isolated environment\n\n");
   printf("-f|--force rerun selected tasks even if they don't need run\n\n");
   printf("-t <task[:partitions]>[<task[:partitions]], select tasks and\n");
   printf("   optionally partitions.  tasks are separated by vertical bars\n");
@@ -1895,6 +1985,8 @@ void parse_args(ac_schedule_t *h) {
   char *filenames = NULL;
   char *tasks = NULL;
 
+  char *debug_task = NULL;
+
   char **p = h->args;
   char **ep = p + h->argc;
   bool should_read_args = true;
@@ -1906,6 +1998,23 @@ void parse_args(ac_schedule_t *h) {
     if (!strcmp(*p, "-f") || !(strcmp(*p, "--force"))) {
       at.force = true;
       p++;
+    } else if (!strcmp(*p, "--debug")) {
+      p++;
+      if (p + 2 <= ep) {
+        debug_task = *p;
+        p++;
+        at.debug_path = *p;
+        p++;
+        if (p + 1 <= ep) {
+          if (!strcmp(*p, "dump_input")) {
+            at.debug_dump_input = true;
+            p++;
+          }
+        }
+      } else {
+        at.help = true;
+        p = ep;
+      }
     } else if (!strcmp(*p, "-o")) {
       at.only_run_selected = true;
       p++;
@@ -2155,6 +2264,31 @@ void parse_args(ac_schedule_t *h) {
     for (size_t i = 0; i < at.num_tasks; i++)
       at.tasks[i].task->selected = at.tasks[i].partitions;
   }
+  if (!at.help && debug_task) {
+    debug_task = ac_pool_strdup(h->pool, debug_task);
+    char *p = strchr(debug_task, ':');
+    if (!p) {
+      printf("[ERROR]: debug task partition not specified %s\n\n", debug_task);
+      at.help = true;
+    } else {
+      *p++ = 0;
+      at.debug_task = find_task(h, debug_task);
+      if (!at.debug_task) {
+        at.help = true;
+        printf("[ERROR]: debug task not found %s\n\n", debug_task);
+      } else {
+        if (sscanf(p, "%lu", &at.debug_partition) != 1 ||
+            at.debug_partition >= at.debug_task->num_partitions) {
+          printf("[ERROR]: debug task partition not valid %s\n\n", p);
+          at.help = true;
+        } else
+          ac_io_make_directory(at.debug_path);
+      }
+      if (!at.help) {
+        h->parsed_args.cpus = 1;
+      }
+    }
+  }
   h->parsed_args = at;
 }
 
@@ -2179,6 +2313,17 @@ void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete) {
     ac_schedule_thread_t *a = h->threads + i;
     a->thread_id = i;
     a->scheduler = h;
+  }
+
+  if (h->parsed_args.debug_task) {
+    if (h->parsed_args.dump) {
+      h->num_running = h->cpus;
+      h->on_complete = NULL;
+      h->done = false;
+      dump_selected_tasks(h->threads + 0);
+    } else
+      debug_task(h->threads + 0);
+    return;
   }
 
   if (h->finish_args) {
