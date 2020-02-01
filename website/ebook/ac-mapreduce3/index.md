@@ -1570,3 +1570,109 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 ```
+
+## Debugging a Task
+
+The AC's map/reduce framework allows for debugging individual partitions of tasks in an isolated environment.  
+
+```
+$ ./part_1_13 --debug token_aggregator:0 debug
+$ ls debug/
+tokens_by_frequency_0.lz4
+```
+
+This can be used to run any task/partition and have the output placed in the debug directory (or whatever directory you choose).  To dump the tokens_by_frequency_0.lz4, run the dump command as follows.
+
+```
+./part_1_13 --debug token_aggregator:0 debug -d debug/tokens* | head
+56672	 https
+13554	 define
+10491	 not
+8645	 add
+6034	 svg
+5024	 compare
+4914	 gatsbyjs
+4646	 include
+2648	 types
+2348	 gpointer
+```
+
+An additional parameter dump\_input can be optionally passed to the --debug option to dump the input files.
+
+```
+$ ./part_1_13 --debug token_aggregator:0 debug dump_input | head
+3	 $and
+5	 $comment
+9	 $exact
+1	 $foo~bar
+7	 $merge
+27	 $readonlyarray
+3	 $replacement$
+2	 $tmp
+5	 $visual
+2	 0000ff66
+```
+
+Using lldb, you can set the following breakpoints.
+```
+$ lldb ./part_1_13
+(lldb) target create "./part_1_13"
+Current executable set to './part_1_13' (x86_64).
+(lldb) br set --name debug_task
+Breakpoint 1: where = part_1_13`debug_task + 19 at ac_schedule.c:1532:21, address = 0x000000010009f3d3
+(lldb) r --debug token_aggregator:0 debug dump_input
+Process 83008 launched: '/Users/ac/code/website/ac/examples/mapreduce3/part_1_13' (x86_64)
+Process 83008 stopped
+* thread #1, queue = 'com.apple.main-thread', stop reason = breakpoint 1.1
+    frame #0: 0x000000010009f3d3 part_1_13`debug_task(h=0x00000001001b5898) at ac_schedule.c:1532:21
+   1529	}
+   1530
+   1531	void debug_task(ac_schedule_thread_t *h) {
+-> 1532	  ac_pool_t *pool = ac_pool_init(65536);
+   1533	  h->bh = ac_buffer_init(200);
+   1534	  ac_pool_t *tmp_pool = ac_pool_init(65536);
+   1535	  ac_buffer_t *bh = ac_buffer_init(1024);
+Target 0: (part_1_13) stopped.
+(lldb) br set --name run_worker
+Breakpoint 2: where = part_1_13`run_worker + 12 at ac_schedule.c:1255:8, address = 0x000000010009f6dc
+(lldb) cont
+* thread #1, queue = 'com.apple.main-thread', stop reason = breakpoint 2.1
+    frame #0: 0x000000010009f6dc part_1_13`run_worker(w=0x00000001001be080) at ac_schedule.c:1255:8
+   1252
+   1253	static void setup_worker(ac_worker_t *w) {}
+   1254	static bool run_worker(ac_worker_t *w) {
+-> 1255	  bool r = true;
+   1256	  w->timer = ac_timer_init(1);
+   1257	  ac_timer_start(w->timer);
+   1258	  if (w->task->runner)
+(lldb) n
+(lldb)
+Process 83008 stopped
+* thread #1, queue = 'com.apple.main-thread', stop reason = step over
+    frame #0: 0x000000010009f719 part_1_13`run_worker(w=0x00000001001be080) at ac_schedule.c:1259:9
+   1256	  w->timer = ac_timer_init(1);
+   1257	  ac_timer_start(w->timer);
+   1258	  if (w->task->runner)
+-> 1259	    r = w->task->runner(w);
+   1260	  ac_timer_stop(w->timer);
+   1261	  return true;
+   1262	}
+(lldb) s
+Process 83008 stopped
+* thread #1, queue = 'com.apple.main-thread', stop reason = step in
+    frame #0: 0x00000001000a0d0f part_1_13`in_out_runner(w=0x00000001001be080) at ac_schedule.c:1831:50
+   1828	}
+   1829
+   1830	static bool in_out_runner(ac_worker_t *w) {
+-> 1831	  ac_transform_t *transforms = (ac_transform_t *)w->data;
+   1832	  ac_in_t *in = NULL;
+   1833	  while (transforms) {
+   1834	    size_t num_outs = transforms->num_outputs;
+Target 0: (part_1_13) stopped.
+```
+
+The in_out_runner is the default runner.  From here, it should be pretty straight forward to step through your individual task.  You can also set breakpoints in your configured code.  
+
+## Further Help
+
+I plan on continuing to write more posts to further explain the AC map/reduce library.  There is a number of additional functions in ac\_schedule.h, ac\_in.h, ac\_out.h, and ac\_io.h which should be fairly well commented in github and will soon have examples on this website.
