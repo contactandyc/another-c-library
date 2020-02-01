@@ -414,7 +414,7 @@ bool setup_text_to_tokens(ac_task_t *task) {
 
 ## Partitioning output
 
-The dump_term_frequency was needed to describe the binary contents of the record.  ac_io_prefix is a good choice for a format when the record is variable length and binary.
+The dump\_term\_frequency was needed to describe the binary contents of the record.  ac\_io\_prefix is a good choice for a format when the record is variable length and binary.
 
 Running this will yield the following.
 ```
@@ -426,7 +426,7 @@ tasks/text_to_tokens_0/tokens_0.lz4 from text_to_tokens is configured
 Abort trap: 6
 ```
 
-In order to have split output, a partition method must be specified.  The function that needs to be called is ac_task_output_partition.
+In order to have split output, a partition method must be specified.  The function that needs to be called is ac\_task\_output\_partition.
 
 ```c
 void ac_task_output_partition(ac_task_t *task, ac_io_partition_f part,
@@ -450,9 +450,9 @@ size_t partition_by_token(const ac_io_record_t *r, size_t num_part, void *tag) {
 }
 ```
 
-ac_conv includes a number of conversions which are useful including hashing a set of bytes and converting it into a 64 bit integer (this uses the xxhash found in lz4 library).
+ac\_conv includes a number of conversions which are useful including hashing a set of bytes and converting it into a 64 bit integer (this uses the xxhash found in lz4 library).
 
-The partition_by_token can now be configured in setup_text_to_tokens.
+The partition\_by\_token can now be configured in setup\_text\_to\_tokens.
 ```c
 bool setup_text_to_tokens(ac_task_t *task) {
   ...
@@ -476,7 +476,7 @@ Finished token_aggregator[1] on thread 0 in 0.000ms
 Finished dump_tokens[0] on thread 0 in 0.000ms
 ```
 
-Notice that the text_to_tokens seemed to take a little time.  
+Notice that the text\_to\_tokens seemed to take a little time.  
 ```
 $ ./part_1_3 -s -t token_aggregator:0
 task: token_aggregator [0/2]
@@ -491,7 +491,7 @@ task: token_aggregator [0/2]
         tasks/token_aggregator_0/tokens_by_frequency_0.lz4
 ```
 
-Inspecting the first partition of token_aggregator, we can see that the tokens_0_0.lz4 is 11 bytes and the tokens_1_0.lz4 is 49 bytes.  The lz4 format typically has an 11 byte overhead, so the 11 byte files are actually empty files - which is okay.  The tokens_1_0.lz4 can be dumped using the -d option.
+Inspecting the first partition of token\_aggregator, we can see that the tokens\_0\_0.lz4 is 11 bytes and the tokens\_1\_0.lz4 is 49 bytes.  The lz4 format typically has an 11 byte overhead, so the 11 byte files are actually empty files - which is okay.  The tokens\_1\_0.lz4 can be dumped using the -d option.
 
 ```
 $ ./part_1_3 -d tasks/text_to_tokens_1/tokens_0_0.lz4
@@ -552,7 +552,7 @@ int compare_tokens(const ac_io_record_t *r1, const ac_io_record_t *r2,
 }
 ```
 
-The compare_tokens can now be configured in setup_text_to_tokens.
+The compare\_tokens can now be configured in setup\_text\_to\_tokens.
 ```c
 bool setup_text_to_tokens(ac_task_t *task) {
   ...
@@ -601,7 +601,7 @@ bool reduce(ac_io_record_t *res, const ac_io_record_t *r,
             size_t num_r, ac_buffer_t *bh, void *arg);
 ```
 
-Borrow the reduce function from Part 1 sort_tokens_reduce_sort_by_freq_and_display.c
+Borrow the reduce function from Part 1 sort\_tokens\_reduce\_sort\_by\_freq\_and\_display.c
 ```c
 bool reduce_frequency(ac_io_record_t *res, const ac_io_record_t *r,
                       size_t num_r, ac_buffer_t *bh, void *arg) {
@@ -614,7 +614,7 @@ bool reduce_frequency(ac_io_record_t *res, const ac_io_record_t *r,
 }
 ```
 
-The reduce_frequency can now be configured in setup_text_to_tokens.
+The reduce\_frequency can now be configured in setup\_text\_to\_tokens.
 ```c
 bool setup_text_to_tokens(ac_task_t *task) {
   ...
@@ -649,7 +649,7 @@ Instead of removing the tasks folder, the -f option was to used to force rerunni
 
 ## The Second Task
 
-text_to_tokens has been setup.  Now it's time to setup the token_aggregator.  The token aggregator will take input and then sort it by frequency descending and token ascending.  The compare_tokens_by_frequency function can be borrowed from Part 1.
+text\_to\_tokens has been setup.  Now it's time to setup the token\_aggregator.  The token aggregator will take input and then sort it by frequency descending and token ascending.  The compare\_tokens\_by\_frequency function can be borrowed from Part 1.
 
 ```c
 int compare_tokens_by_frequency(const ac_io_record_t *r1,
@@ -662,7 +662,7 @@ int compare_tokens_by_frequency(const ac_io_record_t *r1,
 }
 ```
 
-For this task, the output will not be partitioned or reduced, so setting those functions will be unnecessary. The output should still be able to be dumped and will have a prefix format.  The setup_token_aggregator will change from...
+For this task, the output will not be partitioned or reduced, so setting those functions will be unnecessary. The output should still be able to be dumped and will have a prefix format.  The setup\_token\_aggregator will change from...
 ```c
 bool setup_token_aggregator(ac_task_t *task) {
   ac_task_output(task, "tokens_by_frequency.lz4", "dump_tokens", 0.9, 0.1,
@@ -686,7 +686,7 @@ bool setup_token_aggregator(ac_task_t *task) {
 }
 ```
 
-The last thing to do is to replace the do_nothing with a function which will convert the input to output.  The function will look like the following.
+The last thing to do is to replace the do\_nothing with a function which will convert the input to output.  The function will look like the following.
 ```c
 bool token_aggregator(ac_worker_t *w) {
   ac_in_t *in = ac_worker_in(w, 0);
@@ -702,7 +702,7 @@ bool token_aggregator(ac_worker_t *w) {
 }
 ```
 
-Finally, token_aggregator must be wired up to the setup_token_aggregator.
+Finally, token\_aggregator must be wired up to the setup\_token\_aggregator.
 
 ```c
 bool setup_token_aggregator(ac_task_t *task) {
@@ -712,7 +712,7 @@ bool setup_token_aggregator(ac_task_t *task) {
 }
 ```
 
-You may be wondering how the input is computed for token_aggregator.  The input is defined by the ac_task_output call in setup_text_to_tokens when token_aggregator is listed as a destination.  Any additional parameters further defining the input for token_aggregator should be defined along with the ac_task_output call.
+You may be wondering how the input is computed for token\_aggregator.  The input is defined by the ac\_task\_output call in setup\_text\_to\_tokens when token\_aggregator is listed as a destination.  Any additional parameters further defining the input for token\_aggregator should be defined along with the ac\_task\_output call.
 
 ```c
 bool setup_text_to_tokens(ac_task_t *task) {
@@ -738,7 +738,7 @@ The individual files are sorted by frequency descending and token ascending.
 
 ## The Final Task
 
-dump_tokens should take the inputs from token_aggregator and print them to the terminal.  This function will not output anything.  To finish it, the do_nothing function will need replaced.
+dump\_tokens should take the inputs from token\_aggregator and print them to the terminal.  This function will not output anything.  To finish it, the do\_nothing function will need replaced.
 ```c
 bool dump_tokens(ac_worker_t *w) {
   ac_in_t *in = ac_worker_in(w, 0);
@@ -751,7 +751,7 @@ bool dump_tokens(ac_worker_t *w) {
 }
 ```
 
-and dump_tokens will have to be used in setup_dump_tokens.
+and dump\_tokens will have to be used in setup\_dump\_tokens.
 ```c
 bool setup_dump_tokens(ac_task_t *task) {
   ac_task_runner(task, dump_tokens);
@@ -759,7 +759,7 @@ bool setup_dump_tokens(ac_task_t *task) {
 }
 ```
 
-do_nothing is no longer needed, so the function can be removed.  
+do\_nothing is no longer needed, so the function can be removed.  
 
 Running the task...
 ```
@@ -798,7 +798,7 @@ $ ./part_1_8
 $
 ```
 
-Perhaps, we would want the dump_tokens task to run everytime.  Add the following to setup_dump_tokens.
+Perhaps, we would want the dump\_tokens task to run everytime.  Add the following to setup\_dump\_tokens.
 
 ```c
 bool setup_dump_tokens(ac_task_t *task) {
@@ -834,7 +834,7 @@ $ ./part_1_10
 Finished dump_tokens[0] on thread 0 in 0.209ms
 ```
 
-Only dump_tokens runs everytime.
+Only dump\_tokens runs everytime.
 
 
 ## Limiting Input
@@ -875,7 +875,7 @@ Finished token_aggregator[1] on thread 3 in 0.851ms
 Finished dump_tokens[0] on thread 0 in 0.744ms
 ```
 
-ac_task_input_limit can be used to limit how many records will pass through the input of the next function (dump_tokens).
+ac\_task\_input\_limit can be used to limit how many records will pass through the input of the next function (dump\_tokens).
 
 ```c
 bool setup_token_aggregator(ac_task_t *task) {
