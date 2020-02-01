@@ -814,7 +814,7 @@ task: split [0/1]
 $ ./input_data_2 --dir .. --ext md
 [ERROR] Command line arguments don't match (c,txt != md) - (use --new-args?)
 
-Find all words ending in .h, .c, and .md and sort by
+Find all tokens ending in .h, .c, and .md and sort by
 frequency descending.
 
 --dir <dir> - directory to scan
@@ -919,7 +919,7 @@ bool setup_multi(ac_task_t *task) {
 }
 
 void custom_usage() {
-  printf("Find all words ending in .h, .c, and .md and sort by\n");
+  printf("Find all tokens ending in .h, .c, and .md and sort by\n");
   printf("frequency descending.\n\n");
   printf("--dir <dir> - directory to scan\n");
   printf("--ext <extensions> - comma delimited list of file extensions to "
@@ -1156,7 +1156,7 @@ bool setup_multi(ac_task_t *task) {
 }
 
 void custom_usage() {
-  printf("Find all words ending in .h, .c, and .md and sort by\n");
+  printf("Find all tokens ending in .h, .c, and .md and sort by\n");
   printf("frequency descending.\n\n");
   printf("--dir <dir> - directory to scan\n");
   printf("--ext <extensions> - comma delimited list of file extensions to "
@@ -1582,7 +1582,7 @@ bool setup_multi(ac_task_t *task) {
 }
 
 void custom_usage() {
-  printf("Find all words ending in .h, .c, and .md and sort by\n");
+  printf("Find all tokens ending in .h, .c, and .md and sort by\n");
   printf("frequency descending.\n\n");
   printf("--dir <dir> - directory to scan\n");
   printf("--ext <extensions> - comma delimited list of file extensions to "
@@ -1860,7 +1860,7 @@ bool setup_multi(ac_task_t *task) {
 }
 
 void custom_usage() {
-  printf("Find all words ending in .h, .c, and .md and sort by\n");
+  printf("Find all tokens ending in .h, .c, and .md and sort by\n");
   printf("frequency descending.\n\n");
   printf("--dir <dir> - directory to scan\n");
   printf("--ext <extensions> - comma delimited list of file extensions to "
@@ -1912,4 +1912,4 @@ Dumping output is similar, except input is replaced with output.  The format can
   ac_task_output_dump(task, ac_task_dump_text, NULL);  
 ```
 
-This will be explored more in the next sections.  At the moment, no files are created.  The next post will connect input to output.
+This will be explored more in the next sections.  At the moment, no files are created.  The next post will explore setting up the example in the first post using the ac\_schedule library.

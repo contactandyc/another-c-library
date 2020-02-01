@@ -293,7 +293,13 @@ ac_out_t *ac_worker_out(ac_worker_t *w, size_t n) {
   size_t flags = o->flags;
   char *base_name = ac_worker_output_base(w, o);
   ac_out_options_buffer_size(&(o->options), ac_worker_ram(w, o->ram_pct));
-  if ((flags & AC_OUTPUT_SPLIT) && o->ext_options.partition) {
+  if (flags & AC_OUTPUT_SPLIT) {
+    if (!o->ext_options.partition) {
+      printf("%s from %s is configured\n  to be split, but does not specify a "
+             "partition method!  Exiting early!\n",
+             base_name, w->task->task_name);
+      abort();
+    }
     if (o->destinations)
       ac_out_ext_options_num_partitions(&(o->ext_options),
                                         o->destinations->task->num_partitions);
@@ -1781,8 +1787,10 @@ static bool in_out_runner(ac_worker_t *w) {
     ac_io_record_t *r;
     if (num_ins == 1) {
       if (transforms->runner) {
-        while ((r = ac_in_advance(ins[0])) != NULL)
+        while ((r = ac_in_advance(ins[0])) != NULL) {
+          ac_pool_clear(w->pool);
           transforms->runner(w, r, outs);
+        }
       } else if (transforms->group_runner) {
         void *compare_arg = NULL;
         if (transforms->create_group_compare_arg)
@@ -1791,8 +1799,10 @@ static bool in_out_runner(ac_worker_t *w) {
         bool more_records = false;
         while ((r = ac_in_advance_group(ins[0], &num_r, &more_records,
                                         transforms->group_compare,
-                                        compare_arg)) != NULL)
+                                        compare_arg)) != NULL) {
+          ac_pool_clear(w->pool);
           transforms->group_runner(w, r, num_r, outs);
+        }
         if (transforms->destroy_group_compare_arg)
           transforms->destroy_group_compare_arg(w, compare_arg);
       } else if (transforms->io_runner) {

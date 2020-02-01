@@ -2,7 +2,8 @@ ROOT=../..
 include $(ROOT)/src/Makefile.include
 
 FLAGS += -g -D_AC_DEBUG_MEMORY_=NULL -lz
-PROGRAMS = data_pipeline_1 data_pipeline_2
+PROGRAMS = part_1_1 part_1_2 part_1_3 part_1_4 part_1_5 part_1_6 part_1_7
+PROGRAMS += part_1_8 part_1_9 part_1_10 part_1_11
 
 all: $(PROGRAMS) examples gitignore
 
@@ -10,13 +11,7 @@ $(PROGRAMS): %: %.c $(OBJECTS) $(HEADER_FILES)
 	gcc $(FLAGS) $(OBJECTS) $< -o $@
 
 examples: $(PROGRAMS)
-	@echo Running the examples
-	@echo
-	rm -rf tasks
-	./data_pipeline_1 --dir ../mapreduce2 --ext c
-	./data_pipeline_1 -s -t split first multi
-	@echo
-	./data_pipeline_2 -s -t multi
+
 clean:
 	rm -rf *~ *.dSYM $(PROGRAMS)
 

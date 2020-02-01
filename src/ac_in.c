@@ -374,6 +374,8 @@ void ac_in_records_destroy(ac_in_t *hp);
 void ac_in_destroy_from_list(ac_in_t *hp);
 
 void ac_in_destroy(ac_in_t *h) {
+  if (!h)
+    return;
   if (h->type == AC_IN_EXT_TYPE)
     ac_in_ext_destroy(h);
   else if (h->type == AC_IN_RECORDS_TYPE)

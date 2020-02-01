@@ -59,42 +59,30 @@ ac_io_file_info_t *get_input_files(ac_worker_t *w, size_t *num_files,
 
 bool do_nothing(ac_worker_t *w) { return true; }
 
-bool setup_split(ac_task_t *task) {
+bool setup_text_to_tokens(ac_task_t *task) {
   ac_task_input_files(task, "split_input", 0.1, get_input_files);
   ac_task_input_format(task, ac_io_delimiter('\n'));
   ac_task_input_dump(task, ac_task_dump_text, NULL);
-  ac_task_output(task, "split.lz4", "first|multi", 0.9, 0.1, AC_OUTPUT_SPLIT);
+  ac_task_output(task, "tokens.lz4", "token_aggregator", 0.9, 0.1,
+                 AC_OUTPUT_SPLIT);
   ac_task_runner(task, do_nothing);
   return true;
 }
 
-bool setup_first(ac_task_t *task) {
-  ac_task_output(task, "first.lz4", "partition|multi", 0.9, 0.1,
-                 AC_OUTPUT_FIRST);
+bool setup_token_aggregator(ac_task_t *task) {
+  ac_task_output(task, "tokens_by_frequency.lz4", "dump_tokens", 0.9, 0.1,
+                 AC_OUTPUT_NORMAL);
   ac_task_runner(task, do_nothing);
   return true;
 }
 
-bool setup_partition(ac_task_t *task) {
-  ac_task_output(task, "partition.lz4", "all|multi", 0.9, 0.1,
-                 AC_OUTPUT_PARTITION);
-  ac_task_runner(task, do_nothing);
-  return true;
-}
-
-bool setup_all(ac_task_t *task) {
-  ac_task_output(task, "all.lz4", "multi", 0.9, 0.1, AC_OUTPUT_NORMAL);
-  ac_task_runner(task, do_nothing);
-  return true;
-}
-
-bool setup_multi(ac_task_t *task) {
+bool setup_dump_tokens(ac_task_t *task) {
   ac_task_runner(task, do_nothing);
   return true;
 }
 
 void custom_usage() {
-  printf("Find all words ending in .h, .c, and .md and sort by\n");
+  printf("Find all tokens ending in .h, .c, and .md and sort by\n");
   printf("frequency descending.\n\n");
   printf("--dir <dir> - directory to scan\n");
   printf("--ext <extensions> - comma delimited list of file extensions to "
@@ -109,11 +97,9 @@ int main(int argc, char *argv[]) {
   ac_schedule_custom_args(scheduler, custom_usage, parse_custom_args,
                           finish_custom_args, &custom);
 
-  ac_schedule_task(scheduler, "split", true, setup_split);
-  ac_schedule_task(scheduler, "partition", true, setup_partition);
-  ac_schedule_task(scheduler, "first", true, setup_first);
-  ac_schedule_task(scheduler, "all", true, setup_all);
-  ac_schedule_task(scheduler, "multi", true, setup_multi);
+  ac_schedule_task(scheduler, "text_to_tokens", true, setup_text_to_tokens);
+  ac_schedule_task(scheduler, "token_aggregator", true, setup_token_aggregator);
+  ac_schedule_task(scheduler, "dump_tokens", false, setup_dump_tokens);
 
   ac_schedule_run(scheduler, ac_worker_complete);
 

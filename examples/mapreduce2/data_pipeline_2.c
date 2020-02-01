@@ -94,7 +94,7 @@ bool setup_multi(ac_task_t *task) {
 }
 
 void custom_usage() {
-  printf("Find all words ending in .h, .c, and .md and sort by\n");
+  printf("Find all tokens ending in .h, .c, and .md and sort by\n");
   printf("frequency descending.\n\n");
   printf("--dir <dir> - directory to scan\n");
   printf("--ext <extensions> - comma delimited list of file extensions to "
