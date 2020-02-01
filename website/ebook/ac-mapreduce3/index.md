@@ -1285,19 +1285,97 @@ Finished text_to_tokens[1] on thread 1 in 1208.007ms
 Finished text_to_tokens[0] on thread 0 in 1282.818ms
 Finished token_aggregator[0] on thread 2 in 5.741ms
 Finished token_aggregator[1] on thread 3 in 5.890ms
-91189	the
-60297	a
-56666	https
-51419	to
-47028	com
-42981	0
-36487	github
-35451	of
-34661	1
-31442	for
+91209	the
+60316	a
+56671	https
+51436	to
+47033	com
+43033	0
+36492	github
+35460	of
+34704	1
+31457	for
 ```
 
-/examples/mapreduce3/part_1_12.c
+## Increasing Partitions
+
+We can increase the number of partitions in the main function and see how our program runs.  If all is good, the output should be the same.
+
+```c
+ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 2, 4, 10);
+```
+
+gets changed to
+```c
+ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 16, 16, 10);
+```
+
+Which changes from using 2 partitions and 4 cpus to 16 partitions and 16 cpus.
+
+```
+$ make part_1_13
+$ ./part_1_13 --dir ../.. --ext c,h,md | head
+Finished text_to_tokens[7] on thread 5 in 229.493ms
+Finished text_to_tokens[8] on thread 3 in 232.452ms
+Finished text_to_tokens[10] on thread 11 in 234.440ms
+Finished text_to_tokens[15] on thread 14 in 241.641ms
+Finished text_to_tokens[11] on thread 7 in 243.947ms
+Finished text_to_tokens[14] on thread 15 in 243.971ms
+Finished text_to_tokens[3] on thread 6 in 246.909ms
+Finished text_to_tokens[6] on thread 10 in 249.808ms
+Finished text_to_tokens[0] on thread 0 in 255.357ms
+Finished text_to_tokens[13] on thread 13 in 264.330ms
+Finished text_to_tokens[1] on thread 1 in 271.022ms
+Finished text_to_tokens[2] on thread 8 in 271.306ms
+Finished text_to_tokens[5] on thread 2 in 275.768ms
+Finished text_to_tokens[9] on thread 9 in 279.335ms
+Finished text_to_tokens[4] on thread 4 in 298.948ms
+Finished text_to_tokens[12] on thread 12 in 384.969ms
+Finished token_aggregator[3] on thread 11 in 16.168ms
+Finished token_aggregator[6] on thread 15 in 17.610ms
+Finished token_aggregator[1] on thread 5 in 18.026ms
+Finished token_aggregator[2] on thread 3 in 18.426ms
+Finished token_aggregator[5] on thread 7 in 18.588ms
+Finished token_aggregator[7] on thread 10 in 18.561ms
+Finished token_aggregator[4] on thread 14 in 19.046ms
+Finished token_aggregator[14] on thread 9 in 19.623ms
+Finished token_aggregator[9] on thread 0 in 20.400ms
+Finished token_aggregator[10] on thread 13 in 20.864ms
+Finished token_aggregator[8] on thread 6 in 21.356ms
+Finished token_aggregator[12] on thread 8 in 21.423ms
+Finished token_aggregator[11] on thread 1 in 22.145ms
+Finished token_aggregator[13] on thread 2 in 22.307ms
+Finished token_aggregator[15] on thread 4 in 26.595ms
+Finished token_aggregator[0] on thread 12 in 31.597ms
+91209	the
+60316	a
+56671	https
+51436	to
+47033	com
+43033	0
+36492	github
+35460	of
+34704	1
+31457	for
+```
+
+is the same as the result from the last section
+```
+91209	the
+60316	a
+56671	https
+51436	to
+47033	com
+43033	0
+36492	github
+35460	of
+34704	1
+31457	for
+```
+
+So increasing partitions, doesn't alter the end result.  Obviously, many other tests could be run to validate the results, but this is a good one!  The full code is below.
+
+/examples/mapreduce3/part\_1\_13.c
 ```c
 #include "ac_conv.h"
 #include "ac_schedule.h"
@@ -1470,7 +1548,7 @@ void custom_usage() {
 }
 
 int main(int argc, char *argv[]) {
-  ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 2, 4, 10);
+  ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 16, 16, 10);
   custom_arg_t custom;
   memset(&custom, 0, sizeof(custom));
 
@@ -1491,66 +1569,4 @@ int main(int argc, char *argv[]) {
   ac_schedule_destroy(scheduler);
   return 0;
 }
-```
-
-## Increasing Partitions
-
-We can increase the number of partitions in the main function and see how our program runs.  If all is good, the output should be the same.
-
-```c
-ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 2, 4, 10);
-```
-
-gets changed to
-```c
-ac_schedule_t *scheduler = ac_schedule_init(argc - 1, argv + 1, 16, 16, 10);
-```
-
-Which changes from using 2 partitions and 4 cpus to 16 partitions and 16 cpus.
-
-```
-$ make part_1_13
-$ ./part_1_13 --dir ../.. --ext c,h,md | head
-Finished text_to_tokens[7] on thread 5 in 229.493ms
-Finished text_to_tokens[8] on thread 3 in 232.452ms
-Finished text_to_tokens[10] on thread 11 in 234.440ms
-Finished text_to_tokens[15] on thread 14 in 241.641ms
-Finished text_to_tokens[11] on thread 7 in 243.947ms
-Finished text_to_tokens[14] on thread 15 in 243.971ms
-Finished text_to_tokens[3] on thread 6 in 246.909ms
-Finished text_to_tokens[6] on thread 10 in 249.808ms
-Finished text_to_tokens[0] on thread 0 in 255.357ms
-Finished text_to_tokens[13] on thread 13 in 264.330ms
-Finished text_to_tokens[1] on thread 1 in 271.022ms
-Finished text_to_tokens[2] on thread 8 in 271.306ms
-Finished text_to_tokens[5] on thread 2 in 275.768ms
-Finished text_to_tokens[9] on thread 9 in 279.335ms
-Finished text_to_tokens[4] on thread 4 in 298.948ms
-Finished text_to_tokens[12] on thread 12 in 384.969ms
-Finished token_aggregator[3] on thread 11 in 16.168ms
-Finished token_aggregator[6] on thread 15 in 17.610ms
-Finished token_aggregator[1] on thread 5 in 18.026ms
-Finished token_aggregator[2] on thread 3 in 18.426ms
-Finished token_aggregator[5] on thread 7 in 18.588ms
-Finished token_aggregator[7] on thread 10 in 18.561ms
-Finished token_aggregator[4] on thread 14 in 19.046ms
-Finished token_aggregator[14] on thread 9 in 19.623ms
-Finished token_aggregator[9] on thread 0 in 20.400ms
-Finished token_aggregator[10] on thread 13 in 20.864ms
-Finished token_aggregator[8] on thread 6 in 21.356ms
-Finished token_aggregator[12] on thread 8 in 21.423ms
-Finished token_aggregator[11] on thread 1 in 22.145ms
-Finished token_aggregator[13] on thread 2 in 22.307ms
-Finished token_aggregator[15] on thread 4 in 26.595ms
-Finished token_aggregator[0] on thread 12 in 31.597ms
-91190	 the
-60298	 a
-56667	 https
-51420	 to
-47028	 com
-42981	 0
-36488	 github
-35452	 of
-34661	 1
-31443	 for
 ```
