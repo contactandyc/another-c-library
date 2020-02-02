@@ -37,7 +37,8 @@
     "react-icons": "^3.8.0",
     "react-typography": "^0.16.19",
     "typography": "^0.16.19",
-    "typography-theme-github": "^0.16.19"
+    "typography-theme-github": "^0.16.19",
+    "victory": "^34.0.1"
   },
   "devDependencies": {
     "prettier": "^1.18.2"

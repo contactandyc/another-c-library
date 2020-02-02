@@ -1,10 +1,52 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import ReactDOM from 'react-dom';
 import { Link } from "gatsby";
 import { FaArrowRight } from "react-icons/fa";
+import { VictoryGroup, VictoryBar, VictoryChart, VictoryAxis, VictoryTooltip } from 'victory';
 
 import Layout from "../components/layout";
 import SEO from "../components/seo";
 import "./index.css";
+
+function Graph() {
+  return (
+    <VictoryChart
+      animate={{
+        duration: 2000,
+        onLoad: { duration: 1000 }
+      }}
+      >
+      <VictoryGroup offset={30}
+        colorScale={"cool"}
+      >
+        <VictoryBar
+          labelComponent={<VictoryTooltip/>}
+          data={[
+            { x: "Ordered", y: 393.470, label: "ac_sort 393.470ms" },
+            { x: "Equal", y: 384.580, label: "ac_sort 384.580ms" },
+            { x: "Reversed", y: 963.120, label: "ac_sort 963.120ms" }
+          ]}
+        />
+        <VictoryBar
+          labelComponent={<VictoryTooltip/>}
+          data={[
+            { x: "Ordered", y: 3315.230, label: "std::sort 3315.230ms" },
+            { x: "Equal", y: 3202.080, label: "std::sort 3202.080ms" },
+            { x: "Reversed", y: 5984.830, label: "std::sort 5984.830ms" }
+          ]}
+        />
+        <VictoryBar
+          labelComponent={<VictoryTooltip/>}
+          data={[
+            { x: "Ordered", y: 4379.690, label: "qsort 4379.690ms" },
+            { x: "Equal", y: 2784.150, label: "qsort 2784.150ms" },
+            { x: "Reversed", y: 22208.090, label: "qsort 22208.090ms" }
+          ]}
+        />
+      </VictoryGroup>
+    </VictoryChart>
+  );
+}
 
 function IndexPage() {
   return (
@@ -30,7 +72,11 @@ function IndexPage() {
           than other quicksort methods on random, sorted, and reversed data.</h3>
           <Link to="/docs/improving-quicksort">Start Sorting <FaArrowRight style={{ height: "12px" }}/></Link>
         </div>
-        <div className="Index-cd-alt">
+        <Graph />
+
+
+
+        {/*<div className="Index-cd-alt">
           user demo % ./quicksort_demo A 1000<br /><br />
 
           Ordered test...<br />
@@ -56,7 +102,7 @@ function IndexPage() {
           Random test...<br />
           system qsort: 93814.700ns<br />
           ac_sort:      86068.300ns
-        </div>
+        </div>*/}
       </div>
 
       <div className="Flex Index-mn">
