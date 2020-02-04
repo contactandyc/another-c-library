@@ -19,7 +19,7 @@ a {
   color: #3182CE;
 }
 
-a:hover {
+/*a:hover {
   text-decoration: none;
   filter: brightness(80%);
   transition: .6s;
@@ -28,7 +28,7 @@ a:hover {
 button:hover {
   transition: .6s;
   filter: brightness(115%);
-}
+}*/
 
 nav {
   display: flex;
@@ -85,6 +85,158 @@ code[class*="language-"], pre[class*="language-"] {
   max-width: 950px;
   width: 72vw;
 }
+
+/* alpha.js */
+.Alpha-h {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: auto;
+  padding: 6px 0;
+  border-bottom: 1px solid #f2f2f2;
+  font-size: 22px;
+}
+
+.Alpha-h-n > div {
+  margin-left: 30px;
+}
+
+.Alpha-h-i {
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.Alpha-ac {
+  background: #f2f2f2;
+  padding: 3px 6px;
+  margin-right: 3px;
+  letter-spacing: 2px;
+}
+
+.Alpha-hr {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.Alpha-hr-top {
+  display: flex;
+  margin: auto;
+  font-size: 40px;
+  height: 300px;
+  align-items: center;
+  margin: 100px auto;
+}
+
+.Alpha-hr-top > iframe {
+  width: 530px;
+  height: 300px;
+  margin-right: 30px;
+}
+
+.Alpha-hr-btm {
+  display: flex;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  justify-content: center;
+}
+
+.Alpha-hr-btm > input {
+  width: 53%;
+  padding: 8px 0 8px 16px;
+  background: #f2f2f2;
+  border: none;
+}
+
+.Alpha-hr-btm > button {
+  width: 8%;
+  padding: 8px 8px 8px 0;
+  background: #f2f2f2;
+  border: none;
+  cursor: pointer;
+  color: #003BFF;
+}
+
+.Alpha-hr-btm > div {
+  background: #003BFF;
+  color: white;
+  width: 20%;
+  text-align: center;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.Alpha-prev {
+  display: flex;
+  margin: 70px auto;
+  max-width: 1200px;
+  align-items: center;
+  justify-content: center;
+}
+
+.Alpha-prev-txt {
+  max-width: 500px;
+  margin: 0 25px;
+}
+
+.Alpha-prev-txt > div:nth-child(1) {
+  color: #003BFF;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.Alpha-prev-txt > div:nth-child(2) {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.Alpha-prev-txt > button {
+  background: #003BFF;
+  color: white;
+  text-align: center;
+  padding: 8px 16px;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  border: none;
+  cursor: pointer;
+  margin-top: 7px;
+}
+
+.Alpha-social {
+  font-size: 20px;
+}
+
+.Alpha-social-signup {
+  display: flex;
+  align-items: center;
+  padding-right: 20px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.Alpha-github-btns {
+  margin-left: 20px;
+  border-left: solid 2px lightgrey;
+  padding-left: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 10px;
+}
+
+.Alpha-social-signup > input {
+  height: 40px;
+  margin: 0 10px;
+  background: #f2f2f2;
+  border: 2px solid lightgrey;
+  border-radius: 8px;
+  padding: 8px;
+  width: 300px;
+}
+
+.Alpha-social-signup-btn {
+  font-size: 16px;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  color: #003BFF;
+  cursor: pointer;
+}
+
 
 /* header.js */
 .Header {
@@ -345,7 +497,7 @@ code[class*="language-"], pre[class*="language-"] {
 }
 
 .Footer-ctr {
-  background-color: rgb(10, 13, 17);
+  background-color: #1D1D1F;
   padding: 10px;
   color: white;
 }
