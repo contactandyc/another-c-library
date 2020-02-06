@@ -38,6 +38,27 @@ char *ac_date(char *dest, time_t ts) {
   return dest;
 }
 
+time_t ac_date_as_time_t(const char *value, time_t default_value) {
+  if (value[0] >= '0' && value[0] <= '9' && value[1] >= '0' &&
+      value[1] <= '9' && value[2] >= '0' && value[2] <= '9' &&
+      value[3] >= '0' && value[3] <= '9' && value[4] == '-' &&
+      value[5] >= '0' && value[5] <= '9' && value[6] >= '0' &&
+      value[6] <= '9' && value[7] == '-' && value[8] >= '0' &&
+      value[8] <= '9' && value[9] >= '0' && value[9] <= '9') {
+    uint32_t year = ((value[0] - '0') * 1000) + ((value[1] - '0') * 100) +
+                    ((value[2] - '0') * 10) + (value[3] - '0');
+    uint32_t month = ((value[5] - '0') * 10) + (value[6] - '0');
+    uint32_t day = ((value[8] - '0') * 10) + (value[9] - '0');
+    struct tm t;
+    memset(&t, 0, sizeof(t));
+    t.tm_year = year - 1900;
+    t.tm_mon = month;
+    t.tm_mday = day;
+    return mktime(&t);
+  }
+  return default_value;
+}
+
 const char *ac_str(const char *value, const char *default_value) {
   if (value)
     return value;

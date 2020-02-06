@@ -357,6 +357,18 @@ ac_worker_input_t *ac_worker_input(ac_worker_t *w, size_t n);
 /* Form an ac_in_t from the specifications for the given task */
 ac_in_t *ac_worker_in(ac_worker_t *w, size_t n);
 
+/* Dump a record from Nth input */
+void ac_worker_dump_input(ac_worker_t *w, ac_io_record_t *r, size_t n);
+
+/* Load records into RAM from the specifications for the given task.  This only
+   works if the input is a fixed format, the file is not compressed, and their
+   is only one input file.  To use this when there are multiple files, first
+   merge the multiple files into a single file.  There is no need to free the
+   memory associated from ac_worker_read as it will be done after task is
+   done.  */
+char *ac_worker_read(ac_worker_t *w, size_t *num_records, char **endp,
+                     size_t n);
+
 /* Return the task name given a task */
 const char *ac_task_name(ac_task_t *task);
 
@@ -365,6 +377,9 @@ ac_schedule_t *ac_task_schedule(ac_task_t *task);
 
 /* Return an actual amount of ram given the task/partition and percentage */
 size_t ac_worker_ram(ac_worker_t *w, double pct);
+
+/* Returns true if in debug mode */
+bool ac_worker_debug(ac_worker_t *w);
 
 /* Return the output base name based upon a task/partition and an output */
 char *ac_worker_output_base(ac_worker_t *w, ac_worker_output_t *outp);

@@ -121,20 +121,60 @@ limitations under the License.
           }                                                                    \
           if (a >= e)                                                          \
             return;                                                            \
-          sort_swap(a, mid);                                                   \
-          if (a < c) {                                                         \
-            if (compare((const type *)c, (const type *)a) < 0) {               \
-              sort_swap(c, a);                                                 \
-            }                                                                  \
+          if (a - base < 4) {                                                  \
+            a = base;                                                          \
+            sort_swap(b, a + 1);                                               \
             sort_swap(d, e - 1);                                               \
-            b = a;                                                             \
+            b = a + 2;                                                         \
             d = e - 2;                                                         \
           } else {                                                             \
-            c = a;                                                             \
-            d = e - 1;                                                         \
-            b = a - 1;                                                         \
+            a -= 2;                                                            \
+            if (a < c) {                                                       \
+              sort_swap(d, e - 1);                                             \
+              d = e - 2;                                                       \
+              if (a < b) {                                                     \
+                if (compare((const type *)b, (const type *)a) < 0) {           \
+                  a = base;                                                    \
+                  sort_swap(b, a + 1);                                         \
+                  b = a + 2;                                                   \
+                } else {                                                       \
+                  b = a;                                                       \
+                  a = base;                                                    \
+                }                                                              \
+              } else {                                                         \
+                if (compare((const type *)c, (const type *)a) < 0) {           \
+                  a = base;                                                    \
+                } else {                                                       \
+                  b = a;                                                       \
+                  a = base;                                                    \
+                }                                                              \
+              }                                                                \
+            } else {                                                           \
+              if (a < d) {                                                     \
+                if (compare((const type *)d, (const type *)a) < 0) {           \
+                  b = c;                                                       \
+                  a = base;                                                    \
+                  sort_swap(d, e - 1);                                         \
+                  d = e - 2;                                                   \
+                } else {                                                       \
+                  b = a;                                                       \
+                  c = d;                                                       \
+                  a = base;                                                    \
+                  d = e - 1;                                                   \
+                }                                                              \
+              } else {                                                         \
+                if (compare((const type *)e, (const type *)a) < 0) {           \
+                  b = d;                                                       \
+                  c = d;                                                       \
+                } else {                                                       \
+                  b = a;                                                       \
+                  c = a;                                                       \
+                }                                                              \
+                a = base;                                                      \
+                d = e - 1;                                                     \
+              }                                                                \
+            }                                                                  \
           }                                                                    \
-          a = base;                                                            \
         } else {                                                               \
           if (e < a) {                                                         \
             mid = a;                                                           \

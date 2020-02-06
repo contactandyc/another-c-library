@@ -69,6 +69,9 @@ char *ac_date_time(char *dest, time_t ts);
  * least 11 bytes (10+0 terminator).  Returns a pointer to dest. */
 char *ac_date(char *dest, time_t ts);
 
+/* converts a yyyy-mm-dd format to a time_t */
+time_t ac_date_as_time_t(const char *value, time_t default_value);
+
 #ifdef __cplusplus
 }
 #endif

@@ -45,6 +45,9 @@ static inline void ac_buffer_clear(ac_buffer_t *h) {
 
 static inline char *ac_buffer_data(ac_buffer_t *h) { return h->data; }
 static inline size_t ac_buffer_length(ac_buffer_t *h) { return h->length; }
+static inline char *ac_buffer_end(ac_buffer_t *h) {
+  return h->data + h->length;
+}
 
 static inline void _ac_buffer_grow(ac_buffer_t *h, size_t length) {
   size_t len = (length + 50) + (h->size >> 3);

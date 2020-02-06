@@ -126,8 +126,8 @@ bool ac_io_make_path_valid(char *filename);
 bool ac_io_extension(const char *filename, const char *extension);
 
 /* Do not put on website - common comparison and split functions */
-static inline int ac_io_compare_uint64_t(ac_io_record_t *p1, ac_io_record_t *p2,
-                                         void *tag) {
+static inline int ac_io_compare_uint64_t(const ac_io_record_t *p1,
+                                         const ac_io_record_t *p2, void *tag) {
   uint64_t *a = (uint64_t *)p1->record;
   uint64_t *b = (uint64_t *)p2->record;
   if (*a != *b)
@@ -135,8 +135,8 @@ static inline int ac_io_compare_uint64_t(ac_io_record_t *p1, ac_io_record_t *p2,
   return 0;
 }
 
-static inline int ac_io_compare_uint32_t(ac_io_record_t *p1, ac_io_record_t *p2,
-                                         void *tag) {
+static inline int ac_io_compare_uint32_t(const ac_io_record_t *p1,
+                                         const ac_io_record_t *p2, void *tag) {
   uint32_t *a = (uint32_t *)p1->record;
   uint32_t *b = (uint32_t *)p2->record;
   if (*a != *b)
