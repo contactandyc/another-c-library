@@ -1,10 +1,257 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import ReactDOM from 'react-dom';
 import { Link } from "gatsby";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa"
+import { Chart } from 'react-charts'
 
-import Layout from "../components/layout";
-import SEO from "../components/seo";
+import Footer from "../components/footer";
 import "./index.css";
+
+function MyChart() {
+  const data = React.useMemo(
+    () => [
+      {
+        label: 'Series 1',
+        data: [[0, 1], [1, 2], [2, 4], [3, 2], [4, 7]]
+      },
+      {
+        label: 'Series 2',
+        data: [[0, 3], [1, 1], [2, 5], [3, 6], [4, 4]]
+      }
+    ],
+    []
+  )
+
+  const axes = React.useMemo(
+    () => [
+      { primary: true, type: 'linear', position: 'bottom' },
+      { type: 'linear', position: 'left' }
+    ],
+    []
+  )
+
+  const lineChart = (
+    // A react-chart hyper-responsively and continuusly fills the available
+    // space of its parent element automatically
+    <div
+      style={{
+        width: '400px',
+        height: '300px'
+      }}
+    >
+      <Chart data={data} axes={axes} />
+    </div>
+  );
+
+  return lineChart;
+}
+
+function Header() {
+  return (
+    <header className="Alpha-h">
+      <div className="Alpha-h-i"><span className="Alpha-ac">AC</span>Library</div>
+      <nav className="Alpha-h-n">
+        <div>Documentation</div>
+        <div>Tutorial</div>
+        <div>GitHub</div>
+        <div>Beta</div>
+      </nav>
+    </header>
+  );
+}
+
+function Hero() {
+  const [cpy, setCpy] = useState("COPY");
+
+  const cpyTxt = () => {
+    // fix this later to be react
+    setCpy("COPIED");
+    var copyText = document.getElementById("myInput");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // For mobile
+    document.execCommand("copy");
+  }
+
+  return (
+    <div className="Alpha-hr">
+      <div className="Alpha-hr-top">
+        <iframe src="https://www.youtube.com/embed/MMCRLJWOqdk" frameborder="0" />
+        <div>
+          <div className="Alpha-h-i"><span className="Alpha-ac">AC</span>Library</div>
+          <div>Build scalable, complex applications <strong>faster.</strong></div>
+        </div>
+      </div>
+      <div className="Alpha-hr-btm">
+        <input type="text" value="git clone https://github.comcontactandyc/another-c-library.git" id="myInput" />
+        <button onClick={cpyTxt}>{cpy}</button>
+        <div>Get Started <FaArrowRight style={{ height: "12px" }}/></div>
+      </div>
+    </div>
+  );
+}
+
+function Preview(props) {
+  if (props.side === "left") {
+    return (
+      <div className="Alpha-prev">
+        <div className="Alpha-prev-txt">
+          <div>{props.ttl}</div>
+          <div>{props.tag}</div>
+          <div>{props.dsc}</div>
+          <button>{props.btn}</button>
+        </div>
+        <div className="Alpha-prev-txt">
+          <MyChart />
+        </div>
+      </div>
+    );
+  } else {
+    return (
+      <div className="Alpha-prev">
+        <div className="Alpha-prev-txt">
+          <MyChart />
+        </div>
+        <div className="Alpha-prev-txt">
+          <div>{props.ttl}</div>
+          <div>{props.tag}</div>
+          <div>{props.dsc}</div>
+          <button>{props.btn}</button>
+        </div>
+      </div>
+    );
+  }
+}
+
+function Social() {
+  return (
+    <div style={{ display: "flex", maxWidth: 1200, margin: "0 auto 80px auto", alignItems: "center", justifyContent: "center" }}>
+      <div className="Alpha-social-signup">
+        <div>Subscribe for release updates:</div>
+        <input name="email"></input>
+        <div className="Alpha-social-signup-btn">SIGNUP</div>
+      </div>
+      <div className="Alpha-github-btns">
+        <iframe src="https://ghbtns.com/github-btn.html?user=twbs&repo=bootstrap&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
+        <iframe src="https://ghbtns.com/github-btn.html?user=twbs&repo=bootstrap&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+      </div>
+    </div>
+  );
+}
+
+function About() {
+  return (
+    <div style={{ background: "#f1f1f1", padding: "70px"}}>
+    <div style={{ display: "flex", maxWidth: "1200px", margin: "auto" }}>
+      <div style={{ maxWidth: "550px", marginRight: "50px" }}>
+        <h3>About AC Library:</h3>
+        <div>
+          Another C Library rebuilds, and in some cases, improves upon, some of the
+          most useful Computer Science algorithms from the ground up. The library is
+          Open Source and was created in late 2019, so it is currently still under very
+          active development.<br /><br />
+
+          Andy and Daniel Curtis created this library to serve as a starting point for C
+          developers. Whether you’re diving into C for the first time or building
+          complex applications, Another C Library offers tools for both learning and
+          building.
+        </div>
+      </div>
+      <div>
+        <h3>The Project Goals:</h3>
+        <ol>
+          <li>
+            To provide an open source collection of algorithms necessary to
+            build complex applications.
+          </li>
+          <li>
+            To help engineers understand algorithms and C better, so that they
+            can create their own.
+          </li>
+          <li>
+            To help people to learn what it takes to create something new.
+          </li>
+          <li>
+            Build scalable applications using technology like Kubernetes, nginx,
+            and docker.
+          </li>
+        </ol>
+      </div>
+    </div>
+    </div>
+  );
+}
+
+function Alpha() {
+  return (
+    <div>
+      <div>
+      <Header />
+      <Hero />
+      </div>
+      <div style={{ background: "#fafafa", margin: "100px auto", padding: "5px"}}>
+        <Preview
+          side="left"
+          ttl="Quicker Sorting"
+          tag="AC’s sort algorithm is significantly faster than the standard qsort and C++’s implementation."
+          dsc="This is accomplished through improved detection for sorted, equal, and reversed records at little to no computational cost, and hand-unrolling heap sorts for small arrays."
+          btn="ac_sort Docs"
+          />
+        <Preview
+          ttl="Faster JSON Parsing"
+          tag="Build lightning-fast services with AC’s JSON parser that can parse over 1GB of json per second per CPU."
+          dsc=""
+          btn="ac_json Docs"
+          />
+      </div>
+      <Social />
+      <About />
+      <Footer />
+    </div>
+  );
+}
+
+export default Alpha;
+
+/*
+function Graph() {
+  return (
+    <VictoryChart
+      animate={{
+        duration: 2000,
+        onLoad: { duration: 1000 }
+      }}
+      >
+      <VictoryGroup offset={30}
+        colorScale={"cool"}
+      >
+        <VictoryBar
+          labelComponent={<VictoryTooltip/>}
+          data={[
+            { x: "Ordered", y: 393.470, label: "ac_sort 393.470ms" },
+            { x: "Equal", y: 384.580, label: "ac_sort 384.580ms" },
+            { x: "Reversed", y: 963.120, label: "ac_sort 963.120ms" }
+          ]}
+        />
+        <VictoryBar
+          labelComponent={<VictoryTooltip/>}
+          data={[
+            { x: "Ordered", y: 3315.230, label: "std::sort 3315.230ms" },
+            { x: "Equal", y: 3202.080, label: "std::sort 3202.080ms" },
+            { x: "Reversed", y: 5984.830, label: "std::sort 5984.830ms" }
+          ]}
+        />
+        <VictoryBar
+          labelComponent={<VictoryTooltip/>}
+          data={[
+            { x: "Ordered", y: 4379.690, label: "qsort 4379.690ms" },
+            { x: "Equal", y: 2784.150, label: "qsort 2784.150ms" },
+            { x: "Reversed", y: 22208.090, label: "qsort 22208.090ms" }
+          ]}
+        />
+      </VictoryGroup>
+    </VictoryChart>
+  );
+}
 
 function IndexPage() {
   return (
@@ -30,7 +277,11 @@ function IndexPage() {
           than other quicksort methods on random, sorted, and reversed data.</h3>
           <Link to="/docs/improving-quicksort">Start Sorting <FaArrowRight style={{ height: "12px" }}/></Link>
         </div>
-        <div className="Index-cd-alt">
+        <Graph />
+
+
+
+        {/*<div className="Index-cd-alt">
           user demo % ./quicksort_demo A 1000<br /><br />
 
           Ordered test...<br />
@@ -91,7 +342,7 @@ function IndexPage() {
         <div className="Index-cd-alt">
 
         </div>
-      </div>*/}
+      </div>
 
       <p className="Index-mn" style={{ paddingTop: 0, textAlign: "center" }}><strong>Our quicksort and parser are just two of our 14 modules. Want to
       see more?<br />Clone our library and run demos in the /demo directory or read
@@ -124,6 +375,4 @@ function IndexPage() {
       </div>
     </Layout>
   );
-}
-
-export default IndexPage;
+}*/
