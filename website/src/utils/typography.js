@@ -1,11 +1,8 @@
-import Typography from 'typography'
-import githubTheme from 'typography-theme-github'
+import Typography from "typography";
+import githubTheme from "typography-theme-github";
 
 githubTheme.overrideThemeStyles = ({ rhythm }, options) => ({
-  'ol, ul': {
-    marginLeft: "16px",
-  }
-})
-const typography = new Typography(githubTheme)
+  'ol, ul': { marginLeft: "16px" }
+});
 
-export default typography
+export default new Typography(githubTheme);
