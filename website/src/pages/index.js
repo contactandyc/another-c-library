@@ -66,6 +66,7 @@ function Hero() {
             type="text"
             value="git clone https://github.comcontactandyc/another-c-library.git"
             id="myInput"
+            readOnly
             />
           <button onClick={cpyTxt}>{cpy}</button>
         </div>
@@ -79,15 +80,20 @@ function Hero() {
 
 function Social() {
   return (
-    <div className="Flex" style={{ display: "flex", maxWidth: 1200, margin: "0 auto 80px auto", alignItems: "center", justifyContent: "center" }}>
+    <div className="Index-social Flex">
       <div className="Index-social-signup Flex">
-        <div>Subscribe for release updates:</div>
-        <input name="email"></input>
-        <div className="Index-social-signup-btn">SIGNUP</div>
+        <form name="subscribe" method="post">
+          <input type="hidden" name="subscribe" value="contact" />
+          <label>Subscribe for release updates: <input className="Index-social-signup-input" type="email" name="email"/>
+          </label>
+          <button className="Index-social-signup-btn" type="submit">
+            SIGNUP
+          </button>
+        </form>
       </div>
       <div className="Index-github-btns">
-        <iframe title="github button" src="https://ghbtns.com/github-btn.html?user=twbs&repo=bootstrap&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
-        <iframe title="github button 2" src="https://ghbtns.com/github-btn.html?user=twbs&repo=bootstrap&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+        <iframe title="github button" src="https://ghbtns.com/github-btn.html?user=twbs&repo=bootstrap&type=fork&count=false&size=large" frameBorder="0" scrolling="0" width="158px" height="30px"></iframe>
+        <iframe title="github button 2" src="https://ghbtns.com/github-btn.html?user=twbs&repo=bootstrap&type=star&count=false&size=large" frameBorder="0" scrolling="0" width="160px" height="30px"></iframe>
       </div>
     </div>
   );
@@ -95,7 +101,7 @@ function Social() {
 
 function About() {
   return (
-    <div style={{ background: "#f1f1f1", padding: "70px"}}>
+    <div style={{ background: "#f1f1f1", padding: "70px 10px"}}>
       <div className="Flex" style={{ display: "flex", maxWidth: "1200px", margin: "auto" }}>
         <div style={{ maxWidth: "550px" }}>
           <h3>About AC Library:</h3>
@@ -148,11 +154,13 @@ function IndexPage() {
           {cnt.map((val, i) => {
             return (
               <Preview
+                key={i}
                 ttl={cnt[i].ttl}
                 sub={cnt[i].sub}
                 dsc={cnt[i].dsc}
                 btn={cnt[i].btn}
                 pth={cnt[i].pth}
+                i={i}
                 />
             );
           })}

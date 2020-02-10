@@ -1,20 +1,83 @@
 import { Link } from "gatsby";
 import React from "react";
 
-import MyChart from "./charts";
+import { BarChart, PieChart } from "./charts";
 import "../pages/index.css";
 
-function Preview(props) {
+function Allocator() {
   return (
-    <div className="Preview Flex">
+    <section className="Preview-code">
+      #include &quot;ac_allocator.h&quot;<br/>
+      <br/>
+      #include &lt;stdio.h&gt;<br/>
+      <br/>
+      int main(int argc, char *argv[]) &#123;<br/>
+      &nbsp; printf(&quot;Demo to show how allocations are tracked\n&quot;);<br/>
+      &nbsp; char *s = ac_strdup(argv[0]);<br/>
+      &nbsp; // ac_free(s);<br/>
+      &nbsp; return 0;<br/>
+      &#125;<br/>
+      <br/>
+      $ ./detecting_memory_loss<br/>
+      Demo to show how allocations are tracked<br/>
+      24 byte(s) allocated in 1 allocations (40 byte(s) overhead)<br/>
+      detecting_memory_loss.c:7: 24 <br/>
+    </section>
+  );
+}
+
+function Garbage() {
+  return (
+    <section className="Preview-code">
+      #include &quot;ac_buffer.h&quot;<br/>
+      #include &quot;ac_pool.h&quot;<br/>
+      <br/>
+      #include &lt;stdio.h&gt;<br/>
+      <br/>
+      int main(int argc, char *argv[]) &#123;<br/>
+      &nbsp; ac_pool_t *pool = ac_pool_init(65536);<br/>
+      &nbsp; char *cmd = ac_pool_strdupf(pool, &quot;CMD: %s&quot;, argv[0]);<br/>
+      &nbsp; printf(&quot;%s\n&quot;, cmd);<br/>
+      &nbsp; ac_buffer_t *bh = ac_buffer_pool_init(pool, 256);<br/>
+      &nbsp; ac_buffer_setf(bh, &quot;The buffer will be destroyed when pool is destroyed!&quot;);<br/>
+      &nbsp; printf(&quot;%s\n&quot;, ac_buffer_data(bh));<br/>
+      &nbsp; ac_pool_destroy(pool);<br/>
+      &nbsp; return 0;<br/>
+      }<br/>
+      <br/>
+      $ ./pool_demo<br/>
+      CMD: ./pool_demo<br/>
+      The buffer will be destroyed when pool is destroyed!<br/>
+    </section>
+  );
+}
+
+function Preview(props) {
+  let flex = "Flex";
+  let prev;
+
+  if (props.i % 2 === 1)
+    flex = "Flex-rvrs";
+
+  if (props.i === 0)
+    prev = <BarChart />
+  else if (props.i === 1)
+    prev = <PieChart />
+  else if (props.i === 2)
+    prev = <Allocator />
+  else if (props.i === 3)
+    prev = <Garbage />
+
+  return (
+    <div className={`Preview ${flex}`}>
       <div className="Preview-txt">
         <div>{props.ttl}</div>
         <div>{props.sub}</div>
         <div>{props.dsc}</div>
         <Link to={props.pth}>{props.btn}</Link>
       </div>
-      <div className="Preview-txt">
-        <MyChart />
+      <div>
+        {prev}
       </div>
     </div>
   );

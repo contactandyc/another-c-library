@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "gatsby";
-import "../pages/index.css";
 import { MdKeyboardArrowRight, MdKeyboardArrowDown } from "react-icons/md";
+import "../pages/index.css";
 
 function Headings(props) {
   return (
