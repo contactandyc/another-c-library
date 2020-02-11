@@ -55,6 +55,7 @@ function MenuItem(props) {
         <Link
           activeStyle={{ color: "#003BFF", fontWeight: 600 }}
           style={{ color: "black" }}
+          partiallyActive={true}
           to={props.pth}
           >
           {props.ttl}

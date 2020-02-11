@@ -70,11 +70,11 @@ function Burger({ open, setOpen }) {
   let burgerClass = open ? "Header-burger Header-burger-open" : "Header-burger";
 
   return (
-    <div className={burgerClass} onClick={() => setOpen(!open)}>
+    <button className={burgerClass} onClick={() => setOpen(!open)}>
       <div />
       <div />
       <div />
-    </div>
+    </button>
   );
 }
 

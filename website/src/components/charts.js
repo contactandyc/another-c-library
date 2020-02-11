@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import ReactDOM from "react-dom";
-import { VictoryChart, VictoryBar, VictoryAxis, VictoryLabel, VictoryTheme, VictoryPie } from "victory";
+import {
+  VictoryChart,
+  VictoryBar,
+  VictoryAxis,
+  VictoryLabel,
+  VictoryPie } from "victory";
 
 function useInterval(callback, delay) {
   const savedCallback = useRef();

@@ -3,7 +3,6 @@ const { createFilePath } = require(`gatsby-source-filesystem`);
 
 exports.createPages = async ({ graphql, actions }) => {
   const { createPage } = actions;
-  // const docsPage = path.resolve(`./src/templates/docs-page.js`);
   const mdPage = path.resolve(`./src/templates/md-page.js`);
   const result = await graphql(`{
     allMarkdownRemark(
@@ -16,6 +15,7 @@ exports.createPages = async ({ graphql, actions }) => {
           }
           frontmatter {
             title
+            posttype
           }
         }
       }
@@ -23,32 +23,47 @@ exports.createPages = async ({ graphql, actions }) => {
   }`);
 
   if (result.errors)
-    throw result.errors
+    throw result.errors;
 
-  // Create blog posts pages.
-  const posts = result.data.allMarkdownRemark.edges
+  let allArr = result.data.allMarkdownRemark.edges.filter(i => i.node.frontmatter.title.length > 0);
+  let tutArr = allArr.filter(i => i.node.frontmatter.posttype === "tutorial");
+  let docArr = allArr.filter(i => i.node.frontmatter.posttype === "docs");
 
-  posts.forEach((post, index) => {
-    //const previous = index === posts.length - 1 ? null : posts[index + 1].node
-    //const next = index === 0 ? null : posts[index - 1].node
+  tutArr.sort(function(a, b) {
+    let ai = parseInt(a.node.frontmatter.title);
+    let bi = parseInt(b.node.frontmatter.title);
+    return ai - bi;
+  });
 
-    //if (post.node.frontmatter.posttype === "ebook") { // posttype bug
-      createPage({
-        path: post.node.fields.slug,
-        component: mdPage,
-        context: {
-          slug: post.node.fields.slug
-        },
-      });
-    /*} else if (post.node.frontmatter.posttype === "docs") {
-      createPage({
-        path: post.node.fields.slug,
-        component: docsPage,
-        context: {
-          slug: post.node.fields.slug
-        },
-      });
-    }*/
+  tutArr.forEach((post, i) => {
+    const next = i === tutArr.length - 1 ? null : tutArr[i + 1].node;
+    const prev = i === 0 ? null : tutArr[i - 1].node;
+
+    createPage({
+      path: post.node.fields.slug,
+      component: mdPage,
+      context: {
+        slug: post.node.fields.slug,
+        prev,
+        next,
+        tutArr
+      },
+    });
+  });
+
+  docArr.forEach((post, i) => {
+    const prev = i === docArr.length - 1 ? null : docArr[i + 1].node;
+    const next = i === 0 ? null : docArr[i - 1].node;
+
+    createPage({
+      path: post.node.fields.slug,
+      component: mdPage,
+      context: {
+        slug: post.node.fields.slug,
+        prev,
+        next,
+      },
+    });
   });
 }
 

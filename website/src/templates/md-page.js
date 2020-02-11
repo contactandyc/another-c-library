@@ -1,15 +1,19 @@
 import React from "react";
 import { Helmet } from "react-helmet";
-import { graphql } from "gatsby";
+import { Link, graphql } from "gatsby";
 
 import Layout from "../components/layout";
 import SEO from "../components/seo";
 import MdContent from "../components/mdcontent";
 import "../pages/index.css";
 
-function MdPages({ data }) {
+function MdPages(props) {
+  const { data } = props;
   const currPage = data.markdownRemark;
   const currTitle = data.markdownRemark.frontmatter.title;
+  const { tutArr, prev, next } = props.pageContext;
+
+  console.log(tutArr);
 
   return (
     <Layout type={data.markdownRemark.frontmatter.posttype}>
@@ -20,6 +24,30 @@ function MdPages({ data }) {
         <p>Copyright {new Date().getFullYear()} Andy Curtis & Daniel Curtis</p>
         <MdContent content={currPage.html} />
       </div>
+      <ul
+        style={{
+          display: `flex`,
+          flexWrap: `wrap`,
+          justifyContent: `space-between`,
+          listStyle: `none`,
+          padding: 0,
+        }}
+      >
+        <li>
+          {prev && (
+            <Link to={prev.fields.slug} rel="prev">
+              ← {prev.frontmatter.title}
+            </Link>
+          )}
+        </li>
+        <li>
+          {next && (
+            <Link to={next.fields.slug} rel="next">
+              {next.frontmatter.title} →
+            </Link>
+          )}
+        </li>
+      </ul>
     </Layout>
   );
 }
