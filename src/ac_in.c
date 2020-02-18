@@ -895,6 +895,7 @@ char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, char delim,
 }
 
 char *ac_in_lz4_readz(ac_in_t *h, int32_t *rlen, uint32_t len) {
+  // printf("Reading %u byte(s)\n", len);
   cleanup_last_read(h);
 
   ac_in_buffer_t *b = &(h->buf);
@@ -958,8 +959,35 @@ char *ac_in_lz4_readz(ac_in_t *h, int32_t *rlen, uint32_t len) {
     }
     reset_block(b);
     fill_blocks(h, b);
-    if (len > b->used)
-      len = b->used;
+    if (len > b->used) {
+      h->bh = ac_buffer_init(len);
+      ac_buffer_resize(h->bh, len);
+      ac_in_buffer_t tmp;
+      tmp.buffer = ac_buffer_data(h->bh);
+      tmp.size = len;
+      tmp.used = b->used - b->pos;
+      tmp.pos = tmp.used;
+      if (tmp.used)
+        memcpy(tmp.buffer, b->buffer + b->pos, tmp.used);
+      b->pos = b->used = 0;
+      // fill_blocks(h, &tmp);
+      tmp.pos = tmp.used;
+      len -= tmp.used;
+      if (len) {
+        fill_blocks(h, b);
+        if (len > b->used) {
+          b->pos = b->used;
+          ac_buffer_destroy(h->bh);
+          h->bh = NULL;
+          return NULL;
+        }
+        b->pos = len;
+        tmp.pos += len;
+        memcpy(tmp.buffer + tmp.used, b->buffer, len);
+      }
+      *rlen = tmp.pos;
+      return tmp.buffer;
+    }
     b->pos = len;
     *rlen = len;
     char *ep = b->buffer + len;
@@ -1022,8 +1050,32 @@ char *ac_in_lz4_read(ac_in_t *h, uint32_t len) {
     reset_block(b);
     fill_blocks(h, b);
     if (len > b->used) {
-      b->pos = b->used;
-      return NULL;
+      h->bh = ac_buffer_init(len);
+      ac_buffer_resize(h->bh, len);
+      ac_in_buffer_t tmp;
+      tmp.buffer = ac_buffer_data(h->bh);
+      tmp.size = len;
+      tmp.used = b->used - b->pos;
+      tmp.pos = tmp.used;
+      if (tmp.used)
+        memcpy(tmp.buffer, b->buffer + b->pos, tmp.used);
+      b->pos = b->used = 0;
+      // fill_blocks(h, &tmp);
+      tmp.pos = tmp.used;
+      len -= tmp.used;
+      if (len) {
+        fill_blocks(h, b);
+        if (len > b->used) {
+          b->pos = b->used;
+          ac_buffer_destroy(h->bh);
+          h->bh = NULL;
+          return NULL;
+        }
+        b->pos = len;
+        tmp.pos += len;
+        memcpy(tmp.buffer + tmp.used, b->buffer, len);
+      }
+      return tmp.buffer;
     }
     b->pos = len;
     return b->buffer;
@@ -1386,6 +1438,8 @@ void ac_in_ext_add(ac_in_t *hp, ac_in_t *in, int tag) {
   if (!h || !in || h->type != AC_IN_EXT_TYPE)
     return;
 
+  in->options.tag = tag;
+  in->rec.tag = tag;
   // Adding this can aid in debugging as you can know record number of problem
   // case.
   // ac_in_limit(in, 100000000);
@@ -1394,7 +1448,6 @@ void ac_in_ext_add(ac_in_t *hp, ac_in_t *in, int tag) {
     ac_in_destroy(in);
     return;
   }
-  in->options.tag = tag;
 
   in_heap_t *heap = &(h->heap);
   move_active_to_heap(h, false);

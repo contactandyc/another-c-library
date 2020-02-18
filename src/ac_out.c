@@ -873,6 +873,7 @@ ac_out_t *ac_out_partitioned_init(const char *filename,
     ac_out_partitioned_t *h = (ac_out_partitioned_t *)ac_malloc(
         sizeof(ac_out_partitioned_t) + strlen(filename) + 1 +
         (sizeof(ac_out_t *) * ext_options->num_partitions));
+    memset(h, 0, sizeof(*h));
     h->options = *options;
     h->part_options = *options;
     h->ext_options = *ext_options;
@@ -1016,8 +1017,8 @@ typedef struct {
 
 const int EXTRA_IN = 0;
 const int EXTRA_FILENAME = 1;
-const int EXTRA_FILE_TO_REMOVE = EXTRA_FILENAME;
-const int EXTRA_ACK_FILE = EXTRA_FILENAME | 2;
+const int EXTRA_FILE_TO_REMOVE = 1;
+const int EXTRA_ACK_FILE = 3;
 
 typedef struct extra_s {
   int type;
@@ -1102,7 +1103,7 @@ static inline void clear_buffer(ac_out_buffer_t *b) {
 }
 
 static inline void init_buffer(ac_out_buffer_t *b, size_t buffer_size) {
-  b->buffer = (char *)ac_malloc(buffer_size);
+  b->buffer = (char *)ac_calloc(buffer_size);
   b->size = buffer_size;
   clear_buffer(b);
 }
@@ -1260,6 +1261,16 @@ void write_sorted(ac_out_sorted_t *h) {
     write_sorted_thread(h);
 }
 
+bool write_one_record(ac_out_sorted_t *h, const void *d, size_t len) {
+  wait_on_thread(h);
+  ac_out_t *out = get_next_tmp(h, false);
+  ac_out_write_record(out, d, len);
+  ac_out_destroy(out);
+  if (h->ext_options.num_per_group)
+    check_for_merge(h);
+  return true;
+}
+
 void ac_out_tag(ac_out_t *hp, int tag) {
   ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
   if (h->type != AC_OUT_SORTED_TYPE)
@@ -1379,6 +1390,8 @@ bool write_sorted_record(ac_out_t *hp, const void *d, size_t len) {
   if (bp + length > h->b->ep) {
     write_sorted(h);
     bp = h->b->bp;
+    if (bp + length > h->b->ep)
+      return write_one_record(h, d, len);
     // TODO: Support records that are larger than the buffer
     // if (bp + length > h->b->ep)
     //  return write_one_record(h, d, len);
@@ -1476,10 +1489,14 @@ void ac_out_sorted_destroy(ac_out_t *hp) {
     ac_out_destroy(out);
     ac_in_destroy(in);
   }
-  if (h->buf1.buffer)
+  if (h->buf1.buffer) {
     ac_free(h->buf1.buffer);
-  if (h->buf2.buffer)
+    h->buf1.buffer = NULL;
+  }
+  if (h->buf2.buffer) {
     ac_free(h->buf2.buffer);
+    h->buf2.buffer = NULL;
+  }
   ac_out_ext_remove_tmp_files(h->tmp_filename, h->filename,
                               h->ext_options.lz4_tmp);
   destroy_extra_ins(h);

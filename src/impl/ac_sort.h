@@ -33,3 +33,4 @@ typedef struct {
 #include "ac_sort/ac_sort_compare_arg_m.h"
 #include "ac_sort/ac_sort_compare_m.h"
 #include "ac_sort/ac_sort_m.h"
+#include "ac_sort/ac_sort_type_m.h"

@@ -762,6 +762,7 @@ static void dump_file(ac_worker_t *w, const char *filename,
   ac_in_options_t opts;
   ac_in_options_init(&opts);
   ac_in_options_format(&opts, format);
+  // ac_in_options_buffer_size(&opts, 10000000);
   ac_in_t *in = ac_in_init(filename, &opts);
   ac_io_record_t *r;
   ac_buffer_t *bh = ac_buffer_init(1000);
@@ -1747,133 +1748,137 @@ void list_selected_tasks(void *arg) {
     get_ack_time(w);
     if ((w->task->scheduler->parsed_args.select_all ||
          (w->task->selected && w->task->selected[w->partition])) &&
-        (show_files || w->partition == (w->num_partitions - 1))) {
+        (show_files || w->partition == 0)) {
       clone_inputs_and_outputs(w);
       fill_inputs(w);
       printf("task: %s [%lu/%lu]\n", w->task->task_name, w->partition,
              w->task->num_partitions);
 
       print_task_link("  dependencies: ", w->task->dependencies);
-      print_task_link("  reverse dependencies: ",
-                      w->task->reverse_dependencies);
       print_task_link("  partial dependencies: ",
                       w->task->partial_dependencies);
+      print_task_link("  reverse dependencies: ",
+                      w->task->reverse_dependencies);
       print_task_link("  reverse partial dependencies: ",
                       w->task->reverse_partial_dependencies);
-
-      if (w->task->runner == in_out_runner) {
-        size_t id = 0;
-        printf("  in_out_runner\n");
-        ac_transform_t *transforms = (ac_transform_t *)w->data;
-        while (transforms) {
-          printf("    transform: %lu\n", id);
-          id++;
-          size_t num_outs = transforms->num_outputs;
-          size_t num_ins = transforms->num_inputs;
-          for (size_t i = 0; i < num_ins; i++) {
-            ac_worker_input_t *n = transforms->inputs[i];
-            printf("      input[%lu]: %s (%lu)\n", i, n->name, n->num_files);
-            if (show_files) {
-              for (size_t j = 0; j < n->num_files; j++)
-                printf("        %s (%lu)\n", n->files[j].filename,
-                       n->files[j].size);
+      if (show_files) {
+        if (w->task->runner == in_out_runner) {
+          size_t id = 0;
+          printf("  in_out_runner\n");
+          ac_transform_t *transforms = (ac_transform_t *)w->data;
+          while (transforms) {
+            printf("    transform: %lu\n", id);
+            id++;
+            size_t num_outs = transforms->num_outputs;
+            size_t num_ins = transforms->num_inputs;
+            for (size_t i = 0; i < num_ins; i++) {
+              ac_worker_input_t *n = transforms->inputs[i];
+              printf("      input[%lu]: %s (%lu)\n", i, n->name, n->num_files);
+              if (show_files) {
+                for (size_t j = 0; j < n->num_files; j++)
+                  printf("        %s (%lu)\n", n->files[j].filename,
+                         n->files[j].size);
+              }
+            }
+            for (size_t i = 0; i < num_outs; i++) {
+              ac_worker_output_t *n = transforms->outputs[i];
+              printf("      output[%lu]: %s %s%s%s\n", i, n->name,
+                     n->flags & AC_OUTPUT_SPLIT ? "split" : "",
+                     n->flags & AC_OUTPUT_PARTITION ? "partition" : "",
+                     (n->flags & (AC_OUTPUT_SPLIT | AC_OUTPUT_PARTITION))
+                         ? ""
+                         : "normal");
+              ac_task_link_t *d = n->destinations;
+              if (d) {
+                printf("        destinations:");
+                while (d) {
+                  printf(" %s[%lu]", d->task->task_name,
+                         d->task->num_partitions);
+                  d = d->next;
+                }
+                printf("\n");
+              }
+              if (show_files) {
+                char *base_name = ac_worker_output_base(w, n);
+                size_t num_partitions = 0;
+                if ((n->flags & AC_OUTPUT_SPLIT) && n->ext_options.partition) {
+                  if (n->destinations)
+                    num_partitions = n->destinations->task->num_partitions;
+                  else
+                    num_partitions = n->task->scheduler->num_partitions;
+                }
+                if (!num_partitions)
+                  printf("        %s\n", base_name);
+                char *filename =
+                    (char *)ac_pool_alloc(w->pool, strlen(base_name) + 20);
+                for (size_t j = 0; j < num_partitions; j++) {
+                  ac_out_partition_filename(filename, base_name, j);
+                  printf("        %s\n", filename);
+                }
+              }
+            }
+            transforms = transforms->next;
+          }
+        } else {
+          printf("  custom runner\n");
+          {
+            ac_worker_input_t *n = w->inputs;
+            size_t i = 0;
+            while (n) {
+              printf("      input[%lu]: %s (%lu)\n", i, n->name, n->num_files);
+              i++;
+              if (show_files) {
+                for (size_t j = 0; j < n->num_files; j++)
+                  printf("        %s (%lu)\n", n->files[j].filename,
+                         n->files[j].size);
+              }
+              n = n->next;
             }
           }
-          for (size_t i = 0; i < num_outs; i++) {
-            ac_worker_output_t *n = transforms->outputs[i];
-            printf("      output[%lu]: %s %s%s%s\n", i, n->name,
-                   n->flags & AC_OUTPUT_SPLIT ? "split" : "",
-                   n->flags & AC_OUTPUT_PARTITION ? "partition" : "",
-                   (n->flags & (AC_OUTPUT_SPLIT | AC_OUTPUT_PARTITION))
-                       ? ""
-                       : "normal");
-            ac_task_link_t *d = n->destinations;
-            if (d) {
-              printf("        destinations:");
-              while (d) {
-                printf(" %s[%lu]", d->task->task_name, d->task->num_partitions);
-                d = d->next;
+          {
+            ac_worker_output_t *n = w->outputs;
+            size_t i = 0;
+            while (n) {
+              printf("      output[%lu]: %s %s%s%s\n", i, n->name,
+                     n->flags & AC_OUTPUT_SPLIT ? "split" : "",
+                     n->flags & AC_OUTPUT_PARTITION ? "partition" : "",
+                     (n->flags & (AC_OUTPUT_SPLIT | AC_OUTPUT_PARTITION))
+                         ? ""
+                         : "normal");
+              ac_task_link_t *d = n->destinations;
+              if (d) {
+                printf("        destinations:");
+                while (d) {
+                  printf(" %s[%lu]", d->task->task_name,
+                         d->task->num_partitions);
+                  d = d->next;
+                }
+                printf("\n");
               }
-              printf("\n");
+              if (show_files) {
+                char *base_name = ac_worker_output_base(w, n);
+                size_t num_partitions = 0;
+                if ((n->flags & AC_OUTPUT_SPLIT) && n->ext_options.partition) {
+                  if (n->destinations)
+                    num_partitions = n->destinations->task->num_partitions;
+                  else
+                    num_partitions = n->task->scheduler->num_partitions;
+                }
+                if (!num_partitions)
+                  printf("        %s\n", base_name);
+                char *filename =
+                    (char *)ac_pool_alloc(w->pool, strlen(base_name) + 20);
+                for (size_t j = 0; j < num_partitions; j++) {
+                  ac_out_partition_filename(filename, base_name, j);
+                  printf("        %s\n", filename);
+                }
+              }
+              n = n->next;
             }
-            if (show_files) {
-              char *base_name = ac_worker_output_base(w, n);
-              size_t num_partitions = 0;
-              if ((n->flags & AC_OUTPUT_SPLIT) && n->ext_options.partition) {
-                if (n->destinations)
-                  num_partitions = n->destinations->task->num_partitions;
-                else
-                  num_partitions = n->task->scheduler->num_partitions;
-              }
-              if (!num_partitions)
-                printf("        %s\n", base_name);
-              char *filename =
-                  (char *)ac_pool_alloc(w->pool, strlen(base_name) + 20);
-              for (size_t j = 0; j < num_partitions; j++) {
-                ac_out_partition_filename(filename, base_name, j);
-                printf("        %s\n", filename);
-              }
-            }
-          }
-          transforms = transforms->next;
-        }
-      } else {
-        printf("  custom runner\n");
-        {
-          ac_worker_input_t *n = w->inputs;
-          size_t i = 0;
-          while (n) {
-            printf("      input[%lu]: %s (%lu)\n", i, n->name, n->num_files);
-            i++;
-            if (show_files) {
-              for (size_t j = 0; j < n->num_files; j++)
-                printf("        %s (%lu)\n", n->files[j].filename,
-                       n->files[j].size);
-            }
-            n = n->next;
-          }
-        }
-        {
-          ac_worker_output_t *n = w->outputs;
-          size_t i = 0;
-          while (n) {
-            printf("      output[%lu]: %s %s%s%s\n", i, n->name,
-                   n->flags & AC_OUTPUT_SPLIT ? "split" : "",
-                   n->flags & AC_OUTPUT_PARTITION ? "partition" : "",
-                   (n->flags & (AC_OUTPUT_SPLIT | AC_OUTPUT_PARTITION))
-                       ? ""
-                       : "normal");
-            ac_task_link_t *d = n->destinations;
-            if (d) {
-              printf("        destinations:");
-              while (d) {
-                printf(" %s[%lu]", d->task->task_name, d->task->num_partitions);
-                d = d->next;
-              }
-              printf("\n");
-            }
-            if (show_files) {
-              char *base_name = ac_worker_output_base(w, n);
-              size_t num_partitions = 0;
-              if ((n->flags & AC_OUTPUT_SPLIT) && n->ext_options.partition) {
-                if (n->destinations)
-                  num_partitions = n->destinations->task->num_partitions;
-                else
-                  num_partitions = n->task->scheduler->num_partitions;
-              }
-              if (!num_partitions)
-                printf("        %s\n", base_name);
-              char *filename =
-                  (char *)ac_pool_alloc(w->pool, strlen(base_name) + 20);
-              for (size_t j = 0; j < num_partitions; j++) {
-                ac_out_partition_filename(filename, base_name, j);
-                printf("        %s\n", filename);
-              }
-            }
-            n = n->next;
           }
         }
       }
+      printf("\n");
     }
 
     worker_complete(w, time(NULL));

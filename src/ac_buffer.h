@@ -69,6 +69,9 @@ static inline void ac_buffer_clear(ac_buffer_t *h);
 /* get the contents of the buffer */
 static inline char *ac_buffer_data(ac_buffer_t *h);
 
+/* get the contents of the buffer at pos (or the end if passed the end) */
+static inline char *ac_buffer_at(ac_buffer_t *h, size_t pos);
+
 /* get the length of the buffer */
 static inline size_t ac_buffer_length(ac_buffer_t *h);
 

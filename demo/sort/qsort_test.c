@@ -22,8 +22,8 @@ static inline int compare_sort(const void *p1, const void *p2) {
 void run_test(const char *test_name, sort_t *base, size_t num_elements,
               char order) {
   int repeat = 10000000 / num_elements;
-  if (repeat < 100)
-    repeat = 100;
+  if (repeat < 1000)
+    repeat = 1000;
   ac_timer_t *copy_timer = ac_timer_init(repeat);
   ac_timer_start(copy_timer);
   for (int i = 0; i < repeat; i++) {
@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
   sort_t *base = (sort_t *)ac_malloc(1000000 * sizeof(sort_t) * 3);
   int i, pos;
   sort_t tmp;
+  srand(1000);
 
   size_t num_elements = 10;
   for (int m = 0; m < 3; m++) {

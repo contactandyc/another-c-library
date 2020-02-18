@@ -7,19 +7,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define sort_t size_t
+//#define sort_t size_t
+
+typedef struct {
+  size_t a;
+  size_t key[4];
+} sort_t;
 
 static inline int compare(const sort_t *a, const sort_t *b) {
-  return (*a != *b) ? *a < *b ? -1 : 1 : 0;
+  return (a->a != b->a) ? a->a < b->a ? -1 : 1 : 0;
 }
-
 ac_sort_m(ac_sort, sort_t, compare);
+// ac_sort_type_m(ac_sort, sort_t);
 
 void run_test(const char *test_name, sort_t *base, size_t num_elements,
               char order) {
   int repeat = 10000000 / num_elements;
-  if (repeat < 100)
-    repeat = 100;
+  if (repeat < 1000)
+    repeat = 1000;
   ac_timer_t *copy_timer = ac_timer_init(repeat);
   ac_timer_start(copy_timer);
   for (int i = 0; i < repeat; i++) {
@@ -45,9 +50,10 @@ void run_test(const char *test_name, sort_t *base, size_t num_elements,
 
 int main(int argc, char *argv[]) {
   setlocale(LC_NUMERIC, "");
-  sort_t *base = (sort_t *)ac_malloc(1000000 * sizeof(sort_t) * 3);
+  sort_t *base = (sort_t *)ac_calloc(1000000 * sizeof(sort_t) * 3);
   int i, pos;
   sort_t tmp;
+  srand(1000);
 
   size_t num_elements = 10;
   for (int m = 0; m < 3; m++) {
@@ -55,19 +61,19 @@ int main(int argc, char *argv[]) {
     if (num_elements > 1000000)
       num_elements = 1000000;
     for (i = 0; i < num_elements; i++)
-      base[i] = i;
+      base[i].a = i;
     run_test("Ordered test", base, num_elements, 'a');
 
     for (i = 0; i < num_elements; i++)
-      base[i] = 100;
+      base[i].a = 100;
     run_test("Equal test", base, num_elements, 'b');
 
     for (i = 0; i < num_elements; i++)
-      base[i] = num_elements - i;
+      base[i].a = num_elements - i;
     run_test("Reverse test", base, num_elements, 'c');
 
     for (i = 0; i < num_elements; i++)
-      base[i] = rand();
+      base[i].a = rand();
     run_test("Random test", base, num_elements, 'd');
   }
   ac_free(base);
