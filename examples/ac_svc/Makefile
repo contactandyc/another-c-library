@@ -1,8 +1,8 @@
 ROOT=../..
 include $(ROOT)/src/Makefile.include
 
-FLAGS += -O3 -lz -luv
-# FLAGS += -g -D_AC_DEBUG_MEMORY_=NULL -lz -luv 
+FLAGS += -O3 -lz -luv -lpthread -lm
+# FLAGS += -g -D_AC_DEBUG_MEMORY_=NULL -lz -luv -lpthread -lm
 PROGRAMS = ac_svc
 
 OBJECTS += $(UV_OBJECTS)
