@@ -1,0 +1,152 @@
+/* footer.js */
+.Footer {
+	background: var(--grey);
+	color: white;
+	text-align: center;
+	padding: 30px 55px;
+}
+
+.Footer-a {
+	color: white !important;
+}
+
+/* header.js */
+.Header {
+	margin: 0 auto;
+	padding: 16px 20px;
+	display: flex;
+	align-content: center;
+	justify-content: space-between;
+	border-bottom: 1px solid var(--lightgrey);
+	position: fixed;
+	width: 100vw;
+	top: 0;
+	background: var(--bg);
+	z-index: 2;
+}
+
+.Header-link {
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 24px;
+	padding: 0;
+	margin: 0;
+	color: var(--link);
+}
+
+.Header-input {
+	margin-left: 22px;
+	padding: 4px 8px;
+	font-size: 14px;
+	border: 1px solid var(--lightgrey);
+	border-radius: 4px;
+}
+
+.Header-flex {
+	display: flex;
+	align-items: center;
+}
+
+.Header-small {
+	margin: auto 8px;
+}
+
+.Header-icon {
+	margin: auto 8px;
+	cursor: pointer;
+	color: var(--link);
+}
+
+.Header-btn {
+	background: rgba(0, 0, 0, 0);
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+
+/* menu.js */
+.Menu {
+	border-right: 1px solid var(--lightgrey);
+	position: fixed;
+	width: 220px;
+	height: 100%;
+	top: 69px;
+	overflow-y: scroll;
+	background: var(--bg);
+	z-index: 10;
+}
+
+.Menu-hide {
+	display: none;
+}
+
+.Menu-ul {
+	list-style-type: none;
+	margin: 0;
+}
+
+.Menu-li {
+	padding: 0;
+	margin: 6px 10px;
+	font-size: 14px;
+	font-weight: 500;
+	text-transform: uppercase;
+}
+
+.Menu-link {
+	text-decoration: none;
+	padding-left: 12px;
+	color: var(--text);
+	text-transform: none;
+}
+
+.Menu-link-active {
+	color: var(--link);
+}
+
+/* next-prev.js */
+.NextPrev {
+	display: flex;
+	justify-content: space-between;
+}
+
+.NextPrev-link {
+	padding: 24px;
+	text-decoration: none;
+}
+
+/* table-contents.js */
+.TableContents {
+	position: fixed;
+	right: 50px;
+	display: flex;
+	flex-direction: column;
+	padding-left: 18px;
+	border-left: solid 2px var(--grey);
+}
+
+.TableContents-link {
+	text-decoration: none;
+	color: var(--text);
+}
+
+@media only screen and (max-width: 1400px) {
+	.TableContents {
+		display: none;
+	}
+}
+
+@media only screen and (max-width: 600px) {
+	.Menu {
+		top: 0;
+	}
+	.Header-input {
+		margin-left: 0px;
+		margin-top: 8px;
+		display: block;
+	}
+	.Header-icon,
+	.Header-small {
+		margin: auto 5px;
+	}
+}

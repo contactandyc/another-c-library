@@ -1,72 +1,76 @@
-# Another C Library Website
+# Gatsby MDX Netlify CMS Documentation Starter
 
-The code behind [AnotherCLibrary.com](https://AnotherCLibrary.com).
-Currently, the website is built using React and GatsbyJS and renders the
-markdown files in the Another C Library GitHub repo.
+An accessible and _blazing_ fast documentation starter for Gatsby integrated with Netlify CMS. Based on [Gatsby MDX Netlify CMS Starter](https://github.com/renvrant/gatsby-mdx-netlify-cms-starter).
 
-## Get Started
+Spend more time building and less time on docs! [Live Demo](https://mdx-cms-docs.netlify.app)
 
-Ensure you're in the root website directory.
-Install the necessary packages using npm (may require sudo):
+[![Netlify Status](https://api.netlify.com/api/v1/badges/dc60d64b-ffee-48d4-ba2d-5be6cb31e470/deploy-status)](https://app.netlify.com/sites/mdx-cms-docs/deploys)
 
-```bash
-npm install
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/danielcurtis/gatsby-starter-netlify-docs)
+
+## Features
+
+- 📖 &nbsp; Netlify CMS for Managing Content
+- 😎 &nbsp; All of the **Awesome** Benefits of Gatsby MDX
+- ♿ &nbsp; Accessible and Fast. Scores 100's in every Lighthouse Category
+- 🖥️ &nbsp; Landing Page Fully-Configurable from Netlify CMS
+- 🧭 &nbsp; Table of Contents Sub-Menu & Toggleable Main-Menu
+- ⏭️ &nbsp; Configurable Next & Previous Buttons
+- 🧛‍♀️ &nbsp; Dark Mode
+- 📱 &nbsp; 100% Repsponsive
+- 📊 &nbsp; Google Anayltics
+- 👩‍💻 &nbsp; Functional Components & React Hooks
+- 🔷 &nbsp; Unopinionated, Minimal CSS
+
+## Get started
+
+Ensure you have NodeJS and the Gatsby CLI installed. If you don't read [these instructions](https://www.gatsbyjs.org/tutorial/part-zero/).
+
+**Create the project**
+
+```
+gatsby new gatsby-starter-netlify-docs https://github.com/danielcurtis/gatsby-starter-netlify-docs
 ```
 
-For local development run gatsby develop:
+**Start the project**
 
-```bash
+```
+cd gatsby-starter-netlify-docs
+npm install
 gatsby develop
 ```
 
-The website will be running locally on port 8000 (localhost:8000)
-For a build production, run gatsby build:
+_You may see some security warnings on this step. Those are being worked on._
 
-```bash
-gatsby build
-```
+The starter will start up at [localhost:8000](http://localhost:8000).
 
-## Architecture
+**Netlify CMS**
 
-The site currently queries markdown files from the Another C Library repo in the
-docs folder. These files are encapsulated within another file which gives them
-their URL alias. At the top of every file, frontmatter (metadata) is added including
-the page type, name, and path (for internal linking only).
+1. After cloning the project, create a repo on GitHub. Don't push your project yet!
+2. Change the repo listed in **static/admin/config.yml** to your newly created repo.
+3. Commit and push your changes. _Note, the default branch is set to main in the config._
 
-The bulk of the code is located in the /src folder. Here, you will find:
+After committing, you can start the project up again with `gatsby develop` and you should get an output from the CLI for the URL to visit the CMS UI.
 
-- components (for page components such as the header)
-- images (for lazy-loaded images, currently none except favicon)
-- pages (for the pages not rendered from markdown files)
-- templates (templates for pages that are rendered from markdown files)
-- utils (additional utility functions, such as typography)
+You should be able to access the CMS locally and make changes. Changes are pushed directly to main, so you'll have to pull them from origin to see them.
 
-The src folder renders the public folder at build.
+In production, you can make changes at https://your-awesome-site/admin. Netlify CMS uses GitHub for authentication. You'll have to get API keys from GitHub, [as described in Netlify's docs.](https://docs.netlify.com/visitor-access/oauth-provider-tokens/#using-an-authentication-provider)
 
-The documentation site is hosted on [Netlify](https://netlify.com), which produces
-the latest build on every commit to master on the Another C Library repo.
+## Contributing
 
-## Licensing
+I'm definitely open to contributions! I'd love to see this project grow beyond me. However, not every PR will be merged. The general guidelines for contributing are:
 
-Throughout the eBook and documentation on this website, the following notice will
-appear at the top of most of the files:
+- Does it make development easier / better?
+- Does it improve cross-platforming (browsers/mobile)?
+- Does it fix a bug?
+- Does it break anything? _Testing 1..2.... :(_
+- Does it reduce the build size?
+- Does it add a feature without adding complexity?
 
-Copyright 2019 Andy Curtis & Daniel Curtis
+Please, create an issue before spending too much time on a PR so we can discuss the changes!
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+## Roadmap
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-Our goal is to produce a work that is unencumbered by licenses, and hope that
-others will find this code or parts of it useful.
-
-The website itself was built using React and GatsbyJS which are both licensed
-under the MIT License.
+- [x] Add syntax highlighting _v1.0.1_
+- [ ] Resolve Security Warnings
+- [ ] Add tests

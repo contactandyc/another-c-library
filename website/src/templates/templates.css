@@ -1,0 +1,96 @@
+/* default-page.js */
+.DefaultPageTemplate {
+	margin: 100px auto 0 auto;
+	max-width: 960px;
+	min-height: 85vh;
+	padding: 8px;
+}
+
+/* home-page.js*/
+.HomePageTemplate {
+	margin-top: 69px;
+}
+
+.HomePageTemplate-top {
+	background: var(--gradient);
+	padding: 20px;
+	height: 500px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.HomePageTemplate-btn,
+.HomePageTemplate-landing-btn {
+	margin: 5px;
+	cursor: pointer;
+	border: none;
+	border-radius: 6px;
+	padding: 6px 12px;
+	color: var(--link);
+}
+
+.HomePageTemplate-sections {
+	display: flex;
+	justify-content: center;
+	margin: 10vh auto;
+}
+
+.HomePageTemplate-section {
+	flex-basis: 20%;
+	margin: 20px;
+}
+
+.HomePageTemplate-landing {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 5vh auto;
+	padding: 5vh;
+	background: var(--lightgrey);
+}
+
+.HomePageTemplate-landing-btn {
+	background: var(--link);
+	color: white;
+	margin: 0 0 5px 0;
+}
+
+.HomePageTemplate-title {
+	margin: auto 25px;
+}
+
+.HomePageTemplate-item {
+	width: 500px;
+	margin: auto 25px;
+}
+
+.HomePageTemplate-bottom {
+	max-width: 1000px;
+	margin: 5vh auto;
+}
+
+@media only screen and (max-width: 1400px) {
+	.DefaultPageTemplate {
+		margin: 120px auto 0 220px;
+	}
+}
+
+@media only screen and (max-width: 600px) {
+	.DefaultPageTemplate {
+		margin: 140px auto 0 auto;
+	}
+	.HomePageTemplate-sections,
+	.HomePageTemplate-landing {
+		flex-direction: column;
+	}
+	.HomePageTemplate-item,
+	.HomePageTemplate-title {
+		margin: 20px;
+		width: 90vw;
+	}
+	.HomePageTemplate-bottom {
+		margin: 20px;
+	}
+}

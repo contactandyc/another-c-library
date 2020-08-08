@@ -1,0 +1,32 @@
+/* 
+ * Every component uses these CSS variables!
+ * Toggling dark/light mode supported by gatsby-plugin-dark-mode 
+ */
+body {
+	--bg: #ffffff;
+	--link: blue; /* #0554f2; */
+	--text: #000000cc;
+	--grey: #4b5566;
+	--lightgrey: #ebedf0;
+	--codebg: #fafaff;
+	--gradient: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 1) 0%,
+		rgba(226, 228, 231, 1) 42%,
+		rgba(75, 85, 102, 1) 100%
+	);
+}
+body.dark {
+	--bg: #181a1b;
+	--link: #3c59fb;
+	--text: #e8e6e3cc;
+	--grey: #3c4452;
+	--lightgrey: #3c4144;
+	--codebg: #bfbfca;
+	--gradient: linear-gradient(
+		180deg,
+		rgba(60, 68, 82, 1) 0%,
+		rgba(58, 65, 79, 1) 50%,
+		rgba(24, 26, 27, 1) 100%
+	);
+}
