@@ -13,7 +13,7 @@ function CodeBlock(props) {
 		borderRadius: `8px`,
 		overflow: `auto`,
 		wordWrap: `normal`,
-		padding: `1.45rem`,
+		padding: `1.45rem 1.45rem 0 1.45rem`,
 		fontFamily: `'SFMono-Regular', Consolas, 'Roboto Mono', 'Droid Sans Mono',
 		'Liberation Mono', Menlo, Courier, monospace`,
 	};
