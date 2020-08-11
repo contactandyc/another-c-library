@@ -19,9 +19,21 @@ const CMS_SHORTCODES = {
 // Include any tags you'd like to replace with React components
 const CMS_COMPONENTS = {
 	h1: (props) => <Heading tag={1} {...props} />,
-	h2: (props) => (
-		<h2 {...props} id={props.children.replace(/ /g, '-').toLowerCase()} />
-	),
+	h2: (props) => {
+		if (Array.isArray(props.children)) {
+			let children = props.children.join('');
+			return (
+				<h2 {...props} id={children.replace(/(\s|_|,)/g, '-').toLowerCase()} />
+			);
+		} else {
+			return (
+				<h2
+					{...props}
+					id={props.children.replace(/(\s|_|,)/g, '-').toLowerCase()}
+				/>
+			);
+		}
+	},
 	h3: (props) => <Heading tag={3} {...props} />,
 	h4: (props) => <Heading tag={4} {...props} />,
 	h5: (props) => <Heading tag={5} {...props} />,

@@ -10,10 +10,14 @@ import RenderMarkdown from '../core/render-markdown';
 
 function DefaultPageTemplate({ location, title, body, children }) {
 	const createLinkPair = (name, url) => {
+		if (Array.isArray(name)) {
+			name = name.join('');
+		}
+
 		const regex = /.*\/\/.*(\.|:)(\w*|\d*)/gi;
 		let link = url.replace(regex, '');
 		link = link.replace(/#.*/, '');
-		link += `#${name.replace(/ /g, '-').toLowerCase()}`;
+		link += `#${name.replace(/(\s|_|,)/g, '-').toLowerCase()}`;
 
 		if (name.length > 27) {
 			name = name.substring(0, 27);
