@@ -28,7 +28,8 @@
 	border: none;
 	border-radius: 6px;
 	padding: 6px 12px;
-	color: var(--link);
+	color: white;
+	background: var(--green);
 }
 
 .HomePageTemplate-sections {
@@ -51,9 +52,12 @@
 	background: var(--lightgrey);
 }
 
+.HomePageTemplate-landing:nth-of-type(odd) {
+	flex-direction: row-reverse;
+	background: var(--bg);
+}
+
 .HomePageTemplate-landing-btn {
-	background: var(--link);
-	color: white;
 	margin: 0 0 5px 0;
 }
 
@@ -92,5 +96,8 @@
 	}
 	.HomePageTemplate-bottom {
 		margin: 20px;
+	}
+	.HomePageTemplate-landing:nth-of-type(odd) {
+		flex-direction: column;
 	}
 }
