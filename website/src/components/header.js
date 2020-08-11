@@ -22,10 +22,10 @@ function Header({ siteTitle }) {
 				/>
 			</div>
 			<div className="Header-flex">
-				<small className="Header-small">v1.0</small>
+				<small className="Header-small">Beta</small>
 				<a
 					aria-label="GitHub"
-					href="https://github.com/danielcurtis/gatsby-starter-netlify-docs"
+					href="https://github.com/contactandyc/another-c-library"
 					target="_blank"
 					rel="noreferrer"
 					className="Header-flex">
