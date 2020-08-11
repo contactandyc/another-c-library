@@ -1,7 +1,7 @@
 backend:
   name: github
-  repo: danielcurtis/gatsby-starter-netlify-docs # replace this!
-  branch: main
+  repo: contactandyc/another-c-library
+  branch: master
 
 media_folder: uploads/img
 public_folder: /img
