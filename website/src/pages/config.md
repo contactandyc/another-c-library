@@ -5,8 +5,8 @@ menu_nav:
   - text: Navigation
   - text: Home
     url: /
-  - text: About
-    url: /about
+  - text: Contact
+    url: /contact
   - text: Contributing
     url: /contributing
   - text: Helpful Tips
@@ -20,11 +20,11 @@ menu_nav:
   - text: ac_allocator
     url: /docs/ac-allocator
   - text: ac_buffer
-    url: /docs/ac_buffer
+    url: /docs/ac-buffer
   - text: ac_common
     url: /docs/ac-common
   - text: ac_conv
-    url: /docs/ac_conv
+    url: /docs/ac-conv
   - text: ac_in
     url: /docs/ac-in
   - text: ac_json
