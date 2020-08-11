@@ -4,7 +4,8 @@
  */
 body {
 	--bg: #ffffff;
-	--link: blue; /* #0554f2; */
+	--green: #38a169;
+	--link: blue;
 	--text: #000000cc;
 	--grey: #4b5566;
 	--lightgrey: #ebedf0;
@@ -18,6 +19,7 @@ body {
 }
 body.dark {
 	--bg: #181a1b;
+	--green: #38a169;
 	--link: #3c59fb;
 	--text: #e8e6e3cc;
 	--grey: #3c4452;
