@@ -106,7 +106,7 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-Most of the objects you will create throughout the book will be named _object_name__t. Functions that pertain to the object will be named *object_name*__function_name_. Many of the objects can be created through _object_name_\_init and destroyed using _object_name_ destroy. Sometimes there will be alternate init functions, and less frequently alternate destroy functions. In general, if you init an object, you are expected to destroy the object later. Objects will not just automatically disappear (unless the pool is used, which we will discuss later).
+Most of the objects you will create throughout the book will be named _object_name__t. Functions that pertain to the object will be named *object_name*__function_name_. Many of the objects can be created through _object_name__init and destroyed using _object_name_ destroy. Sometimes there will be alternate init functions, and less frequently alternate destroy functions. In general, if you init an object, you are expected to destroy the object later. Objects will not just automatically disappear (unless the pool is used, which we will discuss later).
 
 The init function expects that you provide a hint as to how much memory your application might need. If you specify too many bytes, your program will consume extra memory needlessly. If you specify too small of a number, the buffer object will automatically grow as needed.
 
@@ -402,7 +402,7 @@ void buffer_appendf(buffer_t *h, const char *fmt, ...) {
 }
 ```
 
-Most objects and code will manipulate data. Buffer isn't an exception. It is often the case that I will design software around data. The buffer_t structure is the input to all of the functions except buffer_init, which creates it. In C, it is common to name a structure _name_\_s and then typedef that to be _name_\_t. _name_\_s and _name_\_t are the same thing. To refer to _name_\_s, you must include the keyword struct before it. The _name_\_t doesn't require the struct keyword to precede the name (it doesn't work).
+Most objects and code will manipulate data. Buffer isn't an exception. It is often the case that I will design software around data. The buffer_t structure is the input to all of the functions except buffer_init, which creates it. In C, it is common to name a structure _name__s and then typedef that to be _name__t. _name__s and _name__t are the same thing. To refer to _name__s, you must include the keyword struct before it. The _name__t doesn't require the struct keyword to precede the name (it doesn't work).
 
 The code in buffer.h indicates that the buffer_t is a new type (struct buffer_s) and that the members of buffer_s are hidden. By hiding the members of buffer_s in the implementation, one can force users to only work through the interface.
 
@@ -437,7 +437,7 @@ buffer_t *buffer_init(size_t initial_size) {
 
 Objects will typically be allocated as
 
-_object_name_\_t *h = (*object_name\* *)malloc(sizeof(*object_name\*\_t));
+_object_name__t *h = (*object_name\* *)malloc(sizeof(*object_name\*_t));
 
 This allocates the space needed (the size of the buffer_t structure) from the heap.
 
@@ -529,14 +529,14 @@ static inline void _buffer_set(buffer_t *h, const void *data, size_t length) {
 }
 ```
 
-If length is greater than the size member (h->size), then the buffer needs to be resized using \_buffer_alloc
+If length is greater than the size member (h->size), then the buffer needs to be resized using _buffer_alloc
 
 ```c
 if (length > h->size)
   _buffer_alloc(h, length);
 ```
 
-The inline \_buffer_alloc method.
+The inline _buffer_alloc method.
 
 ```c
 static inline void _buffer_alloc(buffer_t *h, size_t length) {
@@ -566,7 +566,7 @@ h->data = (char *)malloc(len + 1);
 h->size = len;
 ```
 
-In \_buffer_set again, copy data which is length bytes long into h->data.
+In _buffer_set again, copy data which is length bytes long into h->data.
 
 ```c
 memcpy(h->data, data, length);
@@ -579,7 +579,7 @@ h->length = length;
 h->data[length] = 0;
 ```
 
-Similar to buffer_set, buffer_append just calls \_buffer_append.
+Similar to buffer_set, buffer_append just calls _buffer_append.
 
 ```c
 void buffer_append(buffer_t *h, const void *data, size_t length) {
@@ -587,7 +587,7 @@ void buffer_append(buffer_t *h, const void *data, size_t length) {
 }
 ```
 
-The key differences are that the new size will be h->length + length instead of just length. \_buffer_grow makes a copy of the old data if the memory has to be reallocated.
+The key differences are that the new size will be h->length + length instead of just length. _buffer_grow makes a copy of the old data if the memory has to be reallocated.
 
 ```c
 static inline void _buffer_append(buffer_t *h, const void *data,
@@ -601,7 +601,7 @@ static inline void _buffer_append(buffer_t *h, const void *data,
 }
 ```
 
-The new length is the same as \_buffer_alloc (length+50+(h->size/8)). The new memory is malloced into data, and the current h->data is copied to the new memory before h->data is freed.
+The new length is the same as _buffer_alloc (length+50+(h->size/8)). The new memory is malloced into data, and the current h->data is copied to the new memory before h->data is freed.
 
 ```c
 static inline void _buffer_grow(buffer_t *h, size_t length) {
@@ -614,13 +614,13 @@ static inline void _buffer_grow(buffer_t *h, size_t length) {
 }
 ```
 
-buffer_sets uses \_buffer_set for its implementation using strlen to determine length.
+buffer_sets uses _buffer_set for its implementation using strlen to determine length.
 
 ```c
 void buffer_sets(buffer_t *h, const char *s) { _buffer_set(h, s, strlen(s)); }
 ```
 
-buffer_appends appends a string. buffer_appends calls \_buffer_append with the strlen of s.
+buffer_appends appends a string. buffer_appends calls _buffer_append with the strlen of s.
 
 ```c
 void buffer_appends(buffer_t *h, const char *s) {
@@ -628,7 +628,7 @@ void buffer_appends(buffer_t *h, const char *s) {
 }
 ```
 
-buffer_setc uses \_buffer_set and takes the address of c and passes a length of 1.
+buffer_setc uses _buffer_set and takes the address of c and passes a length of 1.
 
 ```c
 void buffer_setc(buffer_t *h, char c) { _buffer_set(h, &c, 1); }
@@ -839,4 +839,4 @@ void *buffer_append_alloc(buffer_t *h, size_t length) {
 
 If you followed everything in this, that is great. Otherwise, it might make more sense as the buffer object is used throughout the project. Next up is /2_linked_structures.md
 
-[Table of Contents (if viewing on Github)](../../../README.md)
+<NextPrev prev="2. Timing" prevUrl="/tutorial/2-timing" next="4. Linked Lists" nextUrl="/tutorial/4-linked-lists" />

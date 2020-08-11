@@ -1,6 +1,6 @@
 ---
 title: Improving Quicksort
-description:
+description: A new, faster sorting algorithm  
 ---
 
 Quicksort is an extremely popular sorting algorithm developed by Tony Hoare. His basic intuition was that sorting a set of items could be done using a sequence of swaps around a pivot point. The pivot point would be used to divide the data such that all data less than or equal to the pivot would sit on one side and the rest of data would sit on the other side.  I've noticed an improvement that doesn't seem to be found in any of the implementations.  The idea is explored at the end (feel free to skip the basic description of quicksort if you know it).

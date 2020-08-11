@@ -416,4 +416,4 @@ int main( int argc, char *argv[] ) {
 &point == p ? "equal" : "not equal"
 ```
 
-[Table of Contents (only if viewing on Github)](../../../README.md)
+<NextPrev prev="5. Threads" prevUrl="/tutorial/5-threads" next="7. Allocator" nextUrl="/tutorial/7-allocator" />

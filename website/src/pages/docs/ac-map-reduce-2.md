@@ -3,17 +3,17 @@ title: AC's Map Reduce Part 2
 description:
 ---
 
-## Introducing ac\_schedule
+## Introducing ac_schedule
 
-In the previous AC map/reduce post, the ac\_in/ac\_out objects were used to locate files based upon a directory and one or more extensions, read those the files a line at a time, lowercase each line, tokenize each line, sort the tokens alphabetically, reduce the frequencies, and finally sort by frequency descending followed by a secondary sort of tokens ascending.  
+In the previous AC map/reduce post, the ac_in/ac_out objects were used to locate files based upon a directory and one or more extensions, read those the files a line at a time, lowercase each line, tokenize each line, sort the tokens alphabetically, reduce the frequencies, and finally sort by frequency descending followed by a secondary sort of tokens ascending. 
 
-Part two introduces ac\_schedule.  While the previous code is efficient, my macbook has 16 threaded cores and a lot of RAM.  The code in part one is single threaded.  ac\_schedule let's you break up your work into smaller pieces, connect the work together, and it handles all of the execution.  Part two builds upon part one (part one should not be skipped).
+Part two introduces ac_schedule. While the previous code is efficient, my macbook has 16 threaded cores and a lot of RAM. The code in part one is single threaded. ac_schedule let's you break up your work into smaller pieces, connect the work together, and it handles all of the execution. Part two builds upon part one (part one should not be skipped).
 
-The ac\_in/ac\_out could easily be used to split up data manually and made to be multithreaded.  The ac\_schedule object does this for you and a lot more.  It manages tasks, dependency chains, file handling, file naming, single task debugging, and so much more.
+The ac_in/ac_out could easily be used to split up data manually and made to be multithreaded. The ac_schedule object does this for you and a lot more. It manages tasks, dependency chains, file handling, file naming, single task debugging, and so much more.
 
-## Setting up ac\_schedule
+## Setting up ac_schedule
 
-The ac\_schedule isn't particularly complicated, it just has a few parts to it.  The first thing to do is setup tasks.  For now, these tasks will do nothing at all (other than return true indicating that they didn't fail).
+The ac_schedule isn't particularly complicated, it just has a few parts to it. The first thing to do is setup tasks. For now, these tasks will do nothing at all (other than return true indicating that they didn't fail).
 
 examples/mapreduce2/start.c
 ```c
@@ -61,7 +61,7 @@ ac_schedule_t *ac_schedule_init(int argc, char **args, size_t num_partitions,
                                 size_t cpus, size_t ram);
 ```
 
-ac\_schedule\_init is initialized with the command line arguments, number of partitions, number of cpus, and MB of ram.  The command line arguments are passed to ac\_schedule\_init to potentially allow arguments to control how processing will be done.  
+ac_schedule_init is initialized with the command line arguments, number of partitions, number of cpus, and MB of ram. The command line arguments are passed to ac_schedule_init to potentially allow arguments to control how processing will be done. 
 
 ```c
 #include "ac_schedule.h"
@@ -79,7 +79,7 @@ ac_task_t *ac_schedule_task(ac_schedule_t *h, const char *task_name,
                             bool partitioned, ac_task_f setup);
 ```
 
-Once the scheduler is initialized via ac\_schedule\_init, at least one task must be assigned to it.  ac\_schedule\_task schedules a task by naming it, defining if it is partitioned or not, and specifying a setup function to finish setting the task up.  In our example, we've assigned 5 tasks (the first one (named split) is not partitioned).
+Once the scheduler is initialized via ac_schedule_init, at least one task must be assigned to it. ac_schedule_task schedules a task by naming it, defining if it is partitioned or not, and specifying a setup function to finish setting the task up. In our example, we've assigned 5 tasks (the first one (named split) is not partitioned).
 
 ```c
 ac_schedule_task(scheduler, "split", false, setup_task);
@@ -89,13 +89,13 @@ ac_schedule_task(scheduler, "all", true, setup_task);
 ac_schedule_task(scheduler, "multi", true, setup_task);
 ```
 
-Normally, each scheduled task would have a different setup function.  In this case, all of the functions do the same thing (nothing except return true), so setup\_task can be shared.
+Normally, each scheduled task would have a different setup function. In this case, all of the functions do the same thing (nothing except return true), so setup_task can be shared.
 
 ```c
 void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete);
 ```
 
-ac\_schedule\_run calls all of the setup methods specified via ac\_schedule\_task, sets up how all of the tasks will ultimately run, and finally runs them.  If the on\_complete call is not NULL, it will be called once a task completes.  ac\_worker\_complete is provided by ac\_schedule.h/c (it provides basic information).
+ac_schedule_run calls all of the setup methods specified via ac_schedule_task, sets up how all of the tasks will ultimately run, and finally runs them. If the on_complete call is not NULL, it will be called once a task completes. ac_worker_complete is provided by ac_schedule.h/c (it provides basic information).
 
 ```c
   ac_schedule_run(scheduler, ac_worker_complete);
@@ -116,13 +116,13 @@ bool setup_task(ac_task_t *task) {
 }
 ```
 
-The setup\_task method is used to setup all 5 of the tasks.  Typically, there would be one setup function for each task.  This sets the method to run each partition of the given task.  The do\_nothing function returns true to indicate that the function succeeded.
+The setup_task method is used to setup all 5 of the tasks. Typically, there would be one setup function for each task. This sets the method to run each partition of the given task. The do_nothing function returns true to indicate that the function succeeded.
 
-This is a very basic shell of a program.  Here is a quick recap...
+This is a very basic shell of a program. Here is a quick recap...
 
 In the main function
-1. initialize the scheduler using ac\_schedule\_init
-2. add tasks to the scheduler using ac\_schedule\_task (each task will have a name, be partitioned or not, and have a setup function to be called later)
+1. initialize the scheduler using ac_schedule_init
+2. add tasks to the scheduler using ac_schedule_task (each task will have a name, be partitioned or not, and have a setup function to be called later)
 3. run the scheduler
 4. destroy the scheduler
 
@@ -147,7 +147,7 @@ Finished partition[1] on thread 1 in 0.000ms
 
 All of the tasks finish in 0.000ms which is expected because the tasks do nothing except return true.
 
-Notice that all of the tasks are run on threads.  There is a thread for each cpu specified in ac\_schedule\_init.  There are 5 tasks with [0] and 4 tasks with [1].  The split[0] doesn't have a corresponding split[1].  This is because split was defined as not being partitioned.
+Notice that all of the tasks are run on threads. There is a thread for each cpu specified in ac_schedule_init. There are 5 tasks with [0] and 4 tasks with [1]. The split[0] doesn't have a corresponding split[1]. This is because split was defined as not being partitioned.
 
 Run start again...
 ```
@@ -155,7 +155,7 @@ $ ./start
 $
 ```
 
-Nothing was output.  This is because ac\_schedule will assume that the tasks don't need to rerun as there isn't anything to indicate that the tasks inputs have changed. Let's rerun again with a -h option.
+Nothing was output. This is because ac_schedule will assume that the tasks don't need to rerun as there isn't anything to indicate that the tasks inputs have changed. Let's rerun again with a -h option.
 
 ```
 $ ./start -h
@@ -167,16 +167,16 @@ on improving it to support multiple computers.
 -f|--force rerun selected tasks even if they don't need run
 
 -t <task[:partitions]>[<task[:partitions]], select tasks and
-   optionally partitions.  tasks are separated by vertical bars
+   optionally partitions. tasks are separated by vertical bars
    (|) and partitions are sub-selected by placing a colon and then
-   the partitions.  The partitions can be a single partition
+   the partitions. The partitions can be a single partition
    number, arange separated by a - (1-3), or a list of single
-   partitions or ranges separated by commas.  To select partitions
+   partitions or ranges separated by commas. To select partitions
    1, 3, 4, and 5 of task named first_task
    -t first_task:1,3-5
 
 -o  Normally, all tasks that are needed to run to complete
-    selected task will run.  This will override that behavior
+    selected task will run. This will override that behavior
     and only run selected tasks
 
 -d|--dump <filename1,[filename2],...> dump the contents of files
@@ -211,7 +211,7 @@ Finished partition[1] on thread 1 in 0.000ms
 Finished multi[1] on thread 3 in 0.001ms
 ```
 
-The next option allows for task subselection.  Maybe we only want to rerun partition 1 of first.
+The next option allows for task subselection. Maybe we only want to rerun partition 1 of first.
 ```
 $ ./start -f -t first:1
 Finished first[1] on thread 1 in 0.000ms
@@ -232,7 +232,7 @@ Finished first[0] on thread 1 in 0.000ms
 Finished first[1] on thread 2 in 0.000ms
 ```
 
-By default the scheduler will run all of the tasks if they haven't been run.  For example, if you were to remove the tasks folder and then try and only run first, the following would happen.
+By default the scheduler will run all of the tasks if they haven't been run. For example, if you were to remove the tasks folder and then try and only run first, the following would happen.
 
 ```
 $ rm -rf tasks/
@@ -257,7 +257,7 @@ Finished first[0] on thread 0 in 0.000ms
 Finished first[1] on thread 1 in 0.000ms
 ```
 
-The -l option lists the tasks and information about the tasks.  At this point, there is very little information about each task.  The tasks have a name, partition information, and a custom runner.  The -s option is similar to -l, except it will show more information (if available).
+The -l option lists the tasks and information about the tasks. At this point, there is very little information about each task. The tasks have a name, partition information, and a custom runner. The -s option is similar to -l, except it will show more information (if available).
 
 ```
 $ ./start -l
@@ -297,11 +297,11 @@ Finished first[1] on thread 0 in 0.001ms
 Finished partition[1] on thread 0 in 0.000ms
 ```
 
-Notice that all threads run on once cpu.  
+Notice that all threads run on once cpu. 
 
 The -r option is similar to the -c option, except that it controls how much ram can be used.
 
-In the above example, it may have been desirable for a given task to run everytime and not have to use the -f option to run task over again.  ac\_task\_run\_evertime is meant to be called from the setup function to do just that.
+In the above example, it may have been desirable for a given task to run everytime and not have to use the -f option to run task over again. ac_task_run_evertime is meant to be called from the setup function to do just that.
 
 ```c
 bool setup_task(ac_task_t *task) {
@@ -313,7 +313,7 @@ bool setup_task(ac_task_t *task) {
 
 ## Ordering the tasks
 
-In the last section, the tasks ran in a somewhat random order.  This would be okay if the tasks were in no way dependent upon each other, but that's rarely the case.  Let's consider the code that assigns tasks to the scheduler.
+In the last section, the tasks ran in a somewhat random order. This would be okay if the tasks were in no way dependent upon each other, but that's rarely the case. Let's consider the code that assigns tasks to the scheduler.
 
 ```c
 ac_schedule_task(scheduler, "split", false, setup_task);
@@ -323,7 +323,7 @@ ac_schedule_task(scheduler, "all", true, setup_task);
 ac_schedule_task(scheduler, "multi", true, setup_task);
 ```
 
-It may be desirable to have each task depend upon the previous task, except multi which will depend upon all of the tasks.  In order to do this, a setup function will have to be created for each task.
+It may be desirable to have each task depend upon the previous task, except multi which will depend upon all of the tasks. In order to do this, a setup function will have to be created for each task.
 
 ```c
 ac_schedule_task(scheduler, "split", false, setup_split);
@@ -362,16 +362,16 @@ bool setup_multi(ac_task_t *task) {
 }
 ```
 
-For this example, we can continue with the do\_nothing which just returns true.
+For this example, we can continue with the do_nothing which just returns true.
 
 ```c
 bool ac_task_dependency(ac_task_t *task, const char *dependency);
 bool ac_task_partial_dependency(ac_task_t *task, const char *dependency);
 ```
 
-ac\_task\_dependency creates a full dependency upon listed tasks (const char *dependency is a vertical bar separated list of tasks).  ac\_task\_partial\_dependency creates a dependency upon the previous task and the given partition (unless the previous task isn't partitioned, then it is the same as ac\_task\_dependency).
+ac_task_dependency creates a full dependency upon listed tasks (const char *dependency is a vertical bar separated list of tasks). ac_task_partial_dependency creates a dependency upon the previous task and the given partition (unless the previous task isn't partitioned, then it is the same as ac_task_dependency).
 
-The following will wire up the dependencies.  
+The following will wire up the dependencies. 
 
 
 ```c
@@ -405,7 +405,7 @@ bool setup_multi(ac_task_t *task) {
 }
 ```
 
-The code for this is found in examples/mapreduce2/order\_tasks.c.  Deleting the tasks directory will cleanup all previous run information (from the last section for example).
+The code for this is found in examples/mapreduce2/order_tasks.c. Deleting the tasks directory will cleanup all previous run information (from the last section for example).
 
 ```
 $ rm -rf tasks
@@ -422,9 +422,9 @@ Finished multi[0] on thread 2 in 0.000ms
 Finished multi[1] on thread 3 in 0.000ms
 ```
 
-Notice how all of the tasks are in order.  all and partition are ordered on a per partition basis.  all[0] runs after partition[0] and all[1] runs after partition[1].
+Notice how all of the tasks are in order. all and partition are ordered on a per partition basis. all[0] runs after partition[0] and all[1] runs after partition[1].
 
-In the last section the -l option showed very little information.  Rerunning it now, will show more detail.
+In the last section the -l option showed very little information. Rerunning it now, will show more detail.
 
 ```
 $ ./order_tasks -l
@@ -465,9 +465,9 @@ task: multi [1/2]
   custom runner
 ```
 
-This shows that each multi partition depends upon split, first, partition, and all.  It shows that all has a reverse dependency of multi (multi depends upon all).  all also has a partial dependency of partition.  The scheduler makes sure that the dependencies are complete before a given task/partition can be run.
+This shows that each multi partition depends upon split, first, partition, and all. It shows that all has a reverse dependency of multi (multi depends upon all). all also has a partial dependency of partition. The scheduler makes sure that the dependencies are complete before a given task/partition can be run.
 
-examples/mapreduce2/order\_tasks.c
+examples/mapreduce2/order_tasks.c
 ```c
 #include "ac_schedule.h"
 
@@ -520,11 +520,11 @@ int main(int argc, char *argv[]) {
 
 ## Incorporating input files
 
-Each task within the scheduler will typically have inputs and outputs and in general those inputs and outputs will be files.  Within a larger overall set of tasks, there will be inputs which originate outside the scheduler (content that has been produced from other systems).  Those should be the only inputs that need defined.  All other inputs should be artifacts and/or outputs from other tasks.
+Each task within the scheduler will typically have inputs and outputs and in general those inputs and outputs will be files. Within a larger overall set of tasks, there will be inputs which originate outside the scheduler (content that has been produced from other systems). Those should be the only inputs that need defined. All other inputs should be artifacts and/or outputs from other tasks.
 
-In the completely contrived example from the last section, the task named "split" originates every other job.  This section will focus on how to get the input into the scheduler.
+In the completely contrived example from the last section, the task named "split" originates every other job. This section will focus on how to get the input into the scheduler.
 
-The first change is to add a line to setup\_split indicating that their is outside input using ac\_task\_input\_files.  ac\_task\_input\_files expects the task, an arbitrary name for the input, a percentage (0.0-1.0) of RAM that can be used for the given input, and a function to call to get the list of input files.
+The first change is to add a line to setup_split indicating that their is outside input using ac_task_input_files. ac_task_input_files expects the task, an arbitrary name for the input, a percentage (0.0-1.0) of RAM that can be used for the given input, and a function to call to get the list of input files.
 
 ```c
 void ac_task_input_files(ac_task_t *task, const char *name, double ram_pct,
@@ -537,7 +537,7 @@ ac_io_file_info_t *file_info(ac_worker_t *w, size_t *num_files,
                              ac_worker_input_t *inp);
 ```
 
-Within the scheduler, there is a scheduler, tasks, and workers.  A task is a job to do that may be partitioned.  Workers are a particular partition of a task.  The setup routine sets up how workers can accomplish their goal.
+Within the scheduler, there is a scheduler, tasks, and workers. A task is a job to do that may be partitioned. Workers are a particular partition of a task. The setup routine sets up how workers can accomplish their goal.
 
 ```c
 bool setup_split(ac_task_t *task) {
@@ -547,7 +547,7 @@ bool setup_split(ac_task_t *task) {
 }
 ```
 
-The ac\_task\_input\_files function is called within setup\_split.  This should be called prior to ac\_task\_runner.  get\_input\_files is the second change.  If split were multiple partitions (it is not in this case), each call to get\_input\_files should return the set of input files which relate to the given partition.
+The ac_task_input_files function is called within setup_split. This should be called prior to ac_task_runner. get_input_files is the second change. If split were multiple partitions (it is not in this case), each call to get_input_files should return the set of input files which relate to the given partition.
 
 ```c
 bool file_ok(const char *filename, void *arg) {
@@ -573,7 +573,7 @@ ac_io_file_info_t *get_input_files(ac_worker_t *w, size_t *num_files,
 }
 ```
 
-In [Listing the Files](https://www.anotherclibrary.com/docs/ac-mapreduce#listing-the-files) from the first post about map/reduce there is an explanation for how to use the AC library to list files (file\_ok and ac\_io\_list is explained).  The worker (w) has two pools that can be used.  Memory allocated from the worker\_pool will remain valid for the entire duration of the worker (processing of a particular partition of a task).  pool is the second member of ac\_worker\_t and is meant to be cleared frequently (after every record or group of records).  This function is run before the runner (do\_nothing at the moment), so it should use worker\_pool.  In Listing the Files, ac\_split and ac\_io\_list were used.  ac\_pool\_split and ac\_pool\_io\_list are alternatives that use the pool.  Because the pool is used, there is no need to later free the memory.
+In [Listing the Files](https://www.anotherclibrary.com/docs/ac-mapreduce#listing-the-files) from the first post about map/reduce there is an explanation for how to use the AC library to list files (file_ok and ac_io_list is explained). The worker (w) has two pools that can be used. Memory allocated from the worker_pool will remain valid for the entire duration of the worker (processing of a particular partition of a task). pool is the second member of ac_worker_t and is meant to be cleared frequently (after every record or group of records). This function is run before the runner (do_nothing at the moment), so it should use worker_pool. In Listing the Files, ac_split and ac_io_list were used. ac_pool_split and ac_pool_io_list are alternatives that use the pool. Because the pool is used, there is no need to later free the memory.
 
 ```
 $ make input_data_1
@@ -585,7 +585,7 @@ task: split [0/1]
         sample/sample.tbontb (20)
 ```
 
-This task still doesn't do anything, but by using the -s option (and -t split to only show split task), you can see that the sample/sample.tbontb file is considered input.  The code is not particularly useful since the input files are hard coded into get\_input\_files.  That will be remedied in the next section.
+This task still doesn't do anything, but by using the -s option (and -t split to only show split task), you can see that the sample/sample.tbontb file is considered input. The code is not particularly useful since the input files are hard coded into get_input_files. That will be remedied in the next section.
 
 ```
 $ rm -rf tasks
@@ -603,7 +603,7 @@ $ ./input_data_1
 $
 ```
 
-Running input\_data\_1 the second time doesn't do anything because the scheduler doesn't see anything to do.  However, if you touch sample/sample.tbontb, everything will be rerun because split is the source of every other task.
+Running input_data_1 the second time doesn't do anything because the scheduler doesn't see anything to do. However, if you touch sample/sample.tbontb, everything will be rerun because split is the source of every other task.
 
 ```
 $ touch sample/sample.tbontb
@@ -620,7 +620,7 @@ Finished multi[1] on thread 0 in 0.000ms
 $
 ```
 
-examples/mapreduce2/input\_data\_1.c
+examples/mapreduce2/input_data_1.c
 ```c
 #include "ac_schedule.h"
 
@@ -696,10 +696,10 @@ int main(int argc, char *argv[]) {
 
 ## Command Line Arguments
 
-In the last example, the directory and the file extension were hard coded for the input files.  In this section, I'll show how to use command line arguments and configuration.  Adding arguments involves a fair amount of code, but it's pretty straight forward.
+In the last example, the directory and the file extension were hard coded for the input files. In this section, I'll show how to use command line arguments and configuration. Adding arguments involves a fair amount of code, but it's pretty straight forward.
 
 
-In the main function, ac\_schedule\_custom\_args specifies a custom usage, a custom argument parser, a command that runs once all arguments have been processed.  
+In the main function, ac_schedule_custom_args specifies a custom usage, a custom argument parser, a command that runs once all arguments have been processed. 
 
 ```
 typedef struct {
@@ -726,7 +726,7 @@ int main(int argc, char *argv[]) {
     ac_free(custom.extensions);
 ```
 
-The custom\_usage function just uses printf.
+The custom_usage function just uses printf.
 ```c
 void custom_usage() {
   printf("Select files within a given directory and do nothing!\n");
@@ -736,7 +736,7 @@ void custom_usage() {
 }
 ```
 
-parse\_custom\_args returns 0 if there is a problem or the number of arguments to skip.  In our example, we are using argument pairs and returning 2 if first arg is --dir or --ext.
+parse_custom_args returns 0 if there is a problem or the number of arguments to skip. In our example, we are using argument pairs and returning 2 if first arg is --dir or --ext.
 ```c
 int parse_custom_args(int argc, char **argv, void *arg) {
   if (argc < 2)
@@ -755,7 +755,7 @@ int parse_custom_args(int argc, char **argv, void *arg) {
 }
 ```
 
-finish\_custom\_args is called after all of the args are parsed.
+finish_custom_args is called after all of the args are parsed.
 ```c
 bool finish_custom_args(int argc, char **argv, void *arg) {
   custom_arg_t *ca = (custom_arg_t *)arg;
@@ -772,7 +772,7 @@ bool finish_custom_args(int argc, char **argv, void *arg) {
 }
 ```
 
-Finally, ac\_task\_custom\_arg will retrieve the custom\_arg\_t structure in any function which passes an ac\_worker\_t.
+Finally, ac_task_custom_arg will retrieve the custom_arg_t structure in any function which passes an ac_worker_t.
 ```c
 ac_io_file_info_t *get_input_files(ac_worker_t *w, size_t *num_files,
                                    ac_worker_input_t *inp) {
@@ -782,7 +782,7 @@ ac_io_file_info_t *get_input_files(ac_worker_t *w, size_t *num_files,
 }
 ```
 
-One issue with the command line args is that they need to be the same every time.  To facilitate this, the scheduler will save the arguments and requires the parameter --new-args if they change.  The custom\_arg\_t will remain in memory for the life of the scheduler and is expected to be able to be accessed in a thread-safe manner.
+One issue with the command line args is that they need to be the same every time. To facilitate this, the scheduler will save the arguments and requires the parameter --new-args if they change. The custom_arg_t will remain in memory for the life of the scheduler and is expected to be able to be accessed in a thread-safe manner.
 
 ```
 $ make input_data_2
@@ -823,9 +823,9 @@ frequency descending.
 The scheduler is meant to aid in running tasks in parallel.
 ```
 
-In general, it would be undesirable for parameters to change in a job without first cleaning up the overall set of tasks.  This error is shown to prevent data corruption and to warn the user that they might be making a mistake.  The --new-args will override the error and continue.
+In general, it would be undesirable for parameters to change in a job without first cleaning up the overall set of tasks. This error is shown to prevent data corruption and to warn the user that they might be making a mistake. The --new-args will override the error and continue.
 
-examples/mapreduce2/input\_data\_2.c
+examples/mapreduce2/input_data_2.c
 ```c
 #include "ac_schedule.h"
 
@@ -953,7 +953,7 @@ int main(int argc, char *argv[]) {
 
 ## Splitting up the input jobs
 
-In the previous section, the input was setup to use command line arguments for the split task.  The split task is configured to not be partitioned.  In this section, the split task will be changed to a partitioned task.  In the main file, it is a relatively small change.
+In the previous section, the input was setup to use command line arguments for the split task. The split task is configured to not be partitioned. In this section, the split task will be changed to a partitioned task. In the main file, it is a relatively small change.
 
 ```c
 ac_schedule_task(scheduler, "split", false, setup_split);
@@ -964,9 +964,9 @@ changes to
 ac_schedule_task(scheduler, "split", true, setup_split);
 ```
 
-This alone would be enough if it was okay for every partition to parse all of the input files.  However, in our case, we will want to change the program to have each partition process some of the input files.  This could be done using every Nth file or by using a hash.  The advantage of using a hash over every Nth file is that if a file is added or removed to the file system, files may shift from one partition to another.  This may cause some partitions to not rerun as they should.  For our example, we will use a hash of the filename.  The ac\_io\_file\_info\_t structure has a member hash which is the hash of the filename.
+This alone would be enough if it was okay for every partition to parse all of the input files. However, in our case, we will want to change the program to have each partition process some of the input files. This could be done using every Nth file or by using a hash. The advantage of using a hash over every Nth file is that if a file is added or removed to the file system, files may shift from one partition to another. This may cause some partitions to not rerun as they should. For our example, we will use a hash of the filename. The ac_io_file_info_t structure has a member hash which is the hash of the filename.
 
-The get\_input\_files needs to change to include only the appropriate files.
+The get_input_files needs to change to include only the appropriate files.
 ```c
 ac_io_file_info_t *get_input_files(ac_worker_t *w, size_t *num_files,
                                    ac_worker_input_t *inp) {
@@ -1006,7 +1006,7 @@ ac_io_file_info_t *get_input_files(ac_worker_t *w, size_t *num_files,
 }
 ```
 
-This will count the number of inputs that belong to this partition, allocate an array using the pool that persists for the duration of the task, fill the array, and return it.  There is a function to select inputs in ac\_io named ac\_io\_select\_file\_info which does most of what the above function does.
+This will count the number of inputs that belong to this partition, allocate an array using the pool that persists for the duration of the task, fill the array, and return it. There is a function to select inputs in ac_io named ac_io_select_file_info which does most of what the above function does.
 
 
 ```c
@@ -1016,7 +1016,7 @@ ac_io_file_info_t *ac_io_select_file_info(ac_pool_t *pool, size_t *num_res,
                                           size_t num_partitions);
 ```
 
-Using that function, the new get\_input\_files...
+Using that function, the new get_input_files...
 ```c
 ac_io_file_info_t *get_input_files(ac_worker_t *w, size_t *num_files,
                                    ac_worker_input_t *inp) {
@@ -1049,7 +1049,7 @@ task: split [0/2]
         ../ac_buffer/ac_buffer_appends.c (296)
         ../ac_buffer/ac_buffer_clear.c (488)
         ../ac_buffer/ac_buffer_init.c (287)
-        ...        
+        ...       
 task: split [1/2]
   reverse dependencies:  multi[2] first[2]
   custom runner
@@ -1061,7 +1061,7 @@ task: split [1/2]
         ...
 ```
 
-examples/mapreduce2/input\_data\_3.c
+examples/mapreduce2/input_data_3.c
 ```c
 #include "ac_schedule.h"
 
@@ -1190,7 +1190,7 @@ int main(int argc, char *argv[]) {
 
 ## Ack files
 
-In the last section, input files were wired up to the split task.  We saw how touching the input files would cause split to run over again.  Inside the tasks folder that is created by scheduler, there is an ack folder.  After each partition is run, there will be a file inside the ack folder.  If the ack file for a particular task / partition is touched, the task / partition will run again and all tasks that depend upon that task / partition.
+In the last section, input files were wired up to the split task. We saw how touching the input files would cause split to run over again. Inside the tasks folder that is created by scheduler, there is an ack folder. After each partition is run, there will be a file inside the ack folder. If the ack file for a particular task / partition is touched, the task / partition will run again and all tasks that depend upon that task / partition.
 
 ```
 $ ls tasks
@@ -1209,7 +1209,7 @@ task: partition [0/2]
   custom runner
 ```
 
-There is a full reverse dependency of multi and a reverse partitioned dependency of all.  If tasks/ack/partition\_0 is removed, it should cause partition[0], all[0], multi[0], and multi[1] to run.
+There is a full reverse dependency of multi and a reverse partitioned dependency of all. If tasks/ack/partition_0 is removed, it should cause partition[0], all[0], multi[0], and multi[1] to run.
 
 ```
 $ rm tasks/ack/partition_0
@@ -1220,7 +1220,7 @@ Finished multi[0] on thread 1 in 0.000ms
 Finished multi[1] on thread 2 in 0.000ms
 ```
 
-If instead of removing tasks/ack/partition\_0, it is touched, then all[0], multi[0], and multi[1] will be run.  This ack file is touched after a process finishes, so touching the ack file is equivalent to the task/partition finishing at the time the ack file is touched.
+If instead of removing tasks/ack/partition_0, it is touched, then all[0], multi[0], and multi[1] will be run. This ack file is touched after a process finishes, so touching the ack file is equivalent to the task/partition finishing at the time the ack file is touched.
 
 ```
 $ touch tasks/ack/partition_0
@@ -1249,7 +1249,7 @@ task: split [0/2]
         ../ac_buffer/ac_buffer_setn.c (266)
 ```
 
-If you run ./input\_data\_3 -h, the help shows the following two options..
+If you run ./input_data_3 -h, the help shows the following two options..
 ```
 $ ./input_data_3 -h
 
@@ -1269,7 +1269,7 @@ $ ./input_data_3 -d ../ac_buffer/ac_buffer_setn.c
 $
 ```
 
-and nothing happens.  This is because the scheduler doesn't know how to dump the input files.  In ac\_schedule.h/c there is a function which dumps text and it is defined as.
+and nothing happens. This is because the scheduler doesn't know how to dump the input files. In ac_schedule.h/c there is a function which dumps text and it is defined as.
 
 ```c
 void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
@@ -1278,7 +1278,7 @@ void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
 }
 ```
 
-ac\_task\_dump\_text is a very simple function which simply appends the contents of the record to the buffer.  If the format of input file is not plain text, then you will need to implement your own dump function which should dump text to the buffer.
+ac_task_dump_text is a very simple function which simply appends the contents of the record to the buffer. If the format of input file is not plain text, then you will need to implement your own dump function which should dump text to the buffer.
 
 ```
 bool setup_split(ac_task_t *task) {
@@ -1289,7 +1289,7 @@ bool setup_split(ac_task_t *task) {
 }
 ```
 
-The ac\_task\_dump\_text must be called after the associated ac\_task\_input\_files call and not before another one or an ac\_task\_output call (described later).
+The ac_task_dump_text must be called after the associated ac_task_input_files call and not before another one or an ac_task_output call (described later).
 
 ```
 $ make input_data_4
@@ -1297,7 +1297,7 @@ $ ./input_data_4 -d ../ac_buffer/ac_buffer_setn.c
 $
 ```
 
-This still isn't enough.  The input record delimiter must be specified.  The format choices are delimited (records end in a given character such as a newline or a zero), fixed (the records are determined by a fixed length), and prefix (the records are determined by a 4 byte length prefix before each record).  The text files are newline delimited, so this must be specified (again after ac\_task\_input\_files).
+This still isn't enough. The input record delimiter must be specified. The format choices are delimited (records end in a given character such as a newline or a zero), fixed (the records are determined by a fixed length), and prefix (the records are determined by a 4 byte length prefix before each record). The text files are newline delimited, so this must be specified (again after ac_task_input_files).
 
 ```
 bool setup_split(ac_task_t *task) {
@@ -1326,7 +1326,7 @@ int main(int argc, char *argv[]) {
 
 And it works!
 
-The full source code is found in examples/mapreduce2/input\_data\_4.c.  I've ommitted the code as it only adds the following two lines to setup\_split.
+The full source code is found in examples/mapreduce2/input_data_4.c. I've ommitted the code as it only adds the following two lines to setup_split.
 ```c
 ac_task_input_format(task, ac_io_delimiter('\n'));
 ac_task_input_dump(task, ac_task_dump_text, NULL);
@@ -1334,18 +1334,18 @@ ac_task_input_dump(task, ac_task_dump_text, NULL);
 
 ## Ordering tasks with a dataflow
 
-Up until now, tasks were ordered by using dependencies.  While this can be useful, a much more useful approach would be to order tasks based upon data dependencies.  The scheduler has an approach to having a built in data pipeline that allows dependencies between tasks to be automatically determined.  If data changes within the pipeline, downstream tasks which were dependent upon that data will automatically be run.  
+Up until now, tasks were ordered by using dependencies. While this can be useful, a much more useful approach would be to order tasks based upon data dependencies. The scheduler has an approach to having a built in data pipeline that allows dependencies between tasks to be automatically determined. If data changes within the pipeline, downstream tasks which were dependent upon that data will automatically be run. 
 
-Each task within the scheduler will typically have inputs and outputs and in general those inputs and outputs will be files.  Within a larger overall set of tasks, there will be inputs which originate outside the scheduler (content that has been produced from other systems).  Those should be the only inputs that need defined.  All other inputs should be artifacts and/or outputs from other tasks.
+Each task within the scheduler will typically have inputs and outputs and in general those inputs and outputs will be files. Within a larger overall set of tasks, there will be inputs which originate outside the scheduler (content that has been produced from other systems). Those should be the only inputs that need defined. All other inputs should be artifacts and/or outputs from other tasks.
 
-In the last post, ac\_task\_input\_files was used to connect input from outside ac\_schedule.  To create a data pipeline, ac\_task\_output is used.  ac\_task\_output connects tasks together by outputting files from one task to another.  Those output files become input files for the destination task and that input creates a dependency on the task that output the files.
+In the last post, ac_task_input_files was used to connect input from outside ac_schedule. To create a data pipeline, ac_task_output is used. ac_task_output connects tasks together by outputting files from one task to another. Those output files become input files for the destination task and that input creates a dependency on the task that output the files.
 
 ```c
 void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
                     double out_ram_pct, double in_ram_pct, size_t flags);
 ```
 
-In examples/mapreduce2/input\_data\_4.c, setup\_split doesn't output anything.  I'll change it to output a file named split.lz4
+In examples/mapreduce2/input_data_4.c, setup_split doesn't output anything. I'll change it to output a file named split.lz4
 ```c
 bool setup_split(ac_task_t *task) {
   ac_task_input_files(task, "split_input", 0.1, get_input_files);
@@ -1364,7 +1364,7 @@ bool setup_split(ac_task_t *task) {
 }
 ```
 
-The ac\_task\_output line defines an output file named split.lz4 and two destinations for the file.  The dependency upon split can now be removed from setup\_first and setup\_multi.
+The ac_task_output line defines an output file named split.lz4 and two destinations for the file. The dependency upon split can now be removed from setup_first and setup_multi.
 
 ```c
 bool setup_first(ac_task_t *task) {
@@ -1469,7 +1469,7 @@ task: multi [1/2]
         tasks/split_1/split_1_1.lz4 (0)
 ```
 
-Both multi and first still depend upon split even though they don't call ac\_task\_dependency.  They both have an input and the input consists of two files.  The files come from both split partitions and the filenames a different for partition 0 and partition 1 of multi and first.  When AC\_OUTPUT\_SPLIT is defined in the ac\_task\_output function, the output from each partition is expected to be split into the number of partitions as the destination task (or tasks).  If the destination has more than one task in its list, all of the destinations must have the same number of partitions.
+Both multi and first still depend upon split even though they don't call ac_task_dependency. They both have an input and the input consists of two files. The files come from both split partitions and the filenames a different for partition 0 and partition 1 of multi and first. When AC_OUTPUT_SPLIT is defined in the ac_task_output function, the output from each partition is expected to be split into the number of partitions as the destination task (or tasks). If the destination has more than one task in its list, all of the destinations must have the same number of partitions.
 
 ```
         split[0]                          split[1]
@@ -1485,9 +1485,9 @@ split_0_0.lz4   split_1_0.lz4    split_0_1.lz4   split_1_1.lz4
         multi[0]                          multi[1]
 ```
 
-It's important at this point to note that these files aren't actually created.  They're expected to be created.  Our ac\_task\_runner is still calling do\_nothing which only returns true.  The next section will wire up the remaining tasks.
+It's important at this point to note that these files aren't actually created. They're expected to be created. Our ac_task_runner is still calling do_nothing which only returns true. The next section will wire up the remaining tasks.
 
-examples/mapreduce2/data\_pipeline\_1.c
+examples/mapreduce2/data_pipeline_1.c
 ```c
 #include "ac_schedule.h"
 
@@ -1616,7 +1616,7 @@ int main(int argc, char *argv[]) {
 
 ## Different ways to output
 
-To get started, all of the ac\_task\_dependency and ac\_task\_partial\_dependency calls will be replaced with ac\_task\_output calls.
+To get started, all of the ac_task_dependency and ac_task_partial_dependency calls will be replaced with ac_task_output calls.
 
 ```c
 bool setup_first(ac_task_t *task) {
@@ -1671,10 +1671,10 @@ bool setup_multi(ac_task_t *task) {
 }
 ```
 
-In the last section, AC\_OUTPUT\_SPLIT was used.  AC\_OUTPUT\_SPLIT is the only output option that expects the given task/partition to write split data (data divided amongst N outputs).  AC\_OUTPUT\_FIRST, AC\_OUTPUT\_PARTITION, and AC\_OUTPUT\_NORMAL all will output the same file.  The difference occurs in how downstream tasks consume them as inputs.
+In the last section, AC_OUTPUT_SPLIT was used. AC_OUTPUT_SPLIT is the only output option that expects the given task/partition to write split data (data divided amongst N outputs). AC_OUTPUT_FIRST, AC_OUTPUT_PARTITION, and AC_OUTPUT_NORMAL all will output the same file. The difference occurs in how downstream tasks consume them as inputs.
 
 
-AC\_OUTPUT\_SPLIT will have multiple outputs based upon the number of partitions of the recipients.
+AC_OUTPUT_SPLIT will have multiple outputs based upon the number of partitions of the recipients.
 ```
         split[0]                          split[1]
         /       \                         /       \
@@ -1689,7 +1689,7 @@ split_0_0.lz4   split_1_0.lz4    split_0_1.lz4   split_1_1.lz4
         multi[0]                          multi[1]
 ```
 
-AC\_OUTPUT\_FIRST will have one output and only the data from the first partition will be used downstream.  The only partition that needs to finish before the downstreams can continue is the first partition (at the moment, all partitions execute).
+AC_OUTPUT_FIRST will have one output and only the data from the first partition will be used downstream. The only partition that needs to finish before the downstreams can continue is the first partition (at the moment, all partitions execute).
 
 ```
         first[0]                          first[1]
@@ -1702,7 +1702,7 @@ AC\_OUTPUT\_FIRST will have one output and only the data from the first partitio
         multi[1]
 ```
 
-AC\_OUTPUT\_PARTITION will have one output and the data will go to the corresponding partition downstream.  Notice how all[0] and multi[0] can run immediately after partition[0] is complete (and before partition[1] is complete) and vice versa.
+AC_OUTPUT_PARTITION will have one output and the data will go to the corresponding partition downstream. Notice how all[0] and multi[0] can run immediately after partition[0] is complete (and before partition[1] is complete) and vice versa.
 
 ```
      partition[0]                 partition[1]
@@ -1713,7 +1713,7 @@ AC\_OUTPUT\_PARTITION will have one output and the data will go to the correspon
       multi[0]                      multi[1]
 ```
 
-AC\_OUTPUT\_NORMAL will have one output and all of the data from all of the partitions will go to all of the downstream partitions of the destination tasks.
+AC_OUTPUT_NORMAL will have one output and all of the data from all of the partitions will go to all of the downstream partitions of the destination tasks.
 
 ```
        all[0]                 all[1]
@@ -1761,7 +1761,7 @@ task: multi [1/2]
 
 The input[0] and input[3] both have two inputs as expected and input[1] and input[2] have one input as expected.
 
-examples/mapreduce2/data\_pipeline\_2.c
+examples/mapreduce2/data_pipeline_2.c
 ```c
 #include "ac_schedule.h"
 
@@ -1894,7 +1894,7 @@ int main(int argc, char *argv[]) {
 
 ## Dumping Output
 
-Dumping output is very similar to [Dumping Input](/docs/ac-mapreduce2#dumping-input).  Dumping input required specifying a format and a dump method.  Recall the change to dump input...
+Dumping output is very similar to [Dumping Input](/docs/ac-mapreduce2#dumping-input). Dumping input required specifying a format and a dump method. Recall the change to dump input...
 
 ```c
 bool setup_split(ac_task_t *task) {
@@ -1903,7 +1903,7 @@ bool setup_split(ac_task_t *task) {
   ac_task_input_dump(task, ac_task_dump_text, NULL);
 ```
 
-Dumping output is similar, except input is replaced with output.  The format can be ac_io_delimiter, ac_io_fixed, or ac_io_prefix.  If the output is text and line delimited, it look like the following.
+Dumping output is similar, except input is replaced with output. The format can be ac_io_delimiter, ac_io_fixed, or ac_io_prefix. If the output is text and line delimited, it look like the following.
 
 ```c
   ac_task_output(task, "split.lz4", "first|multi", 0.9, 0.1, AC_OUTPUT_SPLIT);
@@ -1911,4 +1911,6 @@ Dumping output is similar, except input is replaced with output.  The format can
   ac_task_output_dump(task, ac_task_dump_text, NULL);  
 ```
 
-This will be explored more in the next sections.  At the moment, no files are created.  The next post will explore setting up the example in the first post using the ac\_schedule library.
+This will be explored more in the next sections. At the moment, no files are created. The next post will explore setting up the example in the first post using the ac_schedule library.
+
+<NextPrev prev="ac_map_reduce Part 1" prevUrl="/docs/ac-map-reduce" next="ac_map_reduce Part 3" nextUrl="/docs/ac-map-reduce-3" />

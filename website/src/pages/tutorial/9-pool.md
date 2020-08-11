@@ -323,4 +323,4 @@ A common use case for the pool is to allocate a bunch of times and then clear an
 
 # TO BE CONTINUED
 
-[Table of Contents (only if viewing on Github)](../../../README.md)
+<NextPrev prev="8. Allocator Implementation" prevUrl="/tutorial/8-allocator-implementation" next="10. Binary Search Trees" nextUrl="/tutorial/10-binary-search-trees" />

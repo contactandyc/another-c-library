@@ -176,4 +176,4 @@ int done;
 
 ### To Be Continued
 
-[Table of Contents (only if viewing on Github)](../../../README.md)
+<NextPrev prev="7. Allocator" prevUrl="/tutorial/7-allocator" next="9. Pool" nextUrl="/tutorial/9-pool" />

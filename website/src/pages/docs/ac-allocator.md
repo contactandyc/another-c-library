@@ -622,3 +622,5 @@ ac_pool.c:65: 1024
 ```
 
 Hopefully, it is clear that the first error indicating line 7 of track\_objects.c is much more informative than the second.  This is explained in greater detail in [The Global Allocator Object](../../docs/7-allocator/index.md) or in the [ac_pool usage guide](ac_pool/index.md).
+
+<NextPrev next="ac-buffer" nextUrl="/docs/ac-buffer" />

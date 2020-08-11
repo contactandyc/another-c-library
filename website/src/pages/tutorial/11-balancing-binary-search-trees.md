@@ -6,7 +6,7 @@ title: "11. Balancing Binary Search Trees"
 
 This builds significantly on the last section about [binary search trees](../10-binary-search-trees/index.md).  To start, let's explore why balancing a binary search tree is important.
 
-The following code is found in <i>illustrations/11\_balancing\_binary\_search\_trees/1\_binary\_search\_tree</i>
+The following code is found in <i>illustrations/11_balancing_binary_search_trees/1_binary_search_tree</i>
 ```
 cd $ac/illustrations/11_balancing_binary_search_trees/1_binary_search_tree
 ```
@@ -225,11 +225,11 @@ E R
 
 In all cases, after a rotation, the tree is still a valid binary search tree.  To do a right rotation around a node, that node must reference a left node.  The left node and itself will exchange colors.  When doing a left rotation around a node, that node must reference a right node.  The right node and itself will exchange colors.
 
-rotate\_left does the following.
-- assign new\_root to A->right.
-- swap the color between A and new\_root.
-- if A has a parent, link the parent to new\_root; otherwise, link root to new\_root.
-- put A to the left of new\_root and what was previously to the right of new\_root to the left of A.
+rotate_left does the following.
+- assign new_root to A->right.
+- swap the color between A and new_root.
+- if A has a parent, link the parent to new_root; otherwise, link root to new_root.
+- put A to the left of new_root and what was previously to the right of new_root to the left of A.
 
 ```c
 void rotate_left(node_t *A, node_t **root) {
@@ -264,7 +264,7 @@ Rotating to the right is similar to rotating to the left (except you need to swa
 
 I've written a tool to help you to understand how colors and rotations work.
 
-The following code is found in <i>illustrations/11\_balancing\_binary\_search\_trees/2\_tree\_operations</i>
+The following code is found in <i>illustrations/11_balancing_binary_search_trees/2_tree_operations</i>
 ```
 cd $ac/illustrations/11_balancing_binary_search_trees/2_tree_operations
 ```
@@ -274,7 +274,7 @@ make
 ```
 
 ```
-./tree\_operations
+./tree_operations
 ```
 
 You will be prompted with the following...
@@ -651,7 +651,7 @@ The above tree is a valid red-black tree
 
 I'll reference this tool in the explanation of the red-black tree that comes next.  Hopefully, the red-black tree will make more sense as we've already seen how much of it works.
 
-The tool (tree\_operations) can also start with a valid red-black tree, which you can modify by specifying a sequence of characters in the order in which you wish the characters to be inserted.
+The tool (tree_operations) can also start with a valid red-black tree, which you can modify by specifying a sequence of characters in the order in which you wish the characters to be inserted.
 
 ```
 $ ./tree_operations ABC
@@ -713,4 +713,4 @@ A4 C4
 
 Once the tool is loaded, you can insert or erase nodes and try and figure out how to make it work as a red-black tree again.
 
-[Table of Contents (only if viewing on Github)](../../../README.md)
+<NextPrev prev="10. Binary Search Trees" prevUrl="/tutorial/10-binary-search-trees" next="12. Red Black Tree" nextUrl="/tutorial/12-red-black-tree" />

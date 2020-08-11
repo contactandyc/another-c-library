@@ -598,4 +598,4 @@ grep -rn ac_timer .
 
 ac_timer can be replaced with a function name or another object name (or whatever you want to find).
 
-[Table of Contents (only if viewing on Github)](../../../README.md)
+<NextPrev prev="6. Macros" prevUrl="/tutorial/6-macros" next="8. Allocator Implementation" nextUrl="/tutorial/8-allocator-implementation" />

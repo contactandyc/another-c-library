@@ -275,4 +275,4 @@ It takes 0.027 seconds to do the 10 million additions for a single thread (if th
 
 Pthreads also support conditions that are like the pagers above.  They will be described later before needing them.  The next project will require a mutex.
 
-[Table of Contents (only if viewing on Github)](../../../README.md)
+<NextPrev prev="4. Linked Lists" prevUrl="/tutorial/4-linked-lists" next="6. Macros" nextUrl="/tutorial/6-macros" />

@@ -1463,7 +1463,7 @@ change to
 #include <time.h>
 ```
 
-If you go back and change test*timer.c in \_illustrations/2_timing/5_timer* and then run make, you will get some of the same errors that we had when building test_reverse.
+If you go back and change test*timer.c in _illustrations/2_timing/5_timer* and then run make, you will get some of the same errors that we had when building test_reverse.
 
 in illustrations/2_timing/5_timer after making above change
 
@@ -1595,7 +1595,7 @@ long get_time();
 #endif
 ```
 
-The #ifndef, #define, #endif block prevents the compiler from including the same code over and over again. It checks to see if \_file2_H has been defined and if it hasn't, it defines it. If it has been defined previously, the compiler skips the block.
+The #ifndef, #define, #endif block prevents the compiler from including the same code over and over again. It checks to see if _file2_H has been defined and if it hasn't, it defines it. If it has been defined previously, the compiler skips the block.
 
 size_t is used in reverse_string, which is defined in stdlib.h, so we include stdlib.h. One last change is to update file2.c to include file2.h so that we can be sure that file2.c and file2.h don't get out of sync.
 
@@ -1913,14 +1913,14 @@ double timer_sec(timer_t *t);
 #endif
 ```
 
-Earlier, you learned that the struct keyword allows you to group zero or more types to form a new type. In general, I like to name struct types with a \_s suffix and then typedef them to have a \_t suffix. In the timer.h above, the timer_s struct was declared, but never actually defined. The details of what is in the structure are part of the implementation and aren't meant to be known externally. C allows you to define types in this way and use them as long as you only reference them as pointers. All pointers have the same size (the number of bits that the CPU supports or the sizeof(size_t)). For now, just recognize that there is a new type named timer_t and that timer_s will be defined in timer.c.
+Earlier, you learned that the struct keyword allows you to group zero or more types to form a new type. In general, I like to name struct types with a _s suffix and then typedef them to have a _t suffix. In the timer.h above, the timer_s struct was declared, but never actually defined. The details of what is in the structure are part of the implementation and aren't meant to be known externally. C allows you to define types in this way and use them as long as you only reference them as pointers. All pointers have the same size (the number of bits that the CPU supports or the sizeof(size_t)). For now, just recognize that there is a new type named timer_t and that timer_s will be defined in timer.c.
 
 ```c
 struct timer_s;
 typedef struct timer_s timer_t;
 ```
 
-I follow a pattern where every function is prefixed by the object name (in this case, timer). The primary type (if there is one) is usually the object name followed by \_t. Objects will typically have an init, and a destroy method. The job of the header file is to create an interface for applications to use. It should hide the implementation details as much as possible. I usually will define an interface before defining an implementation.
+I follow a pattern where every function is prefixed by the object name (in this case, timer). The primary type (if there is one) is usually the object name followed by _t. Objects will typically have an init, and a destroy method. The job of the header file is to create an interface for applications to use. It should hide the implementation details as much as possible. I usually will define an interface before defining an implementation.
 
 Initialize the timer. repeat is necessary to indicate how many times the test will be repeated within the application so that the final result represents that. If a thing is only being timed with a single repetition, then use a value of 1. This function will allocate the timer_t structure and fill its members appropriately. To free up the resources associated with this call, you must call timer_destroy with the return value of this call.
 
@@ -2679,4 +2679,4 @@ clean:
 
 The difference is that instead of the OBJECTS, HEADER_FILES, and FLAGS variables being specified in the Makefile, they are included by including \$(ROOT)/src/Makefile.include.
 
-[Table of Contents (only if viewing on Github)](../../../README.md)
+<NextPrev prev="1. Getting Started" prevUrl="/tutorial/1-getting-started" next="3. Buffer" nextUrl="/tutorial/3-buffer" />
