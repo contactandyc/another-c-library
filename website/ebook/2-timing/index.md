@@ -131,7 +131,7 @@ typedef unsigned int number_t;
 number_t a = 100;
 ```
 
-Every data type in C has a size.  The size of a pointer is always the same (it is the same as the size\_t type). The sizeof() operator determines the size of a type or variable. sizeof(number\_t) finds the size of the number\_t type (and return four since unsigned int is four bytes). sizeof(void) is not allowed as that does not make sense.
+Every data type in C has a size.  The size of a pointer is always the same (it is the same as the size\_t type). The sizeof() operator determines the size of a type or variable. sizeof(number\_t) finds the size of the number\_t type (and returns four since unsigned int is four bytes). sizeof(void) is not allowed as that does not make sense.
 
 A variable can be cast from one type to another, either implicitly or explicitly.  Imagine you want to convert an int to a double or vice versa.
 
@@ -143,7 +143,7 @@ x = y;
 printf( "%d\n", x ); // would print 100
 ```
 
-When the casting happens, precision is lost if the new type cannot accommodate for the value.  The above example shows casting happening implicitly.  Below is an example of casting happening explicitly.
+When the casting happens, precision is lost if the new type cannot accommodate the value.  The above example shows casting happening implicitly.  Below is an example of casting happening explicitly.
 
 ```c
 int x = 100;
@@ -297,7 +297,7 @@ while(*p != 0) /* fourth time *p == 's', condition is true ('s' != 0) */
 while(*p != 0) /* fifth time *p == 0, so condition is no longer true */
 ```
 
-At this point, p points to just passed the letter s and advanced four times, so the length is four.
+At this point, p points to just past the letter s and has advanced four times, so the length is four.
 
 It is common for developers to use `int` as a return type. However, it is generally more efficient and less bug-prone to use `size_t`.  For a 64 bit CPU to work with an `int`, it must split a register since the CPU is meant to work with 64-bit integers.  This split is not cheap.  Additionally, if you use `size_t` or (`ssize_t` for signed numbers), the program will be more portable to 64-bit systems where a string might be longer than 2 billion bytes.  A better implementation of `strlen` might look like the following.  The only difference is that the `strlen` returns a type `size_t`.  Strings cannot be negative in length, so returning an unsigned number also helps people using the function to understand that.
 
@@ -347,7 +347,7 @@ void print_hello(const char *name) {
 
 This function prints something to the screen and does not return anything.
 
-A void pointer: `void *`, is a special type of pointer that must cast to another type before implementation.
+A void pointer: `void *`, is a special type of pointer that must be cast to another type before implementation.
 
 Before describing the void pointer, I want to show an example of casting pointers.
 
@@ -368,7 +368,7 @@ To avoid such a warning, either change the type of p to `const char *` or cast s
 char *p = (char *)s;
 ```
 
-Imagine you have a function that will print the value of variables of different types, such as the following.
+Imagine you have a function that will print the value of different types of variables, such as the following.
 
 Code found in <i>illustrations/2_timing/1_timer</i>
 
@@ -461,7 +461,7 @@ unsigned long type: 500000
 double type (with four decimal places): 1.5000
 ```
 
-In the program above, the void pointer cannot be used directly.  It must be converted to a different pointer type before the value that the pointer is pointing at can be referenced.  
+In the program above, the void pointer cannot be used directly.  It must be converted to a different pointer type before the value that the pointer is pointing to can be referenced.  
 
 The program above introduced `if`, `else if`, and the `&` operator.  If statements have similar syntax as while statements.  
 
@@ -477,12 +477,78 @@ else {
 }
 ```
 
-The curly braces are not needed if there is exactly one statement.
+The curly braces are not needed if there is exactly one statement. It is also essential to realize the difference between = and ==.  A single equal statement is used for assignment.  A double equal statement indicates an equality test.
 
+The `if` statement works in conjunction with all the `else if` statements that immediately follow it.  `else if` statements are only reached and evaluated if the `if` or `else if` statements above it have not evaluated to a true condition.  Finally, `else` does not expect a condition and essentially becomes the default block to run if all other conditions were evaluated to be false.  This type of logic is known as mutual exclusivity, meaning that only one block of code is executed per pass.
 
-`else if` works in connection with `if`.  `else if` only happens if the if (or else if statements above it) have not been evaluated to equal a true condition.  Finally, else does not expect a condition and essentially becomes the default block to run if all other conditions were evaluated to be false.  It is also essential to realize the difference between = and ==.  A single equal statement is used for assignment.  A double equal statement indicates an equality test.
+In some cases, conditional, mutual exclusivity may also be achieved in a slightly optimized form by using what is known as a `switch`.  The syntax of a `switch` is demonstrated below by converting the `if/else if` logic from the `print_value_of_pointer` function
 
-In code below, p was of type `void *`.  It must be converted before it can be dereferenced (to get the value of what p is pointing at).
+```
+...
+switch(type) {
+  case 'c':
+    char *vp = (char *)p;
+    printf( "char type: %d (%c)\n", *vp, *vp );
+    break;
+  case 'C':
+    unsigned char *vp = (unsigned char *)p;
+    printf( "unsigned char type: %u\n", *vp );
+    break;
+  case 's':
+    short *vp = (short *)p;
+    printf( "short type: %d\n", *vp );
+    break;
+  case 'S':
+    unsigned short *vp = (unsigned short *)p;
+    printf( "unsigned short type: %u\n", *vp );
+    break;
+  case 'i':
+    int *vp = (int *)p;
+    printf( "int type: %d\n", *vp);
+    break;
+  case 'I':
+    unsigned int *vp = (unsigned int *)p;
+    printf( "unsigned int type: %u\n", *vp );
+    break;
+  case 'l':
+    long *vp = (long *)p;
+    printf( "long type: %ld\n", *vp);
+    break;
+  case 'L':
+    unsigned long *vp = (unsigned long *)p;
+    printf( "unsigned long type: %lu\n", *vp );
+    break;
+  case 'd':
+    double *vp = (double *)p;
+    printf( "double type (with 4 decimal places): %0.4f\n", *vp );
+    break; // optional because this is the last case and there is no default
+}
+...
+```
+
+The logic of a `switch` is less extensible than `if/else if/else` statements.  A `switch` may only evaluate for equality against constants on one value, but there are some advantages.  During compilation, the cases of a `switch` statement are mapped to a table which allows for immediate branching to the block of code associated with the true `case`.  As an example, consider a scenario where `type = 'L'`.  With the `if/else if` implementation of this logic, every condition up to and including `type == 'L'` must be evaluated before the appropriate block of code is executed.  In the case of using a `switch`, the `case 'L':` is immediately jumped to and the associated block of code is executed without having to first evaluate if `type` is equal to 'c', 'C', 's', 'S', etc.
+
+The generalized form of a switch statement is as follows
+
+```
+switch(<value>) {
+  case <constant value>:
+    zero or more statements;
+    break;
+  case <constant value>:
+    zero or more statements;
+    break;
+  ...
+  default:
+    zero or more statements;
+}
+```
+
+If a `case` evaluates to true and there is no `break` statement within the `case` block, 'fall-through' occurs and each subsequent `case` is also executed until a `break` statement is encountered. The `default` case is optional, acts as a catch-all if none of the previous cases are true, and is very similar to a trailing `else` statement. The `default` case can also be 'fallen-into' if a `break` statement is not encountered.
+
+Back to void pointers.
+
+In code below, p is of type `void *`.  It must be converted before it can be dereferenced (to get the value of what p is pointing at).
 
 ```c
 unsigned char *vp = (unsigned char *)p;
@@ -675,19 +741,26 @@ for(;;) {
 
 This code will loop through the arguments skipping the name of the program (as it is the first argument in the argv array).
 ```c
-for( int i=1; i<argc; i++ ) {
+for( int i=1; i<argc; i++ ) { }
 ```
 
 ## How to time code
 
-The example is going to reverse strings several times while timing the process.  The program should not modify the arguments that are passed into your program.  If you wish to modify an argument, you should first allocate memory for your program to use and then copy the argument into the newly allocated memory.  The `malloc` function will allocate the number of bytes requested for use.  You can read about it by typing `man malloc` from the command line.  Programs that require extra memory to work with must request that memory from the operating system.  `malloc` is one of the core ways to complete this.  Memory requested should later be freed using the `free` call.  The `malloc` function can return `NULL`, meaning that the memory was not available.  Trying to writing to a pointer that is pointing at NULL will cause your program to crash.  You can check for the error or just allow the program not so gracefully to crash.  In my examples, I am going to allow the program to crash if `NULL` is returned.  The only other reasonable option would be to have the program fail early, which effectively is the same thing.  In the example below, there are a few functions called.  The early writers of C decided to shorten the names of the functions.
+The example is going to reverse strings several times while timing the process.  The program should not modify the arguments that are passed into your program.  If you wish to modify an argument, you should first allocate memory for your program to use and then copy the argument into the newly allocated memory.  The `malloc` function will allocate the number of bytes requested for use.  You can read about it by running the following command.
+
+```
+$ man malloc
+``` 
+
+Programs that require extra memory to work with must request that memory from the operating system.  `malloc` is one of the core ways to complete this.  Memory requested should later be freed using the `free` call.  The `malloc` function can return `NULL`, meaning that the memory was not available.  If a pointer is pointing at `NULL`, any attempts to access what it is pointing at will cause your program to crash.  You can check for the error, or just allow the program to not so gracefully crash.  In my examples, I am going to allow the program to crash if `NULL` is returned.  The only other reasonable option would be to have the program fail early, which effectively is the same thing.  In the example below, there are a few functions called.  The early writers of C decided to shorten the names of the functions.
+
 ```
 malloc - memory allocate
 strlen - string length
 strcpy - string copy
 ```
 
-Once s is pointing at newly allocated memory which is the string length of `argv[i] + 1` for the zero terminator (the current iteration of the loop), a string copy of the argument is performed, so that s points to a copy of the given argument.
+In the following example, on each iteration of the loop, `s` is pointed at newly allocated memory which is the string length of `argv[i]` plus one to make room for the zero terminator. Next, a string copy of the argument is performed so that `s` points to a copy of the given argument.
 
 ```c
 for( int i=1; i<argc; i++ ) {
@@ -698,7 +771,7 @@ for( int i=1; i<argc; i++ ) {
   free(s);
 ```
 
-At the beginning of the program, there were a few `#include` statements.  `#include` effectively copies the contents of the filename into the current program.  To use functions like `malloc`, `strcpy`, and `free`, the proper file must be included.  Files with a suffix ".h" are called header files and typically define how to call a function.  
+At the beginning of the program, there were a few `#include` statements.  `#include` effectively copies the contents of the specified filename into the current program.  To use functions like `malloc`, `strcpy`, and `free`, the proper file must be included.  Files with a suffix ".h" are called header files and typically define how to call a function.  
 
 ```c
 #include <stdio.h>
@@ -717,9 +790,9 @@ I include the include statements above because of the following function calls:
 | string.h | strlen, strcpy, and many other string related functions |
 | sys/time.h | gettimeofday |
 | time.h | sometimes an alternate location of gettimeofday |
-```
 
-This program is going to time how long the reverse string method takes to run.  To get the amount of time that something takes, one might get a start time and an end time and then subtract the start time from the end time.  The following function will get the time in microseconds (millionths of seconds).  Passing NULL to gettimeofday will cause gettimeofday to return the current time.  The timeval structure consists of two members (the number of seconds and the number of microseconds).  
+This program is going to time how long the reverse string function takes to run.  To get the amount of time that a process takes to complete, one might get a start time and an end time then subtract the start time from the end time.  The following function will get the time in microseconds (millionths of seconds).  Passing NULL to `gettimeofday` will cause `gettimeofday` to return the current time.  The `timeval` structure consists of two members, the number of seconds and the number of microseconds.  
+
 ```c
 long get_time() {
   struct timeval tv;
@@ -730,7 +803,8 @@ long get_time() {
 
 A quick note on using parenthesis:  I strongly believe in making code easier to read.  Technically, I could have skipped the parenthesis without harm due to the order of operations, but the code becomes simpler to read by adding the parenthesis.
 
-Reversing a string takes a minimal amount of time.  It is so small that to accurately measure it, you need to repeat the test a million times to make a good step.  In each loop, the `strcpy` resets s such that it has a copy of the ith argument so that it can be reversed.  The time that the process takes is `test_t2 - test_t1`.  
+Reversing a string takes a minimal amount of time.  It is so small that to accurately measure it, you need to repeat the test a million times to yield anything approaching an accurate average.  In each loop, the `strcpy` resets `s` such that it has a copy of the ith argument so that it can be reversed.  The time that the process takes is `test_t2 - test_t1`.
+
 ```c
 int repeat_test = 1000000;
 ...
@@ -744,7 +818,7 @@ long time_spent = test_t2-test_t1;
 overall_time += time_spent;
 ```
 
-After timing the reverse\_string call, printf is used to print the string on the terminal before it was reversed and the new form of the string (s).  Printf allows for format specifiers to match arguments after the first parameter (also known as the format string).  `%s` indicates that there must be a string for the given argument.  `%0.4f` expects a floating-point number and prints four decimal places.  test\_t2 and test\_t1 are both measured in microseconds.  Multiplying the difference by 1000 will change the unit type to nanoseconds.  Since the test was repeated 1 million times, the overall time needs to be divided by 1 million.  By multiplying or dividing a number by a decimal, it converts the type to a decimal.
+After timing the `reverse_string call`, `printf` is used to print the string on the terminal before it was reversed and the new form of the string (s).  `printf` allows for format specifiers to match arguments after the first parameter (also known as the format string).  `%s` indicates that there must be a string for the given argument.  `%0.4f` expects a floating-point number and prints four decimal places.  `test_t2` and `test_t1` are both measured in microseconds.  Multiplying the difference by 1000 will change the unit type to nanoseconds.  Since the test was repeated 1 million times, the overall time needs to be divided by 1 million.  By multiplying or dividing a number by a decimal, it converts the evaluated type to a decimal.
 
 ```c
     printf("%s => %s\n", argv[i], s);
@@ -756,7 +830,8 @@ After timing the reverse\_string call, printf is used to print the string on the
 
 ## Reversing a string
 
-The last function to examine is the reverse_string call.
+The last function to examine is the `reverse_string` call.
+
 ```c
 void reverse_string( char *s ) {
   size_t len = strlen(s);
@@ -772,8 +847,9 @@ void reverse_string( char *s ) {
 ```
 
 The above code works in the following way.
+
 ```
-1.  set a pointer e to the last character in the string.  The last character
+1.  Set a pointer e to the last character in the string.  The last character
     is found by determining the length of the string s and pointing to the
     length-1 char beyond s.
 2.  while s is less than e
@@ -781,7 +857,7 @@ The above code works in the following way.
       advance s by one and decrement e by one.
 ```
 
-Imagine the string "Reverse".  The `strlen` or length of "Reverse" is 7. Subtracting the pointer just after the string from the pointer that points to the beginning of the string, equals 7.
+Imagine the string "Reverse".  The `strlen` or length of "Reverse" is 7. The difference between the pointer referencing the null terminator and the pointer that points to the beginning of the string is 7.
 
 ```
 01234567
@@ -790,7 +866,8 @@ Reverse
 s      e
 ```
 
-To reverse the string, we need the end pointer to point to the last character 'e'.
+To reverse the string, we need the end pointer to point to the last character 'e', e.g. subtract one byte.
+
 ```
 01234567
 Reverse
@@ -798,8 +875,8 @@ Reverse
 s     e
 ```
 
-The first step is to swap R and e.  In order to swap R and e, a temporary
-variable is needed.
+The first step is to swap R and e.  In order to swap R and e, a temporary variable is needed.
+
 ```c
 char tmp = *s;  // *s == R
 *s = *e;        // *e == e, so now string is equal to eeverse
@@ -808,7 +885,8 @@ s++;            // s points to the second e
 e--;            // e points to s
 ```
 
-The while loop will continue because s is less than e.
+The while loop will continue because `s` is less than `e`.
+
 ```
 01234567
 eeversR
@@ -824,7 +902,8 @@ s++;            // s points to v
 e--;            // e points to r
 ```
 
-The while loop will continue because s is less than e.
+The while loop will continue because `s` is less than `e`.
+
 ```
 01234567
 esvereR
@@ -840,7 +919,8 @@ s++;            // s points to the middle e
 e--;            // e points to the middle e
 ```
 
-The while loop will NOT continue because s is not less than e.
+The while loop will NOT continue because `s` is not less than `e`.
+
 ```
 01234567
 esvereR
@@ -853,7 +933,7 @@ The string is now esreveR, which is the reverse of Reverse.
 
 ## The basic Makefile
 
-If you change to that directory, you will find the following Makefile.  
+In the <i>illustrations/2_timing/1_timer</i> directory, you will find the following Makefile.  
 
 ```Makefile
 all: test_timer examples
@@ -869,6 +949,7 @@ clean:
 ```
 
 When you run
+
 ```
 make
 ```
@@ -878,13 +959,13 @@ The first block with a colon will run.  In this Makefile, it is the following li
 all: test_timer examples
 ```
 
-The all group refers to other groups to be built.  In this case, it is test_timer and examples.
+The all group refers to the other groups to be built.  In this case, it is test_timer and examples.
 
 ```Makefile
 test_timer: test_timer.c
 	gcc test_timer.c -o test_timer
 
-Examples:
+examples:
 	./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
 ```
 
@@ -893,19 +974,19 @@ The lines of code after test\_timer will run if the file called test\_timer is o
 gcc test_timer.c -o test_timer
 ```
 
-If you did not want to use a Makefile to build test_timer, you could do so from the command line using the following command.
+If you do not want to use a Makefile to build test_timer, you could do so from the command line using the following command.
 
 ```
-gcc test_timer.c -o test_timer
+$ gcc test_timer.c -o test_timer
 ```
 
-The examples block will run every time because it does not have any dependencies, and examples are not a file that exists.  If you were to create a file called examples, then the examples block would cease to run.  By running `make`, you will effectively build test_timer if it needs to build and run the examples block.  Running  `make clean` will clean up the binary.  You can run any block by specifying it. `make all` is equivalent to running `make`.  If you just want to run the examples block, you can by running `make examples`.  
+The examples block will run every time because it does not have any dependencies, and examples is not a file that exists.  If you were to create a file called examples, then the examples block would cease to run.  By running `make`, you will effectively build test_timer if it needs to build and run the examples block.  Running  `make clean` will clean up the binary file.  You can run any block by specifying it. `make all` is equivalent to running `make`.  If you just want to run the examples block, you can by running `make examples`.  
 
 ## More accurately timing code
 
-In the last section, we explored how to time the reverse\_string function.  In this section, we will explore how to time the function better.  One thing you may have noticed is that there are a million calls to both `reverse_string` and `strcpy`.  There is also the overhead of the loop.  To do the timing correctly, we should have timed the `strcpy` and the loop and subtracted that from the loop, which has the reverse\_string function called.
+In the last section, we explored how to time the reverse\_string function.  In this section, we will explore how to time the function better.  One thing you may have noticed is that there are a million calls to both `reverse_string` and `strcpy`.  There is also the overhead of the loop.  To do the timing correctly, we should have timed the `strcpy` and the loop then subtracted that from the loop that has the reverse\_string function called.
 
-The timing for the work in <i>illustrations/2_timing/2_timer</i> was:
+The timing for the work in <i>illustrations/2_timing/1_timer</i> was:
 
 ```
 $ make
@@ -951,6 +1032,7 @@ $ diff test_timer.c ../1_timer/test_timer.c
 The less than symbols mean that the change is in the file in the first parameter (test\_timer.c).  The greater than symbol indicates that the change is in the file in the second parameter (../1\_timer/test\_timer.c).  You should also notice three dashes (---) between the two lines indicating time\_spent.  The 30,35d29 means that the lines were added after line 29 as lines 30-35.  The 42c36 means that line 42 in test\_timer.c was compared with line 36 in ../1\_timer/test\_timer.c.
 
 As shown above, there are two changes.  The first times everything but reverse_string.
+
 ```c
   long copy_t1 = get_time();
   for( int j=0; j<repeat_test; j++ ) {
@@ -959,7 +1041,8 @@ As shown above, there are two changes.  The first times everything but reverse_s
   long copy_t2 = get_time();
 ```
 
-The second change subtracts the time spent doing everything but the reverse string from the reverse string loop.
+The second change subtracts the time spent doing everything except the `reverse_string` calls in the reverse string loop.
+
 ```c
 long time_spent = (test_t2-test_t1) - (copy_t2-copy_t1);
 ```
