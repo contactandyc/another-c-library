@@ -24,7 +24,7 @@ int main( int argc, char *argv[] ) {
 building:
 
 ```
-git clone https://github.com/contactandyc/realtime.git
+git clone https://github.com/contactandyc/another-c-library.git
 cd illustrations/buffer/1_buffer
 gcc hello_buffer.c buffer.c -o hello_buffer
 ```
@@ -79,19 +79,19 @@ int main(int argc, char *argv[]) {
 
 and so on.
 
-buffer.h is part of this project (it'll later be changed to ac_buffer.h).  ac stands for another c library.  C doesn't have a built-in mechanism to handle growing strings or arrays.  Anyone who has done C will have created an object like buffer or reused someone else's code.  I'm just attempting to create standardized objects which others can use.
+buffer.h is part of this project (it'll later be changed to ac_buffer.h).  ac stands for another c library.  C doesn't have a built-in mechanism to handle growing strings or arrays.  Anyone who has worked with C will have created an object like buffer or reused someone else's code to accomplish the same objective.  I'm just attempting to create standardized objects which others can use.
 
 ## A bit of history and setup
 
-To build solid C code, you need to build reusable objects.  Those objects will then often be used to build larger objects.  The buffer has been one of the most used objects throughout my career.  In other languages, it would generally replace the string and the array.  This object will change in its final form as this object ultimately will build upon another object, which I've called <b>pool</b> that is also one of my goto objects.  The pool will be described after the section on linked structures.  This object plays an important role in printing binary search trees (described in the linked structures section).  
+To build solid C code, you need to build reusable objects.  Those objects will then often be used to build larger objects.  The buffer has been one of the most used objects throughout my career.  In other languages, it would generally replace the string and the array.  This object will change in its final form as this object will ultimately build upon another object called a <b>pool</b> which is also one of my goto objects.  The pool will be described after the section on linked structures.  This object plays an important role in printing binary search trees (described in the linked structures section).  
 
-The interface for buffer is found in buffer.h.  This interface must be included for the c compiler to be able to prepare the code to be converted to a binary properly.  The implementation for buffer is found in buffer.c, and in our example above, we include that in the gcc compilation.  It isn't my goal to explain C in this book, but I will cover some of the language aspects as I go.
+The interface for buffer is found in buffer.h.  This interface must be included for the C compiler to be able to prepare the code to be converted to a binary properly.  The implementation for buffer is found in buffer.c, and in our example above, we include that in the gcc compilation.  It isn't my goal to explain C in this book, but I will cover some of the language aspects as I go.
 
 ```c
 #include "buffer.h"
 ```
 
-Every good C program that is capable of being executed has the main function.  The main function is typically implemented with the following two parameters to allow command-line arguments to be passed to the program.  argc represents the number of arguments (the name of the program is the 1st argument).  argv represents the arguments.  argv[0] references the name of the program as called from the command line.  The main function returns an integer.  If the program executes successfully, it should return 0.
+Every C program that is capable of being executed has the main function.  The main function is typically implemented with the following two parameters to allow command-line arguments to be passed to the program.  argc represents the number of arguments (the name of the program is the 1st argument).  argv represents the arguments.  argv[0] references the name of the program as called from the command line.  The main function returns an integer.  If the program executes successfully, it should return 0.
 ```c
 int main( int argc, char *argv[] ) {
   ...
@@ -99,9 +99,9 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-Most of the objects you will create throughout the book will be named <i>object_name</i>_t.  Functions that pertain to the object will be named <i>object_name</i>_<i>function_name</i>.  Many of the objects can be created through <i>object_name</i>_init and destroyed using <i>object_name</i>_destroy.  Sometimes there will be alternate init functions, and less frequently alternate destroy functions.  In general, if you init an object, you are expected to destroy the object later.  Objects will not just automatically disappear (unless the pool is used, which we will discuss later).
+Most of the objects you will create throughout the book will be named <i>object\_name\_t</i>.  Functions that pertain to the object will be named <i>object\_name\_function\_name</i>.  Many of the objects can be created through <i>object\_name\_init</i> and destroyed using <i>object\_name\_destroy</i>.  Sometimes there will be alternate init functions, and less frequently alternate destroy functions.  In general, if you init an object, you are expected to destroy the object later.  Objects will not just automatically disappear (unless the pool is used, which we will discuss later).
 
-The init function expects that you provide a hint as to how much memory your application might need.  If you specify too many bytes, your program will consume extra memory needlessly.  If you specify too small of a number, the buffer object will automatically grow as needed.
+The init function expects that you provide a hint as to how much memory your application might need.  If you specify too many bytes, your program will consume extra memory needlessly.  If you specify too small of a number, the buffer object will automatically grow as needed, but will also  more computation time.
 ```c
 buffer_t *bh = buffer_init(10);
 ...
@@ -120,15 +120,15 @@ buffer_appendc(bh, ' ');
 
 Append a formatted string where %s gets replaced with the word "Buffer" to the buffer (bh)
 ```c
-buffer_appendf(bh, "%s!", "Buffer");
+_buffer_appendf(bh, "%s!", "Buffer");
 ```
 
-This is just a comment in C.  You can also have comments that extend to the end of the line using // comment
+This is a multi-line comment in C.  You can also have comments that only extend to the end of the line using // comment
 ```c
 /* print Hello Buffer! followed with a newline */
 ```
 
-Print the contents of the buffer (bh) by using the buffer_data(bh) to access its contents.
+Print the contents of the buffer (bh) by using the buffer\_data(bh) to access its contents.
 ```c
 printf( "%s\n", buffer_data(bh) );
 ```
@@ -387,16 +387,15 @@ void buffer_appendf(buffer_t *h, const char *fmt, ...) {
 }
 ```
 
+Most objects and code will manipulate data.  Buffer isn't an exception.  It is often the case that I will design software around data.  The buffer\_t structure is the input to all of the functions except buffer\_init, which creates it.  In C, it is common to name a structure <i>name\_s</i> and then typedef that to be <i>name\_t</i>.  <i>name\_s</i> and <i>name\_t</i> are the same thing.  To refer to <i>name\_s</i>, you must include the keyword struct before it.  The <i>name\_t</i> doesn't require the struct keyword to precede the name (it doesn't work).  
 
-Most objects and code will manipulate data.  Buffer isn't an exception.  It is often the case that I will design software around data.  The buffer_t structure is the input to all of the functions except buffer_init, which creates it.  In C, it is common to name a structure <i>name</i>_s and then typedef that to be <i>name</i>_t.  <i>name</i>_s and <i>name</i>_t are the same thing.  To refer to <i>name</i>_s, you must include the keyword struct before it.  The <i>name</i>_t doesn't require the struct keyword to precede the name (it doesn't work).  
-
-The code in buffer.h indicates that the buffer_t is a new type (struct buffer_s) and that the members of buffer_s are hidden.  By hiding the members of buffer_s in the implementation, one can force users to only work through the interface.
+The code in buffer.h indicates that the buffer\_t is a new type (struct buffer\_s) and that the members of buffer\_s are hidden.  By hiding the members of buffer\_s in the implementation, one can force users to only work through the interface.
 ```c
 struct buffer_s;
 typedef struct buffer_s buffer_t;
 ```
 
-The buffer_s structure is defined as follows in buffer.c.  buffer_s maintains both a length and a size (and data).  data is always size bytes in length (+1).  length is the number of bytes that are currently in use by the buffer within data.
+The buffer\_s structure is defined as follows in buffer.c.  buffer\_s maintains both a length and a size (and data).  data is always size bytes in length (+1).  length is the number of bytes that are currently in use by the buffer within data.
 ```c
 struct buffer_s {
   char *data;
@@ -405,7 +404,7 @@ struct buffer_s {
 };
 ```
 
-The buffer_init function will initialize the object as being empty (length=0), with data being assigned to the initial_size (+1).  In C, strings are terminated with a zero byte.  I've found it handy in the buffer object to keep a zero character at the end of the buffer.
+The buffer\_init function will initialize the object as being empty (length=0), with data being assigned to the initial\_size (+1).  In C, strings are terminated with a zero byte.  I've found it handy in the buffer object to keep a zero character at the end of the buffer as well.
 ```c
 buffer_t *buffer_init(size_t initial_size) {
   buffer_t *h = (buffer_t *)malloc(sizeof(buffer_t));
@@ -420,14 +419,14 @@ buffer_t *buffer_init(size_t initial_size) {
 
 Objects will typically be allocated as
 
-<i>object_name</i>_t *h = (<i>object_name</i> *)malloc(sizeof(<i>object_name</i>_t));
+object\_name\_t *h = (object\_name *) malloc(sizeof(object\_name\_t));
 
-This allocates the space needed (the size of the buffer_t structure) from the heap.
+This allocates the space needed (the size of the buffer\_t structure) from the heap.
 ```c
 buffer_t *h = (buffer_t *)malloc(sizeof(buffer_t));
 ```
 
-The data member needs to be initially allocated to be initial_size + 1 bytes.
+The data member needs to be initially allocated to be initial\_size + 1 bytes.
 ```c
 h->data = (char *)malloc(initial_size + 1);
 ```
@@ -442,20 +441,20 @@ Set the initial length to zero
 h->length = 0;
 ```
 
-Set the size to the initial_size passed into the buffer_init function.
+Set the size to the initial\_size passed into the buffer\_init function.
 ```c
 h->size = initial_size;
 ```
 
-Return the buffer_t object now that it has been properly initialized.
+Return the buffer\_t object now that it has been properly initialized.
 ```c
 return h;
 ```
 
-You may notice that I don't check the return from malloc.  If malloc fails, it will return NULL.  The line after both malloc calls will cause the program to abort, which is the only thing I'd want to do anyway.  For this reason, there isn't a point in having a line like <i>if(!h) abort();</i>.
+You may notice that I don't check the return from malloc.  If malloc fails, it will return NULL.  The line after both malloc calls will cause the program to abort, which is the only thing I'd want to do anyway.  For this reason, there isn't a point in having a line like `if(!h) abort();`.
 
 
-The buffer_destroy method frees up the resources used by buffer_init.
+The buffer\_destroy method frees up the resources used by buffer\_init.
 ```c
 void buffer_destroy(buffer_t *h) {
   free(h->data);
@@ -463,9 +462,9 @@ void buffer_destroy(buffer_t *h) {
 }
 ```
 
-In C, you must keep track of the pointer to memory that you allocate through malloc so that it can be freed later using free.  We will develop objects which will keep track of allocation for us.  These objects will follow a common pattern, which reduces the chance that end users will make a mistake in this regard.
+In C, you must keep track of the pointer to memory that you allocate through malloc so that it can be freed later using free.  We will develop objects which will keep track of allocation for us.  These objects will follow a common pattern which reduces the chance that end users will make a mistake in this regard.
 
-The buffer maintains a single contiguous block of memory that may change as you add more data to it (if the current block of memory is too small, for example).  Clearing the buffer doesn't free memory.  It only resets the length counter to 0 and sets the zero terminator to the 0th byte.
+The buffer maintains a single contiguous block of memory that may change as you add more data to it (if the current block of memory is too small, for example).  Clearing the buffer doesn't free memory, it only resets the length counter to 0 and sets the zero terminator to the 0th byte.
 ```c
 void buffer_clear(buffer_t *h) {
   h->length = 0;
@@ -473,24 +472,24 @@ void buffer_clear(buffer_t *h) {
 }
 ```
 
-To access the data, call buffer_data.  The implementation simply returns the data member from the structure.
+To access the data, call buffer\_data.  The implementation simply returns the data member from the structure.
 ```c
 char *buffer_data(buffer_t *h) { return h->data; }
 ```
 
-Similarly, you can get the length of your data by calling buffer_length.
+Similarly, you can get the length of your data by calling buffer\_length.
 ```c
 size_t buffer_length(buffer_t *h) { return h->length; }
 ```
 
-To set bytes into the buffer, you can use buffer_set, which is implemented as follows.  The buffer doesn't make a distinction between binary data and text.  You can set (or append) binary data or text through this function.
+To set bytes into the buffer, you can use buffer\_set, which is implemented as follows.  The buffer doesn't make a distinction between binary data and text.  You can set (or append) binary data or text through this function.
 ```c
 void buffer_set(buffer_t *h, const void *data, size_t length) {
   _buffer_set(h, data, length);
 }
 ```
 
-The function above simply calls an internal inlined function to set bytes into the buffer.
+The function above simply calls an internal inlined function to set bytes within the buffer.
 ```c
 static inline void _buffer_set(buffer_t *h, const void *data, size_t length) {
   if (length > h->size)
@@ -501,13 +500,13 @@ static inline void _buffer_set(buffer_t *h, const void *data, size_t length) {
 }
 ```
 
-If length is greater than the size member (h->size), then the buffer needs to be resized using _buffer_alloc
+If length is greater than the size member (h->size), then the buffer needs to be resized using \_buffer\_alloc
 ```c
 if (length > h->size)
   _buffer_alloc(h, length);
 ```
 
-The inline _buffer_alloc method.
+The inline \_buffer\_alloc method.
 ```c
 static inline void _buffer_alloc(buffer_t *h, size_t length) {
   size_t len = (length + 50) + (h->size >> 3);
@@ -517,7 +516,7 @@ static inline void _buffer_alloc(buffer_t *h, size_t length) {
 }
 ```
 
-Our new length will be the requested length + 50 + (the old size / 8).  size_t is a type that is defined in stdio.h.
+Our new length will be the requested length + 50 + (the old size / 8).  size\_t is a type that is defined in stdio.h.
 ```c
 size_t len = (length + 50) + (h->size >> 3);
 ```
@@ -533,7 +532,7 @@ h->data = (char *)malloc(len + 1);
 h->size = len;
 ```
 
-In _buffer_set again, copy data which is length bytes long into h->data.
+In \_buffer\_set, we again copy data which is length bytes long into h->data.
 ```c
 memcpy(h->data, data, length);
 ```
@@ -544,14 +543,14 @@ h->length = length;
 h->data[length] = 0;
 ```
 
-Similar to buffer_set, buffer_append just calls _buffer_append.
+Similar to buffer\_set, buffer\_append just calls \_buffer\_append.
 ```c
 void buffer_append(buffer_t *h, const void *data, size_t length) {
   _buffer_append(h, data, length);
 }
 ```
 
-The key differences are that the new size will be h->length + length instead of just length.  _buffer_grow makes a copy of the old data if the memory has to be reallocated.
+The key differences are that the new size will be h->length + length instead of just length.  \_buffer\_grow makes a copy of the old data if the memory has to be reallocated.
 ```c
 static inline void _buffer_append(buffer_t *h, const void *data,
                                   size_t length) {
@@ -564,7 +563,7 @@ static inline void _buffer_append(buffer_t *h, const void *data,
 }
 ```
 
-The new length is the same as _buffer_alloc (length+50+(h->size/8)).  The new memory is malloced into data, and the current h->data is copied to the new memory before h->data is freed.
+The new length is the same as \_buffer\_alloc (length+50+(h->size/8)).  The new memory is malloced into data, and the current h->data is copied to the new memory before h->data is freed.
 ```c
 static inline void _buffer_grow(buffer_t *h, size_t length) {
   size_t len = (length + 50) + (h->size >> 3);
@@ -576,19 +575,19 @@ static inline void _buffer_grow(buffer_t *h, size_t length) {
 }
 ```
 
-buffer_sets uses _buffer_set for its implementation using strlen to determine length.
+buffer\_sets uses \_buffer\_set for its implementation using strlen to determine length.
 ```c
 void buffer_sets(buffer_t *h, const char *s) { _buffer_set(h, s, strlen(s)); }
 ```
 
-buffer_appends appends a string.  buffer_appends calls _buffer_append with the strlen of s.
+buffer\_appends appends a string.  buffer\_appends calls \_buffer\_append with the strlen of s.
 ```c
 void buffer_appends(buffer_t *h, const char *s) {
   _buffer_append(h, s, strlen(s));
 }
 ```
 
-buffer_setc uses _buffer_set and takes the address of c and passes a length of 1.
+buffer\_setc uses \_buffer\_set and takes the address of c and passes a length of 1.
 ```c
 void buffer_setc(buffer_t *h, char c) { _buffer_set(h, &c, 1); }
 ```
@@ -606,7 +605,7 @@ void buffer_appendc(buffer_t *h, char ch) {
 }
 ```
 
-buffer_setn sets the length to zero (clearing buffer) and then calls buffer_appendn.
+buffer\_setn sets the length to zero (clearing buffer) and then calls buffer\_appendn.
 ```c
 void buffer_setn(buffer_t *h, char ch, ssize_t n) {
   h->length = 0;
@@ -614,7 +613,7 @@ void buffer_setn(buffer_t *h, char ch, ssize_t n) {
 }
 ```
 
-buffer_appendn appends ch n times to the buffer.  Using memset instead of memcpy to repeat character n times.
+buffer\_appendn appends ch n times to the buffer.  Using memset instead of memcpy to repeat character n times.
 ```
 void buffer_appendn(buffer_t *h, char ch, ssize_t n) {
   if (n <= 0)
@@ -632,7 +631,7 @@ void buffer_appendn(buffer_t *h, char ch, ssize_t n) {
 ```
 
 
-buffer_setvf sets the length to zero (clearing buffer) and then calls buffer_appendvf.  va_list is defined in stdarg.h
+buffer\_setvf sets the length to zero (clearing buffer) and then calls buffer\_appendvf.  va\_list is defined in stdarg.h
 ```
 void buffer_setvf(buffer_t *h, const char *fmt, va_list args) {
   h->length = 0;
@@ -640,7 +639,7 @@ void buffer_setvf(buffer_t *h, const char *fmt, va_list args) {
 }
 ```
 
-buffer_setf sets the length to zero (clearing buffer).  It then associates a va_list variable to the parameter fmt (which is considered a format string).  The format string is ultimately used much like printf (search for "c printf tutorial" to find more about it).  buffer_appendvf is called, and then the args variable's resources are freed up.  You can make custom functions that set/append to a buffer in much the same way as the setf/appendf methods.  Of course, you will use buffer_clear before buffer_appendvf if you wish to implement a custom set method.
+buffer\_setf sets the length to zero (clearing buffer).  It then associates a va\_list variable to the parameter fmt (which is considered a format string).  The format string is ultimately used much like printf (search for "c printf tutorial" to find more about it).  buffer\_appendvf is called, and then the args variable's resources are freed up.  You can make custom functions that set/append to a buffer in much the same way as the setf/appendf methods.  Of course, you will use buffer\_clear before buffer\_appendvf if you wish to implement a custom set method.
 ```c
 void buffer_setf(buffer_t *h, const char *fmt, ...) {
   h->length = 0;
@@ -651,7 +650,7 @@ void buffer_setf(buffer_t *h, const char *fmt, ...) {
 }
 ```
 
-buffer_appendf is identical to buffer_setf, except that the length isn't reset (h->length = 0 doesn't exist).
+buffer\_appendf is identical to buffer\_setf, except that the length isn't reset (h->length = 0 doesn't exist).
 ```c
 void buffer_appendf(buffer_t *h, const char *fmt, ...) {
   va_list args;
@@ -661,7 +660,7 @@ void buffer_appendf(buffer_t *h, const char *fmt, ...) {
 }
 ```
 
-This method is used to append a formatted string to a buffer and probably one of the more complex functions in buffer.  vsnprintf returns the number of bytes needed to print a given string.  Because the buffer has reserve memory, the leftover (or reserved) memory is frequently enough, and the buffer doesn't need to grow.  I'll break it down afterward.
+This method is used to append a formatted string to a buffer and is probably one of the more complex functions in buffer.  vsnprintf returns the number of bytes needed to print a given string.  Because the buffer has reserve memory, the leftover (or reserved) memory is frequently enough, and the buffer doesn't need to grow.  I'll break it down afterward.
 ```c
 void buffer_appendvf(buffer_t *h, const char *fmt, va_list args) {
   va_list args_copy;
@@ -688,7 +687,7 @@ void buffer_appendvf(buffer_t *h, const char *fmt, va_list args) {
 }
 ```
 
-Before calling vsnprintf, a copy of the args should be made as follows.  The va_end should be called once done with the copy of the args.
+Before calling vsnprintf, a copy of the args should be made as follows.  The va\_end should be called once done with the copy of the args.
 ```c
 va_list args_copy;
 va_copy(args_copy, args);
@@ -706,14 +705,14 @@ Get a pointer to the end of the current data (to append the string)
 char *r = h->data + h->length;
 ```
 
-vsnprintf requires a buffer (r), and a length of the buffer (leftover), and the fmt, and va_list (args_copy).  It returns the number of bytes needed to be successful.  If n is -1, something bad went wrong.  Just abort (maybe this isn't the best decision???)
+vsnprintf requires a buffer (r), the length of the buffer (leftover), the fmt, and a va_list (args_copy).  It returns the number of bytes needed to be successful.  If n is -1, something bad happened and we abort (maybe this isn't the best decision???)
 ```c
 int n = vsnprintf(r, leftover, fmt, args_copy);
 if (n < 0)
   abort();
 ```
 
-If n is less than leftover, then the write was successful, and we are done.  Add n bytes to the overall length.
+If n is less than leftover, then the write was successful and we are done.  Add n bytes to the overall length.
 ```c
 if (n < leftover)
   h->length += n;
@@ -744,7 +743,7 @@ The memory needed for this to complete is 1 byte more than n because vsnprintf r
   h->length += n;
 ```
 
-buffer_alloc resizes the buffer to length bytes and returns you a pointer to the data.  The old data may be overridden.
+buffer\_alloc resizes the buffer to length bytes and returns a pointer to the data.  The old data may be overridden.
 ```c
 void *buffer_alloc(buffer_t *h, size_t length) {
   if (length > h->size)
@@ -755,7 +754,7 @@ void *buffer_alloc(buffer_t *h, size_t length) {
 }
 ```
 
-buffer_resize allows you to alter the size of the buffer and then returns a pointer to the data.  The resize will not overwrite old data (except if resizing to a smaller length).  If resizing to a smaller length, a zero is written to the length byte.
+buffer\_resize allows you to alter the size of the buffer and then returns a pointer to the data.  The resize will not overwrite old data (except if resizing to a smaller length).  If resizing to a smaller length, a zero is written to the length byte.
 ```c
 void *buffer_resize(buffer_t *h, size_t length) {
   if (length > h->size)
@@ -766,7 +765,7 @@ void *buffer_resize(buffer_t *h, size_t length) {
 }
 ```
 
-buffer_append_alloc is like buffer_resize, except that it allocates length more bytes and returns a pointer to those new bytes.  It is safe to assume that the byte after length is set to zero.
+buffer\_append\_alloc is like buffer\_resize, except that it allocates length more bytes and returns a pointer to those new bytes.  It is safe to assume that the byte after length is set to zero.
 ```c
 void *buffer_append_alloc(buffer_t *h, size_t length) {
   if (length + h->length > h->size)
@@ -778,6 +777,6 @@ void *buffer_append_alloc(buffer_t *h, size_t length) {
 }
 ```
 
-If you followed everything in this, that is great.  Otherwise, it might make more sense as the buffer object is used throughout the project.  Next up is /2_linked_structures.md
+If you followed everything in this, that is great.  Otherwise, it might make more sense as the buffer object is used throughout the project.  Next up is /2\_linked\_structures.md
 
 [Table of Contents (if viewing on Github)](../../../README.md)
