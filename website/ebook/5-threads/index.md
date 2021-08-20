@@ -75,8 +75,7 @@ int main(int argc, char *argv[]) {
 ```
 
 ```
-$ gcc test_code.c -o test_code -lpthread
-$ ./test_code
+$ make
 global_number (should be 10000000)= 2010195
 ```
 
@@ -87,9 +86,8 @@ Notice that the number is not 10 million.  When global\_number++ happens, each t
 When writing software which has thread-shared resources, one should generally assume that you must protect them (using the equivalent of the stop signs mentioned above).  Sometimes, when you run software and tests, the result will look okay.  This doesn't necessarily mean that the code is thread safe.  On my computer, when I compiled the code with the -O3 option, I got the following result:
 
 ```
-cd $ac/illustrations/4_threads/2_thread
-gcc -O3 test_code.c -o test_code -lpthread
-./test_code
+$ cd $ac/illustrations/4_threads/2_thread
+$ make
 ```
 
 Outputs
@@ -131,8 +129,7 @@ int main(int argc, char *argv[]) {
 ```
 
 ```
-$ gcc test_code.c -o test_code -lpthread
-$ ./test_code
+$ make
 local_number (should be 10000000)= 2010195
 ```
 
@@ -180,8 +177,7 @@ int main(int argc, char *argv[]) {
 
 When a mutex protects the variable that is being incremented, the local number ends up being what we expected.
 ```
-$ gcc -O3 test_code.c -o test_code -lpthread
-$ ./test_code
+$ make
 local_number (should be 10000000)= 10000000
 ```
 
@@ -206,9 +202,9 @@ Note that the worker\_t structure (w) is shared amongst all of the threads.
 Before ending this chapter, we should consider how long each task takes and the advantages and disadvantages of threads and coordination.
 
 ```
-cd $ac/illustrations/4_threads/1_thread
-make
-time ./test_code
+$ cd $ac/illustrations/4_threads/1_thread
+$ make
+$ time ./test_code
 ```
 
 outputs
@@ -221,9 +217,9 @@ sys	0m0.003s
 ```
 
 ```
-cd $ac/illustrations/4_threads/4_thread
-make
-time ./test_code
+$ cd $ac/illustrations/4_threads/4_thread
+$ make
+$ time ./test_code
 ```
 
 outputs
@@ -237,9 +233,9 @@ sys	0m4.836s
 
 Coordination takes time.  We can test this code in optimized mode
 ```
-cd $ac/illustrations/4_threads/5_thread
-make
-time ./test_code
+$ cd $ac/illustrations/4_threads/5_thread
+$ make
+$ time ./test_code
 ```
 
 outputs
@@ -256,9 +252,9 @@ The optimized build doesn't improve performance.
 Finally, if we look at the last example (6\_single\_thread), we can see that the performance is much faster.
 
 ```
-cd $ac/illustrations/4_threads/6_single_thread
-make
-time ./test_code
+$ cd $ac/illustrations/4_threads/6_single_thread
+$ make
+$ time ./test_code
 ```
 
 outputs
