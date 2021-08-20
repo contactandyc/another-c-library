@@ -1,4 +1,4 @@
-all: test_code
+all: test_code examples
 
 test_code: test_code.c
 	gcc test_code.c -o test_code -lpthread
