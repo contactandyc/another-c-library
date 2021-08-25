@@ -9,7 +9,7 @@ test_timer: test_timer.c $(OBJECTS) $(HEADER_FILES)
 	gcc $(FLAGS) $(OBJECTS) test_timer.c -o test_timer
 
 examples:
-	./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
+	./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse ; cat memory.log
 
 clean:
 	rm -f test_timer *~ memory.log*
