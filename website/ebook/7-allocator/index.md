@@ -355,7 +355,7 @@ test_timer.c:24: 8
 test_timer.c:26 [ac_timer]: 32
 ```
 
-This is output via the `cat memory.log` command in the Makefile and indicates that 4 allocations were not properly freed.
+This output was generated with the `cat memory.log` command in the Makefile and indicates that 4 allocations were not properly freed.
 
 line 24
 ```c
@@ -388,7 +388,7 @@ overall time_spent: 9.5440ns
 ----Date/Time----
 ```
 
-Now the memory issues are fixed and only the date and time are printed from the memory.log file
+Now the memory issues are fixed and only the date/time are printed from the memory.log file
 
 The memory debug flag may be toggled in the Makefile which will determine whether a memory.log file is generated or not.
 
@@ -400,39 +400,6 @@ FLAGS += -D_AC_DEBUG_MEMORY_=\"memory.log\"
 Non-memory-debug mode
 ```Makefile
 FLAGS += -D_AC_DEBUG_MEMORY_=NULL
-```
-
-run
-```
-make clean
-```
-
-and then
-```
-$ make
-gcc -O3 -I../../../src -D_AC_DEBUG_MEMORY_=\"memory.log\" ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_timer.c -o test_timer
-./test_timer ABCDEFGHIJKLMNOPQRSTUVWXYZ Reverse
-ABCDEFGHIJKLMNOPQRSTUVWXYZ => ZYXWVUTSRQPONMLKJIHGFEDCBA
-time_spent: 5.9220ns
-Reverse => esreveR
-time_spent: 1.5720ns
-overall time_spent: 7.4940ns
-```
-
-There is a new file called memory.log in this directory.
-```
-$ ls
-Makefile	memory.log	test_timer	test_timer.c
-```
-
-You can view memory.log by running
-```
-$ cat memory.log
-99 byte(s) allocated in 4 allocations (160 byte(s) overhead)
-test_timer.c:24: 27
-test_timer.c:26 [ac_timer]: 32
-test_timer.c:24: 8
-test_timer.c:26 [ac_timer]: 32
 ```
 
 If you view the test\_timer.c code, you will notice that a significant portion of the main function now has the ac\_ prefix.
