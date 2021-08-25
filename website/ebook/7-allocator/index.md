@@ -61,7 +61,7 @@ void ac_free(void *p);
 #endif
 ```
 
-You may notice that I don't use two parameters for ac_calloc.  This is intentional as I don't see a benefit in changing the signature from malloc.  
+You may notice that I don't use two parameters for ac\_calloc.  This is intentional as I don't see a benefit in changing the signature from malloc.  
 
 We could redefine our interface as
 
@@ -93,9 +93,9 @@ int main( int argc, char *argv[] ) {
 }
 ```
 
-There is a pattern above in that every time we call ac_malloc (and others), we would call it with __FILE__, __LINE__, as the first two parameters.  
+There is a pattern above in that every time we call ac\_malloc (and others), we would call it with \_\_FILE\_\_, \_\_LINE\_\_, as the first two parameters.  
 
-In creating the global allocator, maybe we only want line numbers and malloc to be passed in when the software is defined as being in debug mode.  To define ac_malloc, we might want to do the following.  Considering that we have just identified how to merge the __FILE__ and __LINE__, we will use that.
+In creating the global allocator, maybe we only want line numbers and malloc to be passed in when the software is defined as being in debug mode.  To define ac\_malloc, we might want to do the following.  Considering that we have just identified how to merge the \_\_FILE\_\_ and \_\_LINE\_\_, we will use that.
 
 ```c
 #ifdef _AC_DEBUG_MEMORY_
@@ -107,7 +107,7 @@ In creating the global allocator, maybe we only want line numbers and malloc to 
 void *_ac_malloc_d( const char *caller, size_t len );
 ```
 
-When defining functions this way, it is good to come up with a convention.  My convention is to use an underscore before the function and to suffix the debug function with _d.  In defining the final interface, I came up with a few additional features.  The first is based upon the idea that the allocator will use an internal object to represent its structure.  That object will be global, and all of the allocation functions will have to pass a pointer to the object.
+When defining functions this way, it is good to come up with a convention.  My convention is to use an underscore before the function and to suffix the debug function with \_d.  In defining the final interface, I came up with a few additional features.  The first is based upon the idea that the allocator will use an internal object to represent its structure.  That object will be global, and all of the allocation functions will have to pass a pointer to the object.
 
 ```c
 void *_ac_malloc_d( const char *caller, size_t len );
@@ -123,7 +123,7 @@ The macro changes to.
 #define ac_malloc(len) _ac_malloc_d(NULL, __AC_FILE_LINE__, len)
 ```
 
-A NULL allocator simply means to use the global allocator.
+A NULL allocator simply means that the global allocator will be used.
 
 The second feature is to allow for a mechanism to allow for custom content in place of the caller.  For example, if we allocate a buffer and keep changing its size, we might want to know the following: where the buffer was initialized, the maximum size of the buffer, its initial size, etc. Passing a boolean at the end denotes this custom feature, which defaults to false.
 
@@ -148,7 +148,7 @@ For example,
 typedef void (*my_function)();
 ```
 
-would declare a function pointer type named my_function, which took no arguments and didn't return anything (it has a void return type).  I recommend using a suffix for function pointers (I'm going to use _f).  The allocator needs to define a function pointer to allow other objects to dump their details.
+would declare a function pointer type named my\_function, which takes no arguments and does not return anything (it has a void return type).  I recommend using a suffix for function pointers (I'm going to use \_f).  The allocator needs to define a function pointer to allow other objects to dump their details.
 
 ```c
 typedef void (*ac_dump_details_f)(FILE *out, void *p, size_t length);
@@ -163,11 +163,11 @@ typedef struct {
 } ac_allocator_dump_t;
 ```
 
-Another useful feature is to have the state of the memory usage dumped every so often.  All this means is that if _AC_DEBUG_MEMORY_ is defined as a filename, any program which uses the allocator will record all of the memory allocations every N seconds and rotate the previous snapshot.  To maintain a smaller number of output files, the rotations will rotate files with an ever-expanding gap between them.
+Another useful feature is to have the state of the memory usage dumped every so often.  All this means is that if \_AC\_DEBUG\_MEMORY\_ is defined as a filename, any program which uses the allocator will record all of the memory allocations every N seconds and rotate the previous snapshot.  To maintain a smaller number of output files, the rotations will rotate files with an ever-expanding gap between them.
 
 The full allocator interface is below.
 
-$ac/src/ac_allocator.h
+$ac/src/ac\_allocator.h
 ```c
 #ifndef _ac_allocator_H
 #define _ac_allocator_H
@@ -220,11 +220,11 @@ void _ac_free_d(ac_allocator_t *a, const char *caller, void *p);
 #endif
 ```
 
-Before understanding the implementation, let's see how other objects and code use this.  The ac_timer.h/c will change in the following way:
+Before understanding the implementation, let's see how other objects and code use this.  The ac\_timer.h/c will change in the following way:
 
-Include ac_common.h
+Include ac\_common.h
 
-ac_timer.h
+ac\_timer.h
 ```c
 #include "ac_common.h"
 ```
@@ -245,26 +245,20 @@ ac_timer_t *_ac_timer_init(int repeat);
 #endif
 ```
 
-The above code has two basic cases: one where _AC_DEBUG_MEMORY_ is defined, and one where it is not (#else).  It may be easier to break this into a couple of steps.
+The above code has two basic cases: one where \_AC\_DEBUG\_MEMORY\_ is defined, and one where it is not (#else).  It may be easier to break this into a couple of steps.
 
-1.  convert the init function to be prefixed with an underscore
-
-```c
-ac_timer_t *ac_timer_init(int repeat);
-```
-
-becomes
+1.  Convert the init function to be prefixed with an underscore
 ```c
 ac_timer_t *_ac_timer_init(int repeat);
 ```
 
-2.  create a macro which defines ac_timer_init as _ac_timer_init
+2.  Create a macro which defines ac\_timer\_init as \_ac\_timer\_init
 ```c
 #define ac_timer_init(repeat) _ac_timer_init(repeat)
 ac_timer_t *_ac_timer_init(int repeat);
 ```
 
-3.  define the macro if logic with the else part filled in.
+3.  Define the macro if logic with the else part filled in.
 ```c
 #ifdef _AC_DEBUG_MEMORY_
 #else
@@ -273,17 +267,17 @@ ac_timer_t *_ac_timer_init(int repeat);
 #endif
 ```
 
-4.  Add const char *caller to the debug version of _ac_timer_init
+4.  Add `const char *caller` to the debug version of \_ac\_timer\_init
 ```c
 ac_timer_t *_ac_timer_init(int repeat, const char *caller);
 ```
 
-5.  define the macro to call the init function.
+5.  Define the macro to call the init function.
 ```c
 #define ac_timer_init(repeat) _ac_timer_init(repeat, AC_FILE_LINE_MACRO("ac_timer"))
 ```
 
-6.  put the two calls in the #ifdef _AC_DEBUG_MEMORY_ section.
+6.  Put the two calls in the #ifdef \_AC\_DEBUG\_MEMORY\_ section.
 ```c
 #ifdef _AC_DEBUG_MEMORY_
 #define ac_timer_init(repeat) _ac_timer_init(repeat, AC_FILE_LINE_MACRO("ac_timer"))
@@ -294,9 +288,9 @@ ac_timer_t *_ac_timer_init(int repeat);
 #endif
 ```
 
-Objects will typically use the AC_FILE_LINE_MACRO("object_name") when defining the init call, as in step 5 above.
+Objects will typically use the AC\_FILE\_LINE\_MACRO("object_name") when defining the init call, as in step 5 above.
 
-Change ac_timer.c from
+Change ac\_timer.c from
 ```c
 ac_timer_t *ac_timer_init(int repeat) {
   ac_timer_t *t = (ac_timer_t *)malloc(sizeof(ac_timer_t));
@@ -315,15 +309,14 @@ ac_timer_t *_ac_timer_init(int repeat) {
 #endif
 ```
 
-1.  Change all malloc, calloc, strdup, realloc, and free calls to have ac_ prefix.<br/>
-2.  Change the function name from ac_timer_init to _ac_timer_init.<br/>
-3.  Wrap the block in a #ifdef _AC_DEBUG_MEMORY_/#else/#endif block<br/>
-4.  Define the _AC_DEBUG_MEMORY_ portion.  The _ac_timer_init function has the extra const char *caller parameter.  The allocation uses _ac_malloc_d directly, as shown above.
+1.  Change all malloc, calloc, strdup, realloc, and free calls to have ac\_ prefix.
+2.  Change the function name from ac\_timer\_init to \_ac\_timer\_init.
+3.  Wrap the block in a #ifdef \_AC\_DEBUG\_MEMORY\_/#else/#endif block.
+4.  Define the \_AC\_DEBUG\_MEMORY\_ portion.  The \_ac\_timer\_init function has the extra const char *caller parameter.  The allocation uses \_ac\_malloc\_d directly, as shown above.
 
-To test these changes out, I've modified code from $ac/illustrations/2_timing/13_timer
+To test these changes out, I've modified code from $ac/illustrations/2\_timing/13\_timer
 
-
-The following code is found in <i>illustrations/6_allocator/1_timing</i>
+The following code is found in <i>illustrations/6\_allocator/1\_timing</i>
 ```
 cd $ac/illustrations/6_allocator/1_timing
 ```
@@ -337,6 +330,7 @@ time_spent: 7.7260ns
 Reverse => esreveR
 time_spent: 1.8180ns
 overall time_spent: 9.5440ns
+----Date/Time----
 99 byte(s) allocated in 4 allocations (160 byte(s) overhead)
 test_timer.c:24: 27
 test_timer.c:26 [ac_timer]: 32
@@ -344,15 +338,16 @@ test_timer.c:24: 8
 test_timer.c:26 [ac_timer]: 32
 ```
 
-Include ac_allocator.h in test_timer.c
+Include ac\_allocator.h in test\_timer.c
 ```c
 #include "ac_allocator.h"
 ```
 
-and alter the malloc and free calls to ac_malloc and ac_free.  I've intentionally commented out several destroy calls and the ac_free call.
+and alter the malloc and free calls to ac\_malloc and ac\_free.  I've intentionally commented out several destroy calls and the ac\_free call.
 
-When make was run above, the following extra lines were output
+When `make` was run above, the following extra lines were output
 ```
+----Date/Time----
 99 byte(s) allocated in 4 allocations (160 byte(s) overhead)
 test_timer.c:24: 27
 test_timer.c:26 [ac_timer]: 32
@@ -360,7 +355,7 @@ test_timer.c:24: 8
 test_timer.c:26 [ac_timer]: 32
 ```
 
-This indicates that 4 allocations were not properly freed.
+This is output via the `cat memory.log` command in the Makefile and indicates that 4 allocations were not properly freed.
 
 line 24
 ```c
@@ -372,15 +367,15 @@ line 26
 ac_timer_t *copy_timer = ac_timer_init(ac_timer_get_repeat(overall_timer));
 ```
 
-To fix the code, we need to make sure that copy_timer is destroyed and s is freed.  Lines 47-48 are what need uncommented to make this work.
+To fix the code, we need to make sure that copy\_timer is destroyed and s is freed.  Lines 47-48 are what need uncommented to make this work.
 ```c
 // ac_timer_destroy(copy_timer);
 // ac_free(s);
 ```
 
-The error reported logged the ac_timer_init line as opposed to the ac_malloc inside of ac_timer_init.  This is likely more useful unless you are testing the individual object.
+The error logged the ac\_timer\_init line as opposed to the ac\_malloc inside of ac\_timer_init.  This is likely more useful unless you are testing the individual object.
 
-Go ahead and uncomment those lines and run make again
+Go ahead and uncomment those lines and run `make` again
 ```
 $ make
 gcc -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_timer.c -o test_timer
@@ -390,22 +385,23 @@ time_spent: 7.7260ns
 Reverse => esreveR
 time_spent: 1.8180ns
 overall time_spent: 9.5440ns
+----Date/Time----
 ```
 
-Go ahead and revert your changes.  You can revert your changes in the current directory by running the following git command.  If you don't specify the ., then it will revert all changes in the whole repo (so this command can be somewhat dangerous!)
-```
-git checkout .
+Now the memory issues are fixed and only the date and time are printed from the memory.log file
+
+The memory debug flag may be toggled in the Makefile which will determine whether a memory.log file is generated or not.
+
+Memory-debug mode
+```Makefile
+FLAGS += -D_AC_DEBUG_MEMORY_=\"memory.log\"
 ```
 
-The lines indicating memory loss are no longer printed.  In this example, _AC_DEBUG_MEMORY_ was defined as NULL in the Makefile using the following line.
+Non-memory-debug mode
 ```Makefile
 FLAGS += -D_AC_DEBUG_MEMORY_=NULL
 ```
 
-If we change this to
-```Makefile
-FLAGS += -D_AC_DEBUG_MEMORY_=\"memory.log\"
-```
 run
 ```
 make clean
@@ -439,9 +435,9 @@ test_timer.c:24: 8
 test_timer.c:26 [ac_timer]: 32
 ```
 
-If you view the test_timer.c code, you will notice that a significant portion of the main function now has the ac_ prefix.
+If you view the test\_timer.c code, you will notice that a significant portion of the main function now has the ac\_ prefix.
 
-test_timer.c (main function)
+test\_timer.c (main function)
 ```c
 int main( int argc, char *argv[]) {
   int repeat_test = 1000000;
@@ -480,7 +476,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-Breaking out all of the ac_ statements:
+Breaking out all of the ac\_ statements:
 ```c
   ac_timer_t *overall_timer = ac_timer_init(repeat_test);
     char *s = (char *)ac_malloc(len+1);
@@ -526,7 +522,7 @@ timer_t *overall_timer = timer_init(repeat_test);
 timer_destroy(overall_timer);
 ```
 
-You can see that there are timer objects, malloc, and free.  Given that malloc, calloc, realloc, strdup, and free are so common in code, I opted not to provide any extra qualifiers other than ac.  I aim to make code highly optimized and very readable.  Another important feature of qualified naming is that it makes it possible to search for all places something exists.  For example, to find all cases where ac_timer are used, you can run..
+You can see that there are timer objects, malloc, and free.  Given that malloc, calloc, realloc, strdup, and free are so common in code, I opted not to provide any extra qualifiers other than ac.  I aim to make code highly optimized and very readable.  Another important feature of qualified naming is that it makes it possible to search for all places something exists.  For example, to find all cases where ac\_timer are used, you can run..
 
 ```
 cd $ac/illustrations
@@ -574,28 +570,28 @@ char *strdup(char *p);
 void free(void *p);
 ```
 
-2.  We define those functions with the ac_ prefix such that if we are debugging memory, we can track where the allocations are made.  This allows us to recognize memory leaks and potentially a couple of other common errors.
+2.  We define those functions with the ac\_ prefix such that if we are debugging memory, we can track where the allocations are made.  This allows us to recognize memory leaks and potentially a couple of other common errors.
 
-3.  Callback functions should have a suffix of _f
+3.  Callback functions should have a suffix of \_f
 
-4.  We defined an approach to find when objects are created (and not destroyed).  The basic changes to ac_timer were outlined to make it support using the ac_allocator.
+4.  We defined an approach to find when objects are created (and not destroyed).  The basic changes to ac\_timer were outlined to make it support using the ac\_allocator.
 
-5.  When we are using the ac_allocator object outside of objects, the only change to the code is to replace the 5 basic allocation methods with `ac_...` If, for some reason, you do not wish to allocate memory using the ac method, then make sure that you don't free it with the ac method.
+5.  When we are using the ac\_allocator object outside of objects, the only change to the code is to replace the 5 basic allocation methods with `ac_...` If, for some reason, you do not wish to allocate memory using the ac method, then make sure that you don't free it with the ac method.
 
-6.  We can define _AC_DEBUG_MEMORY_ as NULL and have memory leaks reported to the terminal when the program exits.
+6.  We can define \_AC\_DEBUG\_MEMORY\_ as NULL and have memory leaks reported to the terminal when the program exits.
 
 ```Makefile
 FLAGS += -D_AC_DEBUG_MEMORY_=\"memory.log\"
 ```
 
-7.  We can define _AC_DEBUG_MEMORY_ as a string and have memory leaks reported to a file periodically.  The period is defined in seconds as _AC_DEBUG_MEMORY_SPEED_ and defaults to 60 in ac_common.h
+7.  We can define \_AC\_DEBUG\_MEMORY\_ as a string and have memory leaks reported to a file periodically.  The period is defined in seconds as \_AC\_DEBUG\_MEMORY\_SPEED\_ and defaults to 60 in ac\_common.h
 
-8.  You can grep for any line of code which contains an object using the following approach.  The following grep line will search all subdirectories for the string ac_timer and report the filename and line number where the text is found.
+8.  You can `grep` for any line of code which contains an object using the following approach.  The following `grep` line will search all subdirectories for the string ac\_timer and report the filename and line number where the text is found.
 
 ```
 grep -rn ac_timer .
 ```
 
-ac_timer can be replaced with a function name or another object name (or whatever you want to find).
+ac\_timer can be replaced with a function name or another object name (or whatever you want to find).
 
 [Table of Contents (only if viewing on Github)](../../../README.md)

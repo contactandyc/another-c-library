@@ -483,7 +483,7 @@ The `if` statement works in conjunction with all the `else if` statements that i
 
 In some cases, conditional, mutual exclusivity may also be achieved in a slightly optimized form by using what is known as a `switch`.  The syntax of a `switch` is demonstrated below by converting the `if/else if` logic from the `print_value_of_pointer` function
 
-```
+```c
 ...
 switch(type) {
   case 'c':
