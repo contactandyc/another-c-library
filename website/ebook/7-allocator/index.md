@@ -42,7 +42,7 @@ char *strdup(char *p) {
 }
 ```
 
-It's important to realize that malloc (memory alloc) is the core behind all of these functions or at a minimum, they are derivates of malloc.
+It's important to realize that malloc (memory alloc) is the core behind all of these functions or at a minimum, they are derivatives of malloc.
 
 One of the reasons that people tend to steer clear of C is because you must maintain pointers to memory that you allocate so that it can later be freed.  In the last chapter, I introduced doubly-linked lists.  We can implement a way of tracking allocations using a doubly-linked list.  The functions that we will implement are the ones defined above - so the interface will be pretty straight forward.  To prevent naming conflicts, we will use the ac prefix.
 
