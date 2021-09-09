@@ -317,7 +317,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-In ac_common.h, I also defined AC_FILE_LINE_MACRO, which is a macro meant for objects such as the ac_timer object.  This will become more evident as we work through the allocator object.  As usual, it's a good idea to define macros using a prefix to ensure that your code doesn't conflict with other codebases.
+In ac_common.h, I also defined AC_FILE_LINE_MACRO, which is a macro meant for objects such as the ac_timer object.  This will become more evident as we work through the allocator object.  As usual, it's a good idea to define macros using a prefix to ensure that your code doesn't conflict with other code bases.
 
 $ac/src/ac\_common.h
 ```c
