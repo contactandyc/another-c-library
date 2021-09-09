@@ -44,7 +44,7 @@ Computers allow for multiple threads (which are like workers or people working o
 
 ## Creating threads
 
-In C, threads are created by calling pthread\_create.  They can be created with the expectation that they will be collected once they are done.  They can also be created in what is known as a detached state.  All this means is that your program will not wait for the thread to finish.  In both cases, if your program terminates, the threads will be destroyed.  Threads are like workers, they run in parallel and often on seperate cores.  The example below shows 10 threads incrementing a number a million times and ultimately printing the final number.  The threads are collected using pthread\_join.
+In C, threads are created by calling pthread\_create.  They can be created with the expectation that they will be collected once they are done.  They can also be created in what is known as a detached state.  All this means is that your program will not wait for the thread to finish.  In both cases, if your program terminates, the threads will be destroyed.  Threads are like workers, they run in parallel and often on separate cores.  The example below shows 10 threads incrementing a number a million times and ultimately printing the final number.  The threads are collected using pthread\_join.
 
 The following code is found in <i>illustrations/4\_threads/1\_thread</i>
 
