@@ -6,7 +6,7 @@ title: "9. The Pool Object"
 
 What if our object could keep track of allocations and free memory for us?  This is generally the basis for languages that use garbage collection.  I'm going to illustrate how to build several objects which greatly reduce the number of calls to malloc and free (and reduce the risk that you will have memory leaks).  
 
-The first is an object which I've used for almost my whole career.  I've called it a pool.  The basic idea with this object is that you can allocate and clear.  It has no free function.  When you clear, you clear all of the memory that has been previously allocated from the pool. Internally, it is very efficient in that all it typically does is reset a counter to zero.  The base interface will look something like the following.
+The first is an object which I've used for almost my whole career.  I've called it a pool.  The basic idea with this object is that you can allocate and clear.  It has no free function.  When you clear, you clear all of the memory that has been previously allocated from the pool. Internally, it is very efficient because all it typically does is reset a counter to zero.  The base interface will look something like the following.
 
 pool.h
 ```c
@@ -26,7 +26,7 @@ void pool_destroy(pool_t *h);
 #endif
 ```
 
-There is no free method.  You can call the allocation methods as often as you like, and they will remain valid until pool_clear or pool_destroy is called.
+There is no free method.  You can call the allocation methods as often as you like, and the allocations will remain valid until pool\_clear or pool\_destroy is called.
 
 # The Simplest Implementation
 
@@ -34,12 +34,12 @@ When approaching algorithms, it is often a good idea to think about the simplest
 
 Below describes a simple implementation of the pool interface:
 
-- Have each allocation saved in a singly linked list on the pool_s structure.  
+- Have each allocation saved in a singly linked list on the pool\_s structure.  
 - The clear method could free all of the memory in the linked list.
-- The destroy could call clear, and then free the pool_s object itself.
+- The destroy could call clear, and then free the pool\_s object itself.
 - Each allocation would require it's own link structure.
 
-A singly linked list usually is linked to from a structure and then chained together using a member called next.  Each allocation would be placed in its own structure and linked to by the pool_s structure through the member head.  The two objects and implementation would probably look like the following.
+A singly linked list usually is linked to from a structure and then chained together using a member called next.  Each allocation would be placed in its own structure and linked to by the pool\_s structure through the member head.  The two objects and implementation could look like the following.
 
 ```c
 typedef struct pool_node_s {
@@ -93,7 +93,7 @@ void pool_destroy(pool_t *h) {
 }
 ```
 
-We could allocate the desired memory and the pool_node_t structure together.  If we did that, we wouldn't need the void *m parameter, and the memory requested could just exist after the pool_node_t structure.
+We could allocate the desired memory and the pool\_node\_t structure together.  If we did that, we wouldn't need the void *m parameter, and the memory requested could simply exist after the pool\_node\_t structure.
 
 ```c
 typedef struct pool_node_s {
@@ -208,20 +208,20 @@ size_t ac_pool_used(ac_pool_t *h);
 
 A few significant changes are added to the interface.
 
-- Everything uses the ac_ prefix.
-- The ac_allocator object is used for allocation.
-- ac_pool_init is changed to a macro to support memory debugging.
-- ac_pool_init takes in a size (to support allocating in larger chunks)
-- ac_pool_malloc is changed to ac_pool_alloc.
-- ac_pool_ualloc supports unaligned allocation.
-- ac_pool_dup and sla_pool_udup copy binary data.
-- ac_pool_strdupf/ac_pool_strdupvf support working with format strings.
-- ac_pool_size gets the overall number of bytes that have been allocated.
-- ac_pool_used gets the overall number of bytes that have been allocated internally.
-- impl/ac_pool.h is used to inline a number of the functions for performance.
-- some of the functions are declared as static inline because they are implemented in the impl/ac_pool.h header file.
+- Everything uses the ac\_ prefix.
+- The ac\_allocator object is used for allocation.
+- ac\_pool\_init is changed to a macro to support memory debugging.
+- ac\_pool\_init takes in a size (to support allocating in larger chunks)
+- ac\_pool\_malloc is changed to ac\_pool\_alloc.
+- ac\_pool\_ualloc supports unaligned allocation.
+- ac\_pool\_dup and sla\_pool\_udup copy binary data.
+- ac\_pool\_strdupf/ac\_pool\_strdupvf support working with format strings.
+- ac\_pool\_size gets the overall number of bytes that have been allocated.
+- ac\_pool\_used gets the overall number of bytes that have been allocated internally.
+- impl/ac\_pool.h is used to inline a number of the functions for performance.
+- some of the functions are declared as static inline because they are implemented in the impl/ac\_pool.h header file.
 
-By this point, the code below should look pretty familiar.  Files are included, ac_pool_t is defined, and the _ac_pool_H is defined to prevent the contents of this file from being included more than once.
+By this point, the code below should look pretty familiar.  Files are included, ac\_pool\_t is defined, and the \_ac\_pool\_H is defined to prevent the contents of this file from being included more than once.
 ```c
 #ifndef _ac_pool_H
 #define _ac_pool_H
@@ -236,7 +236,7 @@ struct ac_pool_s;
 typedef struct ac_pool_s ac_pool_t;
 ```
 
-Because this object will use the ac_allocator for debugging memory, the following is needed to define the init function.
+Because this object will use the ac\_allocator for debugging memory, the following is needed to define the init function.
 ```c
 /* ac_pool_init will create a working space of size bytes */
 #ifdef _AC_DEBUG_MEMORY_
@@ -248,7 +248,7 @@ ac_pool_t *_ac_pool_init(size_t size);
 #endif
 ```
 
-If we weren't using the ac_allocator, our init call would look like this:
+If we weren't using the ac\_allocator, our init call would look like this:
 ```c
 ac_pool_t *_ac_pool_init(size_t size);
 ```
@@ -271,9 +271,9 @@ ac_pool_t *_ac_pool_init(size_t size);
 #endif
 ```
 
-The above code has two basic cases:  one where _AC_DEBUG_MEMORY_ is defined, and the other where it is not (#else).  It may be easier to break this into a couple of steps.
+The above code has two basic cases: one where \_AC\_DEBUG\_MEMORY\_ is defined, and the other where it is not (#else).  It may be easier to break this into a couple of steps.
 
-1.  convert the init function to be prefixed with an underscore
+1.  Convert the init function to be prefixed with an underscore
 
 ```c
 ac_pool_t *ac_pool_init(size_t size);
@@ -284,13 +284,13 @@ becomes
 ac_pool_t *_ac_pool_init(size_t size);
 ```
 
-2.  create a macro which defines ac_pool_init as _ac_pool_init
+2.  Create a macro which defines ac\_pool\_init as \_ac\_pool\_init
 ```c
 #define ac_pool_init(size) _ac_pool_init(size)
 ac_pool_t *_ac_pool_init(size_t size);
 ```
 
-3.  define the macro if logic with the else part filled in.
+3.  Define the macro `if` logic with the `else` part filled in.
 ```c
 #ifdef _AC_DEBUG_MEMORY_
 #else
@@ -299,17 +299,17 @@ ac_pool_t *_ac_pool_init(size_t size);
 #endif
 ```
 
-4.  Add const char *caller to the debug version of _ac_pool_init
+4.  Add const char *caller to the debug version of \_ac\_pool\_init
 ```c
 ac_pool_t *_ac_pool_init(size_t size, const char *caller);
 ```
 
-5.  define the macro to call the init function.
+5.  Define the macro to call the init function.
 ```c
 #define ac_pool_init(size) _ac_pool_init(size, AC_FILE_LINE_MACRO("ac_pool"))
 ```
 
-6.  put the two calls in the #ifdef _AC_DEBUG_MEMORY_ section.
+6.  Put the two calls in the #ifdef \_AC\_DEBUG\_MEMORY\_ section.
 ```c
 #ifdef _AC_DEBUG_MEMORY_
 #define ac_pool_init(size) _ac_pool_init(size, AC_FILE_LINE_MACRO("ac_pool"))
@@ -320,7 +320,7 @@ ac_pool_t *_ac_pool_init(size_t size);
 #endif
 ```
 
-A common use case for the pool is to allocate a bunch of times and then clear and repeat.  For example, if you were responding to queries from a search engine, you might want to use this object and allocate a bunch of times for parsing the query and building a response.  Once the response has been written, the pool can be cleared and used for the next query.  The pool would likely need a certain amount of bytes to satisfy the vast majority of the queries.  Given this use, it makes sense for the pool to allocate enough bytes in a single block, and then just to dole out the memory via its allocation methods.  If the single block isn't big enough for all of the allocations, overflow blocks will be allocated.  When the pool is cleared, the overflow blocks will be freed.  The main block will remain, and the counter inside the pool will be reset to zero.  If we make the pool too small, the overflow blocks will continuously get used.  If we make it too big, we waste memory.
+A common use case for the pool is to allocate a bunch of times and then clear and repeat.  For example, if you were responding to queries from a search engine, you might want to use this object and allocate a bunch of times for parsing the query and building a response.  Once the response has been written, the pool can be cleared and used for the next query.  The pool would likely need a certain amount of bytes to satisfy the vast majority of the queries.  Given this use, it makes sense for the pool to allocate enough bytes in a single block, and then dole out the memory via its allocation methods.  If the single block isn't big enough for all of the allocations, overflow blocks will be allocated.  When the pool is cleared, the overflow blocks will be freed, the main block will remain, and the counter inside the pool will be reset to zero.  If we make the pool too small, overflow blocks will have to be constantly allocated.  If we make it too big, we waste memory.
 
 # TO BE CONTINUED
 
