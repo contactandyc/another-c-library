@@ -16,43 +16,44 @@ Implementing the allocator is rather involved and uses much of what you've learn
 - A structure is defined for objects to optionally use when debugging memory.
 
 ## Keywords used
-keyword  | description  
+Keyword  | Description  
 --|--
-\#include  | copy/paste the contents of another file into the given file.
-typedef  | used to define one type as another.
-struct  | group one or more data types together.
-const  |  define a variable as constant (meaning it can't change).
-char  | data type consisting of one byte that is signed (-128 to 127).
-int  | data type consisting of 4 bytes that is signed (-2,147,483,648 to 2,147,483,647).
-ssize_t  | signed data type where the number of bits equals the number of bits in CPU.
-size_t  | unsigned data type where the number of bits equals the number of bits in CPU.
-void  |  data type that doesn't represent any bytes, functions returning void do not return a value.  A void pointer can't be dereferenced.
+\#include  | Copy/paste the contents of another file into the given file.
+typedef  | Used to define one type as another.
+struct  | Group one or more data types together.
+const  |  Define a variable as constant (meaning it can't change).
+char  | Data type consisting of one byte that is signed (-128 to 127).
+int  | Data type consisting of 4 bytes that is signed (-2,147,483,648 to 2,147,483,647).
+ssize\_t  | Signed data type where the number of bits equals the number of bits in CPU.
+size\_t  | Unsigned data type where the number of bits equals the number of bits in CPU.
+void  |  Data type that doesn't represent any bytes. Functions returning void do not return a value. A void pointer can't be dereferenced.
 static  |  Defines a variable or function as only being accessible within the file that declares said function.  If it is declared in a header file and included, then the scope includes the file that includes the file.
-if  | if(\<condition>) {} - if condition is true, execute block of code.
-else  |  else {} - used with if, if all other conditions fail, execute a block of code.
-while  |  while(\<condition>) {} - while condition is true, execute block of code.
-return  | used to return a value from a function.
+if  | if(\<condition>) {} - If condition is true, execute block of code.
+else if  | else if(\<condition>) {} - Used with if to create more than two mutually exclusive conditions. If condition is true, execute block of code.
+else  |  else {} - Used with if/else if. Execute block of code if all other conditions evaluate to false.
+while  |  while(\<condition>) {} - While condition is true, execute block of code.
+return  | Used to return a value from a function.
 NULL  | A special pointer value to indicate that the pointer is not pointing to anything.
 
 ## Symbols used
-symbol  | description
+Symbol  | Description
 --|--
-{}  | defines a block of code or contents of a struct.
-->  | when given a pointer to a struct to reference a member of the type.
-.  | when given a struct (not a pointer, but the actual struct value), used to reference a member of the type.
-+=  | equivalent to x = x + N where N is on the right and x is on the left.
+{}  | Defines a block of code or contents of a struct.
+->  | Deferences a struct member from a struct pointer: struct\_ptr->struct\_member.
+.  | Reference a struct member from a struct variable: struct\_var.struct\_member.
++=  | Equivalent to x = x + N where N is on the right and x is on the left.
 \>>=  | equivalent to x = x >> N where N is on the right and x is on the left.  Shifts the bits of x N times to the right.
-!  | Get the opposite condition of.  Ex. !true == false and !false == true.
-==  | Is two elements equal to each other.
+!  | Negates a condition: !true == false and !false == true.
+==  | Check for equality between two elements.
 =  |  Assign value on the right to the variable on the left.
-\*  | Used to define a data type as a pointer (ex. char *), and to dereference or get the value of what a pointer is pointing to.
+\*  | Used to define a data type as a pointer (ex. char *), and to dereference (get the value of) a pointer.
 & | Used to get the address of a value or to get a pointer to a given value.   
-()  | Used to define parameters of a function, and the condition in an if, while, or for loop (and a few others).
-//  | comment to the end of the line.
-/\* \*/  | inline comment that can span zero or more lines.
-;  |  C mostly doesn't use line breaks to separate code.  semicolons are used instead.
+()  | Used to define parameters of a function or the condition in an if, while, or for loop (and a few others).
+//  | Single line comment.
+/\* \*/  | Multi-line comment.
+;  |  Marks the end of a line of code.
 
-The full source code for ac_allocator is found at <i>src/ac_allocator.c</i>
+The full source code for ac\_allocator is found at <i>src/ac\_allocator.c</i>
 
 The object starts by including the corresponding header file.
 ```c
@@ -83,7 +84,7 @@ Caller references where the memory was allocated from.
 const char *caller;
 ```
 
-Length is the number of bytes that the user requested.  It is a signed number because if it is negative, then the object being allocated begins with the **ac_allocator_dump_t** structure.
+Length is the number of bytes that the user requested.  It is a signed number because if it is negative, then the object being allocated begins with the **ac\_allocator\_dump\_t** structure.
 ```c
 typedef void (*ac_dump_details_f)(FILE *out, const char *caller, void *p, size_t length);
 
@@ -92,7 +93,7 @@ typedef struct {
 } ac_allocator_dump_t;
 ```
 
-The dump structure consists of a function pointer **dump** which is of type **ac_dump_details_f** defined in ac_allocator.h.  You might wonder why I used a struct with a single member.  I reason that it allows the allocator to potentially alter the structure in the future and create minimal work for users of it.  It also is simple to cast the memory allocated to a ac_allocator_dump_t type and then call the dump method.  This would only apply if the **bool custom** was set to true during the allocation of an object.  Sometimes, it is useful to give extra meaning to variables to save space.  Considering that every node that is to be allocated will require the overhead of the structure and that length won't exceed 2^63 bytes, it makes sense to overload the length variable name.
+The dump structure consists of a function pointer **dump** which is of type **ac\_dump\_details\_f** defined in ac\_allocator.h.  You might wonder why I used a struct with a single member.  I reason that it allows the allocator to potentially alter the structure in the future and create minimal work for users of it.  It also is simple to cast the memory allocated to a ac\_allocator\_dump\_t type and then call the dump method.  This would only apply if the **bool custom** was set to true during the allocation of an object.  Sometimes it is useful to give extra meaning to variables to save space.  Considering that every node that is to be allocated will require the overhead of the structure and that length won't exceed 2^63 bytes, it makes sense to overload the length variable name.
 
 The next and previous pointers are used to implement a doubly-linked list.
 ```c
@@ -100,15 +101,15 @@ struct ac_allocator_node_s *next;
 struct ac_allocator_node_s *previous;
 ```
 
-The **ac_allocator_t \*a** member is declared in ac_allocator.h but not defined.
+The **ac\_allocator\_t \*a** member is declared in ac\_allocator.h but not defined.
 ```c
 struct ac_allocator_s;
 typedef struct ac_allocator_s ac_allocator_t;
 ```
 
-The **ac_allocator_t \*a** member isn't strictly necessary.  It is used by ac_free and ac_realloc to double-check that the memory that is about to be freed or reallocated was previously allocated.  It serves as a magic number that must exist just before actual memory the user used.
+The **ac\_allocator\_t \*a** member isn't strictly necessary.  It is used by ac\_free and ac\_realloc to double-check that the memory that is about to be freed or reallocated was previously allocated.  It serves as a magic number that must exist just before the actual memory that the user used.
 
-The typedef of **struct ac_allocator_s** to **ac_allocator_t** was defined in ac_allocator.h, so all that remains is to define ac_allocator_s for use within the ac_allocator.c file.
+The typedef of **struct ac\_allocator\_s** to **ac\_allocator\_t** was defined in ac\_allocator.h, so all that remains is to define ac\_allocator\_s for use within the ac\_allocator.c file.
 ```c
 struct ac_allocator_s {
   ac_allocator_node_t *head;
@@ -136,12 +137,12 @@ size_t total_bytes_allocated;
 size_t total_allocations;
 ```
 
-The allocator allows the memory leaks to be written to a logfile.  If this is NULL, stderr will be used.  If there is a logfile specified, it is not NULL, and thread_safe is true; a monitoring thread will be started, which will periodically write out how many allocations are currently active.
+The allocator allows the memory leaks to be written to a logfile.  If this is NULL, stderr will be used.  If there is a logfile specified, it is not NULL, and thread\_safe is true; a monitoring thread will be started, which will periodically write out how many allocations are currently active.
 ```c
 const char *logfile;
 ```
 
-The allocator can be initialized to be thread-safe (or not).  If it is not thread-safe, then there will not be a monitoring thread started even if logfile is specified.
+The allocator can be initialized to be thread-safe (or not).  If it is not thread-safe, then a monitoring thread will not be started even if logfile is specified.
 ```c
 bool thread_safe;
 ```
