@@ -200,7 +200,7 @@ void buffer_destroy(buffer_t *h);
 
 #endif
 ```
-Notice there aren't any details as to how the buffer is implemented in the interface.  It is very important to separate interfaces from implementations.  If you do this, you continually improve upon the interface.  If hardware changes over time, you can reimplement the implementation part as needed without affecting the rest of the codebases.  Getting interfaces right is somewhat of an art.  There is a balance between getting specific work done and creating reusable objects.  One element of the coding style that I use is that you can use <b>grep</b> to find every line where a given object is used.  I'm not alone in using this coding style.  Projects like libcurl, libuv (behind Google Chrome), and others use similar approaches.
+Notice there aren't any details as to how the buffer is implemented in the interface.  It is very important to separate interfaces from implementations.  If you do this, you continually improve upon the interface.  If hardware changes over time, you can re-implement the implementation part as needed without affecting the rest of the code bases.  Getting interfaces right is somewhat of an art.  There is a balance between getting specific work done and creating reusable objects.  One element of the coding style that I use is that you can use <b>grep</b> to find every line where a given object is used.  I'm not alone in using this coding style.  Projects like libcurl, libuv (behind Google Chrome), and others use similar approaches.
 
 ## The implementation
 
