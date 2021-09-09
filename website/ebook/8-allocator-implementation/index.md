@@ -4,7 +4,7 @@ posttype: "tutorial"
 title: "8. The Global Allocator Implementation"
 ---
 
-Implementing the allocator is rather involved and uses much of what you've learned in the prior chapters. However, it should help you to understand how to code or to improve it should you desire to.
+Implementing the allocator is rather involved and uses much of what you've learned in the prior chapters. However, it should help you to understand how to code or to improve it should you desire.
 
 - Doubly linked lists to track allocations.
 - An object (which gets declared in the global space) to maintain and monitor the doubly linked list.
@@ -13,14 +13,14 @@ Implementing the allocator is rather involved and uses much of what you've learn
 - Static functions are used to prevent functions from being exposed beyond the implementation file.
 - An object constructor and destructor are used to initialize and destroy the global variable (new).
 - Function callbacks are employed to allow other objects to implement their reporting.
-- A structure is defined for objects to use when debugging memory optionally.
+- A structure is defined for objects to optionally use when debugging memory.
 
 ## Keywords used
 keyword  | description  
 --|--
 \#include  | copy/paste the contents of another file into the given file.
 typedef  | used to define one type as another.
-struct  | group one or data types together.
+struct  | group one or more data types together.
 const  |  define a variable as constant (meaning it can't change).
 char  | data type consisting of one byte that is signed (-128 to 127).
 int  | data type consisting of 4 bytes that is signed (-2,147,483,648 to 2,147,483,647).
