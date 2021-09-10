@@ -6,7 +6,6 @@ title: "10. Binary Search Trees"
 
 ## The basic structure
 
-
 A binary search tree is similar to a linked list in that nodes are linked together.  The difference is that each node has two children.  The children are generally understood as being left and right, where the left is less than the given node, and the right is greater.  Trees in computer science generally grow from a root down (unlike trees in nature which grow up from the root).  This is likely because in a binary search tree, the root is considered the top of the tree.  In binary search trees, each child node is aware of its parent node. In the following example, B is aware of D as a parent, A as a left child, and C as a right child.
 
 ```
@@ -21,7 +20,7 @@ A binary search tree is similar to a linked list in that nodes are linked togeth
                    F     
 ```
 
-In the example above, the root is D, and the left of D is B, right is H.  Each node refers to up to three other nodes.  For example, the B node refers to D, A, and C.  D is B's parent.  A is B's left child and C is B's right child.  Before continuing too much with theory, we will build out a binary search tree.  Just like before, the only files that will be changed are doubly\_linked\_list.c will be renamed binary\_search\_tree.c, and the Makefile will have DATA\_STRUCTURE defined as binary\_search\_tree.  The binary search tree is much simpler than the red-black tree, but it isn't entirely without complexity.
+In the example above, the root is D, and the left of D is B, right is H.  Each node may refer to a maximum of three other nodes.  For example, the B node refers to D, A, and C.  D is B's parent.  A is B's left child and C is B's right child.  Before continuing too much with theory, we will build a binary search tree.  doubly\_linked\_list.c will be renamed binary\_search\_tree.c, and the Makefile will have DATA\_STRUCTURE defined as binary\_search\_tree.  The binary search tree is much simpler than the red-black tree, but it isn't entirely without complexity.
 
 The code that follows can be found in illustrations/10\_binary\_search\_trees/1\_binary\_search\_tree
 
@@ -35,15 +34,15 @@ typedef struct node_s {
 } node_t;
 ```
 
-For a binary search tree, instead of thinking in next and previous, we think in terms of two children and a parent.  The children are considered left and right.  We could name the nodes left\_child and right\_child, and that would indeed be a more precise name.  However, left and right have become common names of the left and right children, so we will use left and right.   A linked list can be sorted if the insert method inserts the node in the right place to maintain a sorted list.  It doesn't have to be, and indeed, it frequently is not sorted.  The binary search tree is sorted.  In a binary search tree, the root might not be the first element in the list of nodes (if you are considering sort order).  In the example above, D is the root, but A would be the first node in the sorted set.  Linked lists always maintain that the root node is the first node in the list.  In a binary search tree, the root node is rarely the first node within the sorted set.  It only happens when the root is the leftmost node in the tree.
+For a binary search tree, instead of thinking in next and previous, we think in terms of two children and a parent.  The children are considered left and right.  We could name the nodes left\_child and right\_child, and that would indeed be a more precise name.  However, left and right have become common names of the left and right children, so we will use left and right.   A linked list can be sorted if the insert method inserts the node in the right place to maintain a sorted list.  However, it doesn't have to be sorted, and is frequently not.  In contrast, the binary search tree is always sorted.  In a binary search tree, the root might not be the first element in the list of nodes (if you are considering sort order).  In the example above, D is the root, but A would be the first node in the sorted set.  Sorted linked lists always maintain that the root node (head) is the minimum or maximum value (depending on sort order).  In a binary search tree, the root node is rarely the first node within the sorted set.  That case only occurs when the root is the leftmost node in the tree.
 
-A binary search tree can be empty, much like a linked list can be empty.  If it is empty, it doesn't have any nodes.  Just like a linked list, where you need to create a reference to some part of the list (typically the beginning), you need to maintain a link to the root of the tree.  This is just a pointer to the current root node, which can change depending upon your tree operations.  Initializing the root node to NULL indicates that the tree is empty.
+Like a linked list, a binary search tree can be empty.  If it is empty, it doesn't have any nodes.  Like a linked list, you must maintain a reference to some part of the tree structure so it can be accessed.  This is a pointer to the current root node, which can change at various times depending on your tree operations.  Initializing the root node to NULL indicates that the tree is empty.
 
 ```c
 node_t *root = NULL;
 ```
 
-To build the tree, we will need functionality to insert new nodes.  For now, we will assume that our tree maintains unique keys (no duplicate letters).  In a binary search tree insert method, you first find the place where the node would go, and then if it doesn't already exist, you add the node.  It is often a good idea to search for the node before inserting.  This will eliminate the need to create and destroy the node needlessly if it already existed.  It also is easier to understand the find method, so it comes next.
+To build the tree, we will need functionality to insert new nodes.  For now, we will assume that our tree maintains unique keys (no duplicates).  In a binary search tree insert method, you first find the place where the node would go, and then if it doesn't already exist, you add the node.  It is often a good idea to search for the node before inserting.  This will eliminate the need to create and destroy the node needlessly if it already exists.  It is also easier to understand the find method than the insert method, so we will look at that next.
 
 ## Find
 
@@ -61,7 +60,7 @@ node_t *node_find(char key, node_t *root) {
 }
 ```
 
-You may notice in the code above that the root is no longer the root once it is assigned to its left or right node.  In a binary search tree, you can call the find method with any node in the tree, and it will search that node and all of its children.  This fact generally isn't useful, but it is good to understand it as you think about how binary search trees work.  The node\_find method above can be converted to a recursive function.
+You may notice in the code above that the root is no longer the root once it is assigned to its left or right node.  In a binary search tree, you can call the find method with any node in the tree, and it will search that node and all of its children.  This fact generally isn't useful, but it is good to understand it as you think about how binary search trees work.  The node\_find method above can be converted to a recursive function (a function that calls itself).
 
 ```c
 node_t *node_find(char key, node_t *root) {
@@ -78,7 +77,7 @@ The recursive method requires less code but is less efficient as the recursion r
 
 ## Insert
 
-The node_insert method will require a pointer to the root pointer so that it can potentially modify what the root is. Insert works much like find, except that it needs to find the spot where the new node can fit.  To find that spot, the parent of that spot must be saved and the actual spot itself.  Because the spot where the new node can fit will be NULL, you can use the parent pointer from a given node.  Once a place is found, the node to insert's parent is to set to the saved parent, the left and right pointers are set to NULL, and the spot is set to reference the node.
+The node\_insert method will require a pointer to the root pointer so that it can potentially modify what the root is. Insert works much like find, except that it needs to find the spot where the new node can fit.  To find that spot, the parent of that spot must be saved as well as the actual spot itself.  Because the spot where the new node can fit will be NULL, you can use the parent pointer from a given node.  Once a place is found, the node-to-insert's parent is set to the saved parent, the left and right pointers are set to NULL, and the spot is set to reference the node.
 ```c
 #include <stdbool.h>
 
@@ -105,7 +104,7 @@ bool node_insert(node_t *node_to_insert, node_t **root) {
 
 Before getting to erasing nodes, I'm going to cover basic iteration.  Iteration is needed to solve one case of erasing nodes, so we will cover iteration first.
 
-To find the first node in a tree, you simply traverse all of the left pointers until there are no more.  
+To find the node containing the first sorted value in a tree, you simply traverse all of the left pointers until there are no more.
 ```c
 node_t *node_first(node_t *n) {
   if (!n)
@@ -116,7 +115,7 @@ node_t *node_first(node_t *n) {
 }
 ```
 
-Similarly, to find the last node in a tree, you traverse all of the right pointers until there are no more.
+Similarly, to find the node containing the last sorted value in a tree, you traverse all of the right pointers until there are no more.
 ```c
 node_t *node_last(node_t *n) {
   if (!n)
@@ -127,7 +126,7 @@ node_t *node_last(node_t *n) {
 }
 ```
 
-To find the next node, consider if the current node has a right node.  If it does, then find the leftmost node from the right node.  Otherwise, find the first parent where the child is on the left.
+To find the next in-order-node, consider if the current node has a right node.  If it does, then find the leftmost node from the right node.  Otherwise, find the first parent where the child is on the left.
 ```c
 node_t *node_next(node_t *n) {
   if (n->right) {
@@ -142,7 +141,7 @@ node_t *node_next(node_t *n) {
 }
 ```
 
-To find the previous node, swap left and right from node\_next.  Also, note that previous is supported.
+To find the previous in-order-node, swap left and right from node\_next.  Also, note that previous is supported.
 ```c
 bool node_previous_supported() { return true; }
 
@@ -175,12 +174,12 @@ Erasing nodes is a bit more complicated than insertion because the tree may need
                    F     
 ```
 
-It is erasing leaf nodes (nodes without any children are easy).  A, C, F, and I can be erased by simply removing the link from their parent to them.  Erasing nodes that have only one child are relatively simple.  You just replace the child.  To erase E, you would replace E with F.  Replacing nodes with two children isn't too difficult.  Consider removing H.  If you replaced H with I, the tree would still be intact.  Replacing D is a bit more challenging as H has two children, and if you replaced D with H, how could H point to B, I, and G.  It isn't that big of a problem.  If you reconsider what happened when replacing H with I, you might discover that you were replacing H with the next in order value (which would be I).  If we look for the next in order value after D, you would see that it is E.  E has a child F, so F will first take E's place.  Next, E can take D's place.  The rules are:
+Erasing leaf nodes (nodes without any children) is fairly simple.  A, C, F, and I can be erased by simply removing the link from their parent to them.  Erasing nodes that have only one child are also relatively easy.  You just replace the child.  To erase E, you would replace E with F.  Now consider removing H which has two children.  If you replaced H with I, the tree would still be intact.  Replacing D is a bit more challenging as H has two children, and if you replaced D with H, how could H point to B, I, and G.  It isn't that big of a problem.  If you reconsider what happened when replacing H with I, you might discover that you were replacing H with the next in order value (which would be I).  If we look for the next in order value after D, you would see that it is E.  E has a child F, so F will first take E's place.  Next, E can take D's place.  The rules are:
 
 ```
 1.  If a node is a leaf, unlink it from its parent
 2.  If a node only has one child, replace the node with the child
-3.  If a node has two children, find the next inorder node and unlink it first
+3.  If a node has two children, find the next in-order node and unlink it first
     using rules 1 and 2.  Next, replace the node with the node that was just
     unlinked.
 ```
@@ -298,7 +297,7 @@ else
 next->parent = node_to_erase->parent;
 ```
 
-are very similar. The only difference is whether NULL, node_to_erase->right, node_to_erase->left, and next get's assigned.
+are very similar. The only difference is whether NULL, node\_to\_erase->right, node\_to\_erase->left, and next gets assigned.
 
 The following function could simplify the code.
 ```c
@@ -317,7 +316,7 @@ static inline void replace_node_with_child(node_t *child, node_t *node, node_t *
 }
 ```
 
-The new node_erase would look like
+The new node\_erase would look like
 ```c
 bool node_erase(node_t *node_to_erase, node_t **root) {
   if(node_to_erase->left) {
@@ -343,7 +342,7 @@ bool node_erase(node_t *node_to_erase, node_t **root) {
 }
 ```
 
-A tiny optimization can be made by not allowing NULL to be passed in as the child.  We can avoid the if(child) check-in replace_node_with_child.  
+A tiny optimization can be made by not allowing NULL to be passed in as the child.  We can avoid the if(child) check in replace\_node\_with\_child.  
 
 ```c
 static inline void replace_node_with_child(node_t *child, node_t *node, node_t **root ) {
@@ -394,7 +393,7 @@ next->left->parent = next;
 next->right->parent = next;
 ```
 
-How many times will node_erase be called?  Due to how the successor works, it will be exactly one time (because it will be an only child if node_to_erase isn't considered).  I've flipped the cases so that the easy cases are first.
+How many times will node\_erase be called?  Due to how the successor works, it will be exactly one time (because it will be an only child if node\_to\_erase isn't considered).  I've flipped the cases so that the easy cases are first.
 
 ```c
 bool node_erase(node_t *node, node_t **root) {
@@ -423,7 +422,7 @@ bool node_erase(node_t *node, node_t **root) {
 }
 ```
 
-The remaining code will find the successor (or the next inorder node).
+The remaining code will find the successor (or the next in-order node).
 1. If the successor is to the right of the node\_to\_erase, then alter the successor's parent to be the same as the node and link successor's left to the node's left.
 2. Otherwise, the successor will be to the left of the node\_to\_erase's right node. Link the successor's parent's left to the successor's right child.  If the successor's right child is not NULL, link it to the successor's parent.  Fully replace the node\_to\_erase with the successor.
 
@@ -513,9 +512,9 @@ bool node_erase(node_t *node, node_t **root) {
 }
 ```
 
-## Postorder iteration
+## Post-order iteration
 
-Postorder iteration means to iterate through a tree visiting the left and the right nodes before each root.  Postorder starts from the left deepest node of the tree and then iterates through children before parents.  Given the following example, the iteration will look like.
+Post-order iteration means to iterate through a tree visiting the left and the right nodes before each root.  Post-order starts from the deepest left node of the tree and then iterates through children before parents.  Given the following example, the iteration will look like.
 
 ```
         D9
@@ -532,16 +531,16 @@ Postorder iteration means to iterate through a tree visiting the left and the ri
 or
 
 ```
-ACBEGFD
+ACBFEGIHD
 ```
 
 ```
 Start with the left deepest node, which is A.
 Since A is the left child of B, look for the left deepest node under C which is C
 Since C is the right child of B, B is next
-Since D is the left child of B, look for the left deepest node under H which is F
+Since B is the left child of D, look for the left deepest node under H which is F
 Since F is the right child of E, E is next
-Since G is the left child of G and there isn't a right child, G is next
+Since E is the left child of G and there isn't a right child, G is next
 Since G is the left child of H, look for the left deepest node under I which is I
 Since I is the right child of H, H is next
 Since H is the right child of D, D is next
@@ -571,7 +570,7 @@ In explaining the traversal above, 4 patterns exist.
 4.  If node has no parent, we are done
 ```
 
-Statements 2-4 are used for finding next nodes in postorder iteration.  Statement 3 and statement 4 are the same in as much as every node has a parent; it just may be that the parent is NULL.  The otherwise element of statement 2 also returns the parent.  The first part of statement 2 is the only case where something other than the parent is returned.  Given this, we can state the following about find next nodes in postorder iteration.
+Statements 2-4 are used for finding next nodes in post-order iteration.  Statement 3 and statement 4 are the same in as much as every node has a parent; it just may be that the parent is NULL.  The otherwise element of statement 2 also returns the parent.  The first part of statement 2 is the only case where something other than the parent is returned.  Given this, we can state the following about finding the next node in post-order iteration.
 
 ```
 If node's parent is not NULL and the node is a left child of its parent and
@@ -579,7 +578,7 @@ there is a right child, return the left deepest node of the right child of the
 node's parent, otherwise return the node's parent.
 ```
 
-If a tree is destroyed using postorder iteration, all of the children are destroyed before parents, so the tree remains intact throughout the destruction.  The node\_first\_to\_erase (or first in postorder iteration) calls the left\_deepest\_node method above if n is not NULL.
+If a tree is destroyed using post-order iteration, all of the children are destroyed before parents, so the tree remains intact throughout the destruction.  The node\_first\_to\_erase (or first in post-order iteration) calls the left\_deepest\_node method above if n is not NULL.
 
 ```c
 node_t *node_first_to_erase(node_t *n) {
@@ -589,7 +588,7 @@ node_t *node_first_to_erase(node_t *n) {
 }
 ```
 
-The node\_next\_to\_erase (or next in postorder iteration) uses our statement above.
+The node\_next\_to\_erase (or next in post-order iteration) uses our statement above.
 ```c
 node_t *node_next_to_erase(node_t *n) {
   node_t *parent = n->parent;
@@ -602,14 +601,14 @@ node_t *node_next_to_erase(node_t *n) {
 
 ## Printing a binary tree
 
-The last function to build is a method to print the tree.  It presented a different kind of challenge that programmers often face and so I'm separating it.  To print the binary search tree, I've implemented an approach that requires copying the tree into a different structure. Because we have built the ac\_allocator and the ac\_pool, I've decided to use them.  To demonstrate how they can be useful, I've commented out the free and ac\_pool\_destroy calls.  Before getting into how to print, let's review the changes to test\_data\_structure.c and data\_structure.h.
+The last function to build is a method to print the tree.  This presents a different kind of challenge than programmers often face and so I'm separating it.  To print the binary search tree, I've implemented an approach that requires copying the tree into a different structure. Because we have built the ac\_allocator and the ac\_pool, I've decided to use them.  To demonstrate how they can be useful, I've commented out the free and ac\_pool\_destroy calls.  Before getting into how to print, let's review the changes to test\_data\_structure.c and data\_structure.h.
 
 data\_structure.h includes "ac\_pool.h"
 ```c
 #include "ac_pool.h"
 ```
 
-and node_print takes a pointer to ac_pool_t *pool
+and node\_print takes a pointer to ac\_pool\_t *pool
 ```c
 void node_print(node_t *root);
 ```
@@ -619,7 +618,7 @@ becomes
 void node_print(ac_pool_t *pool, node_t *root);
 ```
 
-The test_data_structure.c needs to incorporate the pool.
+The test\_data\_structure.c needs to incorporate the pool.
 
 In the main function, the pool needs initialized and destroyed.  Also, the free call gets changed to ac\_free.  I've commented the free and destroy call on purpose.
 ```c
@@ -660,9 +659,9 @@ becomes
 node_print(pool, root);
 ```
 
-The Makefile also includes the src library to incorporate the ac_pool object.
+The Makefile also includes the src library to incorporate the ac\_pool object.
 
-The following code is found in <i>illustrations/10_binary_search_trees/1_binary_search_tree</i>
+The following code is found in <i>illustrations/10\_binary\_search\_trees/1\_binary\_search\_tree</i>
 ```
 cd $ac/illustrations/10_binary_search_trees/1_binary_search_tree
 ```
@@ -708,7 +707,7 @@ binary_search_tree.c:14: 32
 ../../../src/ac_pool.c:121: 1040
 ```
 
-Notice that just before the program ended, that it printed 17 lines where allocations happened.  These are allocations that were not properly freed.  Let's check out the lines around 14 of binary_search_tree.c.
+Notice that just before the program terminated, it printed 17 lines where allocations happened.  These are allocations that were not properly freed.  Let's check out the lines around 14 of binary\_search\_tree.c.
 
 ```c
 node_t *node_init(char key) {
@@ -723,7 +722,7 @@ void node_destroy(node_t *n) {
 }
 ```
 
-Notice that the ac_free is commented out.  Let's uncomment it and run make again.
+Notice that the ac\_free is commented out.  Let's uncomment it and run make again.
 
 ```
 $ make
@@ -752,14 +751,14 @@ test_data_structure.c:204: 15
 ../../../src/ac_pool.c:121: 1040
 ```
 
-There are three lines left.  Let's consider the second one (test_data_structure.c:204).  The lines around 204 of test_data_structure.c are below.
+There are three lines left.  Let's consider the second one (test\_data\_structure.c:204).  The lines around 204 of test\_data\_structure.c are below.
 ```c
 char *get_valid_characters(const char *p) {
 	char *res = ac_strdup(p);
 	char *wp = res;
 ```
 
-Line 204 is a ac_strdup call that ultimately gets returned from get_valid_characters.  If we look for the get_valid_characters call, we find it in the main function.  The arg is not freed (ac_free is commented out).  
+Line 204 is a ac\_strdup call that ultimately gets returned from get\_valid\_characters.  If we look for the get\_valid\_characters call, we find it in the main function.  The arg is not freed (ac\_free is commented out).  
 
 ```c
 ac_pool_t *pool = ac_pool_init(1024);
@@ -770,7 +769,7 @@ test_data_structure(pool, arg, repeat);
 return 0;
 ```
 
-Let's uncomment the ac_free(arg); line and run again.
+Let's uncomment the ac\_free(arg) line and run again.
 ```
 $ make
 gcc -g -O3 -I../../../src -D_AC_DEBUG_MEMORY_=NULL ../../../src/ac_timer.c ../../../src/ac_allocator.c ../../../src/ac_buffer.c ../../../src/ac_pool.c test_data_structure.c binary_search_tree.c -o test_data_structure -DDATA_STRUCTURE=\"binary_search_tree\"
@@ -797,7 +796,7 @@ test_data_structure.c:244 [ac_pool] size: 1050, max_size: 1050, initial_size: 10
 ../../../src/ac_pool.c:121: 1040
 ```
 
-The test_data_structure program allows us to print multiple binary search trees if we pass a third argument, which is the number of random trees to print (in addition to the one that is in order at the end).
+The test\_data\_structure program allows us to print multiple binary search trees if we pass a third argument, which is the number of random trees to print (in addition to the one that is in order at the end).
 
 ```
 $ ./test_data_structure PDCBAEMLOQTRYZ 2
@@ -864,7 +863,7 @@ test_data_structure.c:244 [ac_pool] size: 3150, max_size: 3150, initial_size: 10
 ../../../src/ac_pool.c:121: 1040
 ```
 
-Notice that since we printed 3 trees, the total bytes allocated increased to 4140 bytes.  Let's review the test_data_structure function for a moment.
+Notice that since we printed 3 trees, the total bytes allocated increased to 4140 bytes.  Let's review the test\_data\_structure function for a moment.
 
 ```
 void test_data_structure(ac_pool_t *pool, const char *arg, int repeat) {
@@ -888,7 +887,7 @@ void test_data_structure(ac_pool_t *pool, const char *arg, int repeat) {
 }
 ```
 
-For each call of node_print, the pool uses more memory.  However, we can clear the pool just after each print since the pool is only used for allocation within the node_print call.  More specifically, we can clear the pool at the beginning of the for loop to repeat building, printing, and destroying the tree, and just before we recreate the tree one last time.  If you uncomment the ac_pool_clear calls, you can go ahead and rebuild.
+For each call of node\_print, the pool uses more memory.  However, we can clear the pool just after each print since the pool is only used for allocation within the node\_print call.  More specifically, we can clear the pool at the beginning of the for loop to repeat building, printing, and destroying the tree, and just before we recreate the tree one last time.  If you uncomment the ac\_pool\_clear calls, you can go ahead and rebuild.
 
 Rebuild
 ```
@@ -906,7 +905,7 @@ test_data_structure.c:246 [ac_pool] size: 1050, max_size: 1050, initial_size: 10
 ../../../src/ac_pool.c:121: 1040
 ```
 
-You should see that the memory usage didn't grow this time.  If we uncomment the ac_pool_destroy call in the main function, we will see the following output.
+You should see that the memory usage didn't grow this time.  If we uncomment the ac\_pool\_destroy call in the main function, we will see the following output.
 
 ```
 $ make
@@ -984,7 +983,7 @@ print_using_reverse_iteration: hgfedcba
 
 To understand how to print a binary search tree, I've made a slight modification to the node printing function so that it can print the key a random number of times, followed by the depth.
 
-The code that follows can be found in illustrations/10_binary_search_trees/2_binary_search_tree
+The code that follows can be found in illustrations/10\_binary\_search\_trees/2\_binary\_search\_tree
 
 ```
 cd $ac/illustrations/10_binary_search_trees/2_binary_search_tree
@@ -1023,7 +1022,7 @@ The way that I have designed the print function is to print the left nodes verti
 3. If a node has a right child, then add two bytes to conflict check
 4. Determine the length of each node at the beginning to simplify the computation.
 
-To solve this, the first thing I did is create a copy of the tree, which consists of the position of each node, the printed_key, the length of the printed_key, and the depth of the node from its parent (1 if directly beneath parent).  Because we are making a copy of the tree, we also need a parent, left, and right pointer.  I created several helper functions to make this work, which are all declared as static, so they don't conflict with the global namespace.
+To solve this, the first thing I did was create a copy of the tree which consists of the position of each node, the printed_key, the length of the printed\_key, and the depth of the node from its parent (1 if directly beneath parent).  Because we are making a copy of the tree, we also need a parent, left, and right pointer.  I created several helper functions to make this work, which are all declared as static so they don't conflict with the global namespace.
 
 The structure of the node looks like:
 ```c
@@ -1037,7 +1036,7 @@ typedef struct node_print_item_s {
 } node_print_item_t;
 ```
 
-The copy_tree function looks like
+The copy\_tree function looks like
 ```c
 static void copy_tree(ac_pool_t *pool, node_t *node,
                       node_print_item_t **res, node_print_item_t *parent ) {
@@ -1059,7 +1058,7 @@ static void copy_tree(ac_pool_t *pool, node_t *node,
 }
 ```
 
-I'm using the pool to allocate each node.  copy_tree is a recursive function that allocates nodes and puts them into the 3rd parameter.  The printed_key is printed using the following function.
+I'm using the pool to allocate each node.  copy\_tree is a recursive function that allocates nodes and puts them into the 3rd parameter.  The printed\_key is printed using the following function.
 ```c
 static char *get_printed_key(ac_pool_t *pool, node_t *n ) {
   // return ac_pool_strdupf(pool, "%c%d", n->key, get_depth(n));
@@ -1073,7 +1072,7 @@ static char *get_printed_key(ac_pool_t *pool, node_t *n ) {
 }
 ```
 
-The normal get_printed_key function would just use the ac_pool_strdupf function and print the character, followed by the depth.  The depth is calculated using the following function.
+The normal get\_printed\_key function would just use the ac\_pool\_strdupf function and print the character, followed by the depth.  The depth is calculated using the following function.
 ```c
 static int get_depth(node_t *n) {
   int depth = 0;
@@ -1085,7 +1084,7 @@ static int get_depth(node_t *n) {
 }
 ```
 
-All that the depth function does is count how many parents a node has.  The rest of the get_printed_key method is below.  It prints the key from 1 to 15 times and then appends the depth to the key.
+All that the depth function does is count how many parents a node has.  The rest of the get\_printed\_key method is below.  It prints the key from 1 to 15 times and then appends the depth to the key.
 ```c
 int r=rand() % 15;
 char *res = (char *)ac_pool_ualloc(pool, r+4);
@@ -1095,7 +1094,7 @@ sprintf(res+r+1, "%d", get_depth(n));
 return res;
 ```
 
-copy->length is set by simply getting the length of the printed_key.
+copy->length is set by simply getting the length of the printed\_key.
 ```c
 copy->length = strlen(copy->printed_key);
 ```
@@ -1131,12 +1130,12 @@ if(node->right)
   copy_tree(pool, node->right, &copy->right, copy );
 ```
 
-The copy_tree method copies the node_t tree.  
+The copy\_tree method copies the node\_t tree.  
 
 A few helper functions are needed to make the print work.  
 
 ## Finding Peers
-The first finds the first parent who is a left parent that also has a right node.
+The first helper function finds the first left parent that has a right node.
 ```
    A
     \
@@ -1147,7 +1146,7 @@ The first finds the first parent who is a left parent that also has a right node
        C
 ```
 
-In the above example, if C is the start node, then D would be the first node that is a left parent and that also has a right node (E).  In addition to finding the parent, the depth is summed up along the path to the parent node that is the left parent with a right child.
+In the above example, if C is the start node, then D would be the first node that is a left parent (to B) and that also has a right node (E).  In addition to finding the parent, the depth is summed along the path to the parent node that is the left parent with a right child.
 ```c
 static node_print_item_t *find_left_parent_with_right_child( node_print_item_t * item,
                                                              int *depth ) {
@@ -1161,7 +1160,7 @@ static node_print_item_t *find_left_parent_with_right_child( node_print_item_t *
 ```
 
 
-The next function seeks to find the leftmost node at or deeper than a given depth.  This will seek from an item until the depth is less than or equal to the depth on the given node.  It recurses to the left first and only seeks to the right only if left doesn't exist.  If the path doesn't reach the given depth, the function returns NULL and through recursion, chooses another path unless none exists (at which point NULL is returned).
+The next function seeks to find the leftmost node at or deeper than a given depth.  This will seek from an item until the depth is less than or equal to the depth on the given node.  It recurses to the left first and only seeks to the right if left doesn't exist.  If the path doesn't reach the given depth, the function returns NULL and through recursion, chooses another path unless none exists (at which point NULL is returned).
 ```c
 static node_print_item_t *find_left_most_at_depth( node_print_item_t * item, int depth ) {
   if(!item)
@@ -1199,7 +1198,7 @@ static node_print_item_t *find_next_peer( node_print_item_t * item, int depth ) 
 }
 ```
 
-Finally, get_node_depth sums the depth all the way to the root node
+Finally, get\_node\_depth sums the depth all the way to the root node
 ```c
 static int get_node_depth( node_print_item_t *item ) {
   int r=0;
@@ -1211,7 +1210,7 @@ static int get_node_depth( node_print_item_t *item ) {
 }
 ```
 
-Now we are ready to print the binary search tree.  Below is the node_print method, which will be followed by it being broken down.
+Now we are ready to print the binary search tree.  Below is the node\_print method, which is followed with an explanation.
 ```c
 void node_print(ac_pool_t *pool, node_t *root) {
   if (!root)
@@ -1294,19 +1293,19 @@ void node_print(ac_pool_t *pool, node_t *root) {
     return;
 ```
 
-The copy_tree expects the root of a tree and a pointer, which is initially pointing to NULL.  When copy_tree is complete, printable will be a complete replica of the tree referenced by root.  From this point forward, root will no longer be used.
+The copy\_tree function expects the root of a tree and a pointer, which is initially pointing to NULL.  When copy\_tree is complete, printable will be a complete replica of the tree referenced by root.  From this point forward, root will no longer be used.
 ```c
   node_print_item_t *printable = NULL;
   copy_tree(pool, root, &printable, NULL );
 ```
 
-A few variables are declared that will be needed during the process of printing the tree.
+Next, a few variables are declared that will be needed during the process of printing the tree.
 ```c
 node_print_item_t *sn,*n,*n2;
 int actual_depth;
 ```
 
-At each level, there must be at one node that can be printed.  If there isn't a left most node at the given depth, we are done printing the tree.  The leftmost node might be deeper than the current depth.
+At each level, there must be at least one node that can be printed.  If there isn't a left most node at the given depth, we are done printing the tree.  The leftmost node might be deeper than the current depth.
 ```c
 int depth=1;
 while(true) {
@@ -1393,7 +1392,7 @@ while(n) {
 printf( "\n");
 ```
 
-To finalize the work, we will remove the random number of prints in the get_printed_key function.
+To finalize the work, we will remove the random number of prints in the get\_printed\_key function.
 
 ```c
 char *get_printed_key(ac_pool_t *pool, node_t *n ) {
@@ -1416,7 +1415,7 @@ char *get_printed_key(ac_pool_t *pool, node_t *n ) {
 }
 ```
 
-<b>A quick note on how the ac_pool was useful:</b> The copy of the tree was constructed and never had to free any of the nodes associated with it.  Both nodes and the printed keys were allocated.  If we didn't have the pool (or something like it), we would have needed to free each node in the tree.  The node_init and node_destroy methods use ac_malloc and ac_free.  If we weren't concerned with destroying the tree or erasing nodes, we could have used the pool for the allocation and never had to erase the tree at all.  A call to ac_pool_clear would make the memory reusable for another purpose (such as building another tree).  Technically, it takes as long to construct a binary search tree as it does to destroy one.  If you use the pool, you can avoid all of the destruction time.  This will be explored further once the red-black tree (a balanced binary search tree is complete).
+<b>A quick note on how the ac\_pool was useful:</b> The copy of the tree was constructed and never had to free any of the nodes associated with it.  Both the nodes and the printed keys were allocated.  If we didn't have the pool (or something like it), we would have needed to free each node in the tree.  The node\_init and node\_destroy methods use ac\_malloc and ac\_free.  If we weren't concerned with destroying the tree or erasing nodes, we could have used the pool for the allocation and never had to erase the tree at all.  A call to ac\_pool\_clear would make the memory reusable for another purpose (such as building another tree).  Technically, it takes as long to construct a binary search tree as it does to destroy one.  If you use the pool, you can avoid all of the destruction time.  This will be explored further once the red-black tree (a balanced binary search tree is complete).
 
 ## Quick Recap
 
@@ -1425,7 +1424,7 @@ char *get_printed_key(ac_pool_t *pool, node_t *n ) {
 - To find the next node, consider if the current node has a right node.  If it does, then find the leftmost node from the right node.  Otherwise, find the first parent where the child is on the left.
 - Finding the previous node is the same as finding the next node if you swap the words left and right in all places.
 - To find a given node, recursively choose the left node if the given node is less than the current node (where the left node becomes the current node), the right node if the given node is greater than the current node (where the right node becomes the current node), and if the current node is equal to the given node, return the given node.  If a NULL leaf is reached, the given node doesn't exist in the tree.
-- To insert a given node, find where the parent node where the given node should go (similar to find), and link the given node's parent to that parent.  Also, link the parent node's left or right child to the given node.
+- To insert a given node, find the parent node of where the given node should go (similar to find), and link the given node's parent to that parent.  Also, link the parent node's left or right child to the given node.
 - Erasing a node is a bit more complex.  It involves finding the successor and replacing it (perhaps look back if you don't understand it).
 - Printing a binary search tree is largely challenging because of the need to fit in a two-dimensional space.  It involves copying the binary tree into a print-friendly structure and pushing down nodes that don't fit.
 - The pool can be useful for constructing nodes in a tree, especially if you don't want to worry about deconstructing the tree.
