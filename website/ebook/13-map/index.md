@@ -93,7 +93,7 @@ D-3
     2-5
 ```
 
-The third parameter to test_data_structure is 10000, which means to build the tree 10,000 times, randomly, inserting and deleting the values in the second argument.
+The third parameter to test\_data\_structure is 10000, which means to build the tree 10,000 times, randomly, inserting and deleting the values in the second argument.
 
 A good first step in designing any object is to understand the requirements.
 1. find, insert, update, remove
@@ -106,7 +106,7 @@ A good first step in designing any object is to understand the requirements.
 8. multiple data structures should be able to be embedded to the same node
 9. once a node is inserted, its memory location should not change
 
-The code for the interface follows
+The code for the interface is as follows
 ```c
 /*
 Copyright 2019 Andy Curtis
@@ -204,9 +204,9 @@ typedef struct ac_map_node_s {
 } ac_map_node_t;
 ```
 
-is similar to the node_t structure before, except it doesn't have *char key*.
+ac\_map\_node\_s is similar to the node\_t structure before, except it doesn't have *char key*.
 
-To use the ac_map, this structure will be added to the custom structure.  test\_data\_structure.c defines the node\_t structure as it was defined before (with a char key).  Most of the time, you will be able to make the *ac\_map\_node\_t map* be the first member of your structure.  This makes it easy to cast between your structure and the ac\_map\_node\_t structure since they both have the same memory address.  Having the map not be the first member will be explored later (including having multiple map members in a single structure).
+To use the ac\_map, this structure will be added to the custom structure.  test\_data\_structure.c defines the node\_t structure as it was defined before (with a char key).  Most of the time, you will be able to make the *ac\_map\_node\_t map* be the first member of your structure.  This makes it easy to cast between your structure and the ac\_map\_node\_t structure since they both have the same memory address.  Having the map not be the first member will be explored later (including having multiple map members in a single structure).
 ```c
 typedef struct {
   ac_map_node_t map;
@@ -235,7 +235,6 @@ void print_using_iteration(ac_map_node_t *root) {
 ```
 
 or
-
 ```c
 void print_using_iteration(ac_map_node_t *root) {
   ac_map_node_t *n = ac_map_first(root);
@@ -275,7 +274,7 @@ ac_map_node_t *root = /* a valid map with zero or more entries */;
 ac_map_node_t *copy_of_root = ac_map_copy(root, copy_node, pool);
 ```
 
-print\_node\_to\_string\_f is a callback meant to print the value of the node n.  There is an expectation that the value will be printed on a single line.  Printing the internal representation of the tree is used for testing and printing the tree and doesn't need to be complete.  It generally doesn't have practical use within applications.
+print\_node\_to\_string\_f is a callback meant to print the value of the node n.  There is an expectation that the value will be printed on a single line.  Printing the internal representation of the tree is used for testing so printing the tree doesn't need to be complete as it generally doesn't have practical use within applications.
 
 ```c
 typedef char * (*print_node_to_string_f)(ac_pool_t *pool, ac_map_node_t *n);
@@ -291,7 +290,7 @@ bool ac_map_valid(ac_pool_t *pool,
                     print_node_to_string_f print_node);
 ```
 
-ac\_map\_valid checks if the map is valid.  ac\_map\_print dumps the contents of a map in a tree-like manner.  It takes additional parameter flags, which would typically be zero unless you with to not print red nodes in the color red and/or you don't want the black height of a node suffixed in the print.  The flags are bit-oriented and can be or'ed together.
+ac\_map\_valid checks if the map is valid.  ac\_map\_print dumps the contents of a map in a tree-like manner.  It takes additional parameter flags, which would typically be zero unless you were to not print red nodes in the color red and/or you don't want the black height of a node suffixed in the print.  The flags are bit-oriented and can be or'ed together.
 ```c
 #define AC_MAP_DONT_PRINT_RED 1
 #define AC_MAP_DONT_PRINT_BLACK_HEIGHT 2
@@ -311,7 +310,7 @@ ac\_map\_erase unlinks node from the given map.  The node is expected to be a va
 bool ac_map_erase(ac_map_node_t *node, ac_map_node_t **root);
 ```
 
-The find and insert methods were left to the end for a reason.  These are the only two groups of functions that need to understand the value of a node.  These functions end up being custom.  To aid in writing these functions, I've created the following macros.
+The find and insert methods were left last for a reason.  These are the only two groups of functions that need to understand the value of a node.  These functions end up being custom.  To aid in writing these functions, I've created the following macros.
 
 ```c
 ac_map_find_m(name, keytype, datatype, compare)
