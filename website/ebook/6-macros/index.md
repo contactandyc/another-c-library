@@ -11,8 +11,7 @@ __LINE__ - The line of code that you are on.
 __FILE__ - The file that the code exists in.
 ```
 
-For example if you were to create this
-test_special_constants.c
+The following code is found in <i>illustrations/6\_macros/1\_macro</i>
 ```c
 #include <stdio.h>
 
@@ -22,20 +21,17 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-Build it
+Build it and run it
 ```
-gcc test_special_constants.c -o test_special_constants
-```
-
-And run it
-```
-$ ./test_special_constants
-This line of code is at line 4 in function main in the file test_special_constants.c
+$ make
+gcc test_code.c -o test_code
+./test_code
+This line of code is at line 20 in the file test_code.c
 ```
 
 __FILE__ is of the type const char * (meaning it is a sequence of read-only characters).   __LINE__ is an int (integer).
 
-We can utilize the compiler and macros to help us here.  In C, you define a macro using #define.  
+We can utilize the compiler and macros to help us here.  In C, you define a macro using `#define`.  
 
 For example,
 ```c
@@ -61,7 +57,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-Before, it is turned into a binary.  The macro gets placed inline in the code.  For example, a macro can reference a variable that was defined in the function.
+Before, it is turned into a binary.  The macro gets placed inline in the code rather than calling a function.  Another example is a macro referencing a variable that is defined in the main function.
 
 ```c
 #include <stdio.h>
@@ -75,7 +71,7 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-Notice that x doesn't exist when multiply_by_x is defined.  Because it is replaced, it would look like the following.
+Notice that x doesn't exist when multiply\_by\_x is defined.  Because it is replaced, it would look like the following.
 
 ```c
 #include <stdio.h>
@@ -91,6 +87,7 @@ int main( int argc, char *argv[]) {
 
 If x didn't exist, the compiler would ultimately throw an error.
 
+An example of a macro calling a function.
 ```c
 #include <stdio.h>
 
@@ -108,7 +105,6 @@ int main( int argc, char *argv[]) {
 ```
 
 get's converted to
-
 ```c
 #include <stdio.h>
 
@@ -128,8 +124,6 @@ int main( int argc, char *argv[]) {
 Notice that multiply didn't have to exist when the macro was defined.  Macros are evaluated first.  
 
 Macros rarely end in a semicolon.  The following will throw an error.
-
-test_code.c
 ```c
 #include <stdio.h>
 
@@ -156,7 +150,7 @@ test_special_constants.c:3:40: note: expanded from macro 'multiply_by_x'
                                        ^
 ```
 
-The above code get's converted to
+The above code gets converted to
 ```c
 #include <stdio.h>
 
@@ -174,8 +168,6 @@ int main( int argc, char *argv[]) {
 ```
 
 Notice the extra semicolon after multiply.  Generally, macros can contain semicolons but cannot end in semicolons.  Macros can also define multiple lines of code (or multiple statements).
-
-test_code.c
 ```c
 #include <stdio.h>
 
@@ -211,7 +203,7 @@ test_special_constants.c:6:7: note: expanded from macro 'swap'
 
 The swap macro expected a tmp variable to exist.  Declaring tmp will fix the code.
 
-test_code.c
+The following code is found in <i>illustrations/6\_macros/2\_macro</i>
 ```c
 #include <stdio.h>
 
@@ -232,17 +224,16 @@ int main( int argc, char *argv[] ) {
 ```
 
 ```
-$ gcc test_code.c -o test_code
-$ ./test_code
+$ make
+gcc test_code.c -o test_code
+./test_code
 before swap: (5, 10)
 after swap: (10, 5)
 ```
 
-One common error with multi-line macros is to put a space after the \.  The compiler will give you an error for doing this.  Also, I put the \ so that they all line up vertically.  This just makes the code more readable - the compiler doesn't care.  A second error with multi-line macros is to put the \ after the last line.  The \ continues code to the next line.  It's an error to put the \ on the last line (which may or may not get reported by the compiler in a useful way).
+One common error with multi-line macros is putting a space after the backslash.  The compiler will give you an error for doing this.  Also, I put the \ so that they all line up vertically.  This just makes the code more readable - the compiler doesn't care.  A second error with multi-line macros is to put the \ after the last line.  The \ continues code to the next line.  It's an error to put the \ on the last line (which may or may not get reported by the compiler in a useful way).
 
 Macros can be defined in different ways depending upon another macro variable.
-
-test_code.c
 ```c
 #include <stdio.h>
 
@@ -271,9 +262,9 @@ $ ./test_code
 DEBUG: 5
 ```
 
-Finally, we can have the compiler create a single string constant out of the __FILE__ and the __LINE__ (which can include additional information).  Converting a number to a string using #define is a little tricky due to how the preprocessor works.  It has to be done in two passes using a function which calls a function.  The preprocessor doesn't do recursion.  Instead, it works by doing two passes.
+Finally, we can have the compiler create a single string constant out of the __FILE__ and the __LINE__ (which can include additional information).  Converting a number to a string using `#define` is a little tricky due to how the preprocessor works.  It has to be done in two passes using a function which calls a function.  The preprocessor doesn't do recursion.  Instead, it works by doing two passes.
 
-For example,
+For example
 ```c
 #define STRINGIZE2(x) #x
 #define STRINGIZE(x) STRINGIZE2(x)
@@ -281,9 +272,7 @@ For example,
 #define FILE_LINE_MACRO(a) __FILE_LINE__ " [" a "]"
 ```
 
-To resolve, __FILE_LINE__ (assuming we have a file named test_code.c and line 9)
-
-test_code.c
+To resolve `__FILE_LINE__` (assuming we have a file named test_code.c and line 9)
 ```c
 #include <stdio.h>
 
@@ -314,7 +303,6 @@ int main( int argc, char *argv[]) {
 ```
 
 The second pass will look like...
-
 ```c
 #include <stdio.h>
 
@@ -329,9 +317,9 @@ int main( int argc, char *argv[]) {
 }
 ```
 
-In ac_common.h, I also defined AC_FILE_LINE_MACRO, which is a macro meant for objects such as the ac_timer object.  This will become more evident as we work through the allocator object.  As usual, it's a good idea to define macros using ac or AC as a prefix to ensure that your code doesn't conflict with other codebases.  
+In ac_common.h, I also defined AC_FILE_LINE_MACRO, which is a macro meant for objects such as the ac_timer object.  This will become more evident as we work through the allocator object.  As usual, it's a good idea to define macros using a prefix to ensure that your code doesn't conflict with other code bases.
 
-$ac/src/ac_common.h
+$ac/src/ac\_common.h
 ```c
 #ifndef _ac_common_H
 #define _ac_common_H
@@ -371,7 +359,7 @@ Snapshots are saved in increasing intervals.
 #endif
 ```
 
-The ac_parent_object macro is useful for finding the address of a structure when given a pointer to a member of the structure.
+The ac\_parent\_object macro is useful for finding the address of a structure when given a pointer to a member of the structure.
 
 ```c
 #include "ac_common.h"

@@ -46,12 +46,21 @@ Clone the examples in this book into your newly created code directory
 git clone https://github.com/contactandyc/another-c-library.git
 ```
 
-Create an environment variable named ac (another c library) and create the variable available the next time you open the terminal
+Create an environment variable named ac (another c library) and make the variable available the next time you open the terminal. This command is sensitive to the shell program you are using. If you are running macOS 10.15 Catalina or newer, the default shell will be zsh
+```
+echo ac=`pwd`/another-c-library >> ~/.zshrc
+```
+
+Previous to this macOS release and on most Linux distributions, the default shell is bash
 ```
 echo ac=`pwd`/another-c-library >> ~/.bashrc
 ```
 
-Either close the terminal and reopen it or do the following to ensure the last changes take effect.
+Either close the terminal and reopen it, or run one of the following commands (depending on your shell) to ensure the last changes take effect
+```
+. ~/.zshrc
+```
+
 ```
 . ~/.bashrc
 ```

@@ -21,7 +21,7 @@ In this case, I've not included examples in the Makefile.  I've also commented o
 
 To understand why balancing a binary search tree is important, let's look at some worst-case and bad scenarios.
 
-One worst case scenario
+One worst case scenario of a binary search tree
 ```
 $ ./test_data_structure ABCDEFGHI
 Creating binary_search_tree for ABCDEFGHI
@@ -137,7 +137,7 @@ The red-black tree is a mostly balanced binary search tree that was invented by 
 
 ## Properties of a red-black tree
 
-Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
+Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black\_tree)
 
 1. Each node is either red or black.
 2. The root is black.
@@ -147,7 +147,7 @@ Red–black tree Properties (https://en.wikipedia.org/wiki/Red–black_tree)
 
 My additional rules for clarification which are based upon the first 5 rules.
 - If a node has one child, the child must be red (and the parent of that child must be black)
-- Children must all be red or all be black of a given node.  If the parent is red, the children must be black.  If the parent is black, the children can be red or black.
+- If a parent is red, the children must be black.  If the parent is black, the children can be red or black.
 - If a node has two children, one or both of the children can be red if the parent is black
 - If a node is red, it must have either two children who are black or no children at all.
 - The parent of a red node must be black
@@ -274,7 +274,7 @@ make
 ```
 
 ```
-./tree\_operations
+./tree_operations
 ```
 
 You will be prompted with the following...
@@ -282,7 +282,7 @@ You will be prompted with the following...
 (i)nsert, (e)rase, (r)ight_rotate, (l)eft_rotate, (R)ed, (b)lack, re(c)olor, (h)elp, (q)uit
 ```
 
-type
+typing
 ```
 i a
 ```
@@ -296,9 +296,9 @@ The root is not black!
 (i)nsert, (e)rase, (r)ight_rotate, (l)eft_rotate, (R)ed, (b)lack, re(c)olor, (h)elp, (q)uit
 ```
 
-If the node is in parenthesis, it is red.  On your terminal, it should print in the red color, as well.  Whenever you insert a node, it is painted red.  You can use the tool to try and turn this into a proper red-black tree.  In the red-black tree, the root is always black.  We can paint a black by typing the following.
+If the node is in parenthesis, it is red.  On your terminal, it should print in red color as well.  Whenever you insert a node, it is painted red.  You can use the tool to try and turn this into a proper red-black tree.  In the red-black tree, the root is always black.  We can paint a black by typing the following.
 
-type
+typing
 ```
 b a
 ```
@@ -321,12 +321,13 @@ a1
 The above tree is a valid red-black tree
 ```
 
-The first operation was **insert a** broke the red-black tree rules.  It was fixed by painting the root node black.
+The first operation **insert a** broke the red-black tree rules.  It was fixed by painting the root node black.
 
-type
+typing
 ```
 i b
 ```
+
 outputs
 ```
 a1
@@ -349,10 +350,11 @@ The above tree is a valid red-black tree
 
 In this case, nothing needed to be done because b's parent was black.
 
-type
+typing
 ```
 i c
 ```
+
 outputs
 ```
 a1
@@ -367,10 +369,11 @@ a1
 
 In this case, c's parent b is red.  If we rotate around a to the left, it should fix it.
 
-type
+typing
 ```
 l a
 ```
+
 outputs
 ```
 b1
@@ -406,10 +409,11 @@ b1
 The above tree is a valid red-black tree
 ```
 
-type
+typing
 ```
 i d
 ```
+
 outputs
 ```
 b1
@@ -424,10 +428,11 @@ b1
 
 Since the parent (c) and the uncle (a) are both red, we can try recoloring around the grandparent (b).
 
-type
+typing
 ```
 c b
 ```
+
 outputs
 ```
 (b0)
@@ -441,10 +446,11 @@ The root is not black!
 
 If the tree is balanced, we can always just paint the root node black.
 
-type
+typing
 ```
 b b
 ```
+
 outputs
 ```
 b1
@@ -490,10 +496,11 @@ a2 c2
 The above tree is a valid red-black tree
 ```
 
-type
+typing
 ```
 i e
 ```
+
 outputs
 ```
 b1
@@ -509,10 +516,12 @@ a2 c2
 ```
 
 This can be resolved through a left rotation.
-type
+
+typing
 ```
 l c
 ```
+
 outputs
 ```
 b1
@@ -557,11 +566,13 @@ a2 d2
 The above tree is a valid red-black tree
 ```
 
-The tool will also allow you to erase nodes.  Let\'s erase a to start.
-type
+The tool will also allow you to erase nodes.  Let's erase a to start.
+
+typing
 ```
 e a
 ```
+
 outputs
 ```
 b1
@@ -576,9 +587,12 @@ b1 has one right child, and it isn't red
 ```
 
 We can try a left rotation around b
+
+typing
 ```
 l b
 ```
+
 outputs
 ```
 d1
@@ -592,9 +606,12 @@ b2
 (e1) has a different black height than (c2)
 ```
 If we color e black, the tree will be a proper red-black tree.
+
+typing
 ```
 b e
 ```
+
 outputs
 ```
 d1

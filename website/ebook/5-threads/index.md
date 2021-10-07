@@ -44,9 +44,9 @@ Computers allow for multiple threads (which are like workers or people working o
 
 ## Creating threads
 
-In C, threads are created using pthread_create.  They can be created with the expectation that they will be collected once they are done.  They can also be created in what is known as a detached state.  All this means is that your program will not wait for the thread to finish.  In both cases, if your program terminates, the threads will be destroyed.  Threads are like workers.  They run in parallel often on different processors.  The example below shows 10 threads incrementing a number a million times and ultimately printing the final number.  The threads are collected using pthread_join.
+In C, threads are created by calling pthread\_create.  They can be created with the expectation that they will be collected once they are done.  They can also be created in what is known as a detached state.  All this means is that your program will not wait for the thread to finish.  In both cases, if your program terminates, the threads will be destroyed.  Threads are like workers, they run in parallel and often on separate cores.  The example below shows 10 threads incrementing a number a million times and ultimately printing the final number.  The threads are collected using pthread\_join.
 
-The following code is found in <i>illustrations/4_threads/1_thread</i>
+The following code is found in <i>illustrations/4\_threads/1\_thread</i>
 
 test_code.c
 ```c
@@ -75,21 +75,19 @@ int main(int argc, char *argv[]) {
 ```
 
 ```
-$ gcc test_code.c -o test_code -lpthread
-$ ./test_code
+$ make
 global_number (should be 10000000)= 2010195
 ```
 
-Notice that the number is not 10 million.  When global_number++ happens, each thread gets the value of global_number, adds one to it, and then replaces global_number with the new value.  Much like when we initially had a friend help build the building above, each thread is doing very similar work and then overwriting other thread's work.
+Notice that the number is not 10 million.  When global\_number++ happens, each thread gets the value of global\_number, adds one to it, and then replaces global\_number with the new value.  Much like when we initially had a friend help build the building above, each thread is doing very similar work and then overwriting other thread's work.
 
 ## Threads and optimizing code
 
-When writing software which has resources that need protecting, one should generally assume that you must protect them (using the equivalent of the stop signs mentioned above).  Sometimes, when you run software and tests, the result will look okay.  This doesn't necessarily mean that the code is thread safe.  On my computer, when I compiled the code with the -O3 option, I got the following result:
+When writing software which has thread-shared resources, one should generally assume that you must protect them (using the equivalent of the stop signs mentioned above).  Sometimes, when you run software and tests, the result will look okay.  This doesn't necessarily mean that the code is thread safe.  On my computer, when I compiled the code with the -O3 option, I got the following result:
 
 ```
-cd $ac/illustrations/4_threads/2_thread
-gcc -O3 test_code.c -o test_code -lpthread
-./test_code
+$ cd $ac/illustrations/4_threads/2_thread
+$ make
 ```
 
 Outputs
@@ -101,9 +99,9 @@ which makes it look like everything is working.  A rule with writing good code i
 
 ## Avoid global variables when you can
 
-I generally do not like to use global variables (unless they make sense).  In the above example, global_number is a global variable.  The pthread_create function allows you to pass an argument to the thread function for the thread that is being created.  For example:
+I generally do not like to use global variables (unless they make sense).  In the above example, global\_number is a global variable.  The pthread\_create function allows you to pass an argument to the thread function for the thread that is being created.  For example:
 
-The following code is found in <i>illustrations/4_threads/3_thread</i>
+The following code is found in <i>illustrations/4\_threads/3\_thread</i>
 
 test_code.c
 ```c
@@ -131,16 +129,15 @@ int main(int argc, char *argv[]) {
 ```
 
 ```
-$ gcc test_code.c -o test_code -lpthread
-$ ./test_code
+$ make
 local_number (should be 10000000)= 2010195
 ```
 
 ## Mutexes
 
-The pthread library defines a type called mutex which allows your code to lock around a resource much like a stop sign.  The mutex needs initialized and destroyed.  pthread_create only allows one argument to be passed to threads.  To pass the local number and the mutex to the worker function, a structure must be created.  For example:
+The pthread library defines a type called mutex which allows your code to lock a resource much like a stop sign.  The mutex needs initialized and destroyed.  pthread\_create only allows one argument to be passed to threads.  To pass the local number and the mutex to the worker function, a structure must be created.  For example:
 
-The following code is found in <i>illustrations/4_threads/4_thread</i>
+The following code is found in <i>illustrations/4\_threads/4\_thread</i>
 
 test_code.c
 ```c
@@ -178,37 +175,36 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-When a mutex protects the addition, the local number ends up being what we expected.
+When a mutex protects the variable that is being incremented, the local number ends up being what we expected.
 ```
-$ gcc -O3 test_code.c -o test_code -lpthread
-$ ./test_code
+$ make
 local_number (should be 10000000)= 10000000
 ```
 
-pthread_mutex_init and pthread_mutex_destroy both take a pointer to a mutex that needs to be initialized and destroyed.  Note that the pointer to the mutex must not be NULL.
+pthread\_mutex\_init and pthread\_mutex\_destroy both take a pointer to a mutex that needs to be initialized and destroyed.  Note that the pointer to the mutex must not be NULL.
 ```c
 pthread_mutex_init(&w.mutex, NULL);
 ...
 pthread_mutex_destroy(&w.mutex);
 ```
 
-pthread_mutex_lock is like putting up a stop sign and making all of the other threads block or wait.  pthread_mutex_unlock is like taking the stop sign away and allowing the next thread that had a stop sign ready to put its stop sign up.
+pthread\_mutex\_lock is like putting up a stop sign and making all of the other threads block or wait.  pthread\_mutex\_unlock is like taking the stop sign away and allowing the next thread to put its stop sign up.
 ```c
 pthread_mutex_lock(&(w->mutex));
 w->local_number++;
 pthread_mutex_unlock(&(w->mutex));
 ```
 
-Note that the worker_t structure (w) is shared amongst all of the threads.
+Note that the worker\_t structure (w) is shared amongst all of the threads.
 
 ## Timing considerations
 
 Before ending this chapter, we should consider how long each task takes and the advantages and disadvantages of threads and coordination.
 
 ```
-cd $ac/illustrations/4_threads/1_thread
-make
-time ./test_code
+$ cd $ac/illustrations/4_threads/1_thread
+$ make
+$ time ./test_code
 ```
 
 outputs
@@ -221,9 +217,9 @@ sys	0m0.003s
 ```
 
 ```
-cd $ac/illustrations/4_threads/4_thread
-make
-time ./test_code
+$ cd $ac/illustrations/4_threads/4_thread
+$ make
+$ time ./test_code
 ```
 
 outputs
@@ -237,9 +233,9 @@ sys	0m4.836s
 
 Coordination takes time.  We can test this code in optimized mode
 ```
-cd $ac/illustrations/4_threads/5_thread
-make
-time ./test_code
+$ cd $ac/illustrations/4_threads/5_thread
+$ make
+$ time ./test_code
 ```
 
 outputs
@@ -253,12 +249,12 @@ sys	0m4.940s
 
 The optimized build doesn't improve performance.
 
-Finally, if we look at the last example (6_single_thread), we can see that the performance is much faster.
+Finally, if we look at the last example (6\_single\_thread), we can see that the performance is much faster.
 
 ```
-cd $ac/illustrations/4_threads/6_single_thread
-make
-time ./test_code
+$ cd $ac/illustrations/4_threads/6_single_thread
+$ make
+$ time ./test_code
 ```
 
 outputs
@@ -270,10 +266,10 @@ user	0m0.024s
 sys	0m0.002s
 ```
 
-The code in 6_single_thread is so simple that turning on -O3 may not be a good test as the C compiler might just recognize that the final value should be 10000000.  
+The code in 6\_single\_thread is so simple that turning on -O3 may not be a good test as the C compiler might just recognize that the final value should be 10000000.
 
-It takes 0.027 seconds to do the 10 million additions for a single thread (if the program isn't using threads).  Using threads and mutexes to protect the additions, the process takes almost 5 seconds.  Thread coordination takes time (much like people coordination).
+It takes 0.027 seconds to do the 10 million additions with a single thread (if the program isn't using threads).  Using threads and mutexes to protect the additions, the process takes almost 5 seconds.  Thread coordination takes time (much like people coordination).
 
-Pthreads also support conditions that are like the pagers above.  They will be described later before needing them.  The next project will require a mutex.
+Pthreads also support conditions that are similar to the pager analogy.  They will be described later before needing them.  The next project will require a mutex.
 
 [Table of Contents (only if viewing on Github)](../../../README.md)
