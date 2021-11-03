@@ -27,8 +27,8 @@ struct ac_object_pipe_s {
   uv_poll_t read_poll;
   int read_fd;
   int write_fd;
-  ac_object_pipe_f cb;
-  ac_object_pipe_close_f close_cb;
+  ac_object_pipe_cb cb;
+  ac_object_pipe_close_cb close_cb;
   void *cb_arg;
 };
 
@@ -74,13 +74,13 @@ static void on_poll_receive(uv_poll_t *p, int status, int events) {
 
 #ifdef _AC_DEBUG_MEMORY_
 ac_object_pipe_t *_ac_object_pipe_open(uv_loop_t *loop,
-                                           ac_object_pipe_f cb, void *arg,
+                                           ac_object_pipe_cb cb, void *arg,
                                            const char *caller) {
   ac_object_pipe_t *h = (ac_object_pipe_t *)_ac_malloc_d(
       NULL, caller, sizeof(ac_object_pipe_t), false);
 #else
 ac_object_pipe_t *_ac_object_pipe_open(uv_loop_t *loop,
-                                           ac_object_pipe_f cb, void *arg) {
+                                           ac_object_pipe_cb cb, void *arg) {
   ac_object_pipe_t *h =
       (ac_object_pipe_t *)ac_malloc(sizeof(ac_object_pipe_t));
 #endif
@@ -105,7 +105,7 @@ ac_object_pipe_t *_ac_object_pipe_open(uv_loop_t *loop,
 }
 
 void ac_object_pipe_set_close_cb(ac_object_pipe_t *h,
-                                   ac_object_pipe_close_f cb) {
+                                   ac_object_pipe_close_cb cb) {
   h->close_cb = cb;
 }
 

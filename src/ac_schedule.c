@@ -85,8 +85,8 @@ struct ac_schedule_s {
   char **args;
   int argc;
 
-  parse_args_f parse_args;
-  finish_args_f finish_args;
+  parse_args_cb parse_args;
+  finish_args_cb finish_args;
   void *parse_args_arg;
   void (*custom_usage)();
 
@@ -102,7 +102,7 @@ struct ac_schedule_s {
   ac_schedule_thread_t *threads;
   bool started_threads;
 
-  ac_worker_f on_complete;
+  ac_worker_cb on_complete;
   bool done;
 
   size_t num_partitions;
@@ -134,14 +134,14 @@ struct ac_transform_s {
   size_t num_inputs;
   ac_worker_output_t **outputs;
   size_t num_outputs;
-  ac_io_runner_f io_runner;
-  ac_runner_f runner;
-  ac_group_runner_f group_runner;
-  ac_io_compare_f group_compare;
-  ac_worker_data_f create_group_compare_arg;
-  ac_destroy_worker_data_f destroy_group_compare_arg;
-  ac_worker_data_f create_data;
-  ac_destroy_worker_data_f destroy_data;
+  ac_io_runner_cb io_runner;
+  ac_runner_cb runner;
+  ac_group_runner_cb group_runner;
+  ac_io_compare_cb group_compare;
+  ac_worker_data_cb create_group_compare_arg;
+  ac_destroy_worker_data_cb destroy_group_compare_arg;
+  ac_worker_data_cb create_data;
+  ac_destroy_worker_data_cb destroy_data;
   ac_transform_t *next;
 };
 
@@ -156,8 +156,8 @@ struct ac_task_s {
 
   ac_schedule_t *scheduler;
 
-  ac_task_f setup;
-  ac_worker_f runner;
+  ac_task_cb setup;
+  ac_worker_cb runner;
 
   ac_transform_t *transforms;
 
@@ -253,27 +253,27 @@ static ac_transform_t *_ac_task_transform(ac_task_t *task, const char *inp,
 }
 
 void ac_task_transform(ac_task_t *task, const char *inp, const char *outp,
-                       ac_runner_f runner) {
+                       ac_runner_cb runner) {
   ac_transform_t *t = _ac_task_transform(task, inp, outp);
   t->runner = runner;
 }
 
 void ac_task_io_transform(ac_task_t *task, const char *inp, const char *outp,
-                          ac_io_runner_f runner) {
+                          ac_io_runner_cb runner) {
   ac_transform_t *t = _ac_task_transform(task, inp, outp);
   t->io_runner = runner;
 }
 
 void ac_task_group_transform(ac_task_t *task, const char *inp, const char *outp,
-                             ac_group_runner_f runner,
-                             ac_io_compare_f compare) {
+                             ac_group_runner_cb runner,
+                             ac_io_compare_cb compare) {
   ac_transform_t *t = _ac_task_transform(task, inp, outp);
   t->group_runner = runner;
   t->group_compare = compare;
 }
 
-void ac_task_group_compare_arg(ac_task_t *task, ac_worker_data_f create,
-                               ac_destroy_worker_data_f destroy) {
+void ac_task_group_compare_arg(ac_task_t *task, ac_worker_data_cb create,
+                               ac_destroy_worker_data_cb destroy) {
   ac_transform_t *n = task->transforms;
   while (n->next)
     n = n->next;
@@ -281,8 +281,8 @@ void ac_task_group_compare_arg(ac_task_t *task, ac_worker_data_f create,
   n->destroy_group_compare_arg = destroy;
 }
 
-void ac_task_transform_data(ac_task_t *task, ac_worker_data_f create,
-                            ac_destroy_worker_data_f destroy) {
+void ac_task_transform_data(ac_task_t *task, ac_worker_data_cb create,
+                            ac_destroy_worker_data_cb destroy) {
   ac_transform_t *n = task->transforms;
   while (n->next)
     n = n->next;
@@ -464,7 +464,7 @@ static ac_task_state_link_t *tasks_to_finish(ac_schedule_t *h,
 }
 
 void ac_schedule_custom_args(ac_schedule_t *h, void (*custom_usage)(),
-                             parse_args_f parse_args, finish_args_f finish_args,
+                             parse_args_cb parse_args, finish_args_cb finish_args,
                              void *arg) {
   h->parse_args = parse_args;
   h->finish_args = finish_args;
@@ -618,7 +618,7 @@ static ac_worker_t *create_worker(ac_pool_t *pool, ac_task_t *task,
 
 static ac_worker_input_t *_ac_task_input(ac_task_t *task, const char *name,
                                          ac_worker_output_t *src, double pct,
-                                         ac_worker_file_info_f file_info) {
+                                         ac_worker_file_info_cb file_info) {
   ac_schedule_t *scheduler = task->scheduler;
   ac_pool_t *pool = scheduler->pool;
 
@@ -757,7 +757,7 @@ bool match_filename(const char *a, const char *b) {
 }
 
 static void dump_file(ac_worker_t *w, const char *filename,
-                      ac_io_format_t format, ac_task_dump_f dump,
+                      ac_io_format_t format, ac_task_dump_cb dump,
                       void *dump_arg) {
   ac_in_options_t opts;
   ac_in_options_init(&opts);
@@ -878,7 +878,7 @@ void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
 
   ac_task_link_t *n = to->destinations;
   while (n) {
-    ac_worker_file_info_f file_info = NULL;
+    ac_worker_file_info_cb file_info = NULL;
     if (flags & AC_OUTPUT_SPLIT) {
       file_info = file_info_split;
       ac_task_dependency(n->task, task->task_name);
@@ -906,7 +906,7 @@ void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
 }
 
 void ac_task_input_files(ac_task_t *task, const char *name, double pct,
-                         ac_worker_file_info_f file_info) {
+                         ac_worker_file_info_cb file_info) {
   ac_schedule_t *scheduler = task->scheduler;
   ac_pool_t *pool = scheduler->pool;
   if (!file_info)
@@ -925,7 +925,7 @@ void ac_task_input_files(ac_task_t *task, const char *name, double pct,
 
 /* These ac_task_output_... methods must be called after ac_task_output and
    will apply to the previous ac_task_output call. */
-void ac_task_output_partition(ac_task_t *task, ac_io_partition_f part,
+void ac_task_output_partition(ac_task_t *task, ac_io_partition_cb part,
                               void *arg) {
   if (!task->current_output)
     return;
@@ -938,7 +938,7 @@ void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
   ac_buffer_appends(bh, r->record);
 }
 
-void ac_task_output_dump(ac_task_t *task, ac_task_dump_f dump, void *arg) {
+void ac_task_output_dump(ac_task_t *task, ac_task_dump_cb dump, void *arg) {
   if (!task->current_output)
     return;
 
@@ -948,7 +948,7 @@ void ac_task_output_dump(ac_task_t *task, ac_task_dump_f dump, void *arg) {
   // ac_task_input_dump(task, dump, arg);
 }
 
-void ac_task_output_compare(ac_task_t *task, ac_io_compare_f compare,
+void ac_task_output_compare(ac_task_t *task, ac_io_compare_cb compare,
                             void *arg) {
   if (!task->current_output)
     return;
@@ -959,7 +959,7 @@ void ac_task_output_compare(ac_task_t *task, ac_io_compare_f compare,
 }
 
 void ac_task_output_intermediate_compare(ac_task_t *task,
-                                         ac_io_compare_f compare, void *arg) {
+                                         ac_io_compare_cb compare, void *arg) {
   if (!task->current_output)
     return;
 
@@ -976,7 +976,7 @@ void ac_task_output_keep_first(ac_task_t *task) {
   ac_task_input_keep_first(task);
 }
 
-void ac_task_output_reducer(ac_task_t *task, ac_io_reducer_f reducer,
+void ac_task_output_reducer(ac_task_t *task, ac_io_reducer_cb reducer,
                             void *arg) {
   if (!task->current_output)
     return;
@@ -987,7 +987,7 @@ void ac_task_output_reducer(ac_task_t *task, ac_io_reducer_f reducer,
 }
 
 void ac_task_output_intermediate_reducer(ac_task_t *task,
-                                         ac_io_reducer_f reducer, void *arg) {
+                                         ac_io_reducer_cb reducer, void *arg) {
   if (!task->current_output)
     return;
 
@@ -1091,7 +1091,7 @@ void ac_task_input_format(ac_task_t *task, ac_io_format_t format) {
   }
 }
 
-void ac_task_input_dump(ac_task_t *task, ac_task_dump_f dump, void *arg) {
+void ac_task_input_dump(ac_task_t *task, ac_task_dump_cb dump, void *arg) {
   ac_task_input_link_t *inp = task->current_input;
   while (inp) {
     inp->input->dump = dump;
@@ -1100,7 +1100,7 @@ void ac_task_input_dump(ac_task_t *task, ac_task_dump_f dump, void *arg) {
   }
 }
 
-void ac_task_input_compare(ac_task_t *task, ac_io_compare_f compare,
+void ac_task_input_compare(ac_task_t *task, ac_io_compare_cb compare,
                            void *arg) {
   ac_task_input_link_t *inp = task->current_input;
   while (inp) {
@@ -1114,7 +1114,7 @@ void ac_task_input_keep_first(ac_task_t *task) {
   ac_task_input_reducer(task, ac_io_keep_first, NULL);
 }
 
-void ac_task_input_reducer(ac_task_t *task, ac_io_reducer_f reducer,
+void ac_task_input_reducer(ac_task_t *task, ac_io_reducer_cb reducer,
                            void *arg) {
   ac_task_input_link_t *inp = task->current_input;
   while (inp) {
@@ -1365,7 +1365,7 @@ static bool run_worker(ac_worker_t *w) {
     a = a->next;
   }
   w->schedule_thread->allocs = NULL;
-  return true;
+  return r;
 }
 
 time_t get_ack_time_for_task_and_partition(ac_task_t *task, size_t partition) {
@@ -2052,7 +2052,7 @@ static bool in_out_runner(ac_worker_t *w) {
   return true;
 }
 
-void ac_task_runner(ac_task_t *task, ac_worker_f runner) {
+void ac_task_runner(ac_task_t *task, ac_worker_cb runner) {
   task->runner = runner;
 }
 
@@ -2417,7 +2417,7 @@ void parse_args(ac_schedule_t *h) {
   h->parsed_args = at;
 }
 
-void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete) {
+void ac_schedule_run(ac_schedule_t *h, ac_worker_cb on_complete) {
   schedule_setup(h);
   parse_args(h);
   if (h->parsed_args.cpus) {
@@ -2482,7 +2482,7 @@ void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete) {
 }
 
 ac_task_t *ac_schedule_task(ac_schedule_t *h, const char *task_name,
-                            bool partitioned, ac_task_f setup) {
+                            bool partitioned, ac_task_cb setup) {
   ac_task_t *node = _task_find(task_name, h->task_root);
   if (!node) {
     size_t num_partitions = 1;

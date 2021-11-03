@@ -405,3 +405,23 @@ ac_lz4_t *_ac_lz4_init(int level, ac_lz4_block_size_t size, bool block_checksum,
 }
 
 void ac_lz4_destroy(ac_lz4_t *r) { ac_free(r); }
+
+size_t ac_lz4_compress_appending_to_buffer(ac_buffer_t *dest, void *src, int src_size) {
+  int max_dst_size = LZ4_compressBound(src_size);
+  size_t olen = ac_buffer_length(dest);
+  void *dst = (void *)ac_buffer_append_ualloc(dest, max_dst_size);
+  int compressed_data_size = LZ4_compress_default((const char *)src, (char *)dst, src_size, max_dst_size);
+  if (compressed_data_size <= 0) {
+    ac_buffer_resize(dest, olen);
+    return 0;
+  }
+  ac_buffer_resize(dest, olen + compressed_data_size);
+  return compressed_data_size;
+}
+
+bool ac_lz4_decompress_into_fixed_buffer(void *dest, int dest_size, void *src, int src_size) {
+  int decompressed_size = LZ4_decompress_safe((const char *)src, (char *)dest, src_size, dest_size);
+  if (decompressed_size != dest_size)
+    return false;
+  return true;
+}

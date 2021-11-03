@@ -197,9 +197,7 @@ typedef struct {
 } ac_io_file_info_root_t;
 
 void _ac_io_list(ac_io_file_info_root_t *root, const char *path,
-                 ac_pool_t *pool,
-                 bool (*file_valid)(const char *filename, void *arg),
-                 void *arg) {
+                 ac_pool_t *pool, ac_file_valid_cb file_valid, void *arg) {
   if (!path)
     path = "";
   DIR *dp = opendir(path[0] ? path : ".");
@@ -248,15 +246,17 @@ void _ac_io_list(ac_io_file_info_root_t *root, const char *path,
 
 static ac_io_file_info_t *
 __ac_io_list(ac_pool_t *pool, const char *path, size_t *num_files,
-             bool (*file_valid)(const char *filename, void *arg), void *arg) {
+             ac_file_valid_cb file_valid, void *arg) {
   ac_io_file_info_root_t root;
   root.head = root.tail = NULL;
   root.num_files = root.bytes = 0;
   ac_pool_t *tmp_pool = ac_pool_init(4096);
   _ac_io_list(&root, path, tmp_pool, file_valid, arg);
   *num_files = root.num_files;
-  if (!root.num_files)
+  if (!root.num_files) {
+    ac_pool_destroy(tmp_pool);
     return NULL;
+  }
   ac_io_file_info_t *res;
   if (pool)
     res = (ac_io_file_info_t *)ac_pool_calloc(
@@ -281,14 +281,13 @@ __ac_io_list(ac_pool_t *pool, const char *path, size_t *num_files,
 
 ac_io_file_info_t *
 ac_io_list(const char *path, size_t *num_files,
-           bool (*file_valid)(const char *filename, void *arg), void *arg) {
+           ac_file_valid_cb file_valid, void *arg) {
   return __ac_io_list(NULL, path, num_files, file_valid, arg);
 }
 
 ac_io_file_info_t *
 ac_pool_io_list(ac_pool_t *pool, const char *path, size_t *num_files,
-                bool (*file_valid)(const char *filename, void *arg),
-                void *arg) {
+                ac_file_valid_cb file_valid, void *arg) {
   return __ac_io_list(pool, path, num_files, file_valid, arg);
 }
 

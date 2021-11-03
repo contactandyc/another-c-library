@@ -219,9 +219,9 @@ static int unicode_to_utf8(char *dest, char **src) {
   if (c >= '0' && c <= '9')
     ch = c - '0';
   else if (c >= 'A' && c <= 'F')
-    ch = c - 'A';
+    ch = c - 'A' + 10;
   else if (c >= 'a' && c <= 'f')
-    ch = c - 'a';
+    ch = c - 'a' + 10;
   else
     return -1;
 
@@ -229,9 +229,9 @@ static int unicode_to_utf8(char *dest, char **src) {
   if (c >= '0' && c <= '9')
     ch = (ch << 4) + c - '0';
   else if (c >= 'A' && c <= 'F')
-    ch = (ch << 4) + c - 'A';
+    ch = (ch << 4) + c - 'A' + 10;
   else if (c >= 'a' && c <= 'f')
-    ch = (ch << 4) + c - 'a';
+    ch = (ch << 4) + c - 'a' + 10;
   else
     return -1;
 
@@ -239,9 +239,9 @@ static int unicode_to_utf8(char *dest, char **src) {
   if (c >= '0' && c <= '9')
     ch = (ch << 4) + c - '0';
   else if (c >= 'A' && c <= 'F')
-    ch = (ch << 4) + c - 'A';
+    ch = (ch << 4) + c - 'A' + 10;
   else if (c >= 'a' && c <= 'f')
-    ch = (ch << 4) + c - 'a';
+    ch = (ch << 4) + c - 'a' + 10;
   else
     return -1;
 
@@ -249,9 +249,9 @@ static int unicode_to_utf8(char *dest, char **src) {
   if (c >= '0' && c <= '9')
     ch = (ch << 4) + c - '0';
   else if (c >= 'A' && c <= 'F')
-    ch = (ch << 4) + c - 'A';
+    ch = (ch << 4) + c - 'A' + 10;
   else if (c >= 'a' && c <= 'f')
-    ch = (ch << 4) + c - 'a';
+    ch = (ch << 4) + c - 'a' + 10;
   else
     return -1;
 
@@ -264,9 +264,9 @@ static int unicode_to_utf8(char *dest, char **src) {
     if (c >= '0' && c <= '9')
       ch2 = c - '0';
     else if (c >= 'A' && c <= 'F')
-      ch2 = c - 'A';
+      ch2 = c - 'A' + 10;
     else if (c >= 'a' && c <= 'f')
-      ch2 = c - 'a';
+      ch2 = c - 'a' + 10;
     else
       return -1;
 
@@ -274,9 +274,9 @@ static int unicode_to_utf8(char *dest, char **src) {
     if (c >= '0' && c <= '9')
       ch2 = (ch2 << 4) + c - '0';
     else if (c >= 'A' && c <= 'F')
-      ch2 = (ch2 << 4) + c - 'A';
+      ch2 = (ch2 << 4) + c - 'A' + 10;
     else if (c >= 'a' && c <= 'f')
-      ch2 = (ch2 << 4) + c - 'a';
+      ch2 = (ch2 << 4) + c - 'a' + 10;
     else
       return -1;
 
@@ -284,9 +284,9 @@ static int unicode_to_utf8(char *dest, char **src) {
     if (c >= '0' && c <= '9')
       ch2 = (ch2 << 4) + c - '0';
     else if (c >= 'A' && c <= 'F')
-      ch2 = (ch2 << 4) + c - 'A';
+      ch2 = (ch2 << 4) + c - 'A' + 10;
     else if (c >= 'a' && c <= 'f')
-      ch2 = (ch2 << 4) + c - 'a';
+      ch2 = (ch2 << 4) + c - 'a' + 10;
     else
       return -1;
 
@@ -294,9 +294,9 @@ static int unicode_to_utf8(char *dest, char **src) {
     if (c >= '0' && c <= '9')
       ch2 = (ch2 << 4) + c - '0';
     else if (c >= 'A' && c <= 'F')
-      ch2 = (ch2 << 4) + c - 'A';
+      ch2 = (ch2 << 4) + c - 'A' + 10;
     else if (c >= 'a' && c <= 'f')
-      ch2 = (ch2 << 4) + c - 'a';
+      ch2 = (ch2 << 4) + c - 'a' + 10;
     else
       return -1;
     if (ch2 < 0xDC00 || ch2 > 0xDFFF)
@@ -342,7 +342,7 @@ static inline char *_ac_json_decode(ac_pool_t *pool, char *s, char *p,
   while (p < ep) {
     int ch = *p++;
     if (ch != '\\')
-      *rp++ = *p++;
+      *rp++ = ch;
     else {
       ch = *p++;
       switch (ch) {
@@ -387,6 +387,7 @@ static inline char *_ac_json_decode(ac_pool_t *pool, char *s, char *p,
       }
     }
   }
+  *rp = 0;
   return res;
 }
 

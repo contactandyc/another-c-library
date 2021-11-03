@@ -553,3 +553,50 @@ static inline void ac_jsono_append(ac_json_t *j, const char *key,
     o->tail = on;
   }
 }
+
+static inline ac_json_t *ac_jsono_path(ac_pool_t *pool, ac_json_t *j, const char *path) {
+  size_t num_paths = 0;
+  char **paths = ac_pool_split2(pool, &num_paths, '.', path);
+  for( size_t i=0; i<num_paths; i++ ) {
+    if(ac_json_is_array(j)) {
+      char *value = strchr(paths[i], '=');
+      if(value) {
+        *value = 0;
+        value++;
+        ac_json_t *next = NULL;
+        ac_jsona_t *iter = ac_jsona_first(j);
+        while(iter) {
+          char *v = ac_jsonv(ac_jsono_scan(iter->value, paths[i]));
+          if(v && !strcmp(v, value)) {
+            next = iter->value;
+            break;
+          }
+          iter = ac_jsona_next(iter);
+        }
+        j = next;
+      }
+      else {
+        size_t num = 0;
+        if(sscanf(paths[i], "%lu", &num) != 1)
+          return NULL;
+        j = ac_jsona_scan(j, num);
+      }
+    }
+    else
+      j = ac_jsono_scan(j, paths[i]);
+
+    if(!j)
+      return NULL;
+  }
+  return j;
+}
+
+static inline char *ac_jsono_pathv(ac_pool_t *pool, ac_json_t *j, const char *path) {
+  j = ac_jsono_path(pool, j, path);
+  return ac_jsonv(j);
+}
+
+static inline char *ac_jsono_pathd(ac_pool_t *pool, ac_json_t *j, const char *path) {
+  j = ac_jsono_path(pool, j, path);
+  return ac_jsond(pool, j);
+}

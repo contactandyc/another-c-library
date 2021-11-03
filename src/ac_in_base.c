@@ -312,7 +312,7 @@ char *ac_in_base_readz(ac_in_base_t *h, int32_t *rlen, int32_t len) {
     tmp.pos = tmp.used;
     tmp.eof = false;
     if (tmp.used)
-      memcpy(p, b->buffer + b->pos, tmp.used);
+      memcpy(tmp.buffer, b->buffer + b->pos, tmp.used);
     b->pos = b->used = 0;
     fill_blocks(h, &tmp);
     if (tmp.eof)
@@ -367,6 +367,11 @@ char *ac_in_base_read(ac_in_base_t *h, int32_t len) {
     reset_block(b);
     fill_blocks(h, b);
     if (len > b->used) {
+      if(b->eof) {
+        b->pos = b->used;
+        return NULL;
+      }
+      abort();
       b->pos = b->used;
       return NULL;
     }

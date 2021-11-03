@@ -23,34 +23,34 @@ typedef struct ac_worker_s ac_worker_t;
 struct ac_worker_input_s;
 typedef struct ac_worker_input_s ac_worker_input_t;
 
-typedef bool (*ac_task_f)(ac_task_t *task);
-typedef bool (*ac_worker_f)(ac_worker_t *w);
+typedef bool (*ac_task_cb)(ac_task_t *task);
+typedef bool (*ac_worker_cb)(ac_worker_t *w);
 
-typedef void *(*ac_worker_data_f)(ac_worker_t *w);
-typedef void (*ac_destroy_worker_data_f)(ac_worker_t *w, void *d);
+typedef void *(*ac_worker_data_cb)(ac_worker_t *w);
+typedef void (*ac_destroy_worker_data_cb)(ac_worker_t *w, void *d);
 
-typedef void (*ac_task_dump_f)(ac_worker_t *w, ac_io_record_t *r,
+typedef void (*ac_task_dump_cb)(ac_worker_t *w, ac_io_record_t *r,
                                ac_buffer_t *bh, void *arg);
 
 void ac_task_dump_text(ac_worker_t *w, ac_io_record_t *r, ac_buffer_t *bh,
                        void *arg);
 
-typedef void (*ac_runner_f)(ac_worker_t *w, ac_io_record_t *r, ac_out_t **out);
-typedef void (*ac_group_runner_f)(ac_worker_t *w, ac_io_record_t *r,
+typedef void (*ac_runner_cb)(ac_worker_t *w, ac_io_record_t *r, ac_out_t **out);
+typedef void (*ac_group_runner_cb)(ac_worker_t *w, ac_io_record_t *r,
                                   size_t num_r, ac_out_t **out);
 
-typedef void (*ac_io_runner_f)(ac_worker_t *w, ac_in_t **ins, size_t num_ins,
+typedef void (*ac_io_runner_cb)(ac_worker_t *w, ac_in_t **ins, size_t num_ins,
                                ac_out_t **outs, size_t num_outs);
 
-typedef ac_io_file_info_t *(*ac_worker_file_info_f)(ac_worker_t *w,
+typedef ac_io_file_info_t *(*ac_worker_file_info_cb)(ac_worker_t *w,
                                                     size_t *num_files,
                                                     ac_worker_input_t *inp);
 
 /* This function should advance past used args and return < 0 on error.
    Make sure it doesn't extend beyond argc. */
-typedef int (*parse_args_f)(int argc, char **argv, void *arg);
+typedef int (*parse_args_cb)(int argc, char **argv, void *arg);
 
-typedef bool (*finish_args_f)(int argc, char **argv, void *arg);
+typedef bool (*finish_args_cb)(int argc, char **argv, void *arg);
 
 /**************************************************************************
 The following functions should be called to setup the scheduler.  Once all
@@ -78,20 +78,20 @@ void ac_schedule_task_dir(ac_schedule_t *h, const char *task_dir);
    parsed with a NULL first argument.  Make sure to return eargs if everything
    is good.  Otherwise, return NULL. */
 void ac_schedule_custom_args(ac_schedule_t *h, void (*custom_usage)(),
-                             parse_args_f parse_args, finish_args_f finish_args,
+                             parse_args_cb parse_args, finish_args_cb finish_args,
                              void *arg);
 
 /* Add a task to the scheduler with an associated name and define whether it
    is partitioned or not.  The setup function will further describe the task
    once all of the tasks have been added to the scheduler. */
 ac_task_t *ac_schedule_task(ac_schedule_t *h, const char *task_name,
-                            bool partitioned, ac_task_f setup);
+                            bool partitioned, ac_task_cb setup);
 
 /* An on_complete method that prints completion of each task to stderr */
 bool ac_worker_complete(ac_worker_t *w);
 
 /* Run all of the tasks */
-void ac_schedule_run(ac_schedule_t *h, ac_worker_f on_complete);
+void ac_schedule_run(ac_schedule_t *h, ac_worker_cb on_complete);
 
 /* Destroy the scheduler */
 void ac_schedule_destroy(ac_schedule_t *h);
@@ -105,24 +105,24 @@ specified by ac_schedule_task.
 void *ac_task_custom_arg(ac_task_t *task);
 
 /* Define what should run for the given task */
-void ac_task_runner(ac_task_t *task, ac_worker_f runner);
+void ac_task_runner(ac_task_t *task, ac_worker_cb runner);
 
 void ac_task_default_runner(ac_task_t *task);
 
 void ac_task_transform(ac_task_t *task, const char *inp, const char *outp,
-                       ac_runner_f runner);
+                       ac_runner_cb runner);
 
 void ac_task_io_transform(ac_task_t *task, const char *inp, const char *outp,
-                          ac_io_runner_f runner);
+                          ac_io_runner_cb runner);
 
 void ac_task_group_transform(ac_task_t *task, const char *inp, const char *outp,
-                             ac_group_runner_f runner, ac_io_compare_f compare);
+                             ac_group_runner_cb runner, ac_io_compare_cb compare);
 
-void ac_task_group_compare_arg(ac_task_t *task, ac_worker_data_f create,
-                               ac_destroy_worker_data_f destroy);
+void ac_task_group_compare_arg(ac_task_t *task, ac_worker_data_cb create,
+                               ac_destroy_worker_data_cb destroy);
 
-void ac_task_transform_data(ac_task_t *task, ac_worker_data_f create,
-                            ac_destroy_worker_data_f destroy);
+void ac_task_transform_data(ac_task_t *task, ac_worker_data_cb create,
+                            ac_destroy_worker_data_cb destroy);
 
 /* Define outside input files to a task.  Inputs from other tasks are auto
    configured through ac_task_output. Inputs are named for convenience with
@@ -132,7 +132,7 @@ void ac_task_transform_data(ac_task_t *task, ac_worker_data_f create,
    task (and should range from 0-1).
    */
 void ac_task_input_files(ac_task_t *task, const char *name, double ram_pct,
-                         ac_worker_file_info_f file_info);
+                         ac_worker_file_info_cb file_info);
 
 /* Once intermediate files are no longer required, they are removed unless
    AC_OUTPUT_KEEP is defined. */
@@ -168,27 +168,27 @@ static const size_t AC_OUTPUT_PARTITION = 8;
 void ac_task_output(ac_task_t *task, const char *name, const char *destinations,
                     double out_ram_pct, double in_ram_pct, size_t flags);
 
-void ac_task_output_dump(ac_task_t *task, ac_task_dump_f dump, void *arg);
+void ac_task_output_dump(ac_task_t *task, ac_task_dump_cb dump, void *arg);
 
 /* These ac_task_output_... methods must be called after ac_task_output and
    will apply to the previous ac_task_output call. */
-void ac_task_output_partition(ac_task_t *task, ac_io_partition_f part,
+void ac_task_output_partition(ac_task_t *task, ac_io_partition_cb part,
                               void *arg);
 
-void ac_task_output_compare(ac_task_t *task, ac_io_compare_f compare,
+void ac_task_output_compare(ac_task_t *task, ac_io_compare_cb compare,
                             void *compare_tag);
 
 void ac_task_output_intermediate_compare(ac_task_t *task,
-                                         ac_io_compare_f compare,
+                                         ac_io_compare_cb compare,
                                          void *compare_tag);
 
 void ac_task_output_keep_first(ac_task_t *task);
 
-void ac_task_output_reducer(ac_task_t *task, ac_io_reducer_f reducer,
+void ac_task_output_reducer(ac_task_t *task, ac_io_reducer_cb reducer,
                             void *reducer_tag);
 
 void ac_task_output_intermediate_reducer(ac_task_t *task,
-                                         ac_io_reducer_f reducer,
+                                         ac_io_reducer_cb reducer,
                                          void *reducer_tag);
 
 void ac_task_output_group_size(ac_task_t *task, size_t num_per_group,
@@ -220,14 +220,14 @@ void ac_task_output_lz4(ac_task_t *task, int level, ac_lz4_block_size_t size,
    one or more destinations, the calls are silently ignored. */
 void ac_task_input_format(ac_task_t *task, ac_io_format_t format);
 
-void ac_task_input_dump(ac_task_t *task, ac_task_dump_f dump, void *arg);
+void ac_task_input_dump(ac_task_t *task, ac_task_dump_cb dump, void *arg);
 
-void ac_task_input_compare(ac_task_t *task, ac_io_compare_f compare,
+void ac_task_input_compare(ac_task_t *task, ac_io_compare_cb compare,
                            void *compare_tag);
 
 void ac_task_input_keep_first(ac_task_t *task);
 
-void ac_task_input_reducer(ac_task_t *task, ac_io_reducer_f reducer,
+void ac_task_input_reducer(ac_task_t *task, ac_io_reducer_cb reducer,
                            void *reducer_tag);
 
 void ac_task_input_compressed_buffer_size(ac_task_t *task, size_t buffer_size);
@@ -298,19 +298,19 @@ struct ac_worker_s {
 struct ac_worker_input_s {
   size_t id;
   char *name;
-  ac_worker_file_info_f file_info;
+  ac_worker_file_info_cb file_info;
   ac_io_file_info_t *files;
   size_t num_files;
   double ram_pct;
 
   ac_in_options_t options;
-  ac_io_compare_f compare;
+  ac_io_compare_cb compare;
   void *compare_arg;
-  ac_io_reducer_f reducer;
+  ac_io_reducer_cb reducer;
   void *reducer_arg;
   size_t limit;
 
-  ac_task_dump_f dump;
+  ac_task_dump_cb dump;
   void *dump_arg;
 
   ac_task_t *task;
@@ -326,7 +326,7 @@ struct ac_worker_output_s {
   size_t flags;
   size_t num_partitions;
 
-  ac_task_dump_f dump;
+  ac_task_dump_cb dump;
   void *dump_arg;
 
   ac_out_options_t options;

@@ -46,20 +46,22 @@ typedef struct ac_io_file_info_s {
 
 ac_sort_compare_arg_def(ac_io_sort_records, ac_io_record_t);
 
-typedef bool (*ac_io_reducer_f)(ac_io_record_t *res, const ac_io_record_t *r,
+typedef bool (*ac_io_reducer_cb)(ac_io_record_t *res, const ac_io_record_t *r,
                                 size_t num_r, ac_buffer_t *bh, void *tag);
 
-typedef int (*ac_io_compare_f)(const ac_io_record_t *, const ac_io_record_t *,
+typedef int (*ac_io_compare_cb)(const ac_io_record_t *, const ac_io_record_t *,
                                void *tag);
 
-typedef size_t (*ac_io_partition_f)(const ac_io_record_t *r, size_t num_part,
+typedef size_t (*ac_io_partition_cb)(const ac_io_record_t *r, size_t num_part,
                                     void *tag);
 
-typedef bool (*ac_io_fixed_reducer_f)(char *d, size_t num_r, void *tag);
+typedef bool (*ac_io_fixed_reducer_cb)(char *d, size_t num_r, void *tag);
 
-typedef void (*ac_io_fixed_sort_f)(void *p, size_t total_elems);
+typedef void (*ac_io_fixed_sort_cb)(void *p, size_t total_elems);
 
-typedef int (*ac_io_fixed_compare_f)(const void *p1, const void *p2, void *tag);
+typedef int (*ac_io_fixed_compare_cb)(const void *p1, const void *p2, void *tag);
+
+typedef bool (*ac_file_valid_cb)(const char *filename, void *arg);
 
 bool ac_io_keep_first(ac_io_record_t *res, const ac_io_record_t *r,
                       size_t num_r, ac_buffer_t *bh, void *tag);
@@ -71,7 +73,7 @@ bool ac_io_file_info(ac_io_file_info_t *fi);
 
 ac_io_file_info_t *
 ac_io_list(const char *path, size_t *num_files,
-           bool (*file_valid)(const char *filename, void *arg), void *arg);
+           ac_file_valid_cb file_valid, void *arg);
 
 ac_io_file_info_t *
 ac_pool_io_list(ac_pool_t *pool, const char *path, size_t *num_files,

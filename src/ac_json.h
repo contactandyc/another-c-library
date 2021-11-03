@@ -123,6 +123,11 @@ static inline ac_jsona_t *ac_jsona_nth_node(ac_json_t *j, int nth);
 static inline void ac_jsona_erase(ac_jsona_t *n);
 static inline void ac_jsona_append(ac_json_t *j, ac_json_t *item);
 
+static inline ac_json_t *ac_jsono_path(ac_pool_t *pool, ac_json_t *j, const char *path);
+static inline char *ac_jsono_pathv(ac_pool_t *pool, ac_json_t *j, const char *path);
+static inline char *ac_jsono_pathd(ac_pool_t *pool, ac_json_t *j, const char *path);
+
+
 static inline int ac_jsono_count(ac_json_t *j);
 static inline ac_jsono_t *ac_jsono_first(ac_json_t *j);
 static inline ac_jsono_t *ac_jsono_last(ac_json_t *j);

@@ -45,36 +45,36 @@ ac_map_t *ac_map_postorder_first(ac_map_t *n);
 ac_map_t *ac_map_postorder_next(ac_map_t *n);
 
 /*
-  ac_map_copy_node_f is a callback meant to be used with ac_map_copy to
+  ac_map_copy_node_cb is a callback meant to be used with ac_map_copy to
   copy one map to another given a root node.  The tag will typically be an
   allocator such as the pool.
 */
-typedef ac_map_t *(*ac_map_copy_node_f)(ac_map_t *n, void *tag);
+typedef ac_map_t *(*ac_map_copy_node_cb)(ac_map_t *n, void *tag);
 
-ac_map_t *ac_map_copy(ac_map_t *root, ac_map_copy_node_f copy, void *tag);
+ac_map_t *ac_map_copy(ac_map_t *root, ac_map_copy_node_cb copy, void *tag);
 
 /*
-  print_node_to_string_f is a callback meant to print the value of the node n.
+  ac_print_node_to_string_cb is a callback meant to print the value of the node n.
   There is an expectation that the value will be printed on a single line.
   Printing the internal representation of the tree is largely meant for testing
   and doesn't need to be complete.
 */
-typedef char *(*print_node_to_string_f)(ac_pool_t *pool, ac_map_t *n);
+typedef char *(*ac_print_node_to_string_cb)(ac_pool_t *pool, ac_map_t *n);
 
 bool ac_map_valid_to_buffer(ac_buffer_t *bh, ac_pool_t *pool, ac_map_t *root,
-                            print_node_to_string_f print_node);
+                            ac_print_node_to_string_cb print_node);
 
 bool ac_map_valid(ac_pool_t *pool, ac_map_t *root,
-                  print_node_to_string_f print_node);
+                  ac_print_node_to_string_cb print_node);
 
 #define AC_MAP_DONT_PRINT_RED 1
 #define AC_MAP_DONT_PRINT_BLACK_HEIGHT 2
 
 void ac_map_print_to_buffer(ac_buffer_t *bh, ac_pool_t *pool, ac_map_t *node,
-                            print_node_to_string_f print_node, int flags);
+                            ac_print_node_to_string_cb print_node, int flags);
 
 void ac_map_print(ac_pool_t *pool, ac_map_t *node,
-                  print_node_to_string_f print_node, int flags);
+                  ac_print_node_to_string_cb print_node, int flags);
 
 bool ac_map_erase(ac_map_t *node, ac_map_t **root);
 

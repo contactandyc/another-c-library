@@ -44,17 +44,20 @@ limitations under the License.
       return NULL;                                                             \
     datatype *low = (datatype *)base;                                          \
     datatype *high = (datatype *)base + num_elements;                          \
+    datatype *res = high-1;                                                    \
     datatype *mid;                                                             \
     while (low < high) {                                                       \
       mid = low + ((high - low) >> 1);                                         \
       int n = compare((const keytype *)p, (const datatype *)mid);              \
       if (n > 0)                                                               \
         low = mid + 1;                                                         \
-      else                                                                     \
+      else {                                                                   \
+        res = mid;                                                             \
         high = mid;                                                            \
+      }                                                                        \
     }                                                                          \
-    if (!compare((const keytype *)p, (const datatype *)low))                   \
-      return low;                                                              \
+    if (!compare((const keytype *)p, (const datatype *)res))                   \
+      return res;                                                              \
     return NULL;                                                               \
   }
 

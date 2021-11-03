@@ -15,8 +15,8 @@
 
 void ac_out_destroy(ac_out_t *out);
 
-typedef ac_io_record_t *(*ac_in_advance_f)(ac_in_t *h);
-typedef ac_io_record_t *(*ac_in_advance_unique_f)(ac_in_t *h, size_t *num_r);
+typedef ac_io_record_t *(*ac_in_advance_cb)(ac_in_t *h);
+typedef ac_io_record_t *(*ac_in_advance_unique_cb)(ac_in_t *h, size_t *num_r);
 
 static const int AC_IN_NORMAL_TYPE = 0; // default (due to memset)
 static const int AC_IN_EXT_TYPE = 1;
@@ -42,11 +42,11 @@ struct ac_in_list_s {
   size_t num_current;
   ac_io_record_t *current_tmp;
   size_t num_current_tmp;
-  ac_in_advance_f advance;
-  ac_in_advance_f advance_tmp;
-  ac_in_advance_unique_f advance_unique;
-  ac_in_advance_unique_f advance_unique_tmp;
-  ac_in_advance_f count_advance;
+  ac_in_advance_cb advance;
+  ac_in_advance_cb advance_tmp;
+  ac_in_advance_unique_cb advance_unique;
+  ac_in_advance_unique_cb advance_unique_tmp;
+  ac_in_advance_cb count_advance;
   size_t limit;
   size_t record_num;
   ac_out_t *out;
@@ -67,18 +67,18 @@ struct ac_in_s {
   size_t num_current;
   ac_io_record_t *current_tmp;
   size_t num_current_tmp;
-  ac_in_advance_f advance;
-  ac_in_advance_f advance_tmp;
-  ac_in_advance_unique_f advance_unique;
-  ac_in_advance_unique_f advance_unique_tmp;
-  ac_in_advance_f count_advance;
+  ac_in_advance_cb advance;
+  ac_in_advance_cb advance_tmp;
+  ac_in_advance_unique_cb advance_unique;
+  ac_in_advance_unique_cb advance_unique_tmp;
+  ac_in_advance_cb count_advance;
   size_t limit;
   size_t record_num;
   ac_out_t *out;
   void (*destroy_out)(ac_out_t *out);
   ac_buffer_t *group_bh;
 
-  ac_in_advance_f sub_advance;
+  ac_in_advance_cb sub_advance;
   ac_buffer_t *reducer_bh;
   ac_buffer_t *reducer_group_bh;
 
@@ -107,7 +107,7 @@ ac_io_record_t *ac_in_advance_unique_single(ac_in_t *h, size_t *num_r) {
 }
 
 ac_io_record_t *ac_in_advance_group(ac_in_t *h, size_t *num_r,
-                                    bool *more_records, ac_io_compare_f compare,
+                                    bool *more_records, ac_io_compare_cb compare,
                                     void *arg) {
   // TODO: group within buffer only - detect buffer switch (save first record
   // for comparison).
@@ -391,6 +391,8 @@ void ac_in_destroy(ac_in_t *h) {
       h->destroy_out(h->out);
     if (h->group_bh)
       ac_buffer_destroy(h->group_bh);
+    if (h->bh)
+      ac_buffer_destroy(h->bh);
 
     ac_free(h);
   }
@@ -703,7 +705,7 @@ void ac_in_limit(ac_in_t *h, size_t limit) {
 
 ac_io_record_t *advance_reduced(ac_in_t *h) {
   ac_buffer_t *bh = h->reducer_group_bh;
-  ac_io_compare_f compare = h->options.compare;
+  ac_io_compare_cb compare = h->options.compare;
   void *arg = h->options.compare_arg;
   ac_buffer_clear(bh);
   ac_io_record_t r1;
@@ -835,7 +837,7 @@ char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, char delim,
     reset_block(b);
     sp = b->buffer;
     p = sp + b->used;
-    b->pos = b->used;
+    //b->pos = b->used;
     fill_blocks(h, b);
     char *ep = sp + b->used;
     while (p < ep) {
@@ -894,6 +896,44 @@ char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, char delim,
   return NULL;
 }
 
+
+char *ac_in_use_buffer(ac_in_t *h, ac_in_buffer_t *b, uint32_t len, uint32_t *rlen, bool cap_length) {
+  /* where length is greater than the
+     internal buffer.  In this case, a buffer is used and
+     all data is copied into it. */
+  h->bh = ac_buffer_init(len);
+  ac_buffer_resize(h->bh, len);
+  ac_in_buffer_t tmp;
+  tmp.buffer = ac_buffer_data(h->bh);
+  tmp.size = len;
+  tmp.used = b->used - b->pos;
+  tmp.pos = tmp.used;
+  if (tmp.used)
+    memcpy(tmp.buffer, b->buffer + b->pos, tmp.used);
+  b->pos = b->used = 0;
+  len -= tmp.used;
+  if (len) {
+    fill_blocks(h, b);
+    if (len > b->used) {
+      if(cap_length)
+        len = b->used;
+      else {
+        b->pos = b->used;
+        ac_buffer_destroy(h->bh);
+        h->bh = NULL;
+        return NULL;
+      }
+    }
+    b->pos = len;
+    tmp.pos += len;
+    memcpy(tmp.buffer + tmp.used, b->buffer, len);
+  }
+  if(rlen)
+    *rlen = tmp.pos;
+  return tmp.buffer;
+}
+
+
 char *ac_in_lz4_readz(ac_in_t *h, int32_t *rlen, uint32_t len) {
   cleanup_last_read(h);
 
@@ -920,32 +960,7 @@ char *ac_in_lz4_readz(ac_in_t *h, int32_t *rlen, uint32_t len) {
       return p;
     }
 
-    /* where length is greater than the
-       internal buffer.  In this case, a buffer is used and
-       all data is copied into it. */
-    h->bh = ac_buffer_init(len);
-    ac_buffer_resize(h->bh, len);
-    ac_in_buffer_t tmp;
-    tmp.buffer = ac_buffer_data(h->bh);
-    tmp.size = len;
-    tmp.used = b->used - b->pos;
-    tmp.pos = tmp.used;
-    if (tmp.used)
-      memcpy(tmp.buffer, b->buffer + b->pos, tmp.used);
-    b->pos = b->used = 0;
-    fill_blocks(h, &tmp);
-    tmp.pos = tmp.used;
-    len -= tmp.used;
-    if (len) {
-      fill_blocks(h, b);
-      if (len > b->used)
-        len = b->used;
-      b->pos = len;
-      tmp.pos += len;
-      memcpy(tmp.buffer + tmp.used, b->buffer, len);
-    }
-    *rlen = tmp.pos;
-    return tmp.buffer;
+    return ac_in_use_buffer(h, b, len, rlen, true);
   } else {
     if (b->eof) {
       *rlen = b->used - b->pos;
@@ -959,7 +974,7 @@ char *ac_in_lz4_readz(ac_in_t *h, int32_t *rlen, uint32_t len) {
     reset_block(b);
     fill_blocks(h, b);
     if (len > b->used)
-      len = b->used;
+      return ac_in_use_buffer(h, b, len, rlen, false);
     b->pos = len;
     *rlen = len;
     char *ep = b->buffer + len;
@@ -984,36 +999,7 @@ char *ac_in_lz4_read(ac_in_t *h, uint32_t len) {
       b->pos = b->used;
       return NULL;
     }
-
-    /* where length is greater than the
-       internal buffer.  In this case, a buffer is used and
-       all data is copied into it. */
-    h->bh = ac_buffer_init(len);
-    ac_buffer_resize(h->bh, len);
-    ac_in_buffer_t tmp;
-    tmp.buffer = ac_buffer_data(h->bh);
-    tmp.size = len;
-    tmp.used = b->used - b->pos;
-    tmp.pos = tmp.used;
-    if (tmp.used)
-      memcpy(tmp.buffer, b->buffer + b->pos, tmp.used);
-    b->pos = b->used = 0;
-    fill_blocks(h, &tmp);
-    tmp.pos = tmp.used;
-    len -= tmp.used;
-    if (len) {
-      fill_blocks(h, b);
-      if (len > b->used) {
-        b->pos = b->used;
-        ac_buffer_destroy(h->bh);
-        h->bh = NULL;
-        return NULL;
-      }
-      b->pos = len;
-      tmp.pos += len;
-      memcpy(tmp.buffer + tmp.used, b->buffer, len);
-    }
-    return tmp.buffer;
+    return ac_in_use_buffer(h, b, len, NULL, false);
   } else {
     if (b->eof) {
       b->pos = b->used;
@@ -1021,10 +1007,8 @@ char *ac_in_lz4_read(ac_in_t *h, uint32_t len) {
     }
     reset_block(b);
     fill_blocks(h, b);
-    if (len > b->used) {
-      b->pos = b->used;
-      return NULL;
-    }
+    if (len > b->used)
+      return ac_in_use_buffer(h, b, len, NULL, false);
     b->pos = len;
     return b->buffer;
   }
@@ -1089,8 +1073,8 @@ void ac_in_options_compressed_buffer_size(ac_in_options_t *h,
   h->compressed_buffer_size = buffer_size;
 }
 
-void ac_in_options_reducer(ac_in_options_t *h, ac_io_compare_f compare,
-                           void *compare_arg, ac_io_reducer_f reducer,
+void ac_in_options_reducer(ac_in_options_t *h, ac_io_compare_cb compare,
+                           void *compare_arg, ac_io_reducer_cb reducer,
                            void *reducer_arg) {
   h->compare = compare;
   h->compare_arg = compare_arg;
@@ -1112,12 +1096,12 @@ struct in_heap_s {
   ssize_t size;
   ssize_t max_size;
   ac_in_t **heap;
-  ac_io_compare_f compare;
+  ac_io_compare_cb compare;
   void *compare_arg;
 };
 
 static inline void in_heap_init(in_heap_t *h, ssize_t mx,
-                                ac_io_compare_f compare, void *arg) {
+                                ac_io_compare_cb compare, void *arg) {
   h->size = 0;
   if (mx < 2)
     mx = 2;
@@ -1134,6 +1118,7 @@ static inline size_t in_heap_max(in_heap_t *h) { return h->max_size; }
 static inline void in_heap_destroy(in_heap_t *h) {
   if (!h)
     return;
+
   ac_free(h->heap);
 }
 
@@ -1226,11 +1211,11 @@ typedef struct {
   size_t num_current;
   ac_io_record_t *current_tmp;
   size_t num_current_tmp;
-  ac_in_advance_f advance;
-  ac_in_advance_f advance_tmp;
-  ac_in_advance_unique_f advance_unique;
-  ac_in_advance_unique_f advance_unique_tmp;
-  ac_in_advance_f count_advance;
+  ac_in_advance_cb advance;
+  ac_in_advance_cb advance_tmp;
+  ac_in_advance_unique_cb advance_unique;
+  ac_in_advance_unique_cb advance_unique_tmp;
+  ac_in_advance_cb count_advance;
   size_t limit;
   size_t record_num;
   ac_out_t *out;
@@ -1245,14 +1230,14 @@ typedef struct {
   in_heap_t heap;
 
   ac_buffer_t *reducer_bh;
-  ac_io_reducer_f reducer;
+  ac_io_reducer_cb reducer;
   void *reducer_arg;
 
-  ac_io_compare_f compare;
+  ac_io_compare_cb compare;
   void *compare_arg;
 } ac_in_ext_t;
 
-ac_in_t *ac_in_ext_init(ac_io_compare_f compare, void *arg,
+ac_in_t *ac_in_ext_init(ac_io_compare_cb compare, void *arg,
                         ac_in_options_t *options) {
   ac_in_options_t opts;
   if (!options) {
@@ -1386,15 +1371,14 @@ void ac_in_ext_add(ac_in_t *hp, ac_in_t *in, int tag) {
   if (!h || !in || h->type != AC_IN_EXT_TYPE)
     return;
 
-  // Adding this can aid in debugging as you can know record number of problem
-  // case.
-  // ac_in_limit(in, 100000000);
+  in->rec.tag = tag;
+  in->options.tag = tag;
+
   ac_in_reset(in);
   if (!ac_in_advance(in)) {
     ac_in_destroy(in);
     return;
   }
-  in->options.tag = tag;
 
   in_heap_t *heap = &(h->heap);
   move_active_to_heap(h, false);
@@ -1419,7 +1403,7 @@ void ac_in_ext_add(ac_in_t *hp, ac_in_t *in, int tag) {
   }
 }
 
-void ac_in_ext_reducer(ac_in_t *hp, ac_io_reducer_f reducer, void *arg) {
+void ac_in_ext_reducer(ac_in_t *hp, ac_io_reducer_cb reducer, void *arg) {
   ac_in_ext_t *h = (ac_in_ext_t *)hp;
   if (!h || h->type != AC_IN_EXT_TYPE)
     return;
@@ -1455,11 +1439,11 @@ typedef struct {
   size_t num_current;
   ac_io_record_t *current_tmp;
   size_t num_current_tmp;
-  ac_in_advance_f advance;
-  ac_in_advance_f advance_tmp;
-  ac_in_advance_unique_f advance_unique;
-  ac_in_advance_unique_f advance_unique_tmp;
-  ac_in_advance_f count_advance;
+  ac_in_advance_cb advance;
+  ac_in_advance_cb advance_tmp;
+  ac_in_advance_unique_cb advance_unique;
+  ac_in_advance_unique_cb advance_unique_tmp;
+  ac_in_advance_cb count_advance;
   size_t limit;
   size_t record_num;
   ac_out_t *out;
@@ -1500,7 +1484,7 @@ ac_io_record_t *ac_in_records_advance(ac_in_t *hp) {
 ac_io_record_t *ac_in_records_advance_and_reduce(ac_in_t *hp) {
   ac_in_records_t *h = (ac_in_records_t *)hp;
   ac_in_options_t *opts = &h->options;
-  ac_io_compare_f compare = opts->compare;
+  ac_io_compare_cb compare = opts->compare;
   void *arg = opts->compare_arg;
   while (h->rp < h->ep) {
     ac_io_record_t *cur = h->rp;
@@ -1561,18 +1545,18 @@ void default_transform(ac_in_t *in, ac_out_t *out, void *arg) {
 static void get_tmp_name(char *dest, const char *fmt) {
   static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   static int id = 0;
-  int next;
+  int _id;
   pthread_mutex_lock(&mutex);
-  next = id;
+  _id = id;
   id++;
   pthread_mutex_unlock(&mutex);
-  sprintf(dest, fmt, id);
+  sprintf(dest, fmt, _id);
 }
 
 ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,
-                         ac_io_compare_f compare, void *compare_arg,
-                         ac_io_reducer_f reducer, void *reducer_arg,
-                         ac_in_transform_f transform, void *arg) {
+                         ac_io_compare_cb compare, void *compare_arg,
+                         ac_io_reducer_cb reducer, void *reducer_arg,
+                         ac_in_transform_cb transform, void *arg) {
   ac_out_options_t opts;
   ac_out_options_init(&opts);
   ac_out_options_buffer_size(&opts, buffer_size);
@@ -1612,21 +1596,21 @@ void ac_in_out2(ac_in_t *in, ac_out_t *out, ac_out_t *out2) {
   }
 }
 
-void ac_in_out_custom(ac_in_t *in, ac_out_t *out, ac_in_out_f cb, void *arg) {
+void ac_in_out_custom(ac_in_t *in, ac_out_t *out, ac_in_out_cb cb, void *arg) {
   ac_io_record_t *r;
   while ((r = ac_in_advance(in)) != NULL)
     cb(out, r, arg);
 }
 
 void ac_in_out_custom2(ac_in_t *in, ac_out_t *out, ac_out_t *out2,
-                       ac_in_out2_f cb, void *arg) {
+                       ac_in_out2_cb cb, void *arg) {
   ac_io_record_t *r;
   while ((r = ac_in_advance(in)) != NULL)
     cb(out, out2, r, arg);
 }
 
-void ac_in_out_group(ac_in_t *in, ac_out_t *out, ac_io_compare_f compare,
-                     void *compare_arg, ac_in_out_group_f group, void *arg) {
+void ac_in_out_group(ac_in_t *in, ac_out_t *out, ac_io_compare_cb compare,
+                     void *compare_arg, ac_in_out_group_cb group, void *arg) {
   size_t num_r = 0;
   ac_io_record_t *r;
   bool more_records = false;
@@ -1636,8 +1620,8 @@ void ac_in_out_group(ac_in_t *in, ac_out_t *out, ac_io_compare_f compare,
 }
 
 void ac_in_out_group2(ac_in_t *in, ac_out_t *out, ac_out_t *out2,
-                      ac_io_compare_f compare, void *compare_arg,
-                      ac_in_out_group2_f group, void *arg) {
+                      ac_io_compare_cb compare, void *compare_arg,
+                      ac_in_out_group2_cb group, void *arg) {
   size_t num_r = 0;
   ac_io_record_t *r;
   bool more_records = false;

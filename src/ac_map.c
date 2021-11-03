@@ -105,7 +105,7 @@ ac_map_t *ac_map_postorder_next(ac_map_t *n) {
 
 /* copy */
 static void tree_copy(ac_map_t *n, ac_map_t **res, ac_map_t *parent,
-                      ac_map_copy_node_f copy, void *tag) {
+                      ac_map_copy_node_cb copy, void *tag) {
   ac_map_t *c = copy(n, tag);
   c->parent_color = n->parent_color;
   rb_set_parent(c, parent);
@@ -119,7 +119,7 @@ static void tree_copy(ac_map_t *n, ac_map_t **res, ac_map_t *parent,
     c->right = NULL;
 }
 
-ac_map_t *ac_map_copy(ac_map_t *root, ac_map_copy_node_f copy, void *tag) {
+ac_map_t *ac_map_copy(ac_map_t *root, ac_map_copy_node_cb copy, void *tag) {
   ac_map_t *res = NULL;
   if (root)
     tree_copy(root, &res, NULL, copy, tag);
@@ -138,7 +138,7 @@ static int count_black_nodes(ac_map_t *n) {
 
 static void print_node_with_color_to_buffer(ac_buffer_t *bh, ac_pool_t *pool,
                                             ac_map_t *n,
-                                            print_node_to_string_f print_node) {
+                                            ac_print_node_to_string_cb print_node) {
   bool red = rb_is_red(n);
   char *s = print_node(pool, n);
   if (red)
@@ -149,7 +149,7 @@ static void print_node_with_color_to_buffer(ac_buffer_t *bh, ac_pool_t *pool,
 }
 
 bool ac_map_valid(ac_pool_t *pool, ac_map_t *root,
-                  print_node_to_string_f print_node) {
+                  ac_print_node_to_string_cb print_node) {
   ac_buffer_t *bh = ac_buffer_init(10000);
   bool valid = ac_map_valid_to_buffer(bh, pool, root, print_node);
   if (!valid)
@@ -160,7 +160,7 @@ bool ac_map_valid(ac_pool_t *pool, ac_map_t *root,
 
 /* test if valid */
 bool ac_map_valid_to_buffer(ac_buffer_t *bh, ac_pool_t *pool, ac_map_t *root,
-                            print_node_to_string_f print_node) {
+                            ac_print_node_to_string_cb print_node) {
   /* an empty tree is valid */
   if (!root)
     return true;
@@ -275,7 +275,7 @@ static int get_black_height(ac_map_t *n) {
 }
 
 static char *get_printed_key(ac_pool_t *pool, ac_map_t *n,
-                             print_node_to_string_f print_node, int flags) {
+                             ac_print_node_to_string_cb print_node, int flags) {
   char *s = print_node(pool, n);
   bool red = rb_is_red(n);
   if (red && (flags & AC_MAP_DONT_PRINT_RED) == 1)
@@ -290,7 +290,7 @@ static char *get_printed_key(ac_pool_t *pool, ac_map_t *n,
 
 static void copy_tree_to_print(ac_pool_t *pool, ac_map_t *node,
                                ac_map_print_t **res, ac_map_print_t *parent,
-                               print_node_to_string_f print_node, int flags) {
+                               ac_print_node_to_string_cb print_node, int flags) {
   ac_map_print_t *copy =
       (ac_map_print_t *)ac_pool_alloc(pool, sizeof(ac_map_print_t));
   *res = copy;
@@ -370,7 +370,7 @@ static int get_node_depth(ac_map_print_t *item) {
 }
 
 void ac_map_print(ac_pool_t *pool, ac_map_t *root,
-                  print_node_to_string_f print_node, int flags) {
+                  ac_print_node_to_string_cb print_node, int flags) {
   ac_buffer_t *bh = ac_buffer_init(10000);
   ac_map_print_to_buffer(bh, pool, root, print_node, flags);
   if (ac_buffer_length(bh))
@@ -379,7 +379,7 @@ void ac_map_print(ac_pool_t *pool, ac_map_t *root,
 }
 
 void ac_map_print_to_buffer(ac_buffer_t *bh, ac_pool_t *pool, ac_map_t *root,
-                            print_node_to_string_f print_node, int flags) {
+                            ac_print_node_to_string_cb print_node, int flags) {
   if (!root)
     return;
 

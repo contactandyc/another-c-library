@@ -34,6 +34,11 @@ extern "C" {
 /* returns a 64 bit hash of data */
 uint64_t ac_hash64(const void *data, size_t len);
 
+/* returns a 64 bit representation of md5 */
+uint64_t ac_md5(const void *s, size_t len);
+uint64_t ac_md5_str(const char *s);
+
+
 /* returns value if value is not NULL, otherwise default_value */
 const char *ac_str(const char *value, const char *default_value);
 
@@ -71,6 +76,12 @@ char *ac_date(char *dest, time_t ts);
 
 /* converts a yyyy-mm-dd format to a time_t */
 time_t ac_date_as_time_t(const char *value, time_t default_value);
+
+/* converts a hh:mm:ss format to a time_t */
+time_t ac_time_of_day_as_time_t(const char *value, time_t default_value);
+
+/* converts a yyyy-mm-dd?hh:mm:ss format to a time_t */
+time_t ac_date_time_as_time_t(const char *value, time_t default_value);
 
 #ifdef __cplusplus
 }

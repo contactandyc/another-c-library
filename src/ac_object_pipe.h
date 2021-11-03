@@ -25,8 +25,8 @@ limitations under the License.
 extern "C" {
 #endif
 
-typedef void (*ac_object_pipe_f)(void *d, void *arg);
-typedef void (*ac_object_pipe_close_f)(void *d);
+typedef void (*ac_object_pipe_cb)(void *d, void *arg);
+typedef void (*ac_object_pipe_close_cb)(void *d);
 
 struct ac_object_pipe_s;
 typedef struct ac_object_pipe_s ac_object_pipe_t;
@@ -34,16 +34,16 @@ typedef struct ac_object_pipe_s ac_object_pipe_t;
 #ifdef _AC_DEBUG_MEMORY_
 #define ac_object_pipe_open(loop, cb, arg)                                     \
   _ac_object_pipe_open(loop, cb, arg, AC_FILE_LINE_MACRO("ac_object_pipe"))
-ac_object_pipe_t *_ac_object_pipe_open(uv_loop_t *loop, ac_object_pipe_f cb,
+ac_object_pipe_t *_ac_object_pipe_open(uv_loop_t *loop, ac_object_pipe_cb cb,
                                        void *arg, const char *caller);
 #else
 #define ac_object_pipe_open(loop, cb, arg) _ac_object_pipe_open(loop, cb, arg)
-ac_object_pipe_t *_ac_object_pipe_open(uv_loop_t *loop, ac_object_pipe_f cb,
+ac_object_pipe_t *_ac_object_pipe_open(uv_loop_t *loop, ac_object_pipe_cb cb,
                                        void *arg);
 #endif
 
 void ac_object_pipe_set_close_cb(ac_object_pipe_t *h,
-                                 ac_object_pipe_close_f cb);
+                                 ac_object_pipe_close_cb cb);
 
 void ac_object_pipe_write(ac_object_pipe_t *h, void *object);
 void ac_object_pipe_close(ac_object_pipe_t *h);

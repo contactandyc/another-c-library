@@ -16,11 +16,20 @@ limitations under the License.
 
 #include "ac_conv.h"
 #include "lz4/xxhash.h"
+#include "md5/md5.h"
 
 #include <stdio.h>
 
 uint64_t ac_hash64(const void *s, size_t len) {
   return (uint64_t)XXH64(s, len, 0);
+}
+
+uint64_t ac_md5(const void *s, size_t len) {
+    return md5_hash(s, len);
+}
+
+uint64_t ac_md5_str(const char *s) {
+    return md5_hash_str(s);
 }
 
 char *ac_date_time(char *dest, time_t ts) {
@@ -38,6 +47,21 @@ char *ac_date(char *dest, time_t ts) {
   return dest;
 }
 
+time_t ac_time_of_day_as_time_t(const char *value, time_t default_value) {
+  if (value[0] >= '0' && value[0] <= '9' && value[1] >= '0' &&
+      value[1] <= '9' && value[2] == ':' &&
+      value[3] >= '0' && value[3] <= '9' && value[4] >= '0' &&
+      value[4] <= '9' && value[5] == ':' && value[6] >= '0' &&
+      value[6] <= '9' && value[7] >= '0' && value[7] <= '9') {
+    uint32_t hour = ((value[0] - '0') * 10) + (value[1] - '0');
+    uint32_t minute = ((value[3] - '0') * 10) + (value[4] - '0');
+    uint32_t second = ((value[6] - '0') * 10) + (value[7] - '0');
+    return (hour*3600)+(minute*60)+(second);
+  }
+  return default_value;
+}
+
+
 time_t ac_date_as_time_t(const char *value, time_t default_value) {
   if (value[0] >= '0' && value[0] <= '9' && value[1] >= '0' &&
       value[1] <= '9' && value[2] >= '0' && value[2] <= '9' &&
@@ -52,12 +76,24 @@ time_t ac_date_as_time_t(const char *value, time_t default_value) {
     struct tm t;
     memset(&t, 0, sizeof(t));
     t.tm_year = year - 1900;
-    t.tm_mon = month;
+    t.tm_mon = month-1;
     t.tm_mday = day;
-    return mktime(&t);
+    return gmtime(&t);
   }
   return default_value;
 }
+
+
+time_t ac_date_time_as_time_t(const char *value, time_t default_value) {
+  time_t a = ac_date_as_time_t(value, default_value);
+  if(a==default_value)
+    return default_value;
+  time_t b = ac_time_of_day_as_time_t(value+11, default_value);
+  if(b==default_value)
+    return a;
+  return a+b;
+}
+
 
 const char *ac_str(const char *value, const char *default_value) {
   if (value)

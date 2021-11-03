@@ -35,9 +35,9 @@ typedef struct {
 
   bool full_record_required;
 
-  ac_io_compare_f compare;
+  ac_io_compare_cb compare;
   void *compare_arg;
-  ac_io_reducer_f reducer;
+  ac_io_reducer_cb reducer;
   void *reducer_arg;
 } ac_in_options_t;
 

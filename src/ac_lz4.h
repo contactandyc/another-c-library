@@ -18,8 +18,13 @@ limitations under the License.
 #define _ac_lz4_H
 
 #include "ac_common.h"
+#include "ac_buffer.h"
 
 #include <inttypes.h>
+
+size_t ac_lz4_compress_appending_to_buffer(ac_buffer_t *dest, void *src, int src_size);
+bool ac_lz4_decompress_into_fixed_buffer(void *dest, int dest_size, void *src, int src_size);
+
 
 enum ac_lz4_block_size_s { s64kb = 0, s256kb = 1, s1mb = 2, s4mb = 3 };
 typedef enum ac_lz4_block_size_s ac_lz4_block_size_t;

@@ -70,11 +70,11 @@ extern "C" {
 #define ac_free(p) free(p)
 #endif
 
-typedef void (*ac_dump_details_f)(FILE *out, const char *caller, void *p,
+typedef void (*ac_dump_details_cb)(FILE *out, const char *caller, void *p,
                                   size_t length);
 
 typedef struct {
-  ac_dump_details_f dump;
+  ac_dump_details_cb dump;
 } ac_allocator_dump_t;
 
 struct ac_allocator_s;

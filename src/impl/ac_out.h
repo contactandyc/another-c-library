@@ -40,29 +40,29 @@ typedef struct {
   bool sort_while_partitioning;
   size_t num_sort_threads;
 
-  ac_io_partition_f partition;
+  ac_io_partition_cb partition;
   void *partition_arg;
   size_t num_partitions;
 
-  ac_io_compare_f compare;
+  ac_io_compare_cb compare;
   void *compare_arg;
 
   size_t num_per_group;
-  ac_io_compare_f int_compare;
+  ac_io_compare_cb int_compare;
   void *int_compare_arg;
 
-  ac_io_reducer_f reducer;
+  ac_io_reducer_cb reducer;
   void *reducer_arg;
 
-  ac_io_reducer_f int_reducer;
+  ac_io_reducer_cb int_reducer;
   void *int_reducer_arg;
 
-  ac_io_fixed_reducer_f fixed_reducer;
+  ac_io_fixed_reducer_cb fixed_reducer;
   void *fixed_reducer_arg;
 
-  ac_io_fixed_compare_f fixed_compare;
+  ac_io_fixed_compare_cb fixed_compare;
   void *fixed_compare_arg;
 
-  ac_io_fixed_sort_f fixed_sort;
+  ac_io_fixed_sort_cb fixed_sort;
   void *fixed_sort_arg;
 } ac_out_ext_options_t;

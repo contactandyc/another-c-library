@@ -34,17 +34,17 @@ typedef struct {
 typedef struct {
   void *object;
   void *arg;
-  ac_threaded_pipe_f cb;
+  ac_threaded_pipe_cb cb;
 } ac_threaded_pipe_object_t;
 
 struct ac_threaded_pipe_s {
   int read_fd;
   int write_fd;
-  ac_threaded_pipe_f cb;
+  ac_threaded_pipe_cb cb;
   thread_data_t *threads;
   int num_threads;
 
-  ac_threaded_pipe_close_f close_cb;
+  ac_threaded_pipe_close_cb close_cb;
   void *close_arg;
 
   pid_t parent_pid;
@@ -55,13 +55,13 @@ struct ac_threaded_pipe_s {
   size_t update_interval;
   time_t global_update_time;
 
-  ac_threaded_pipe_create_global_arg_f create_global_arg;
-  ac_threaded_pipe_destroy_global_arg_f destroy_global_arg;
+  ac_threaded_pipe_create_global_arg_cb create_global_arg;
+  ac_threaded_pipe_destroy_global_arg_cb destroy_global_arg;
   void *global_arg;
 
-  ac_threaded_pipe_create_thread_arg_f create_thread_arg;
-  ac_threaded_pipe_clear_thread_arg_f clear_thread_arg;
-  ac_threaded_pipe_destroy_thread_arg_f destroy_thread_arg;
+  ac_threaded_pipe_create_thread_arg_cb create_thread_arg;
+  ac_threaded_pipe_clear_thread_arg_cb clear_thread_arg;
+  ac_threaded_pipe_destroy_thread_arg_cb destroy_thread_arg;
 };
 
 void *update_task(void *arg) {
@@ -202,15 +202,15 @@ ac_threaded_pipe_t *_ac_threaded_pipe_init(int num_threads) {
 
 void ac_threaded_pipe_set_global_arg(
     ac_threaded_pipe_t *s, void *arg,
-    ac_threaded_pipe_destroy_global_arg_f destroy_arg) {
+    ac_threaded_pipe_destroy_global_arg_cb destroy_arg) {
   s->global_arg = arg;
   s->destroy_global_arg = destroy_arg;
 }
 
 void ac_threaded_pipe_set_global_methods(
     ac_threaded_pipe_t *s, void *update_arg, size_t update_interval,
-    ac_threaded_pipe_create_global_arg_f create_arg,
-    ac_threaded_pipe_destroy_global_arg_f destroy_arg) {
+    ac_threaded_pipe_create_global_arg_cb create_arg,
+    ac_threaded_pipe_destroy_global_arg_cb destroy_arg) {
   s->update_arg = update_arg;
   s->update_interval = update_interval;
   s->create_global_arg = create_arg;
@@ -220,21 +220,21 @@ void ac_threaded_pipe_set_global_methods(
 }
 
 void ac_threaded_pipe_set_thread_methods(
-    ac_threaded_pipe_t *s, ac_threaded_pipe_create_thread_arg_f create,
-    ac_threaded_pipe_clear_thread_arg_f clear,
-    ac_threaded_pipe_destroy_thread_arg_f destroy) {
+    ac_threaded_pipe_t *s, ac_threaded_pipe_create_thread_arg_cb create,
+    ac_threaded_pipe_clear_thread_arg_cb clear,
+    ac_threaded_pipe_destroy_thread_arg_cb destroy) {
   s->create_thread_arg = create;
   s->clear_thread_arg = clear;
   s->destroy_thread_arg = destroy;
 }
 
 void ac_threaded_pipe_set_close_cb(ac_threaded_pipe_t *h,
-                                     ac_threaded_pipe_close_f cb, void *arg) {
+                                     ac_threaded_pipe_close_cb cb, void *arg) {
   h->close_cb = cb;
   h->close_arg = arg;
 }
 
-bool ac_threaded_pipe_write(ac_threaded_pipe_t *h, ac_threaded_pipe_f cb,
+bool ac_threaded_pipe_write(ac_threaded_pipe_t *h, ac_threaded_pipe_cb cb,
                               void *object, void *arg) {
   if (h->write_fd == -1 || (ssize_t)(object) == -1 ||
       (ssize_t)(object) == -2) // protect -1 from getting through

@@ -29,13 +29,13 @@ limitations under the License.
 
 /* options for fixed output -- TODO */
 void ac_out_ext_options_fixed_compare(ac_out_ext_options_t *h,
-                                      ac_io_fixed_compare_f compare, void *arg);
+                                      ac_io_fixed_compare_cb compare, void *arg);
 void ac_out_ext_options_fixed_sort(ac_out_ext_options_t *h,
-                                   ac_io_fixed_sort_f sort, void *arg);
+                                   ac_io_fixed_sort_cb sort, void *arg);
 void ac_out_ext_options_fixed_reducer(ac_out_ext_options_t *h,
-                                      ac_io_fixed_reducer_f reducer, void *arg);
+                                      ac_io_fixed_reducer_cb reducer, void *arg);
 
-typedef bool (*ac_out_write_f)(ac_out_t *h, const void *d, size_t len);
+typedef bool (*ac_out_write_cb)(ac_out_t *h, const void *d, size_t len);
 
 const int AC_OUT_NORMAL_TYPE = 0;
 const int AC_OUT_PARTITIONED_TYPE = 1;
@@ -44,7 +44,7 @@ const int AC_OUT_SORTED_TYPE = 2;
 struct ac_out_s {
   int type;
   ac_out_options_t options;
-  ac_out_write_f write_record;
+  ac_out_write_cb write_record;
 
   int fd;
   bool fd_owner;
@@ -58,7 +58,7 @@ struct ac_out_s {
   size_t buffer_pos2;
   size_t buffer_size2;
 
-  ac_out_write_f write_d;
+  ac_out_write_cb write_d;
   gzFile gz;
 
   ac_lz4_t *lz4;
@@ -521,7 +521,7 @@ void ac_out_ext_options_dont_compress_tmp(ac_out_ext_options_t *h) {
 
 /* options for creating a partitioned output */
 void ac_out_ext_options_partition(ac_out_ext_options_t *h,
-                                  ac_io_partition_f part, void *arg) {
+                                  ac_io_partition_cb part, void *arg) {
   h->partition = part;
   h->partition_arg = arg;
 }
@@ -533,7 +533,7 @@ void ac_out_ext_options_num_partitions(ac_out_ext_options_t *h,
 
 /* options for sorting the output */
 void ac_out_ext_options_compare(ac_out_ext_options_t *h,
-                                ac_io_compare_f compare, void *arg) {
+                                ac_io_compare_cb compare, void *arg) {
   h->compare = compare;
   h->compare_arg = arg;
 }
@@ -544,7 +544,7 @@ void ac_out_ext_options_intermediate_group_size(ac_out_ext_options_t *h,
 }
 
 void ac_out_ext_options_intermediate_compare(ac_out_ext_options_t *h,
-                                             ac_io_compare_f compare,
+                                             ac_io_compare_cb compare,
                                              void *arg) {
   h->int_compare = compare;
   h->int_compare_arg = arg;
@@ -552,13 +552,13 @@ void ac_out_ext_options_intermediate_compare(ac_out_ext_options_t *h,
 
 /* set the reducer */
 void ac_out_ext_options_reducer(ac_out_ext_options_t *h,
-                                ac_io_reducer_f reducer, void *arg) {
+                                ac_io_reducer_cb reducer, void *arg) {
   h->reducer = reducer;
   h->reducer_arg = arg;
 }
 
 void ac_out_ext_options_intermediate_reducer(ac_out_ext_options_t *h,
-                                             ac_io_reducer_f reducer,
+                                             ac_io_reducer_cb reducer,
                                              void *arg) {
   h->int_reducer = reducer;
   h->int_reducer_arg = arg;
@@ -566,21 +566,21 @@ void ac_out_ext_options_intermediate_reducer(ac_out_ext_options_t *h,
 
 /* options for fixed output */
 void ac_out_ext_options_fixed_reducer(ac_out_ext_options_t *h,
-                                      ac_io_fixed_reducer_f reducer,
+                                      ac_io_fixed_reducer_cb reducer,
                                       void *arg) {
   h->fixed_reducer = reducer;
   h->fixed_reducer_arg = arg;
 }
 
 void ac_out_ext_options_fixed_compare(ac_out_ext_options_t *h,
-                                      ac_io_fixed_compare_f compare,
+                                      ac_io_fixed_compare_cb compare,
                                       void *arg) {
   h->fixed_compare = compare;
   h->fixed_compare_arg = arg;
 }
 
 void ac_out_ext_options_fixed_sort(ac_out_ext_options_t *h,
-                                   ac_io_fixed_sort_f sort, void *arg) {
+                                   ac_io_fixed_sort_cb sort, void *arg) {
   h->fixed_sort = sort;
   h->fixed_sort_arg = arg;
 }
@@ -807,7 +807,7 @@ void ac_out_partition_filename(char *dest, const char *filename, size_t id) {
 typedef struct {
   int type;
   ac_out_options_t options;
-  ac_out_write_f write_record;
+  ac_out_write_cb write_record;
 
   char *filename;
 
@@ -820,7 +820,7 @@ typedef struct {
 
   ac_out_t **partitions;
   size_t num_partitions;
-  ac_io_partition_f partition;
+  ac_io_partition_cb partition;
   void *partition_arg;
 
   size_t *tasks;
@@ -849,7 +849,7 @@ ac_out_t *ac_out_partitioned_init(const char *filename,
                                   ac_out_options_t *options,
                                   ac_out_ext_options_t *ext_options) {
   if (ext_options->num_partitions == 0) {
-    ac_io_partition_f partition = ext_options->partition;
+    ac_io_partition_cb partition = ext_options->partition;
     ext_options->partition = NULL;
     ac_out_t *r = ac_out_ext_init(filename, options, ext_options);
     ext_options->partition = partition;
@@ -859,7 +859,7 @@ ac_out_t *ac_out_partitioned_init(const char *filename,
       abort();
     // give suffix to filename
     char *tmp_name = (char *)ac_malloc(strlen(filename) + 20);
-    ac_io_partition_f partition = ext_options->partition;
+    ac_io_partition_cb partition = ext_options->partition;
     ext_options->partition = NULL;
     suffix_filename_with_id(tmp_name, filename, 0, NULL, false);
     ac_out_t *r = ac_out_ext_init(tmp_name, options, ext_options);
@@ -873,6 +873,7 @@ ac_out_t *ac_out_partitioned_init(const char *filename,
     ac_out_partitioned_t *h = (ac_out_partitioned_t *)ac_malloc(
         sizeof(ac_out_partitioned_t) + strlen(filename) + 1 +
         (sizeof(ac_out_t *) * ext_options->num_partitions));
+    memset(h, 0, sizeof(*h));
     h->options = *options;
     h->part_options = *options;
     h->ext_options = *ext_options;
@@ -1028,7 +1029,7 @@ typedef struct extra_s {
 typedef struct {
   int type;
   ac_out_options_t options;
-  ac_out_write_f write_record;
+  ac_out_write_cb write_record;
 
   ac_in_options_t file_options;
 
@@ -1102,7 +1103,7 @@ static inline void clear_buffer(ac_out_buffer_t *b) {
 }
 
 static inline void init_buffer(ac_out_buffer_t *b, size_t buffer_size) {
-  b->buffer = (char *)ac_malloc(buffer_size);
+  b->buffer = (char *)ac_calloc(buffer_size);
   b->size = buffer_size;
   clear_buffer(b);
 }
@@ -1369,6 +1370,16 @@ bool write_fixed_sorted_record(ac_out_t *hp, const void *d, size_t len) {
 }
 */
 
+bool write_one_record(ac_out_sorted_t *h, const void *d, size_t len) {
+   wait_on_thread(h);
+   ac_out_t *out = get_next_tmp(h, false);
+   ac_out_write_record(out, d, len);
+   ac_out_destroy(out);
+   if (h->ext_options.num_per_group)
+     check_for_merge(h);
+   return true;
+}
+
 bool write_sorted_record(ac_out_t *hp, const void *d, size_t len) {
   if (len > 0xffffffffU)
     return false;
@@ -1379,9 +1390,8 @@ bool write_sorted_record(ac_out_t *hp, const void *d, size_t len) {
   if (bp + length > h->b->ep) {
     write_sorted(h);
     bp = h->b->bp;
-    // TODO: Support records that are larger than the buffer
-    // if (bp + length > h->b->ep)
-    //  return write_one_record(h, d, len);
+    if (bp + length > h->b->ep)
+      return write_one_record(h, d, len);
   }
 
   /* Write data to the end of the buffer and the records to the beginning.
@@ -1476,10 +1486,14 @@ void ac_out_sorted_destroy(ac_out_t *hp) {
     ac_out_destroy(out);
     ac_in_destroy(in);
   }
-  if (h->buf1.buffer)
+  if (h->buf1.buffer) {
     ac_free(h->buf1.buffer);
-  if (h->buf2.buffer)
+    h->buf1.buffer = NULL;
+  }
+  if (h->buf2.buffer) {
     ac_free(h->buf2.buffer);
+    h->buf2.buffer = NULL;
+  }
   ac_out_ext_remove_tmp_files(h->tmp_filename, h->filename,
                               h->ext_options.lz4_tmp);
   destroy_extra_ins(h);

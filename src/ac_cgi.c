@@ -84,7 +84,8 @@ char *ac_cgi_decode(ac_pool_t *pool, char *s) {
         p += 5;
       } else
         *wp++ = '&';
-    }
+    } else
+      *wp++ = *p++;
   }
   return res;
 }
@@ -263,6 +264,7 @@ static void add_key_value(ac_cgi_t *h, char *kv) {
 ac_cgi_t *ac_cgi_init(ac_pool_t *pool, const char *q) {
   ac_cgi_t *h = (ac_cgi_t *)ac_pool_alloc(pool, sizeof(ac_cgi_t) +
                                                           (strlen(q) * 2) + 2);
+  memset(h, 0, sizeof(ac_cgi_t));
   h->pool = pool;
   strcpy((char *)(h + 1), q);
 
