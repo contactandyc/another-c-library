@@ -897,7 +897,7 @@ char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, char delim,
 }
 
 
-char *ac_in_use_buffer(ac_in_t *h, ac_in_buffer_t *b, uint32_t len, uint32_t *rlen, bool cap_length) {
+char *ac_in_use_buffer(ac_in_t *h, ac_in_buffer_t *b, uint32_t len, int32_t *rlen, bool cap_length) {
   /* where length is greater than the
      internal buffer.  In this case, a buffer is used and
      all data is copied into it. */
