@@ -78,7 +78,7 @@ time_t ac_date_as_time_t(const char *value, time_t default_value) {
     t.tm_year = year - 1900;
     t.tm_mon = month-1;
     t.tm_mday = day;
-    return gmtime(&t);
+    return timegm(&t);
   }
   return default_value;
 }
