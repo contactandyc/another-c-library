@@ -171,7 +171,7 @@ int64_t ac_int64_t(const char *value, int64_t default_value) {
     return default_value;
 
   int64_t res = 0;
-  if (sscanf(value, "%lld", &res) == 1)
+  if (sscanf(value, "%" SCNd64, &res) == 1)
     return res;
   return default_value;
 }
@@ -181,7 +181,7 @@ uint64_t ac_uint64_t(const char *value, uint64_t default_value) {
     return default_value;
 
   uint64_t res = 0;
-  if (sscanf(value, "%llu", &res) == 1)
+  if (sscanf(value, "%" SCNu64, &res) == 1)
     return res;
   return default_value;
 }
