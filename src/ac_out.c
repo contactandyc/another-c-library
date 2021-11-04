@@ -1017,8 +1017,8 @@ typedef struct {
 
 const int EXTRA_IN = 0;
 const int EXTRA_FILENAME = 1;
-const int EXTRA_FILE_TO_REMOVE = EXTRA_FILENAME;
-const int EXTRA_ACK_FILE = EXTRA_FILENAME | 2;
+const int EXTRA_FILE_TO_REMOVE = 1;
+const int EXTRA_ACK_FILE = 3;
 
 typedef struct extra_s {
   int type;
