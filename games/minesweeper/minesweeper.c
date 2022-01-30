@@ -17,12 +17,15 @@ https://www.codeproject.com/Tips/5255355/How-to-Put-Color-on-Windows-Console
 #define RED_START "\x1B[31m"
 #define RED_END "\x1B[0m"
 
-void print_token(int **board, int size, int i, int j ) {
+void print_token(int **board, int size, int i, int j, bool print_bombs ) {
     if(board[i][j] == 0) {
         printf(" ? ");
     }
     else if(board[i][j] == -1) {
-        printf(RED_START " * " RED_END );
+        if(print_bombs)
+            printf(RED_START " * " RED_END );
+        else
+            printf(" ? ");
     }
     else if(board[i][j] > 1) {
         printf(" %d ", board[i][j] - 1);
@@ -33,7 +36,7 @@ void print_token(int **board, int size, int i, int j ) {
 
 }
 
-void print_minesweeper(int **board, int size) { 
+void print_minesweeper(int **board, int size, bool print_bombs) { 
   printf( "\n        " );
   for( int i=0; i<size; i++ ) {
     printf (" %c ", 'A'+i );
@@ -42,7 +45,7 @@ void print_minesweeper(int **board, int size) {
   for( int i=0; i<size; i++ ) {
       printf ("    %d   ", i );
       for( int j=0; j<size; j++ ) {
-          print_token(board, size, i, j);
+          print_token(board, size, i, j, print_bombs);
       }
       printf ("\n");
   }  
@@ -85,16 +88,18 @@ int count_bombs(int **board, int size, int x, int y ) {
 void zero_move( int **board, int size, int x, int y ) {
     if(x < 0 || x >= size) return;
     if(y < 0 || y >= size) return;
+    if(board[x][y] != 0) return;
     if(count_bombs(board, size, x, y) > 0)
         return;
-    zero_move(board, size, x-1, y-1);
+    board[x][y] = 1;
+    // zero_move(board, size, x-1, y-1);
     zero_move(board, size, x, y-1);
-    zero_move(board, size, x+1, y-1);
+    // zero_move(board, size, x+1, y-1);
     zero_move(board, size, x-1, y);
     zero_move(board, size, x+1, y);
-    zero_move(board, size, x-1, y+1);
+    //zero_move(board, size, x-1, y+1);
     zero_move(board, size, x, y+1);
-    zero_move(board, size, x+1, y+1);
+    //zero_move(board, size, x+1, y+1);
 }
 
 
@@ -106,10 +111,10 @@ move_t try_move(int **board, int size, int x, int y ) {
     else {
         // how many bombs are around this?
         int num_bombs = count_bombs(board, size, x, y );
-        board[x][y] = num_bombs+1;
-        if(board[x][y] == 1) {
+        if(num_bombs == 0)
             zero_move(board, size, x, y );
-        }
+        else
+            board[x][y] = num_bombs+1;
         return GOOD_MOVE;
     }
 }
@@ -156,14 +161,14 @@ int main( int argc, char *argv[] ) {
     }
     place_bombs(board, size, 5);
     clear_screen();
-    print_minesweeper(board, size);
+    print_minesweeper(board, size, false);
     char move[10];
     while(true) {
         if(!get_input(board, size, move))
             break;
         clear_screen();
         move_t m = do_move(board, size, move);
-        print_minesweeper(board, size);
+        print_minesweeper(board, size, m==GAME_OVER ? true : false);
         if(m == INVALID_MOVE)
             printf( "%s is an invalid move!\n", move );
         else if(m == GAME_OVER) {
