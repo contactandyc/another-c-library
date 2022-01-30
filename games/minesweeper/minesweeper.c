@@ -9,6 +9,7 @@ void clear_screen() {
 
 /*
 reg add HKEY_CURRENT_USER\Console /v VirtualTerminalLevel /t REG_DWORD /d 0x00000001 /f
+https://www.codeproject.com/Tips/5255355/How-to-Put-Color-on-Windows-Console
 
 */
 
