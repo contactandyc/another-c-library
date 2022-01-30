@@ -5,3 +5,4 @@ minesweeper: minesweeper.c
 
 clean:
 	rm -rf minesweeper
+
