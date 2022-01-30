@@ -24,9 +24,13 @@ void print_token(int **board, int size, int i, int j ) {
     else if(board[i][j] == -1) {
         printf(RED_START " * " RED_END );
     }
-    else if(board[i][j] > 0) {
+    else if(board[i][j] > 1) {
         printf(" %d ", board[i][j] - 1);
     }
+    else if(board[i][j] == 1) {
+        printf("   " );
+    }
+
 }
 
 void print_minesweeper(int **board, int size) { 
@@ -64,6 +68,36 @@ int check_for_bomb(int **board, int size, int x, int y) {
     return 0;
 }
 
+int count_bombs(int **board, int size, int x, int y ) {
+    int num_bombs = 
+        check_for_bomb(board, size, x-1, y-1) +
+        check_for_bomb(board, size, x, y-1 ) +
+        check_for_bomb(board, size, x+1, y-1) + 
+        check_for_bomb(board, size, x-1, y) +
+        check_for_bomb(board, size, x+1, y) + 
+        check_for_bomb(board, size, x-1, y+1) +
+        check_for_bomb(board, size, x, y+1 ) +
+        check_for_bomb(board, size, x+1, y+1); 
+    return num_bombs;
+}
+
+
+void zero_move( int **board, int size, int x, int y ) {
+    if(x < 0 || x >= size) return;
+    if(y < 0 || y >= size) return;
+    if(count_bombs(board, size, x, y) > 0)
+        return;
+    zero_move(board, size, x-1, y-1);
+    zero_move(board, size, x, y-1);
+    zero_move(board, size, x+1, y-1);
+    zero_move(board, size, x-1, y);
+    zero_move(board, size, x+1, y);
+    zero_move(board, size, x-1, y+1);
+    zero_move(board, size, x, y+1);
+    zero_move(board, size, x+1, y+1);
+}
+
+
 move_t try_move(int **board, int size, int x, int y ) {
     if(board[x][y] < 0)
         return GAME_OVER;
@@ -71,16 +105,11 @@ move_t try_move(int **board, int size, int x, int y ) {
         return INVALID_MOVE;
     else {
         // how many bombs are around this?
-        int num_bombs = 
-            check_for_bomb(board, size, x-1, y-1) +
-            check_for_bomb(board, size, x, y-1 ) +
-            check_for_bomb(board, size, x+1, y-1) + 
-            check_for_bomb(board, size, x-1, y) +
-            check_for_bomb(board, size, x+1, y) + 
-            check_for_bomb(board, size, x-1, y+1) +
-            check_for_bomb(board, size, x, y+1 ) +
-            check_for_bomb(board, size, x+1, y+1); 
+        int num_bombs = count_bombs(board, size, x, y );
         board[x][y] = num_bombs+1;
+        if(board[x][y] == 1) {
+            zero_move(board, size, x, y );
+        }
         return GOOD_MOVE;
     }
 }
