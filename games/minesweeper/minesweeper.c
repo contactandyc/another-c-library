@@ -7,6 +7,11 @@ void clear_screen() {
     printf( "\e[1;1H\e[2J" );
 }
 
+/*
+reg add HKEY_CURRENT_USER\Console /v VirtualTerminalLevel /t REG_DWORD /d 0x00000001 /f
+
+*/
+
 #define RED_START "\x1B[31m"
 #define RED_END "\x1B[0m"
 
@@ -43,6 +48,11 @@ void place_bombs( int **board, int size, int num_bombs ) {
         } while(board[x][y] != 0);
         board[x][y] = -1;
     }
+}
+
+void get_input() {
+    printf( "Your Move: " );
+
 }
 
 int main( int argc, char *argv[] ) {
