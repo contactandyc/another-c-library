@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <title>Minesweeper!</title>
+        <script language="Javascript">
+        </script>
+    
+    </head>
+    <body>        
+        <div id="board">
+        </div>
+        <script language="Javascript">
+            let rows = 20, cols = 25;
+            let board = [];
+            function populate_board() {
+                for( let i=0; i<rows; i++ ) {
+                    let row = [];
+                    for( let j=0; j<cols; j++ ) {
+                        row.push(0);
+                    }
+                    board.push(row);
+                }
+            }
+            function place_bombs(how_many) {
+                for( let i=0; i<how_many; i++ ) {
+                    while(1) {
+                        let x = Math.floor(Math.random() * rows);
+                        let y = Math.floor(Math.random() * cols);
+                        console.log(x);
+                        console.log(y);
+                        console.log(board[x]);
+                        if(board[x][y] != 0)
+                            continue;
+                        board[x][y] = -1;
+                        break;
+                    }
+                }
+            }
+            function create_column(t, x, y) {
+                let pct = "" + (100)/cols + "%";
+                let d = document.createElement('div');
+                d.style.width = pct;
+                d.style.display = 'inline-block';
+                d.style.height = '100%';
+                d.style.backgroundColor = (x+y) % 2 == 0 ? "green" : "blue";
+                d.id = 'b_' + x + '_' + y;
+
+                if(board[x][y] != 0) {
+                    let img = document.createElement('img');
+                    img.src = 'bomb.jpeg';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    d.appendChild(img);
+                }
+                t.appendChild(d);
+            }
+            function create_rows(t) {
+                let pct = "" + (100)/rows + "%";
+                for( let i=0; i<rows; i++ ) {
+                    let d = document.createElement('div');
+                    d.style.width = '100%';
+                    d.style.height = pct;
+                    for( let j=0; j<cols; j++ ) {
+                        create_column(d, i, j);
+                    }
+                    t.appendChild(d);
+                }
+            }
+            populate_board();
+            place_bombs(15);
+            create_rows(document.getElementById("board"));
+        </script>
+    </body>
+</html>
