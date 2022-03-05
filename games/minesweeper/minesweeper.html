@@ -1,73 +1,35 @@
 <html>
-    <head>
-        <title>Minesweeper!</title>
-        <script language="Javascript">
-        </script>
-    
-    </head>
-    <body>        
-        <div id="board">
+  <head>
+    <title>Minesweeper!</title>
+    <script language="Javascript"></script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div id="board" class="game-board"></div>
+      <div class="sidebar">
+        <div>
+          <label class="info-label">Time</label>
+          <div class="info" id="time">1:30</div>
         </div>
-        <script language="Javascript">
-            let rows = 20, cols = 25;
-            let board = [];
-            function populate_board() {
-                for( let i=0; i<rows; i++ ) {
-                    let row = [];
-                    for( let j=0; j<cols; j++ ) {
-                        row.push(0);
-                    }
-                    board.push(row);
-                }
-            }
-            function place_bombs(how_many) {
-                for( let i=0; i<how_many; i++ ) {
-                    while(1) {
-                        let x = Math.floor(Math.random() * rows);
-                        let y = Math.floor(Math.random() * cols);
-                        console.log(x);
-                        console.log(y);
-                        console.log(board[x]);
-                        if(board[x][y] != 0)
-                            continue;
-                        board[x][y] = -1;
-                        break;
-                    }
-                }
-            }
-            function create_column(t, x, y) {
-                let pct = "" + (100)/cols + "%";
-                let d = document.createElement('div');
-                d.style.width = pct;
-                d.style.display = 'inline-block';
-                d.style.height = '100%';
-                d.style.backgroundColor = (x+y) % 2 == 0 ? "green" : "blue";
-                d.id = 'b_' + x + '_' + y;
-
-                if(board[x][y] != 0) {
-                    let img = document.createElement('img');
-                    img.src = 'bomb.jpeg';
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    d.appendChild(img);
-                }
-                t.appendChild(d);
-            }
-            function create_rows(t) {
-                let pct = "" + (100)/rows + "%";
-                for( let i=0; i<rows; i++ ) {
-                    let d = document.createElement('div');
-                    d.style.width = '100%';
-                    d.style.height = pct;
-                    for( let j=0; j<cols; j++ ) {
-                        create_column(d, i, j);
-                    }
-                    t.appendChild(d);
-                }
-            }
-            populate_board();
-            place_bombs(15);
-            create_rows(document.getElementById("board"));
-        </script>
-    </body>
+        <div>
+          <label class="info-label">Size</label>
+          <div class="info" id="size">20x20</div>
+        </div>
+        <div>
+          <label class="info-label"># Bombs</label>
+          <div class="info" id="num-bombs">35</div>
+        </div>
+        <div>
+          <label class="info-label">Flags Remaining</label>
+          <div class="info" id="num-flags">35</div>
+        </div>
+        <div>
+          <div id="reset-button" onclick="window.location.reload()">Reset</div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="./js/minesweeper.js"></script>
+    <script language="Javascript"></script>
+  </body>
 </html>
