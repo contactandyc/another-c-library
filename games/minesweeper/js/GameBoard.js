@@ -7,6 +7,7 @@ export default class GameBoard {
   constructor(parent, size, click, rightClick) {
     this.size = size;
     this.parent = document.getElementById(parent);
+    this.boardEl = null;
     this.click = click;
     this.rightClick = rightClick;
     if (parent === undefined) {
@@ -163,9 +164,10 @@ export default class GameBoard {
 
   buildBoard() {
     let b = this.parent;
-    b.classList.add('game-board');
-    b.style.setProperty('--grid-col', this.size);
-    b.style.setProperty('--grid-rows', this.size);
+    this.boardEl = document.createElement('div');
+    this.boardEl.classList.add('game-board');
+    this.boardEl.style.setProperty('--grid-col', this.size);
+    this.boardEl.style.setProperty('--grid-rows', this.size);
     this.board = [];
     for (let y = 0; y < this.size; y++) {
       this.board[y] = [];
@@ -184,10 +186,15 @@ export default class GameBoard {
             this.rightClick({ y: y, x: x });
           });
         }
-        b.appendChild(d);
+        this.boardEl.appendChild(d);
         this.board[y].push({ el: d, state: GameBoard.GRASS });
         this.setState({ y: y, x: x }, GameBoard.GRASS);
       }
     }
+    b.appendChild(this.boardEl);
+  }
+
+  removeBoard() {
+    this.parent.removeChild(this.boardEl);
   }
 }
