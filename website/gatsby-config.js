@@ -22,6 +22,14 @@ module.exports = {
         path: `${__dirname}/src/images`,
       },
     },
+    `gatsby-plugin-sitemap`,
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `images`,
+        path: `${__dirname}/minesweeper`,
+      },
+    },
     {
       resolve: `gatsby-source-filesystem`,
       options: {
