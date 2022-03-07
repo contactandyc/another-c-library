@@ -1,0 +1,220 @@
+:root {
+  --grid-col: 4;
+  --grid-rows: 4;
+  --button-color: white;
+  --button-text-color: black;
+}
+
+@font-face {
+  font-family: 'Sigmar';
+  src: url('fonts/SigmarOne-Regular.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  background: url('./media/images/Plain.png');
+  background-position: center;
+  background-size: cover;
+  font-family: 'Sigmar';
+  color: white;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  width: 100%;
+}
+
+.sidebar {
+  margin: 2vh 2vh 2vh 2vh;
+  width: 100%;
+  max-width: 20vw;
+  background-color: rgba(0, 100, 22, 0.75);
+  border-radius: 10px;
+  padding: 2%;
+  font-size: 1.25em;
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+}
+
+.info-label {
+  display: block;
+}
+
+.info {
+  font-size: 3em;
+  line-height: 1em;
+}
+
+.game-board {
+  margin: 2vh 0 2vh 2vh;
+  width: 90vh;
+  height: 90vh;
+  max-width: 75vw;
+  max-height: 75vw;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-col), 1fr);
+  grid-template-rows: repeat(var(--grid-rows), 1fr);
+  border: #006416 solid 10px;
+  border-radius: 10px;
+  background-color: #006416;
+  gap: 5px;
+  opacity: 85%;
+}
+
+@keyframes dirt-reveal {
+  to {
+    background-color: #685112;
+  }
+}
+
+@keyframes explode-animation {
+  0% {
+    background-color: #ff7b00;
+  }
+  35% {
+    background-color: #ff7b00;
+  }
+  50% {
+    background-color: #ff0000;
+  }
+  65% {
+    background-color: #bb6412;
+  }
+  100% {
+    background-color: #bb6412;
+  }
+}
+
+.board-square {
+  border-radius: 5px;
+  color: white;
+  font-size: 1.5em;
+  text-align: center;
+  overflow: hidden;
+}
+
+.board-square.even {
+  background-color: #01b127;
+  cursor: pointer;
+}
+
+.board-square.odd {
+  background-color: #41f167;
+  cursor: pointer;
+}
+
+.board-square.dirt {
+  animation-name: dirt-reveal;
+  animation-duration: 0.25s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+  background-color: #685112;
+  cursor: default !important;
+}
+
+.board-square.exploding {
+  animation-name: explode-animation;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: initial;
+  cursor: default !important;
+}
+
+.board-square.exploded {
+  background-color: black;
+  cursor: default !important;
+}
+
+.bomb {
+  background: url('./media/images/bomb.png');
+  background-position: center;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.flag {
+  background: url('./media/images/flag.png');
+  background-position: center;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+}
+
+#reset-button {
+  padding: 5%;
+  border-radius: 10px;
+  background-color: #ff0000;
+  cursor: pointer;
+}
+
+#reset-button:hover {
+  background-color: #b10000;
+}
+
+#reset-button:active {
+  background-color: #ff4646;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 100%;
+  }
+}
+
+.modal {
+  position: absolute;
+  animation-name: modal-fade-in;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+  background-color: rgba(0, 0, 0, 0.75);
+  text-align: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.modal-box {
+  display: inline-block;
+  padding: 4%;
+  min-width: 400px;
+  background-color: #007c1b;
+  margin: auto;
+  top: 50%;
+  border-radius: 20px;
+  transform: translateY(-50%);
+  position: relative;
+}
+
+.modal-content {
+  text-align: center;
+  font-size: 1.5em;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 4%;
+}
+
+.modal-buttons button {
+  font-size: 1.5em;
+  font-family: 'Sigmar';
+  border: none;
+  background-color: var(--button-color);
+  color: var(--button-text-color);
+  padding: 2% 3%;
+  border-radius: 10px;
+  cursor: pointer;
+  margin: 3%;
+}
