@@ -3,7 +3,7 @@ module.exports = {
     title: `Another C Library`,
     description: `Another C Library rebuilds, and in some cases, improves upon, some of the most useful Computer Science algorithms from the ground up for engineers to build complex, scalable applications.`,
     author: `Daniel Curtis`,
-    siteUrl: `https://www.anotherclibrary.com`,
+    siteUrl: `https://www.anotherclibrary.com`
   },
   plugins: [
     `gatsby-plugin-catch-links`,
@@ -11,7 +11,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
-        trackingId: "UA-155680388-1",
+        trackingId: 'UA-155680388-1'
       }
     },
     `gatsby-plugin-sitemap`,
@@ -19,49 +19,42 @@ module.exports = {
       resolve: `gatsby-source-filesystem`,
       options: {
         name: `images`,
-        path: `${__dirname}/src/images`,
-      },
+        path: `${__dirname}/src/images`
+      }
     },
     `gatsby-plugin-sitemap`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
-        name: `images`,
-        path: `${__dirname}/minesweeper`,
-      },
-    },
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
         path: `${__dirname}/ebook`,
-        name: "ebook",
-      },
+        name: 'ebook'
+      }
     },
     {
-      resolve: "gatsby-transformer-remark",
+      resolve: 'gatsby-transformer-remark',
       options: {
         plugins: [
           {
             resolve: `gatsby-remark-prismjs`,
             options: {
-              classPrefix: "language-",
+              classPrefix: 'language-',
               aliases: {
-                sh: "shell",
-                es6: "javascript",
-                env: "bash",
-                mdx: "md",
-                ".json": "json",
-              },
-            },
+                sh: 'shell',
+                es6: 'javascript',
+                env: 'bash',
+                mdx: 'md',
+                '.json': 'json'
+              }
+            }
           },
           {
             resolve: `gatsby-remark-autolink-headers`,
             options: {
-              offsetY: `80`,
-            },
-          },
-        ],
-      },
+              offsetY: `80`
+            }
+          }
+        ]
+      }
     },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
@@ -71,15 +64,15 @@ module.exports = {
         name: `Another C Library`,
         short_name: `ac_`,
         start_url: `/`,
-        icon: `src/images/ac-logo.png`,
-      },
+        icon: `src/images/ac-logo.png`
+      }
     },
     {
       resolve: `gatsby-plugin-typography`,
       options: {
-        pathToConfigModule: `src/utils/typography`,
-      },
+        pathToConfigModule: `src/utils/typography`
+      }
     },
-    `gatsby-plugin-offline`,
-  ],
-}
+    `gatsby-plugin-offline`
+  ]
+};
