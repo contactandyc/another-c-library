@@ -4,27 +4,25 @@ The code behind [AnotherCLibrary.com](https://AnotherCLibrary.com).
 Currently, the website is built using React and GatsbyJS and renders the
 markdown files in the Another C Library GitHub repo.
 
-## Get Started
+## Quick start
 
-Ensure you're in the root website directory.
-Install the necessary packages using npm (may require sudo):
+Ensure you're in the root website directory and have the latest code `git pull`
 
-```bash
-npm install
-```
+1. Ensure you're using node version 14: `node --version`
+2. If you're not, use `nvm use v14` to switch (https://github.com/nvm-sh/nvm)
+3. Run `npm install`
+4. Run `npm run develop` to run your project locally at http:localhost:8000
+5. Run `npm run build` before committing code to ensure it builds
 
-For local development run gatsby develop:
+## Adding plain HTML/JS/CSS pages
 
-```bash
-gatsby develop
-```
+Everything inside the /static folder will be served, but it must be static (can't fetch data). To add a new static file without React, navigate to the static folder and add a new directory for your files.
 
-The website will be running locally on port 8000 (localhost:8000)
-For a build production, run gatsby build:
+For example, an index.html file inside the /static/games/minesweeper directory will be available at localhost:8000/games/minesweeper.
 
-```bash
-gatsby build
-```
+## Adding react pages
+
+To add a new react page, go to /src/pages and add a new page. If your page has a lot of repeating code, split it out into a component in the /src/components directory.
 
 ## Architecture
 
