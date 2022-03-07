@@ -38,8 +38,8 @@ class GameManager {
       this.game.removeBoard();
     }
     this.game = new MineSweeper(
+      25,
       20,
-      5,
       (time) => this.win(time),
       () => this.lose()
     );
