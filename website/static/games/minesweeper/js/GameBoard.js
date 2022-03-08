@@ -174,6 +174,7 @@ export default class GameBoard {
       for (let x = 0; x < this.size; x++) {
         let d = document.createElement('div');
         d.id = `b_${y}_${x}`;
+        d.style.setProperty('--square-font-size', `${20 / this.size}em`);
         if (this.click != undefined) {
           d.addEventListener('click', (e) => {
             e.preventDefault();

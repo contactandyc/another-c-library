@@ -6,14 +6,14 @@ export default class MineSweeper {
     this.size = size;
     this.numBombs = numBombs;
     this.flaggedBombs = 0;
-    this.time = { m: 0, s: 0 };
+
     this.state = 'playing';
     this.modal = null;
     this.winCb = winCb;
     this.loseCb = loseCb;
     this.gb = new GameBoard(
       'board',
-      20,
+      this.size,
       (pos) => this.click(pos),
       (pos) => this.rightClick(pos)
     );
@@ -21,13 +21,11 @@ export default class MineSweeper {
     document.getElementById('num-flags').innerText = this.flagsRemaining;
     document.getElementById('num-bombs').innerText = this.numBombs;
     document.getElementById('size').innerText = `${this.size}x${this.size}`;
-    document.getElementById('time').innerText = '00:00';
-    setTimeout(() => this.updateTime(), 1000);
   }
 
   win() {
     this.state = 'ended';
-    this.winCb(this.time);
+    this.winCb();
   }
 
   lose(pos) {
@@ -38,20 +36,6 @@ export default class MineSweeper {
     setTimeout(() => {
       this.loseCb(this.time);
     }, 2000);
-  }
-
-  updateTime() {
-    if (this.state === 'playing') {
-      this.time.s++;
-      if (this.time.s > 60) {
-        this.time.s = 0;
-        this.time.m++;
-      }
-      document.getElementById('time').innerText = `${this.time.m
-        .toString()
-        .padStart(2, '0')}:${this.time.s.toString().padStart(2, '0')}`;
-    }
-    setTimeout(() => this.updateTime(), 1000);
   }
 
   rightClick(pos) {

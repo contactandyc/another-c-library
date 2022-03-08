@@ -7,23 +7,53 @@ class GameManager {
     this.musicPlayer = new MusicPlayer();
     document.getElementById('container').style.display = 'none';
     this.modal = null;
-    let tn = document.createTextNode(`Wanna play a game?`);
-    this.modal = new Modal(tn);
-    this.modal.addButton(
-      'New Game',
-      (e) => {
-        this.musicPlayer.addTrack('./media/music/looking_for_adventure.wav');
-        this.musicPlayer.addTrack('./media/music/Epic_Sport.wav');
-        this.musicPlayer.addTrack('./media/music/Inspiring_Muted_Guitar.mp3');
-        this.musicPlayer.play();
-        document.getElementById('container').style.display = 'flex';
-        this.newGame();
-      },
-      {
-        color: 'blue',
-        textColor: 'white',
+
+    this.time = { m: 0, s: 0 };
+    document.getElementById('time').innerText = '00:00';
+    this.presentNewGameModal();
+    document
+      .getElementById('reset-button')
+      .addEventListener('click', () => this.presentNewGameModal());
+    document.getElementById('settings-button');
+    this.begin();
+  }
+
+  updateTime() {
+    if (this.game.state === 'playing') {
+      this.time.s++;
+      if (this.time.s > 60) {
+        this.time.s = 0;
+        this.time.m++;
       }
-    );
+      document.getElementById(
+        'time'
+      ).innerText = `${this.time.m
+        .toString()
+        .padStart(2, '0')}:${this.time.s.toString().padStart(2, '0')}`;
+    }
+  }
+
+  stopTimer() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+  }
+
+  startTimer() {
+    this.timer = setInterval(() => this.updateTime(), 1000);
+  }
+
+  //disambiguated from newGame this happens only once per page load when you press the start button.
+  begin() {
+    this.setupMusicPlaylist();
+    document.getElementById('container').style.display = 'flex';
+  }
+
+  setupMusicPlaylist() {
+    this.musicPlayer.addTrack('./media/music/looking_for_adventure.wav');
+    this.musicPlayer.addTrack('./media/music/Epic_Sport.wav');
+    this.musicPlayer.addTrack('./media/music/Inspiring_Muted_Guitar.mp3');
   }
 
   exitClicked() {
@@ -31,21 +61,67 @@ class GameManager {
   }
 
   newGame() {
+    // console.log('size', this.size);
+    // console.log('num bombs', this.numBombs);
     if (this.modal) {
       this.modal.remove();
     }
     if (this.game != undefined) {
       this.game.removeBoard();
     }
+    delete this.game;
     this.game = new MineSweeper(
-      20,
-      15,
-      (time) => this.win(time),
+      this.size,
+      this.numBombs,
+      () => this.win(),
       () => this.lose()
     );
+    this.stopTimer();
+    this.time = { m: 0, s: 0 };
+    this.startTimer();
   }
 
-  win(time) {
+  closeNewGameModal() {
+    this.numBombs = Number(document.getElementById('bombs-input').value);
+    this.size = Number(document.getElementById('size-input').value);
+    this.musicPlayer.play();
+    this.newGame();
+  }
+
+  presentNewGameModal() {
+    if (this.modal) {
+      this.modal.remove();
+    }
+    let options = document.createElement('div');
+    options.id = 'new-game-options';
+    let label = document.createElement('h2');
+    label.innerText = "Let's play a game...";
+    options.appendChild(label);
+
+    let sizeInput = document.createElement('input');
+    sizeInput.type = 'text';
+    sizeInput.id = 'size-input';
+    sizeInput.placeholder = 'Size';
+    sizeInput.defaultValue = 20;
+    if (this.size) sizeInput.value = this.size;
+    options.appendChild(sizeInput);
+
+    let bombsInput = document.createElement('input');
+    bombsInput.type = 'text';
+    bombsInput.id = 'bombs-input';
+    bombsInput.placeholder = '# of Bombs';
+    sizeInput.defaultValue = 10;
+    if (this.numBombs) bombsInput.value = this.numBombs;
+    options.appendChild(bombsInput);
+
+    this.modal = new Modal(options);
+    this.modal.addButton('New Game', (e) => this.closeNewGameModal(), {
+      color: 'blue',
+      textColor: 'white',
+    });
+  }
+
+  win() {
     let tn = document.createTextNode(
       `Congrats! You won in ${time.m} minute(s) and ${time.s} second(s)`
     );
@@ -56,7 +132,7 @@ class GameManager {
       color: 'red',
       textColor: 'white',
     });
-    this.modal.addButton('New Game', (e) => this.newGame(), {
+    this.modal.addButton('New Game', (e) => this.presentNewGameModal(), {
       color: 'blue',
       textColor: 'white',
     });
@@ -70,7 +146,7 @@ class GameManager {
       color: 'red',
       textColor: 'white',
     });
-    this.modal.addButton('Walk of Shame', (e) => this.newGame(), {
+    this.modal.addButton('Walk of Shame', (e) => this.presentNewGameModal(), {
       color: 'blue',
       textColor: 'white',
     });

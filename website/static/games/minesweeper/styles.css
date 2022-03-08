@@ -1,6 +1,7 @@
 :root {
   --grid-col: 4;
   --grid-rows: 4;
+  --square-font-size: 1.1em;
   --button-color: white;
   --button-text-color: black;
 }
@@ -93,9 +94,12 @@ body {
 }
 
 .board-square {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
   border-radius: 5px;
   color: white;
-  font-size: 1.5em;
+  font-size: var(--square-font-size);
   text-align: center;
   overflow: hidden;
 }
@@ -163,6 +167,22 @@ body {
   background-color: #ff4646;
 }
 
+#settings-button {
+  padding: 5%;
+  border-radius: 10px;
+  margin-top: 3%;
+  background-color: blue;
+  cursor: pointer;
+}
+
+#settings-button:hover {
+  background-color: rgb(0, 0, 190);
+}
+
+#settings-button:active {
+  background-color: rgb(88, 88, 255);
+}
+
 @keyframes modal-fade-in {
   from {
     opacity: 0;
@@ -199,6 +219,8 @@ body {
 .modal-content {
   text-align: center;
   font-size: 1.5em;
+  display: flex;
+  justify-content: center;
 }
 
 .modal-buttons {
@@ -217,4 +239,25 @@ body {
   border-radius: 10px;
   cursor: pointer;
   margin: 3%;
+}
+
+#new-game-options {
+  display: flex;
+  flex-direction: column;
+  vertical-align: center;
+  justify-content: center;
+  text-align: center;
+  width: 90%;
+}
+
+#new-game-options input {
+  border: none;
+  font-family: 'Sigmar';
+  padding: 1%;
+  border-radius: 10px;
+  font-size: 1.5em;
+  max-width: 100%;
+  text-align: center;
+  line-height: 23px;
+  margin-bottom: 30px;
 }
