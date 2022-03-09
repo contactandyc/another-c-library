@@ -44,6 +44,20 @@ body {
   flex-direction: column;
 }
 
+.sidebar-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  margin: 15% 0;
+}
+
+.sidebar-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 .info-label {
   display: block;
 }
@@ -152,8 +166,12 @@ body {
   height: 100%;
 }
 
-#reset-button {
+.sidebar-buttons div {
   padding: 5%;
+}
+
+#reset-button {
+  margin-bottom: 5%;
   border-radius: 10px;
   background-color: #ff0000;
   cursor: pointer;
@@ -168,9 +186,7 @@ body {
 }
 
 #settings-button {
-  padding: 5%;
   border-radius: 10px;
-  margin-top: 3%;
   background-color: blue;
   cursor: pointer;
 }
@@ -260,4 +276,39 @@ body {
   text-align: center;
   line-height: 23px;
   margin-bottom: 30px;
+}
+
+@media only screen and (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+  }
+  .game-board {
+    max-height: 90vw;
+    max-width: 90vw;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-width: 90%;
+    flex-direction: column;
+  }
+
+  .sidebar-info {
+    flex-direction: row;
+    margin: 3% 0;
+  }
+
+  .sidebar-buttons {
+    flex-direction: row;
+  }
+
+  #reset-button {
+    margin: 0;
+  }
+
+  .sidebar-buttons div {
+    margin: 0;
+    width: 40%;
+    padding: 2%;
+  }
 }

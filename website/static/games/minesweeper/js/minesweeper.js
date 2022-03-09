@@ -1,7 +1,7 @@
 import GameBoard from './GameBoard.js';
 
 export default class MineSweeper {
-  constructor(size, numBombs, winCb, loseCb) {
+  constructor(size, numBombs, soundPlayer, winCb, loseCb) {
     this.flagsRemaining = numBombs;
     this.size = size;
     this.numBombs = numBombs;
@@ -11,6 +11,7 @@ export default class MineSweeper {
     this.modal = null;
     this.winCb = winCb;
     this.loseCb = loseCb;
+    this.soundPlayer = soundPlayer;
     this.gb = new GameBoard(
       'board',
       this.size,
@@ -31,26 +32,29 @@ export default class MineSweeper {
   lose(pos) {
     this.state = 'ended';
     this.gb.explode(pos);
-    var audio = new Audio('./media/sounds/Explosion Powerful.mp3');
-    audio.play();
+    this.soundPlayer.src = './media/sounds/Explosion Powerful.mp3';
+    this.soundPlayer.load();
+    this.soundPlayer.play();
     setTimeout(() => {
       this.loseCb(this.time);
     }, 2000);
   }
 
   rightClick(pos) {
-    if (this.gb.isFlagged(pos)) {
-      this.gb.toggleFlag(pos);
-      if (this.gb.isBomb(pos)) this.flaggedBombs--;
-      this.flagsRemaining++;
-    } else if (!this.gb.isRevealed(pos)) {
-      this.gb.toggleFlag(pos);
-      if (this.gb.isBomb(pos)) this.flaggedBombs++;
-      this.flagsRemaining--;
-      if (this.flagsRemaining === 0 && this.flaggedBombs === this.numBombs)
-        this.win();
+    if (this.state != 'ended') {
+      if (this.gb.isFlagged(pos)) {
+        this.gb.toggleFlag(pos);
+        if (this.gb.isBomb(pos)) this.flaggedBombs--;
+        this.flagsRemaining++;
+      } else if (!this.gb.isRevealed(pos)) {
+        this.gb.toggleFlag(pos);
+        if (this.gb.isBomb(pos)) this.flaggedBombs++;
+        this.flagsRemaining--;
+        if (this.flagsRemaining === 0 && this.flaggedBombs === this.numBombs)
+          this.win();
+      }
+      document.getElementById('num-flags').innerText = this.flagsRemaining;
     }
-    document.getElementById('num-flags').innerText = this.flagsRemaining;
   }
 
   click(pos) {

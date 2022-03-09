@@ -10,12 +10,30 @@ export default class GameBoard {
     this.boardEl = null;
     this.click = click;
     this.rightClick = rightClick;
+    this.pressTimer = null;
+    this.altClick = false;
     if (parent === undefined) {
       throw Error(
         `[Error] GameBoard: parent element, ${parent}, does not exist`
       );
     }
     this.buildBoard();
+  }
+
+  addClickAndLongClickListener(el, clickHandler, longClickHandler) {
+    this.longClick = false;
+    el.addEventListener('mousedown', (e) => {
+      this.pressTimer = setTimeout(() => {
+        this.altClick = true;
+        longClickHandler(e);
+      }, 300);
+    });
+    el.addEventListener('mouseup', (e) => {
+      clearTimeout(this.pressTimer);
+      if (this.altClick === false) clickHandler(e);
+      this.pressTimer = null;
+      this.altClick = false;
+    });
   }
 
   isInBounds(pos) {
@@ -43,7 +61,10 @@ export default class GameBoard {
   }
 
   isBomb(pos) {
-    if (this.hasState(pos, GameBoard.BOMB)) return 1;
+    if (this.hasState(pos, GameBoard.BOMB)) {
+      //Could do a check here to see if the bomb should be auto-flagged
+      return 1;
+    }
     return 0;
   }
 
@@ -175,18 +196,22 @@ export default class GameBoard {
         let d = document.createElement('div');
         d.id = `b_${y}_${x}`;
         d.style.setProperty('--square-font-size', `${20 / this.size}em`);
-        if (this.click != undefined) {
-          d.addEventListener('click', (e) => {
+        this.addClickAndLongClickListener(
+          d,
+          (e) => {
             e.preventDefault();
             this.click({ y: y, x: x });
-          });
-        }
-        if (this.rightClick != undefined) {
-          d.addEventListener('contextmenu', (e) => {
+          },
+          (e) => {
             e.preventDefault();
             this.rightClick({ y: y, x: x });
-          });
-        }
+          }
+        );
+        d.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          this.altClick = true;
+          this.rightClick({ y: y, x: x });
+        });
         this.boardEl.appendChild(d);
         this.board[y].push({ el: d, state: GameBoard.GRASS });
         this.setState({ y: y, x: x }, GameBoard.GRASS);

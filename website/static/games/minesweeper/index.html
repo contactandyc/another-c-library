@@ -8,24 +8,27 @@
     <div id="container" class="container">
       <div id="board"></div>
       <div class="sidebar">
-        <div>
-          <label class="info-label">Time</label>
-          <div class="info" id="time">1:30</div>
+        <div class="sidebar-info">
+          <div>
+            <label class="info-label">Time</label>
+            <div class="info" id="time">1:30</div>
+          </div>
+          <div>
+            <label class="info-label">Size</label>
+            <div class="info" id="size">20x20</div>
+          </div>
+          <div>
+            <label class="info-label"># Bombs</label>
+            <div class="info" id="num-bombs">35</div>
+          </div>
+          <div>
+            <label class="info-label">Flags Remaining</label>
+            <div class="info" id="num-flags">35</div>
+          </div>
         </div>
-        <div>
-          <label class="info-label">Size</label>
-          <div class="info" id="size">20x20</div>
-        </div>
-        <div>
-          <label class="info-label"># Bombs</label>
-          <div class="info" id="num-bombs">35</div>
-        </div>
-        <div>
-          <label class="info-label">Flags Remaining</label>
-          <div class="info" id="num-flags">35</div>
-        </div>
-        <div>
-          <div id="reset-button" onclick="window.location.reload()">Reset</div>
+        <div class="sidebar-buttons">
+          <div id="reset-button">New Game</div>
+          <div id="settings-button">Settings</div>
         </div>
       </div>
     </div>

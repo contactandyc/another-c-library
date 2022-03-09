@@ -4,18 +4,42 @@ import MusicPlayer from './MusicPlayer.js';
 
 class GameManager {
   constructor() {
+    this.musicVol = 0.5;
+    this.soundVol = 1;
     this.musicPlayer = new MusicPlayer();
+    this.musicPlayer.volume = this.musicVol;
+    this.soundPlayer = new Audio();
+    this.soundPlayer.volume = this.soundVol;
     document.getElementById('container').style.display = 'none';
     this.modal = null;
 
     this.time = { m: 0, s: 0 };
     document.getElementById('time').innerText = '00:00';
     this.presentNewGameModal();
+
     document
       .getElementById('reset-button')
       .addEventListener('click', () => this.presentNewGameModal());
-    document.getElementById('settings-button');
+    document
+      .getElementById('settings-button')
+      .addEventListener('click', () => this.presentSettingsModal());
     this.begin();
+  }
+
+  addClickAndLongClickListener(el, clickHandler, longClickHandler) {
+    this.longClick = false;
+    el.addEventListener('onmousedown', (e) => {
+      this.pressTimer = setTimeout(() => {
+        this.longClick = true;
+        longClickHandler(e);
+      }, 500);
+    });
+    el.addEventListener('onmouseup', (e) => {
+      clearTimeout(this.pressTimer);
+      if (this.longClick === false) clickHandler(e);
+      this.pressTimer = null;
+      this.longClick = false;
+    });
   }
 
   updateTime() {
@@ -73,6 +97,7 @@ class GameManager {
     this.game = new MineSweeper(
       this.size,
       this.numBombs,
+      this.soundPlayer,
       () => this.win(),
       () => this.lose()
     );
@@ -121,12 +146,77 @@ class GameManager {
     });
   }
 
+  exitSettings() {
+    this.musicPlayer.volume = this.musicVol;
+    this.soundPlayer.volume = this.soundVol;
+    this.modal.remove();
+  }
+
+  saveSettings() {
+    this.musicVol = document.getElementById('music-volume').value / 100;
+    this.soundVol = document.getElementById('sound-volume').value / 100;
+    this.exitSettings();
+  }
+
+  presentSettingsModal() {
+    if (this.modal) {
+      this.modal.remove();
+    }
+    let options = document.createElement('div');
+    options.id = 'new-game-options';
+    let label = document.createElement('h2');
+    label.innerText = 'Settings';
+    options.appendChild(label);
+
+    let musicLabel = document.createElement('label');
+    musicLabel.innerText = 'Music Volume';
+    options.appendChild(musicLabel);
+    let musicVolume = document.createElement('input');
+    musicVolume.type = 'range';
+    musicVolume.id = 'music-volume';
+    musicVolume.min = 0;
+    musicVolume.max = 100;
+    musicVolume.value = this.musicVol * 100;
+    musicVolume.addEventListener('change', (e) => {
+      this.musicPlayer.volume = e.currentTarget.value / 100;
+    });
+    options.appendChild(musicVolume);
+
+    let soundsLabel = document.createElement('label');
+    soundsLabel.innerText = 'Sounds Volume';
+    options.appendChild(soundsLabel);
+    let soundsVolume = document.createElement('input');
+    soundsVolume.type = 'range';
+    soundsVolume.id = 'sound-volume';
+    soundsVolume.min = 0;
+    soundsVolume.max = 100;
+    soundsVolume.value = this.soundVol * 100;
+    soundsVolume.addEventListener('change', (e) => {
+      this.soundPlayer.volume = e.currentTarget.value / 100;
+      this.soundPlayer.src = './media/sounds/Victory.mp3';
+      this.soundPlayer.load();
+      this.soundPlayer.play();
+    });
+    options.appendChild(soundsVolume);
+
+    this.modal = new Modal(options);
+    this.modal.addButton('Exit', (e) => this.exitSettings(), {
+      color: 'white',
+      textColor: 'blue',
+    });
+    this.modal.addButton('Save', (e) => this.saveSettings(), {
+      color: 'blue',
+      textColor: 'white',
+    });
+  }
+
   win() {
     let tn = document.createTextNode(
       `Congrats! You won in ${time.m} minute(s) and ${time.s} second(s)`
     );
-    var audio = new Audio('./media/sounds/Victory.mp3');
-    audio.play();
+    this.soundPlayer.src = './media/sounds/Victory.mp3';
+    this.soundPlayer.load();
+    this.soundPlayer.play();
     this.modal = new Modal(tn);
     this.modal.addButton('Exit', (e) => this.exitClicked(), {
       color: 'red',

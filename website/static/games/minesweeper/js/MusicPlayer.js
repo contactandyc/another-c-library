@@ -1,16 +1,11 @@
-export default class MusicPlayer {
+export default class MusicPlayer extends Audio {
   constructor() {
+    super();
     this.playlist = [];
     this.currentTrack = 0;
-    this.player = new Audio();
-    this.player.addEventListener('ended', () => {
+    this.addEventListener('ended', () => {
       this.startNextTrack();
     });
-  }
-
-  loadSrc(src) {
-    this.player.src = src;
-    this.player.load();
   }
 
   startNextTrack() {
@@ -18,21 +13,19 @@ export default class MusicPlayer {
       let numTracks = this.playlist.length;
       this.currentTrack++;
       if (this.currentTrack >= numTracks) this.currentTrack = 0;
-      this.player.src = this.playlist[this.currentTrack];
-      this.player.load();
+      this.src = this.playlist[this.currentTrack];
+      this.load();
       this.play();
     }
   }
 
   play() {
-    if (this.player.src === '')
-      if (this.playlist[0] != undefined) this.loadSrc(this.playlist[0]);
-      else return;
-    this.player.play();
-  }
-
-  pause() {
-    this.player.pause();
+    if (this.src === '')
+      if (this.playlist[0] != undefined) {
+        this.src = this.playlist[0];
+        this.load();
+      } else return;
+    super.play();
   }
 
   addTrack(src) {
