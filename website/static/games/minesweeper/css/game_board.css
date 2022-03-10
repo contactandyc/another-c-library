@@ -1,0 +1,111 @@
+.game-board {
+  margin: 2vh 0 2vh 2vh;
+  width: 90vh;
+  height: 90vh;
+  max-width: 75vw;
+  max-height: 75vw;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-col), 1fr);
+  grid-template-rows: repeat(var(--grid-rows), 1fr);
+  border: #006416 solid 10px;
+  border-radius: 10px;
+  background-color: #006416;
+  gap: 5px;
+  opacity: 85%;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@keyframes dirt-reveal {
+  to {
+    background-color: #685112;
+  }
+}
+
+@keyframes explode-animation {
+  0% {
+    background-color: #ff7b00;
+  }
+  35% {
+    background-color: #ff7b00;
+  }
+  50% {
+    background-color: #ff0000;
+  }
+  65% {
+    background-color: #bb6412;
+  }
+  100% {
+    background-color: #bb6412;
+  }
+}
+
+.board-square {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 5px;
+  color: white;
+  font-size: var(--square-font-size);
+  text-align: center;
+  overflow: hidden;
+}
+
+.board-square.even {
+  background-color: #01b127;
+  cursor: pointer;
+}
+
+.board-square.odd {
+  background-color: #41f167;
+  cursor: pointer;
+}
+
+.board-square.dirt {
+  animation-name: dirt-reveal;
+  animation-duration: 0.25s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+  background-color: #685112;
+  cursor: default !important;
+}
+
+.board-square.exploding {
+  animation-name: explode-animation;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: initial;
+  cursor: default !important;
+}
+
+.board-square.exploded {
+  background-color: black;
+  cursor: default !important;
+}
+
+.bomb {
+  background: url('../media/images/bomb.png');
+  background-position: center;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.flag {
+  background: url('../media/images/flag.png');
+  background-position: center;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+}
+
+@media only screen and (max-width: 1024px) {
+  .game-board {
+    max-height: 90vw;
+    max-width: 90vw;
+  }
+}

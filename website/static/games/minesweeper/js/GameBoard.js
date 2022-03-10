@@ -1,23 +1,33 @@
-export default class GameBoard {
+export default class GameBoard extends HTMLElement {
   static BOMB = 1;
   static FLAG = 2;
   static HIDDEN = 4;
   static REVEALED = 8;
   static EXPLODED = 16;
-  constructor(parent, size, click, rightClick) {
-    this.size = size;
-    this.parent = document.getElementById(parent);
+
+  constructor() {
+    super();
+    this.shadow = this.attachShadow({ mode: 'open' });
+    let styleLink = document.createElement('link');
+    styleLink.setAttribute('rel', 'stylesheet');
+    styleLink.setAttribute('href', './css/game_board.css');
+    this.shadow.appendChild(styleLink);
     this.boardEl = null;
-    this.click = click;
-    this.rightClick = rightClick;
+    this.board = null;
     this.pressTimer = null;
     this.altClick = false;
-    if (parent === undefined) {
-      throw Error(
-        `[Error] GameBoard: parent element, ${parent}, does not exist`
-      );
-    }
-    this.buildBoard();
+  }
+
+  static observedAttributes = ['size'];
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    this.size = Number(newValue);
+  }
+
+  connectedCallback() {
+    this._buildBoard();
+    const event = new CustomEvent('ready');
+    this.dispatchEvent(event);
   }
 
   addClickAndLongClickListener(el, clickHandler, longClickHandler) {
@@ -86,7 +96,7 @@ export default class GameBoard {
     return this.board[pos.y][pos.x].state;
   }
 
-  showNumber(pos, num) {
+  _showNumber(pos, num) {
     if (!this.isInBounds(pos)) {
       throw Error(
         `[Error]GameBoard: Position not in-bounds for showNumber: (${pos.x},${pos.y})`
@@ -103,7 +113,7 @@ export default class GameBoard {
     if (!this.isInBounds(pos)) return;
     if (state === null) state = this.getState(pos);
     let square = this.board[pos.y][pos.x];
-    this.showNumber(pos, 0);
+    this._showNumber(pos, 0);
     if (!this.compareState(state, GameBoard.REVEALED)) {
       square.el.className = 'board-square';
       if (
@@ -119,7 +129,7 @@ export default class GameBoard {
         !this.compareState(state, GameBoard.FLAG)
       ) {
         square.el.classList.add('bomb');
-      } else this.showNumber(pos, this.countBombs(pos));
+      } else this._showNumber(pos, this.countBombs(pos));
     }
     if (this.compareState(state, GameBoard.FLAG)) {
       square.el.classList.add('flag');
@@ -127,7 +137,7 @@ export default class GameBoard {
     square.state = state;
   }
 
-  updateAdjacent(pos) {
+  _updateAdjacent(pos) {
     this.setState({ y: pos.y, x: pos.x + 1 });
     this.setState({ y: pos.y, x: pos.x - 1 });
     this.setState({ y: pos.y + 1, x: pos.x });
@@ -146,7 +156,7 @@ export default class GameBoard {
     }
     let state = this.getState(pos);
     this.setState(pos, state | GameBoard.BOMB);
-    this.updateAdjacent(pos);
+    this._updateAdjacent(pos);
   }
 
   toggleFlag(pos) {
@@ -159,7 +169,7 @@ export default class GameBoard {
     this.setState(pos, state ^ GameBoard.FLAG);
   }
 
-  nextExplode(pos, step) {
+  _nextExplode(pos, step) {
     this.explode({ y: pos.y, x: pos.x + 1 }, step);
     this.explode({ y: pos.y, x: pos.x - 1 }, step);
     this.explode({ y: pos.y + 1, x: pos.x }, step);
@@ -179,12 +189,11 @@ export default class GameBoard {
     square.state |= GameBoard.EXPLODED;
     if (this.hasState(pos, GameBoard.BOMB)) square.el.classList.add('bomb');
     setTimeout(() => {
-      this.nextExplode(pos, step + 1);
+      this._nextExplode(pos, step + 1);
     }, 100);
   }
 
-  buildBoard() {
-    let b = this.parent;
+  _buildBoard() {
     this.boardEl = document.createElement('div');
     this.boardEl.classList.add('game-board');
     this.boardEl.style.setProperty('--grid-col', this.size);
@@ -200,27 +209,44 @@ export default class GameBoard {
           d,
           (e) => {
             e.preventDefault();
-            this.click({ y: y, x: x });
+            const event = new CustomEvent('squareclick', {
+              detail: { pos: { y: y, x: x } },
+            });
+            this.dispatchEvent(event);
           },
           (e) => {
             e.preventDefault();
-            this.rightClick({ y: y, x: x });
+            const event = new CustomEvent('squarealtclick', {
+              detail: { pos: { y: y, x: x } },
+            });
+            this.dispatchEvent(event);
           }
         );
         d.addEventListener('contextmenu', (e) => {
           e.preventDefault();
           this.altClick = true;
-          this.rightClick({ y: y, x: x });
+          const event = new CustomEvent('squarealtclick', {
+            detail: { pos: { y: y, x: x } },
+          });
+          this.dispatchEvent(event);
         });
         this.boardEl.appendChild(d);
-        this.board[y].push({ el: d, state: GameBoard.GRASS });
-        this.setState({ y: y, x: x }, GameBoard.GRASS);
+        this.board[y].push({ el: d, state: GameBoard.HIDDEN });
+        this.setState({ y: y, x: x }, GameBoard.HIDDEN);
       }
     }
-    b.appendChild(this.boardEl);
+    this.shadow.appendChild(this.boardEl);
   }
 
   removeBoard() {
-    this.parent.removeChild(this.boardEl);
+    this.shadow.removeChild(this.boardEl);
+    this.boardEl = null;
+  }
+
+  resetBoard() {
+    this.removeBoard();
+    this._buildBoard();
   }
 }
+
+customElements.define('game-board', GameBoard);

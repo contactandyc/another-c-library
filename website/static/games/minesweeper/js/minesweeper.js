@@ -12,13 +12,18 @@ export default class MineSweeper {
     this.winCb = winCb;
     this.loseCb = loseCb;
     this.soundPlayer = soundPlayer;
-    this.gb = new GameBoard(
-      'board',
-      this.size,
-      (pos) => this.click(pos),
-      (pos) => this.rightClick(pos)
-    );
-    this.placeBombs();
+    this.gb = document.createElement('game-board');
+    this.gb.setAttribute('size', this.size);
+    this.gb.addEventListener('ready', () => {
+      this.placeBombs();
+    });
+    this.gb.addEventListener('squareclick', (e) => {
+      this.click(e.detail.pos);
+    });
+    this.gb.addEventListener('squarealtclick', (e) => {
+      this.rightClick(e.detail.pos);
+    });
+    document.getElementById('board').appendChild(this.gb);
     document.getElementById('num-flags').innerText = this.flagsRemaining;
     document.getElementById('num-bombs').innerText = this.numBombs;
     document.getElementById('size').innerText = `${this.size}x${this.size}`;
@@ -104,6 +109,6 @@ export default class MineSweeper {
   }
 
   removeBoard() {
-    this.gb.removeBoard();
+    document.getElementById('board').removeChild(this.gb);
   }
 }
