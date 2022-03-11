@@ -1,7 +1,7 @@
 let bombs = 50,
     bombs_des = 0,
-    cols = 16,
-    rows = 16,
+    cols = 14,
+    rows = 14,
     flags = 0,
     board = [],
     timer = 0,
@@ -13,19 +13,16 @@ let bombs = 50,
 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
     is_on_phone = true;
 function setting(type) {
-    if (type=="visible") {
-        setting_visible = !setting_visible;
-
-        document.getElementById(`settings`).style.animationName=setting_visible?"slidein":"slideout";
-        return;
-    }
-    let outter = document.getElementById(`setting_${type}`);
-    let inner =  document.getElementById(`setting_${type}_inner`);
     switch (type) {
         case 'flag':
             setting_flag = !setting_flag;
-            inner.style.left = setting_flag ? "12px" : "-12px";
-            outter.style.backgroundColor = setting_flag ? "green" : "red";
+            document.getElementById("info_flags_img").style.filter = setting_flag ?
+            "grayscale(0)" : "grayscale(100%)";
+            break;
+        case 'visible':
+            setting_visible = !setting_visible;
+            document.getElementById("settings").style.animationName=setting_visible?"slidein":"slideout";
+            break;
     }
 }
 function init_board() {
@@ -95,7 +92,8 @@ function win() {
     let bkg = document.getElementById("background");
     let wnr = document.getElementById("winner");
     let tmr = document.getElementById("winner_timeleft");
-    tmr.innerText = `Time - ${Math.floor(timer / 60)}:${timer % 60 - 1}`; 
+    let sec = timer % 60;
+    tmr.innerText = `Time - ${Math.floor(timer / 60)}:${sec<10?"0":""}${timer % 60}`;
     wnr.style.animationName = "slidein";
     clearInterval(info);
 }
@@ -120,6 +118,13 @@ function left_click(e) {
     let d = e.currentTarget;
     let spl = d.id.split("_");
     let cd = [Number(spl[1]), Number(spl[2])];
+    if (is_flagged(cd[0], cd[1])) {
+        flags--;
+        if (board[cd[0]][cd[1]] == -1)
+            bombs_des--;
+        document.getElementById(`b_${cd[0]}_${cd[1]}`).style.backgroundImage = "";
+        return;
+    }
     if (board[cd[0]][cd[1]] == -1)
         lose();
     else if (board[cd[0]][cd[1]] == 0)
@@ -197,10 +202,11 @@ function clear_number(x, y) {
     zero_move(x + 1, y - 1);
 }
 function update_info() {
-    let IT = document.getElementById("info_timer");
-    let IF = document.getElementById("info_flags");
-    IT.innerText = `Timer - ${Math.floor(timer / 60)}:${timer % 60}`;
-    IF.innerText = `Flags used - ${flags}`
+    let IT = document.getElementById("info_timer_text");
+    let IF = document.getElementById("info_flags_text");
+    let sec = timer % 60;
+    IT.innerText = `${Math.floor(timer / 60)}:${sec<10?"0":""}${timer % 60}`;
+    IF.innerText = `${flags} / ${bombs}`;
     timer++;
 }
 function generate_board() {
@@ -208,7 +214,7 @@ function generate_board() {
     for (let x = 0; x < rows; x++) {
         let r = document.createElement("div");
         r.style.left = is_on_phone ? 
-        `${x * 60}px` : `${x * 36}px`;
+        `${x * 60}px` : `${x * 42}px`;
 
         for (let y = 0; y < cols; y++) {
             let d = document.createElement("div");

@@ -13,16 +13,16 @@
         </div>
         <div id="info">
             <div id="info_timer">
-                <p id="info_timer_text">Timer - 0:0</p>
+                <p id="info_timer_text">0:00</p>
             </div>
-            <div id="info_flags">
-                <p id="info_flags_text">Flags - 0</p>
+            <div id="info_flags" onclick="setting('flag')">
+                <img id="info_flags_img" src="flag.png">
+                <p id="info_flags_text">0/30</p>
             </div>
             <button id="setting_restart" onclick="clearInterval(info);play_again(false)">
                 Restart?
             </button><br>
             <div id="setting_visible" onclick="setting('visible')"></div>
-            <div id="setting_flag" onclick="setting('flag')"></div>
         </div>
         <div id="settings">
             <h6>Flagging mode</h6>
