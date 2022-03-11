@@ -142,7 +142,7 @@ function right_click(e) {
     if (board[cd[0]][cd[1]] == -1)
         bombs_des++;
     else if (board[cd[0]][cd[1]] == 1)
-        return;
+        return clear_number(cd[0], cd[1]);;
     if (bombs_des == bombs)
         win();
     flag(cd[0], cd[1]);
