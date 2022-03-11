@@ -80,7 +80,7 @@ int count_bombs(int **board, int size, int x, int y ) {
         check_for_bomb(board, size, x+1, y) + 
         check_for_bomb(board, size, x-1, y+1) +
         check_for_bomb(board, size, x, y+1 ) +
-        check_for_bomb(board, size, x+1, y+1); 
+        check_for_bomb(board, size, x+1, y+1);
     return num_bombs;
 }
 

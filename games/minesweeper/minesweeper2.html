@@ -1,0 +1,149 @@
+<html>
+  <head>
+    <title>Minesweeper!</title>
+    <script language="Javascript"></script>
+  </head>
+  <body>
+    <div id="board"></div>
+    <script language="Javascript">
+      let rows = 20,
+        cols = 25,
+        bombs = 10,
+        bombs_left = bombs,
+        flags = 0;
+      let board = [];
+      function populate_board() {
+        for (let i = 0; i < rows; i++) {
+          let row = [];
+          for (let j = 0; j < cols; j++) {
+            row.push(0);
+          }
+          board.push(row);
+        }
+      }
+      function place_bombs(how_many) {
+        for (let i = 0; i < how_many; i++) {
+          while (1) {
+            let x = Math.floor(Math.random() * rows);
+            let y = Math.floor(Math.random() * cols);
+            if (board[x][y]) continue;
+            board[x][y] = -1;
+            break;
+          }
+        }
+      }
+      function flag(x, y) {
+        let flagged = document.getElementById(`b_${x}_${y}`).style;
+        flagged.backgroundPosition = "center";
+        flagged.backgroundImage = "url('flag.png')";
+        flagged.backgroundSize = "cover";
+      }
+      function unflag(x, y) {
+        let unflagged = document.getElementById(`b_${x}_${y}`).style.backgroundImage = "url('')";
+      }
+      function check_bomb(x, y) {
+        if (x >= rows || x < 0 || y >= cols || y < 0)
+            return 0;
+        if (board[x][y] < 0)
+            return 1;
+        return 0;
+      }
+      function count_bombs(x, y) {
+        return check_bomb(x - 1, y - 1) +
+        check_bomb(x, y - 1) +
+        check_bomb(x + 1, y - 1) +
+        check_bomb(x - 1, y) +
+        check_bomb(x + 1, y) +
+        check_bomb(x - 1, y + 1) +
+        check_bomb(x, y + 1) +
+        check_bomb(x + 1, y + 1);
+      }
+      function zero_move(x, y) {
+        if (x >= rows || x < 0 || y >= cols || y < 0 || board[x][y] == 1 || board[x][y] == 2)
+          return;
+        board[x][y] = 1;
+        if (count_bombs(x, y) > 0)
+          document.getElementById(`b_${x}_${y}_p`).innerText = count_bombs(x, y);
+        else {
+          document.getElementById(`b_${x}_${y}`).style.backgroundColor = "#909090";
+          zero_move(x + 1, y);
+          zero_move(x, y + 1);
+          zero_move(x - 1, y);
+          zero_move(x, y - 1);
+        }
+      }
+      function clicked(e) {
+        let sqr = e.currentTarget;
+        let spl = sqr.id.split("_");
+        let brd = board[Number(spl[1])][Number(spl[2])];
+        if (!brd)
+          zero_move(Number(spl[1]), Number(spl[2]));
+        if (brd == -1)
+          alert("You are loser!");
+      }
+      function right_click(e) {
+        e.preventDefault();
+        let sqr = e.currentTarget;
+        let spl = sqr.id.split("_");
+        let brd = board[Number(spl[1])][Number(spl[2])];
+        if (brd == 2) {
+          unflag(Number(spl[1], Number(spl[2])));
+          return;
+        }
+        if (brd < 1) {
+          flag(Number(spl[1]), Number(spl[2]));
+          board[Number(spl[1])][Number(spl[2])] = 2;
+        }
+        if (brd == -1)
+          bombs_left--;
+        if (bombs_left == 0)
+          alert("You are still loser, but a lil less.");
+        flags++;
+      }
+      function create_column(t, x, y) {
+        let pct = "" + 100 / cols + "%";
+        let d = document.createElement("div");
+        let p = document.createElement("p");
+        d.style.width = pct;
+        d.style.display = "inline-block";
+        d.style.height = "100%";
+        d.style.background = "#808080";
+        d.style.borderColor = "black";
+        d.style.borderWidth = "1px";
+        d.style.borderStyle = "solid";
+        d.addEventListener("click", clicked);
+        d.addEventListener("contextmenu", right_click);
+        d.id = "b_" + x + "_" + y;
+        p.style.position = "absolute";
+        p.style.fontSize = "150%"
+        p.style.margin = "auto";
+        p.style.marginLeft = "20px";
+        p.id = d.id + "_p";
+        d.appendChild(p);
+
+        //if (board[x][y] != 0) {
+        //    d.style.backgroundPosition = "center";
+        //    d.style.backgroundImage = "url('bomb.jpeg')";
+        //    d.style.backgroundSize = "cover";
+        //}
+        t.appendChild(d);
+      }
+      function create_rows(t) {
+        let pct = "" + 100 / rows + "%";
+        for (let i = 0; i < rows; i++) {
+          let d = document.createElement("div");
+          d.style.width = "100%";
+          d.style.height = pct;
+          for (let j = 0; j < cols; j++) {
+            create_column(d, i, j);
+          }
+          t.appendChild(d);
+        }
+      }
+      populate_board();
+      place_bombs(bombs);
+      let brd = document.getElementById("board");
+      create_rows(brd);
+    </script>
+  </body>
+</html>
