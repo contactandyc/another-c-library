@@ -1,0 +1,20 @@
+#board>div {
+    position: absolute;
+
+}
+#board>div>div {
+    position: relative;
+    width: 25px;
+    height: 25px;
+    background-color: #707070;
+    border-width: 1px;
+    border-color: black;
+    margin-top: 1px;
+    background-size: cover;
+}
+#board>div>div>p {
+    position: absolute;
+    top: -80%;
+    font-size: 150%;
+    font-weight: 550;
+}
