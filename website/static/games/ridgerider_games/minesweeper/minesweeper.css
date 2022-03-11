@@ -8,7 +8,7 @@ body {
     width: 200px;
     font-size: 100%;
 }
-#info_timer, #info_flags, #setting_restart {
+#info_flags, #setting_restart {
     width: 100px;
     position: fixed;
     text-align: center;
@@ -22,11 +22,13 @@ body {
     border-color: black;
 }
 #info_timer {
+    text-align: center;
+    position: fixed;
     margin-left: 240px;
     height:40px;
     width: 100px;
-    top: 1.5%;
-    font-size:200%;
+    top: 1%;
+    font-size:250%;
 }
 #info_flags {
     margin-left: 370px;
@@ -40,6 +42,7 @@ body {
     filter: grayscale(100%);
 }
 #info_flags_text, #info_timer_text {
+    user-select: none;
     margin-top: 2px;
 }
 #settings {
