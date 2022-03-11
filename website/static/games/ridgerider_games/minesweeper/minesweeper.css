@@ -54,6 +54,7 @@ body {
     background-color: #707070;
     border-width: 1px;
     border-color: black;
+    border-style: solid;
     margin-top: 1px;
     background-position: center;
     background-size: cover;
