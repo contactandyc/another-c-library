@@ -1,4 +1,4 @@
-let bombs = 50,
+let bombs = 30,
     bombs_des = 0,
     cols = 14,
     rows = 14,
