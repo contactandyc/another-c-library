@@ -12,22 +12,23 @@
             <div id="board"></div>
         </div>
         <div id="info">
-            <p id="info_timer">Timer - 0:0</p>
-            <p id="info_flags">Flags used - 0</p>
+            <div id="info_timer">
+                <p id="info_timer_text">Timer - 0:0</p>
+            </div>
+            <div id="info_flags">
+                <p id="info_flags_text">Flags - 0</p>
+            </div>
+            <button id="setting_restart" onclick="clearInterval(info);play_again(false)">
+                Restart?
+            </button><br>
+            <div id="setting_visible" onclick="setting('visible')"></div>
+            <div id="setting_flag" onclick="setting('flag')"></div>
         </div>
         <div id="settings">
-            <h6>Squares adjacent to bombs glow red the more bombs that are near</h6>
-            <div id="setting_danger">
-                <button id="setting_danger_inner" onclick="setting('danger')"></button>
-            </div>
             <h6>Flagging mode</h6>
-            <div id="setting_flag">
-                <button id="setting_flag_inner" onclick="setting('flag')"></button>
-            </div>
             <h6>Number of bombs. (wont change board until next game)</h6>
-            <input id="setting_bombs" type="number" value="99"/>
+            <input id="setting_bombs" type="number" value="50"/>
             <br><br>
-            <button id="setting_restart" onclick="clearInterval(info);play_again(false)">Restart?</button>
         </div>
         <div id="loser">
             <h1>You are a loser</h1>

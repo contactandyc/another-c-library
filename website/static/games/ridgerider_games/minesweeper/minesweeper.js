@@ -1,22 +1,27 @@
-let bombs = 99,
+let bombs = 50,
     bombs_des = 0,
-    cols = 20,
-    rows = 30,
+    cols = 16,
+    rows = 16,
     flags = 0,
     board = [],
     timer = 0,
+    is_on_phone = false,
     setting_danger = true,
-    setting_flag = false;
+    setting_flag = false,
+    setting_visible = false;
     info = setInterval(update_info, 1000);
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+    is_on_phone = true;
 function setting(type) {
+    if (type=="visible") {
+        setting_visible = !setting_visible;
+
+        document.getElementById(`settings`).style.animationName=setting_visible?"slidein":"slideout";
+        return;
+    }
     let outter = document.getElementById(`setting_${type}`);
     let inner =  document.getElementById(`setting_${type}_inner`);
     switch (type) {
-        case 'danger':
-            setting_danger = !setting_danger;
-            inner.style.left = setting_danger ? "12px" : "-12px";
-            outter.style.backgroundColor = setting_danger ? "green" : "red";
-            break;
         case 'flag':
             setting_flag = !setting_flag;
             inner.style.left = setting_flag ? "12px" : "-12px";
@@ -30,13 +35,13 @@ function init_board() {
     }
 }
 function place_bombs() {
-    let bmbs = document.getElementById("setting_bombs").value;
-    if (!isNaN(bmbs)) {
-        if (bmbs > rows * cols) {
+    let bmbs = document.getElementById("setting_bombs");
+    if (!isNaN(bmbs.value)) {
+        if (bmbs.value > rows * cols) {
             alert(`Bomb limit is ${rows*cols}, bomb count has been reduced to that.`);
-            bmbs = 600;
+            bmbs.value = rows*cols;
         }
-        bombs = Number(bmbs);
+        bombs = Number(bmbs.value);
     }
     else
         alert(`${bmbs} is not a number. Set bombs to default (99).`);
@@ -49,19 +54,19 @@ function place_bombs() {
         i--;
     }
 }
+function count_func(x, y, func) {
+    return func(x - 1, y + 1) +
+           func(x, y + 1) +
+           func(x + 1, y + 1) +
+           func(x - 1, y) + 
+           func(x + 1, y) + 
+           func(x - 1, y - 1) +
+           func(x, y - 1) +
+           func(x + 1, y - 1);
+}
 function count_bomb(x, y) {
     return (!(x < 0 || x >= rows || y < 0 || y >= cols) && board[x][y] == -1)?
     1 : 0;
-}
-function count_bombs(x, y) {
-    return count_bomb(x - 1, y + 1) +
-           count_bomb(x, y + 1) +
-           count_bomb(x + 1, y + 1) +
-           count_bomb(x - 1, y) + 
-           count_bomb(x + 1, y) + 
-           count_bomb(x - 1, y - 1) +
-           count_bomb(x, y - 1) +
-           count_bomb(x + 1, y - 1);
 }
 function flag(x , y) {
     let flag = document.getElementById(`b_${x}_${y}`).style;
@@ -75,7 +80,6 @@ function lose() {
     let bkg = document.getElementById("background");
     let lsr = document.getElementById("loser");
     lsr.style.animationName = "slidein";
-    bkg.style.backgroundColor = "#707070";
     
     for (let i = 0; i < board.length; i++)
         for (let j = 0; j < board[i].length; j++)
@@ -93,7 +97,6 @@ function win() {
     let tmr = document.getElementById("winner_timeleft");
     tmr.innerText = `Time - ${Math.floor(timer / 60)}:${timer % 60 - 1}`; 
     wnr.style.animationName = "slidein";
-    bkg.style.backgroundColor = "#007000";
     clearInterval(info);
 }
 function play_again(win) {
@@ -101,7 +104,6 @@ function play_again(win) {
     let dlg = document.getElementById(win ? "winner" : "loser");
     let brd = document.getElementById("board");
     dlg.style.animationName = "slideout";
-    bkg.style.backgroundColor = "#006000";
     brd.innerHTML = "";
     board = [];
     bombs_des = flags = timer = 0;
@@ -150,18 +152,11 @@ function zero_move(x, y) {
     if (x < 0 || x >= rows || y < 0 || y >= cols || board[x][y] == 1 || is_flagged(x, y))
         return;
     let b = document.getElementById(`b_${x}_${y}`).style;
-    b.backgroundColor = "#909090";
+    b.animationName = "reveal";
     board[x][y] = 1;
     let cb;
-    if (cb = count_bombs(x, y)) {
+    if (cb = count_func(x, y, count_bomb)) {
         document.getElementById(`p_${x}_${y}`).innerHTML = cb;
-        b.animationName = "reveal";
-        if (setting_danger)
-                document.getElementById(`b_${x}_${y}`).style.color = `rgb(
-                    ${cb>4?64*(cb-4):0},
-                     0,
-                     ${64 *cb}
-                )`;
         return;
     }
     setTimeout(() => {
@@ -180,15 +175,14 @@ function is_flag_valid(x, y) {
         return 1;
     return ((board[x][y] == -1 && is_flagged(x, y)) || board[x][y] == 1 || board[x][y] == 0)
 }
+function count_flag(x, y) {
+    return (!(x < 0 || x >= rows || y < 0 || y >= cols) && is_flagged(x, y))?
+    1 : 0;
+}
 function clear_number(x, y) {
-    if (is_flag_valid(x - 1, y + 1) +
-        is_flag_valid(x, y + 1) +
-        is_flag_valid(x + 1, y + 1) +
-        is_flag_valid(x - 1, y) +
-        is_flag_valid(x + 1, y) +
-        is_flag_valid(x - 1, y - 1) +
-        is_flag_valid(x, y - 1) +
-        is_flag_valid(x + 1, y - 1) != 8
+    if (count_func(x, y, count_flag) != count_func(x, y, count_bomb)) 
+        return;
+    if (count_func(x, y, is_flag_valid) != 8
     ) {
         lose();
         return;
@@ -205,7 +199,6 @@ function clear_number(x, y) {
 function update_info() {
     let IT = document.getElementById("info_timer");
     let IF = document.getElementById("info_flags");
-    let IB = document.getElementById("info_bombs");
     IT.innerText = `Timer - ${Math.floor(timer / 60)}:${timer % 60}`;
     IF.innerText = `Flags used - ${flags}`
     timer++;
@@ -214,8 +207,9 @@ function generate_board() {
     let brd = document.getElementById("board");
     for (let x = 0; x < rows; x++) {
         let r = document.createElement("div");
-        r.style.position = "absolute";
-        r.style.left = `${x * 28}px`;
+        r.style.left = is_on_phone ? 
+        `${x * 60}px` : `${x * 36}px`;
+
         for (let y = 0; y < cols; y++) {
             let d = document.createElement("div");
             let p = document.createElement("p");
