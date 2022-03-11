@@ -39,7 +39,7 @@ class GameManager {
     }
     this.game = new MineSweeper(
       20,
-      5,
+      15,
       (time) => this.win(time),
       () => this.lose()
     );
