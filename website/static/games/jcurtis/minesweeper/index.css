@@ -1,0 +1,38 @@
+body {
+  background-color: white;
+}
+
+h2,
+h3 {
+  color: black;
+}
+
+#box {
+  text-align: center;
+}
+
+#field table {
+  border-collapse: collapse;
+  font-size: 150%;
+  font-family: sans-serif;
+  font-weight: bold;
+  display: inline-block;
+}
+
+#field table td {
+  background-color: rgb(195, 195, 195);
+  width: 35px;
+  min-width: 35px;
+  height: 35px;
+  min-height: 35px;
+  border: 1px solid black;
+}
+
+button {
+  width: 100px;
+  height: 30px;
+  background-color: rgb(195, 195, 195);
+  color: black;
+  font-weight: bolder;
+  border-radius: 20px 20px 20px 20px;
+}
