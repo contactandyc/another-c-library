@@ -9,24 +9,34 @@ body {
     font-size: 100%;
 }
 #info_timer, #info_flags, #setting_restart {
-    width: 200px;
+    width: 100px;
     position: fixed;
     text-align: center;
-    height: 20px;
+    top: 2%;
+    height: 30px;
+    font-size:130%;
     background-color: #707070;
-    border-radius: 25px;
+    border-radius: 6px;
     border-width: 3px;
     border-style: solid;
     border-color: black;
+}
+#info_timer {
+    margin-left: 240px;
+    height:40px;
+    width: 100px;
+    top: 1.5%;
+    font-size:200%;
 }
 #info_flags {
     margin-left: 370px;
 }
 #info_flags_img {
     position: absolute;
-    width:25px;
-    height:25px;
-    margin-left: -90px;
+    width:50px;
+    height:50px;
+    top: 10%;
+    margin-left: -60px;
     filter: grayscale(100%);
 }
 #info_flags_text, #info_timer_text {
@@ -47,13 +57,35 @@ body {
     animation-duration: 1s;
     animation-fill-mode: forwards;
 }
-
 #setting_danger {
     margin:auto;
     width:52px;
     height:29px;
     background-color: green;
     border-radius: 25px;
+}
+#setting_restart {
+    position: absolute;
+    width: 100px;
+    height:35px;
+    font-size: 100%;
+    margin-left: 114px;
+    top: 40%;
+    background-color: blue;
+    border-color: darkblue;
+}
+#setting_visible {
+    width: 30px;
+    height: 30px;
+    background-position: center;
+    background-size: cover;
+    background-image: url('gear.png');
+    border: 0px;
+    position: fixed;
+    top: 3%;
+}
+#setting_bombs {
+    width:40px;
 }
 #setting_danger_inner {
     position: relative;
@@ -71,7 +103,7 @@ body {
 #board {
     position: fixed;
     left: 20%;
-    top: 5%;
+    top: 10%;
 }
 #board>div {
     position: absolute;
@@ -114,7 +146,7 @@ body {
     animation-duration: 1s;
     animation-fill-mode: forwards;
 }
-#loser>button, #winner>button, #setting_restart {
+#loser>button, #winner>button {
     width: 100px;
     height:60px;
     font-size: 130%;
@@ -123,27 +155,6 @@ body {
     border-color: darkblue;
     margin-top: 10%;
 } 
-#setting_restart {
-    width: 75px;
-    height:23px;
-    font-size: 100%;
-    margin-top: 0;
-    margin-left: 210px;
-}
-#setting_visible {
-    width: 30px;
-    height: 30px;
-    background-position: center;
-    background-size: cover;
-    background-image: url('gear.png');
-    border: 0px;
-    position: fixed;
-    margin-left: 330px;
-    margin-top: -20px;
-}
-#setting_bombs {
-    width:40px;
-}
 @keyframes slidein {
     from {
         top: -100%;
