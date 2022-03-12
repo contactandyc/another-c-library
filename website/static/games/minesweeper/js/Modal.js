@@ -7,14 +7,16 @@ export default class Modal {
     let modalBox = document.createElement('div');
     modalBox.className = 'modal-box';
 
-    this.modalContent = document.createElement('div');
-    this.modalContent.className = 'modal-content';
-    this.modalContent.appendChild(content);
+    if (content != undefined && content != null) {
+      this.modalContent = document.createElement('div');
+      this.modalContent.className = 'modal-content';
+      this.modalContent.appendChild(content);
+      modalBox.appendChild(this.modalContent);
+    }
 
     this.modalButtons = document.createElement('div');
     this.modalButtons.className = 'modal-buttons';
 
-    modalBox.appendChild(this.modalContent);
     modalBox.appendChild(this.modalButtons);
     this.modal.appendChild(modalBox);
     document.body.appendChild(this.modal);
