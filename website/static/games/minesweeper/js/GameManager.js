@@ -10,7 +10,6 @@ class GameManager {
     this.musicPlayer.volume = this.musicVol;
     this.soundPlayer = new Audio();
     this.soundPlayer.volume = this.soundVol;
-    document.getElementById('container').style.display = 'none';
     this.modal = null;
 
     this.time = { m: 0, s: 0 };
@@ -18,11 +17,8 @@ class GameManager {
     this.presentNewGameModal();
 
     document
-      .getElementById('reset-button')
-      .addEventListener('click', () => this.presentNewGameModal());
-    document
-      .getElementById('settings-button')
-      .addEventListener('click', () => this.presentSettingsModal());
+      .getElementById('menu-button')
+      .addEventListener('click', () => this.presentMenuModal());
     this.begin();
   }
 
@@ -71,7 +67,6 @@ class GameManager {
   //disambiguated from newGame this happens only once per page load when you press the start button.
   begin() {
     this.setupMusicPlaylist();
-    document.getElementById('container').style.display = 'flex';
   }
 
   setupMusicPlaylist() {
@@ -135,14 +130,36 @@ class GameManager {
     bombsInput.type = 'text';
     bombsInput.id = 'bombs-input';
     bombsInput.placeholder = '# of Bombs';
-    sizeInput.defaultValue = 10;
+    bombsInput.defaultValue = 5;
     if (this.numBombs) bombsInput.value = this.numBombs;
     options.appendChild(bombsInput);
 
     this.modal = new Modal(options);
     this.modal.addButton('New Game', (e) => this.closeNewGameModal(), {
-      color: 'blue',
+      color: '#006416',
       textColor: 'white',
+    });
+  }
+
+  presentMenuModal() {
+    if (this.modal) {
+      this.modal.remove();
+    }
+    let label = document.createElement('h2');
+    label.innerText = 'Main Menu';
+
+    this.modal = new Modal(label);
+    this.modal.addButton('New Game', (e) => this.presentNewGameModal(), {
+      color: '#006416',
+      textColor: 'white',
+    });
+    this.modal.addButton('Settings', (e) => this.presentSettingsModal(), {
+      color: '#006416',
+      textColor: 'white',
+    });
+    this.modal.addButton('Exit', (e) => this.exitClicked(), {
+      color: 'white',
+      textColor: '#006416',
     });
   }
 
@@ -200,31 +217,31 @@ class GameManager {
     options.appendChild(soundsVolume);
 
     this.modal = new Modal(options);
+    this.modal.addButton('Save', (e) => this.saveSettings(), {
+      color: '#006416',
+      textColor: 'white',
+    });
     this.modal.addButton('Exit', (e) => this.exitSettings(), {
       color: 'white',
-      textColor: 'blue',
-    });
-    this.modal.addButton('Save', (e) => this.saveSettings(), {
-      color: 'blue',
-      textColor: 'white',
+      textColor: '#006416',
     });
   }
 
   win() {
     let tn = document.createTextNode(
-      `Congrats! You won in ${time.m} minute(s) and ${time.s} second(s)`
+      `Congrats! You won in ${this.time.m} minute(s) and ${this.time.s} second(s)`
     );
     this.soundPlayer.src = './media/sounds/Victory.mp3';
     this.soundPlayer.load();
     this.soundPlayer.play();
     this.modal = new Modal(tn);
-    this.modal.addButton('Exit', (e) => this.exitClicked(), {
-      color: 'red',
+    this.modal.addButton('New Game', (e) => this.presentNewGameModal(), {
+      color: '#006416',
       textColor: 'white',
     });
-    this.modal.addButton('New Game', (e) => this.presentNewGameModal(), {
-      color: 'blue',
-      textColor: 'white',
+    this.modal.addButton('Exit', (e) => this.exitClicked(), {
+      color: 'white',
+      textColor: '#006416',
     });
   }
 
@@ -233,12 +250,12 @@ class GameManager {
     gif.src = './media/images/lose.gif';
     this.modal = new Modal(gif);
     this.modal.addButton('Wallow in defeat!', (e) => this.exitClicked(), {
-      color: 'red',
+      color: '#006416',
       textColor: 'white',
     });
     this.modal.addButton('Walk of Shame', (e) => this.presentNewGameModal(), {
-      color: 'blue',
-      textColor: 'white',
+      color: 'white',
+      textColor: '#006416',
     });
   }
 }

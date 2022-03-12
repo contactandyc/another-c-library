@@ -21,38 +21,64 @@ body {
   color: white;
   height: 100vh;
   margin: 0;
+  font-size: 16px;
 }
 
 .container {
   display: flex;
   position: absolute;
-  justify-content: center;
+  justify-content: space-around;
   width: 100%;
+  height: 85vh;
+  padding-top: 2%;
+}
+
+#board {
+  width: 75vh;
+  max-width: 95vw;
+  margin: 2% auto;
 }
 
 .sidebar {
-  margin: 2vh 2vh 2vh 2vh;
-  width: 100%;
-  max-width: 20vw;
+  position: fixed;
+  height: 15vh;
+  width: 100vw;
+  box-sizing: border-box;
+  bottom: 0;
+  right: 0;
   background-color: rgba(0, 100, 22, 0.75);
-  border-radius: 10px;
   padding: 2%;
   font-size: 1.25em;
   text-align: center;
   display: flex;
-  justify-content: space-around;
-  flex-direction: column;
+  justify-content: space-evenly;
+  flex-direction: row;
 }
 
-.sidebar-info {
+.sidebar-detail {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  margin: 15% 0;
+  justify-content: space-evenly;
+}
+
+#menu-button {
+  width: 30px;
+  height: 30px;
+  background-image: url('../media/images/hamburger_menu.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+}
+
+.menu-button-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .sidebar-buttons {
+  min-width: 200px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -125,7 +151,7 @@ body {
   display: inline-block;
   padding: 4%;
   min-width: 400px;
-  background-color: #007c1b;
+  background-color: #01b127;
   margin: auto;
   top: 50%;
   border-radius: 20px;
@@ -142,6 +168,7 @@ body {
 
 .modal-buttons {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   margin-top: 4%;
 }
@@ -187,33 +214,45 @@ body {
   vertical-align: middle;
 }
 
+.flag-select-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+#time {
+  width: 200px;
+}
+
 @media only screen and (max-width: 1024px) {
+  body {
+    font-size: 12px;
+  }
+
+  #time {
+    width: auto;
+  }
+
   .container {
     flex-direction: column;
+    height: 50vh;
+  }
+
+  #board {
+    width: 49vh;
+    max-width: 95vw;
   }
 
   .sidebar {
     width: 100%;
-    max-width: 90%;
+    height: 45vh;
     flex-direction: column;
+    flex-wrap: wrap;
   }
 
-  .sidebar-info {
+  .menu-button-container {
+    display: flex;
+    justify-content: center;
     flex-direction: row;
-    margin: 3% 0;
-  }
-
-  .sidebar-buttons {
-    flex-direction: row;
-  }
-
-  #reset-button {
-    margin: 0;
-  }
-
-  .sidebar-buttons div {
-    margin: 0;
-    width: 40%;
-    padding: 2%;
   }
 }

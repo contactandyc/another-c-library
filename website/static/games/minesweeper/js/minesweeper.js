@@ -12,8 +12,12 @@ export default class MineSweeper {
     this.winCb = winCb;
     this.loseCb = loseCb;
     this.soundPlayer = soundPlayer;
+    this.flagging = false;
+    this.revealedSquares = 0;
     this.gb = document.createElement('game-board');
     this.gb.setAttribute('size', this.size);
+    this.gb.className = 'game-board-el';
+    this.gb.id = 'thegame';
     this.gb.addEventListener('ready', () => {
       this.placeBombs();
     });
@@ -21,12 +25,15 @@ export default class MineSweeper {
       this.click(e.detail.pos);
     });
     this.gb.addEventListener('squarealtclick', (e) => {
-      this.rightClick(e.detail.pos);
+      this.altClick(e.detail.pos);
     });
     document.getElementById('board').appendChild(this.gb);
     document.getElementById('num-flags').innerText = this.flagsRemaining;
-    document.getElementById('num-bombs').innerText = this.numBombs;
-    document.getElementById('size').innerText = `${this.size}x${this.size}`;
+    document.getElementById('flag-select').addEventListener('change', (e) => {
+      this.flagging = e.detail.checked;
+    });
+    // document.getElementById('num-bombs').innerText = this.numBombs;
+    // document.getElementById('size').innerText = `${this.size}x${this.size}`;
   }
 
   win() {
@@ -45,18 +52,20 @@ export default class MineSweeper {
     }, 2000);
   }
 
-  rightClick(pos) {
+  altClick(pos) {
     if (this.state != 'ended') {
       if (this.gb.isFlagged(pos)) {
         this.gb.toggleFlag(pos);
         if (this.gb.isBomb(pos)) this.flaggedBombs--;
         this.flagsRemaining++;
       } else if (!this.gb.isRevealed(pos)) {
-        this.gb.toggleFlag(pos);
-        if (this.gb.isBomb(pos)) this.flaggedBombs++;
-        this.flagsRemaining--;
-        if (this.flagsRemaining === 0 && this.flaggedBombs === this.numBombs)
-          this.win();
+        if (this.flagsRemaining > 0) {
+          this.gb.toggleFlag(pos);
+          if (this.gb.isBomb(pos)) this.flaggedBombs++;
+          this.flagsRemaining--;
+          if (this.flagsRemaining === 0 && this.flaggedBombs === this.numBombs)
+            this.win();
+        }
       }
       document.getElementById('num-flags').innerText = this.flagsRemaining;
     }
@@ -65,10 +74,8 @@ export default class MineSweeper {
   click(pos) {
     //doMove(gb, pos);
     if (this.state != 'ended') {
-      if (this.gb.isFlagged(pos)) {
-        this.gb.toggleFlag(pos);
-        if (this.gb.isBomb(pos)) this.flaggedBombs--;
-        this.flagsRemaining++;
+      if (this.gb.isFlagged(pos) || this.flagging) {
+        this.altClick(pos);
       } else if (this.gb.isBomb(pos)) {
         this.lose(pos);
       } else {
@@ -97,7 +104,13 @@ export default class MineSweeper {
       this.gb.isExploded(pos)
     )
       return;
+    if (this.gb.isFlagged(pos)) {
+      this.altClick(pos);
+    }
     this.gb.setState(pos, this.gb.getState(pos) | GameBoard.REVEALED);
+    this.revealedSquares++;
+    if (this.revealedSquares === this.size * this.size - this.numBombs)
+      this.win();
     if (this.gb.countBombs(pos) === 0) {
       setTimeout(() => {
         this.doMove({ y: pos.y + 1, x: pos.x });

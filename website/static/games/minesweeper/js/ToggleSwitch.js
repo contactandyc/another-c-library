@@ -1,23 +1,38 @@
 class ToggleSwitch extends HTMLElement {
   constructor() {
     super();
-    let shadow = this.attachShadow({ mode: 'open' });
+    this.shadow = this.attachShadow({ mode: 'open' });
     const linkElem = document.createElement('link');
     linkElem.setAttribute('rel', 'stylesheet');
     linkElem.setAttribute('href', './css/toggle_switch.css');
-    shadow.appendChild(linkElem);
+    this.shadow.appendChild(linkElem);
+  }
 
-    let container = document.createElement('label');
-    container.className = 'toggle-switch';
-
+  connectedCallback() {
     let input = document.createElement('input');
     input.type = 'checkbox';
-    container.appendChild(input);
+    input.setAttribute('name', 'toggle-switch');
+    input.id = this.id + '-input';
+    input.addEventListener('change', (e) => {
+      const event = new CustomEvent('change', {
+        detail: { checked: e.target.checked },
+      });
+      this.dispatchEvent(event);
+    });
+    this.shadow.appendChild(input);
+    input.addEventListener('change', (e) => {
+      let event = new CustomEvent('change', {
+        detail: {
+          checked: e.currentTarget.checked,
+        },
+      });
+      this.dispatchEvent(event);
+    });
 
-    let slider = document.createElement('span');
-    slider.className = 'slider round';
-    container.appendChild(slider);
-    shadow.appendChild(container);
+    let label = document.createElement('label');
+    label.className = 'toggle-switch';
+    label.setAttribute('for', this.id + '-input');
+    this.shadow.appendChild(label);
   }
 }
 

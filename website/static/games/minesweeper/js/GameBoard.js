@@ -1,3 +1,7 @@
+//Emitted Events
+// - ready
+// - squareclick
+// - squarealtclick
 export default class GameBoard extends HTMLElement {
   static BOMB = 1;
   static FLAG = 2;
@@ -12,6 +16,9 @@ export default class GameBoard extends HTMLElement {
     styleLink.setAttribute('rel', 'stylesheet');
     styleLink.setAttribute('href', './css/game_board.css');
     this.shadow.appendChild(styleLink);
+    this.contentBox = document.createElement('div');
+    this.contentBox.className = 'board-content';
+    this.shadow.appendChild(this.contentBox);
     this.boardEl = null;
     this.board = null;
     this.pressTimer = null;
@@ -235,11 +242,11 @@ export default class GameBoard extends HTMLElement {
         this.setState({ y: y, x: x }, GameBoard.HIDDEN);
       }
     }
-    this.shadow.appendChild(this.boardEl);
+    this.contentBox.appendChild(this.boardEl);
   }
 
   removeBoard() {
-    this.shadow.removeChild(this.boardEl);
+    this.contentBox.removeChild(this.boardEl);
     this.boardEl = null;
   }
 
