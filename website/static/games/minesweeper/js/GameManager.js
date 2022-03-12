@@ -96,6 +96,7 @@ class GameManager {
       () => this.win(),
       () => this.lose()
     );
+    document.getElementById('flag-select').checked = false;
     this.stopTimer();
     this.time = { m: 0, s: 0 };
     this.startTimer();
