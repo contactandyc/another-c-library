@@ -1,19 +1,76 @@
-body {
-    background-color:green; 
-}
-#info {
-    left: 20%;
-    position: fixed;
-    top:1%;
-    width: 200px;
-    font-size: 100%;
-}
-#info_flags, #setting_restart {
-    width: 100px;
-    position: fixed;
+.pop-up-screen {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    flex-flow: column nowrap;
+    height: 300px;
+    width: 400px;
+    top: -400px;
+    padding: 0;
+    background-color: #707070;
+    border-radius: 25px;
     text-align: center;
-    top: 2%;
-    height: 30px;
+    border-style: solid;
+    border-color: black;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+.blue-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    user-select: none;
+    height: 60px;
+    width: 100px;
+    font-size: 130%;
+    border-radius: 10px;
+    background-color: blue;
+    border-style: solid;
+    border-width: 3px;
+    border-color: black;
+}
+.blue-button:active {
+    background-color: darkblue;
+}
+.center-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.no-user-select {
+    user-select: none;
+}
+
+
+
+body {
+    display: flex;
+    background-color:green;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+}
+.background {
+    order: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column nowrap;
+}
+.info {
+    display: flex;
+    flex-flow: row nowrap;
+    width: 611px;
+    height: 50px;
+    justify-content: space-between;
+}
+.info-item {
+    text-align: center;
+    height:30px;
+    width: 100px;
+}
+.info_flags {
     font-size:130%;
     background-color: #707070;
     border-radius: 6px;
@@ -21,149 +78,79 @@ body {
     border-style: solid;
     border-color: black;
 }
-#info_timer {
+#info_flags_img {
+    position: relative;
+    width: 25px;
+    height: 25px;
+    margin-right:10px;
+    background-image: url('just_flag.png');
+    background-size: cover;
+    background-position-x: left;
+}
+.info_timer {
+    position: relative;
+    bottom: 40px;
     text-align: center;
-    position: fixed;
-    margin-left: 240px;
-    height:40px;
-    width: 100px;
-    top: 1%;
+    flex-grow: 0.4;
     font-size:250%;
 }
-#info_flags {
-    margin-left: 370px;
-}
-#info_flags_img {
-    position: absolute;
-    width:50px;
-    height:50px;
-    top: 10%;
-    margin-left: -60px;
-    filter: grayscale(100%);
-}
-#info_flags_text, #info_timer_text {
-    user-select: none;
-    margin-top: 2px;
-}
-#settings {
-    position: fixed;
-    left: 35%;
-    top: -100%;
-    width: 17%;
-    height: 200px;
-    text-align: center;
-    background-color: #707070;
-    border-radius: 25px;
-    border-width: 3px;
-    border-style: solid;
-    border-color: black;
-    animation-duration: 1s;
-    animation-fill-mode: forwards;
-}
-#setting_danger {
-    margin:auto;
-    width:52px;
-    height:29px;
-    background-color: green;
-    border-radius: 25px;
-}
-#setting_restart {
-    position: absolute;
-    width: 100px;
-    height:35px;
-    font-size: 100%;
-    margin-left: 114px;
-    top: 40%;
-    background-color: blue;
-    border-color: darkblue;
+.info_restart {
+    display: flex;
+    align-self: baseline;
 }
 #setting_visible {
-    width: 30px;
+    order: 0;
     height: 30px;
+    width: 30px;
     background-position: center;
     background-size: cover;
-    background-image: url('gear.png');
-    border: 0px;
-    position: fixed;
-    top: 3%;
+    background-image: url('settings.png');
+    border-radius: 20px;
 }
 #setting_bombs {
     width:40px;
+    align-self: center;
 }
-#setting_danger_inner {
-    position: relative;
-    left: 12px;
-    top: 2px;
-    width: 25px;
-    height:25px;
-    background-color:gray;
-    border: 0px;
-    border-radius: 25px;
-}
-#setting_flag_inner {
+.setting_flag_inner {
     left: -12px;
 }
 #board {
-    position: fixed;
-    left: 20%;
-    top: 10%;
+    align-self: center;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    height: 532px;
+    width: 611px;
 }
-#board>div {
-    position: absolute;
-}
-#board>div>div {
-    position: relative;
-    width: 35px;
+#board div {
     height: 35px;
+    width: 35px;
+    flex-grow: 1;
     background-color: #303030;
     border-width: 2px;
     border-color: black;
     border-style: solid;
     margin-top: 3px;
+    margin-left: 3px;
     background-position: center;
     background-size: cover;
     animation-duration: 1s;
     animation-fill-mode: forwards;
+    align-items: center;
 }
-#board>div>div>p {
-    position: absolute;
-    top: -80%;
-    margin-left: 25%;
-    margin-top: 80%;
+#board p {
+    text-align: center;
+    margin: 0;
     font-size: 130%;
     font-weight: 550;
     user-select: none;
-    color:black;
 }
-#loser, #winner {
-    position: absolute;
-    width: 400px;
-    height: 300px;
-    background-color: #707070;
-    border-radius: 25px;
-    text-align: center;
-    left: 30%;
-    top: -100%;
-    border-style: solid;
-    border-color: black;
-    animation-duration: 1s;
-    animation-fill-mode: forwards;
-}
-#loser>button, #winner>button {
-    width: 100px;
-    height:60px;
-    font-size: 130%;
-    border-radius: 50px;
-    background-color: blue;
-    border-color: darkblue;
-    margin-top: 10%;
-} 
 @keyframes slidein {
     from {
-        top: -100%;
+        top: -400px;
     }
     to {
-        top:30%;
+        top: 30%;
     }
 }
 @keyframes slideout {
@@ -171,7 +158,7 @@ body {
         top: 30%;
     }
     to {
-        top: -100%;
+        top: -400px;
     }
 }
 @keyframes reveal {
@@ -190,31 +177,14 @@ body {
         background-color:#909090
     }
 }
-@media only screen and (max-width: 1000px) {
-    #board>div>div {
-        width: 50px;
-        height: 50px;
+@keyframes init {
+    from {
+
     }
-    #board {
-        left: 1%;
+    50% {
+        background-color:#505050
     }
-    #info {
-        left: 15%;
-        top: 3%;
-        scale: 1.4;
-        height: 25px;
+    to {
+        background-color:#303030
     }
-    #setting_flag {
-        display: unset;
-    }
-    #setting_restart {
-        top: 5%;
-        margin-left: 230px;
-        scale: 1.4;
-    }
-    #settings, #winner, #loser {
-        left: 24%;
-        scale: 1.4;
-        width: 500px;
-    }
-  }
+}

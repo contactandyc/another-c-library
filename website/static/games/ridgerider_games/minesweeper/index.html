@@ -6,37 +6,55 @@
         </title>
         <script src="minesweeper.js"></script>
         <link rel = "stylesheet" href="minesweeper.css"></link>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
-    <body id = "body">
-        <div id="background">
-            <div id="board"></div>
-        </div>
-        <div id="info">
-            <div id="info_timer">
-                <p id="info_timer_text">0:00</p>
+    <body id="body">
+        <div class="info">
+            <div class="blue-button info-item" id="setting_visible" onclick="setting('visible')">
             </div>
-            <div id="info_flags" onclick="setting('flag')">
-                <img id="info_flags_img" src="just_flag.png">
-                <p id="info_flags_text">0/30</p>
-            </div>
-            <button id="setting_restart" onclick="clearInterval(info);play_again(false)">
+            <div class="blue-button info-item info_restart" onclick="clearInterval(info);play_again(false)">
                 Restart?
-            </button><br>
-            <div id="setting_visible" onclick="setting('visible')"></div>
+            </div><br>
+            <div class="info_timer info-item">
+                <p class="no-user-select info-item" id="info_timer_text">
+                    0:00
+                </p>
+            </div>
+            <div class="info_flags info-item center-text" onclick="setting('flag')">
+                <div id="info_flags_img">
+                </div>
+                <p class="no-user-select" id="info_flags_text">
+                    0 / 30
+                </p>
+            </div>
         </div>
-        <div id="settings">
-            <h6>Number of bombs. (wont change board until next game)</h6>
-            <input id="setting_bombs" type="number" value="30"/>
-            <br><br>
-        </div>
-        <div id="loser">
-            <h1>You are a loser</h1>
-            <button onclick="play_again(false);">Play again?</button>
-        </div>
-        <div id="winner">
-            <h1>You are a winner!</h1>
-            <p id="winner_timeleft">Time - 0</p>
-            <button onclick="play_again(true);">Play again?</button>
+        <div class="background">
+            <div id="board">
+            </div>
+            <div class="pop-up-screen " id="loser">
+                <h1>
+                    You are a loser.
+                </h1>
+                <div class="no-user-select blue-button" onclick="play_again(false);">
+                    Play again?
+                </div>
+            </div>
+            <div class="pop-up-screen" id="winner">
+                <h1>You are a winner!</h1>
+                <p id="winner_timeleft">
+                    Time - 0
+                </p>
+                <div class="no-user-select  blue-button" class onclick="play_again(true);">
+                    Play again?
+                </div>
+            </div>
+            <div class="pop-up-screen" id="settings">
+                <h6>
+                    Number of bombs. (wont change board until next game)
+                </h6>
+                <input id="setting_bombs" type="number" value="30"/>
+                <br><br>
+            </div>
         </div>
     </body>
 </html>

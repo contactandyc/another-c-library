@@ -21,7 +21,8 @@ function setting(type) {
             break;
         case 'visible':
             setting_visible = !setting_visible;
-            document.getElementById("settings").style.animationName=setting_visible?"slidein":"slideout";
+            let setting = document.getElementById("settings");
+            setting.style.animationName=setting_visible?"slidein":"slideout";
             break;
     }
 }
@@ -212,23 +213,20 @@ function update_info() {
 function generate_board() {
     let brd = document.getElementById("board");
     for (let x = 0; x < rows; x++) {
-        let r = document.createElement("div");
-        r.style.left = is_on_phone ? 
-        `${x * 60}px` : `${x * 42}px`;
-
         for (let y = 0; y < cols; y++) {
             let d = document.createElement("div");
             let p = document.createElement("p");
             d.id = `b_${x}_${y}`;
+            d.style.animationName="init";
             d.addEventListener("click", left_click);
             d.addEventListener("contextmenu", right_click);
             p.id = `p_${x}_${y}`;
             d.appendChild(p);
-            r.appendChild(d);
+            brd.appendChild(d);
         }
-        brd.appendChild(r);
     }
 }
+document.addEventListener("contextmenu", e=>{e.preventDefault()}); // to prevent misclicks to bring up menu
 init_board();
 window.onload = ()=>{
     place_bombs();
