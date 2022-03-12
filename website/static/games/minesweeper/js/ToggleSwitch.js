@@ -8,25 +8,37 @@ class ToggleSwitch extends HTMLElement {
     this.shadow.appendChild(linkElem);
   }
 
+  get checked() {
+    return this.input.checked;
+  }
+
+  set checked(ischecked) {
+    let cur = this.checked;
+    if (cur != ischecked) {
+      this.input.checked = ischecked;
+      let event = new CustomEvent('change', {
+        detail: {
+          checked: ischecked,
+        },
+      });
+      this.dispatchEvent(event);
+    }
+  }
+
   connectedCallback() {
-    let input = document.createElement('input');
-    input.type = 'checkbox';
-    input.setAttribute('name', 'toggle-switch');
-    input.id = this.id + '-input';
-    input.addEventListener('change', (e) => {
+    this.input = document.createElement('input');
+    this.input.type = 'checkbox';
+    this.input.setAttribute('name', 'toggle-switch');
+    this.input.id = this.id + '-input';
+    this.input.addEventListener('change', (e) => {
       const event = new CustomEvent('change', {
         detail: { checked: e.target.checked },
       });
       this.dispatchEvent(event);
     });
-    this.shadow.appendChild(input);
-    input.addEventListener('change', (e) => {
-      let event = new CustomEvent('change', {
-        detail: {
-          checked: e.currentTarget.checked,
-        },
-      });
-      this.dispatchEvent(event);
+    this.shadow.appendChild(this.input);
+    this.input.addEventListener('change', (e) => {
+      this.checked = e.currentTarget.checked;
     });
 
     let label = document.createElement('label');
