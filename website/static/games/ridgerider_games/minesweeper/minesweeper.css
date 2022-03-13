@@ -83,6 +83,7 @@ body {
     width: 25px;
     height: 25px;
     margin-right:10px;
+    filter: grayscale(100%);
     background-image: url('just_flag.png');
     background-size: cover;
     background-position-x: left;
