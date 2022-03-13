@@ -5,13 +5,19 @@ let bombs = 30,
     flags = 0,
     board = [],
     timer = 0,
-    is_on_phone = false,
     setting_danger = true,
     setting_flag = false,
-    setting_visible = false;
+    setting_visible = false,
+    bef_bomb_change = bombs,
+    crt_bomb_count = bombs;
     info = setInterval(update_info, 1000);
-if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
-    is_on_phone = true;
+function slide(id, in_out) {
+    document.getElementById(id).style.animationName=in_out ?
+    "slidein":"slideout";
+}
+function revert_settings() {
+    bombs = bef_bomb_change;
+}
 function setting(type) {
     switch (type) {
         case 'flag':
@@ -21,9 +27,18 @@ function setting(type) {
             break;
         case 'visible':
             setting_visible = !setting_visible;
-            let setting = document.getElementById("settings");
-            setting.style.animationName=setting_visible?"slidein":"slideout";
+            slide("settings", setting_visible)
             break;
+        case 'bomb':
+            bef_bomb_change = bombs;
+            let bmbs = document.getElementById("setting_bombs");
+            if (!isNaN(bmbs.value)) {
+                if (bmbs.value > rows * cols)
+                    alert(`Bomb limit is ${bmbs.value=rows*cols}, bomb count has been reduced to that.`);
+                bombs = Number(bmbs.value);
+            }
+            else
+                alert(`${bmbs} is not a number. Set bombs to default (99).`);
     }
 }
 function init_board() {
@@ -33,16 +48,7 @@ function init_board() {
     }
 }
 function place_bombs() {
-    let bmbs = document.getElementById("setting_bombs");
-    if (!isNaN(bmbs.value)) {
-        if (bmbs.value > rows * cols) {
-            alert(`Bomb limit is ${rows*cols}, bomb count has been reduced to that.`);
-            bmbs.value = rows*cols;
-        }
-        bombs = Number(bmbs.value);
-    }
-    else
-        alert(`${bmbs} is not a number. Set bombs to default (99).`);
+    crt_bomb_count = bombs;
     for (let i = bombs; i;) {
         let x = Math.floor(Math.random() * rows) 
         let y = Math.floor(Math.random() * cols);
@@ -75,9 +81,7 @@ function is_flagged(x , y) {
     return document.getElementById(`b_${x}_${y}`).style.backgroundImage != "";
 }
 function lose() {
-    let bkg = document.getElementById("background");
-    let lsr = document.getElementById("loser");
-    lsr.style.animationName = "slidein";
+    slide("loser", true)
     
     for (let i = 0; i < board.length; i++)
         for (let j = 0; j < board[i].length; j++)
@@ -90,26 +94,24 @@ function lose() {
     clearInterval(info);
 }
 function win() {
-    let bkg = document.getElementById("background");
-    let wnr = document.getElementById("winner");
     let tmr = document.getElementById("winner_timeleft");
     let sec = timer % 60;
     tmr.innerText = `Time - ${Math.floor(timer / 60)}:${sec<10?"0":""}${timer % 60}`;
-    wnr.style.animationName = "slidein";
+    slide("winner", true)
     clearInterval(info);
 }
 function play_again(win) {
-    let bkg = document.getElementById("background");
-    let dlg = document.getElementById(win ? "winner" : "loser");
     let brd = document.getElementById("board");
-    dlg.style.animationName = "slideout";
     brd.innerHTML = "";
     board = [];
     bombs_des = flags = timer = 0;
-    info = setInterval(update_info, 1000);
     init_board();
     place_bombs();
     generate_board();
+    info = setInterval(update_info, 1000);
+    if (win=="restart")
+        return;
+    slide(win ? "winner" : "loser", false)
 }
 function left_click(e) {
     if (setting_flag) {
@@ -207,7 +209,7 @@ function update_info() {
     let IF = document.getElementById("info_flags_text");
     let sec = timer % 60;
     IT.innerText = `${Math.floor(timer / 60)}:${sec<10?"0":""}${timer % 60}`;
-    IF.innerText = `${flags} / ${bombs}`;
+    IF.innerText = `${flags} / ${crt_bomb_count}`;
     timer++;
 }
 function generate_board() {

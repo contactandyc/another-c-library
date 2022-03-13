@@ -51,6 +51,25 @@ body {
     justify-content: center;
     align-items: center;
 }
+.starting_menu {
+    z-index: 1;
+    text-align: unset;
+    font-size: 140%;
+    padding-left:40px;
+    padding-top: 0;
+    padding-right:40px;
+    height: 380px;
+    top: 30%;
+    justify-content: flex-start;
+}
+.starting_menu p {
+    margin-top: 0;
+}
+.starting_menu h3 {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
 .background {
     order: 1;
     display: flex;
@@ -114,6 +133,29 @@ body {
 }
 .setting_flag_inner {
     left: -12px;
+}
+.settings_button_container {
+    margin-top: 60px;
+    display: flex;
+    width: 190px;
+    justify-content: space-between;
+    align-self: center;
+}
+.ok_button {
+    width: 70px;
+    height:40px;
+    background-color: green;
+}
+.ok_button:active {
+    background-color: darkgreen;
+}
+.cancel_button {
+    width: 70px;
+    height:40px;
+    background-color: red;
+}
+.cancel_button:active {
+    background-color: darkred;
 }
 #board {
     align-self: center;

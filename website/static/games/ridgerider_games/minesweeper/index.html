@@ -9,10 +9,25 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body id="body">
+        <div class="pop-up-screen starting_menu" id="starting_menu">
+            <h3>
+                Minesweeper
+            </h3>
+            <p>
+                Your goal is to <font color="blue">flag</font> all the hidden bombs. <br>
+                The numbers on the revealed squares represent how many bombs are <font color="blue">adjacent to that square</font>. 
+                <br>
+                <br>
+                But remember, if you reveal a bomb it's <font color="red">Game Over.</font>
+            </p>
+            <div class="blue-button" onclick="slide('starting_menu', false);">
+                <h5>Let's go!</h5>
+            </div>
+        </div>
         <div class="info">
             <div class="blue-button info-item" id="setting_visible" onclick="setting('visible')">
             </div>
-            <div class="blue-button info-item info_restart" onclick="clearInterval(info);play_again(false)">
+            <div class="blue-button info-item info_restart" onclick="clearInterval(info);play_again('restart')">
                 Restart?
             </div><br>
             <div class="info_timer info-item">
@@ -49,10 +64,16 @@
                 </div>
             </div>
             <div class="pop-up-screen" id="settings">
-                <h6>
-                    Number of bombs. (wont change board until next game)
-                </h6>
-                <input id="setting_bombs" type="number" value="30"/>
+                Number of bombs. (wont change board until next game)
+                <input id="setting_bombs" onchange="setting('bomb')" type="number" value="30"/>
+                <div class="settings_button_container">
+                    <div class="blue-button ok_button" onclick="setting('visible');">
+                        Ok
+                    </div>
+                    <div class="blue-button cancel_button" onclick="setting('visible');revert_settings();">
+                        Cancel
+                    </div>
+                </div>
                 <br><br>
             </div>
         </div>
