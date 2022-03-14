@@ -9,21 +9,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body id="body">
-        <div class="pop-up-screen starting_menu" id="starting_menu">
-            <h3>
-                Minesweeper
-            </h3>
-            <p>
-                Your goal is to <font color="blue">flag</font> all the hidden bombs. <br>
-                The numbers on the revealed squares represent how many bombs are <font color="blue">adjacent to that square</font>. 
-                <br>
-                <br>
-                But remember, if you reveal a bomb it's <font color="red">Game Over.</font>
-            </p>
-            <div class="blue-button" onclick="slide('starting_menu', false);">
-                <h5>Let's go!</h5>
-            </div>
-        </div>
         <div class="info">
             <div class="blue-button info-item" id="setting_visible" onclick="setting('visible')">
             </div>
@@ -65,7 +50,7 @@
             </div>
             <div class="pop-up-screen" id="settings">
                 Number of bombs. (wont change board until next game)
-                <input id="setting_bombs" onchange="setting('bomb')" type="number" value="30"/>
+                <input class="setting_bomb" id="setting_bombs" onchange="setting('bomb', 'setting_bombs')" type="number" value="30"/>
                 <div class="settings_button_container">
                     <div class="blue-button ok_button" onclick="setting('visible');">
                         Ok
@@ -75,6 +60,27 @@
                     </div>
                 </div>
                 <br><br>
+            </div>
+            <div class="pop-up-screen starting_menu" id="starting_menu">
+                <h3>
+                    Minesweeper
+                </h3>
+                <p>
+                    Your goal is to <font color="blue">flag</font> all the hidden bombs. <br>
+                    The numbers on the revealed squares represent how many bombs are <font color="blue">adjacent to that square</font>. 
+                    <br>
+                    <br>
+                    But remember, if you reveal a bomb it's <font color="#990000">Game Over.</font>
+                </p>
+                <div>
+                    <i>Number of bombs:
+                        <input class="setting_bomb" id="start_bombs" onchange="setting('bomb', 'start_bombs')" type="number" value="30"/>
+                    </i> 
+                </div>
+                <br>
+                <div class="blue-button lets_go_button" onclick="show('starting_menu', false);info=setInterval(update_info, 1000);place_bombs();">
+                    <h5>Let's go!</h5>
+                </div>
             </div>
         </div>
     </body>

@@ -9,16 +9,33 @@ let bombs = 30,
     setting_flag = false,
     setting_visible = false,
     bef_bomb_change = bombs,
-    crt_bomb_count = bombs;
-    info = setInterval(update_info, 1000);
-function slide(id, in_out) {
-    document.getElementById(id).style.animationName=in_out ?
-    "slidein":"slideout";
+    crt_bomb_count = bombs,
+    game_over = false,
+    info;
+function show(id, vis) {
+    document.getElementById(id).style.display=vis?"flex":"none";
+}
+function bomb_move(x, y) {
+    if (x < 0 || x >= rows || y < 0 || y >= cols || board[x][y] == 2)
+        return;
+    let b = document.getElementById(`b_${x}_${y}`).style;
+    b.animationName = "boom";
+    board[x][y] = 2;
+    setTimeout(() => {
+        bomb_move(x - 1, y + 1);
+        bomb_move(x, y + 1);
+        bomb_move(x + 1, y + 1);
+        bomb_move(x - 1, y);
+        bomb_move(x + 1, y);
+        bomb_move(x - 1, y - 1);
+        bomb_move(x, y - 1);
+        bomb_move(x + 1, y - 1);
+    }, 100);
 }
 function revert_settings() {
     bombs = bef_bomb_change;
 }
-function setting(type) {
+function setting(type, id) {
     switch (type) {
         case 'flag':
             setting_flag = !setting_flag;
@@ -27,11 +44,11 @@ function setting(type) {
             break;
         case 'visible':
             setting_visible = !setting_visible;
-            slide("settings", setting_visible)
+            show("settings", setting_visible)
             break;
         case 'bomb':
             bef_bomb_change = bombs;
-            let bmbs = document.getElementById("setting_bombs");
+            let bmbs = document.getElementById(id);
             if (!isNaN(bmbs.value)) {
                 if (bmbs.value > rows * cols)
                     alert(`Bomb limit is ${bmbs.value=rows*cols}, bomb count has been reduced to that.`);
@@ -81,26 +98,23 @@ function is_flagged(x , y) {
     return document.getElementById(`b_${x}_${y}`).style.backgroundImage != "";
 }
 function lose() {
-    slide("loser", true)
-    
-    for (let i = 0; i < board.length; i++)
-        for (let j = 0; j < board[i].length; j++)
-            if (board[i][j] == -1) {
-                let b = document.getElementById(`b_${i}_${j}`).style;
-                b.animationDuration = "2s";
-                b.animationName = "boom";
-                b.backgroundImage = "url('bomb.png')";
-            }
+    update_info();
+    game_over=true;
+    show("loser", true);
     clearInterval(info);
 }
 function win() {
+    game_over=true;
+    update_info();
     let tmr = document.getElementById("winner_timeleft");
+    timer--;
     let sec = timer % 60;
     tmr.innerText = `Time - ${Math.floor(timer / 60)}:${sec<10?"0":""}${timer % 60}`;
-    slide("winner", true)
+    show("winner", true)
     clearInterval(info);
 }
 function play_again(win) {
+    game_over=false;
     let brd = document.getElementById("board");
     brd.innerHTML = "";
     board = [];
@@ -111,9 +125,11 @@ function play_again(win) {
     info = setInterval(update_info, 1000);
     if (win=="restart")
         return;
-    slide(win ? "winner" : "loser", false)
+    show(win ? "winner" : "loser", false)
 }
 function left_click(e) {
+    if (game_over)
+        return;
     if (setting_flag) {
         right_click(e);
         return;
@@ -128,8 +144,18 @@ function left_click(e) {
         document.getElementById(`b_${cd[0]}_${cd[1]}`).style.backgroundImage = "";
         return;
     }
-    if (board[cd[0]][cd[1]] == -1)
-        lose();
+    if (board[cd[0]][cd[1]] == -1) {
+        for (let i = 0; i < board.length; i++)
+            for (let j = 0; j < board[i].length; j++)
+                if (board[i][j] == -1) {
+                    let b = document.getElementById(`b_${i}_${j}`).style;
+                    b.animationDuration = "1.2s";
+                    b.animationName = "boom";
+                    b.backgroundImage = "url('bomb.png')";
+                }
+        setTimeout(lose, rows * 100);
+        bomb_move(cd[0], cd[1]);
+    }
     else if (board[cd[0]][cd[1]] == 0)
         zero_move(cd[0], cd[1]);
     else
@@ -155,6 +181,9 @@ function right_click(e) {
         win();
     flag(cd[0], cd[1]);
     flags++;
+}
+function start() {
+
 }
 function zero_move(x, y) {
     if (x < 0 || x >= rows || y < 0 || y >= cols || board[x][y] == 1 || is_flagged(x, y))
@@ -230,7 +259,4 @@ function generate_board() {
 }
 document.addEventListener("contextmenu", e=>{e.preventDefault()}); // to prevent misclicks to bring up menu
 init_board();
-window.onload = ()=>{
-    place_bombs();
-    generate_board();
-}
+window.onload = generate_board;

@@ -1,13 +1,13 @@
 .pop-up-screen {
     position: absolute;
-    display: flex;
+    display: none;
     justify-content: center;
+    align-self: center;
     flex-flow: column nowrap;
-    height: 300px;
-    width: 400px;
-    top: -400px;
-    padding: 0;
-    background-color: #707070;
+    height: 200px;
+    width: 300px;
+    padding-top: 10px;
+    background-color: white;
     border-radius: 25px;
     text-align: center;
     border-style: solid;
@@ -46,20 +46,22 @@
 
 body {
     display: flex;
-    background-color:green;
+    background-color:#003000;
     flex-flow: column wrap;
     justify-content: center;
     align-items: center;
 }
 .starting_menu {
+    display: flex;
     z-index: 1;
     text-align: unset;
     font-size: 140%;
     padding-left:40px;
     padding-top: 0;
     padding-right:40px;
-    height: 380px;
-    top: 30%;
+    height: 480px;
+    width:400px;
+    top: 15%;
     justify-content: flex-start;
 }
 .starting_menu p {
@@ -90,8 +92,9 @@ body {
     width: 100px;
 }
 .info_flags {
+    width: 110px;
     font-size:130%;
-    background-color: #707070;
+    background-color: white;
     border-radius: 6px;
     border-width: 3px;
     border-style: solid;
@@ -127,7 +130,7 @@ body {
     background-image: url('settings.png');
     border-radius: 20px;
 }
-#setting_bombs {
+.setting_bomb {
     width:40px;
     align-self: center;
 }
@@ -146,7 +149,10 @@ body {
     height:40px;
     background-color: green;
 }
-.ok_button:active {
+.lets_go_button {
+    background-color: green;
+}
+.ok_button:active, .lets_go_button:active {
     background-color: darkgreen;
 }
 .cancel_button {
@@ -163,7 +169,7 @@ body {
     flex-flow: row wrap;
     justify-content: space-between;
     height: 532px;
-    width: 611px;
+    width: 564px;
 }
 #board div {
     height: 35px;
@@ -173,8 +179,6 @@ body {
     border-width: 2px;
     border-color: black;
     border-style: solid;
-    margin-top: 3px;
-    margin-left: 3px;
     background-position: center;
     background-size: cover;
     animation-duration: 1s;
@@ -187,22 +191,6 @@ body {
     font-size: 130%;
     font-weight: 550;
     user-select: none;
-}
-@keyframes slidein {
-    from {
-        top: -400px;
-    }
-    to {
-        top: 30%;
-    }
-}
-@keyframes slideout {
-    from {
-        top: 30%;
-    }
-    to {
-        top: -400px;
-    }
 }
 @keyframes reveal {
     from {
@@ -218,6 +206,17 @@ body {
     to {
         font-size: 130%;
         background-color:#909090
+    }
+}
+@keyframes boom {
+    from {
+        background-color:#303030;
+    }
+    20% {
+        background-color: #902020;
+    }
+    to {
+        background-color:#101010;
     }
 }
 @keyframes init {
