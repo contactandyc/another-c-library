@@ -139,8 +139,11 @@ var fieldManager = (function () {
         }
         if (cell.isEmpty()) {
           var queue = traverseMatrix(cell.index, []);
-          for (var i = 0; i < queue.length; i++) {
-            cells[queue[i]].reveal();
+
+          for (let i = 1; i < queue.length; i++) {
+            setTimeout(function revealDelay() {
+              cells[queue[i]].reveal();
+            }, i * 5)
           }
         }
       }
