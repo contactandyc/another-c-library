@@ -91,7 +91,7 @@ function count_bomb(x, y) {
 }
 function flag(x , y) {
     let flag = document.getElementById(`b_${x}_${y}`).style;
-    flag.backgroundImage = "url('flag.png')";
+    flag.backgroundImage = "url('images/flag.png')";
     flag.animationName = "flag";
 }
 function is_flagged(x , y) {
@@ -151,7 +151,7 @@ function left_click(e) {
                     let b = document.getElementById(`b_${i}_${j}`).style;
                     b.animationDuration = "1.2s";
                     b.animationName = "boom";
-                    b.backgroundImage = "url('bomb.png')";
+                    b.backgroundImage = "url('images/bomb.png')";
                 }
         setTimeout(lose, rows * 100);
         bomb_move(cd[0], cd[1]);
@@ -186,7 +186,7 @@ function start() {
 
 }
 function zero_move(x, y) {
-    if (x < 0 || x >= rows || y < 0 || y >= cols || board[x][y] == 1 || is_flagged(x, y))
+    if (x < 0 || x >= rows || y < 0 || y >= cols || board[x][y] == 1 || board[x][y] == 2 || is_flagged(x, y))
         return;
     let b = document.getElementById(`b_${x}_${y}`).style;
     b.animationName = "reveal";

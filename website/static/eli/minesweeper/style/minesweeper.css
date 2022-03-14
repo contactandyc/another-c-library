@@ -106,7 +106,7 @@ body {
     height: 25px;
     margin-right:10px;
     filter: grayscale(100%);
-    background-image: url('just_flag.png');
+    background-image: url('../images/just_flag.png');
     background-size: cover;
     background-position-x: left;
 }
@@ -127,7 +127,7 @@ body {
     width: 30px;
     background-position: center;
     background-size: cover;
-    background-image: url('settings.png');
+    background-image: url('../images/settings.png');
     border-radius: 20px;
 }
 .setting_bomb {
@@ -169,14 +169,14 @@ body {
     flex-flow: row wrap;
     justify-content: space-between;
     height: 532px;
-    width: 564px;
+    width: 532px;
 }
 #board div {
     height: 35px;
     width: 35px;
     flex-grow: 1;
     background-color: #303030;
-    border-width: 2px;
+    border-width: 1px;
     border-color: black;
     border-style: solid;
     background-position: center;
