@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="style/index.css" />
+    <title>Minesweeper by Jonathan Curtis</title>
+  </head>
+  <body onload="start(rows, cols, bombs)">
+    <div id="wrap">
+      <div id="top-bar">
+        <button onclick="toggleSettingsPage()">⚙️</button>
+        <h2 id="status">MINESWEEPER</h2>
+        <button onclick="toggleHelpPage()">❔</button>
+      </div>
+      <div id="game-page">
+        <div id="game"></div>
+        <div id="bottom-bar">
+          <div class="stat">
+            <p id="bomb-counter">0</p>
+            <p>BOMBS</p>
+          </div>
+          <div id="mode-div" class="stat" onclick="multiBtn()">
+            <p id="mode-icon">⛏️</p>
+            <p id="mode-text">MINE</p>
+          </div>
+          <div class="stat">
+            <p id="timer">0.00</p>
+            <p>TIME</p>
+          </div>
+          <div class="stat">
+            <p id="moves-counter">0</p>
+            <p>MOVES</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="settings-page">
+        <form id="settings">
+          <p class="setting-text">ROWS</p>
+          <input
+            class="text-input setting"
+            type="number"
+            name="rows"
+            value="10"
+          />
+          <p class="setting-text">COLUMNS</p>
+          <input class="setting" type="number" name="columns" value="10" />
+          <p class="setting-text">BOMBS</p>
+          <input class="setting" type="number" name="bombs" value="5" />
+          <input
+            class="btn setting"
+            type="button"
+            onclick="start(Number(this.form.rows.value), Number(this.form.columns.value), Number(this.form.bombs.value)); updateBombs(); closeSettingsPage()"
+            class="buttons"
+            value="SAVE SETTINGS AND RESTART"
+          />
+        </form>
+      </div>
+
+      <div id="help-page">
+        <h3>Help</h3>
+        <ul>
+          <li>
+            Click the ⛏️/🏴 button to toggle between flagging and mining mode
+          </li>
+          <li>
+            Win by either marking all bombs with flags, or by revealing all safe
+            squares
+          </li>
+          <li>Clicking bombs will result in a loss</li>
+        </ul>
+      </div>
+    </div>
+
+    <script src="js/cell.js" type="text/javascript"></script>
+    <script src="js/field.js" type="text/javascript"></script>
+    <script src="js/ui.js" type="text/javascript"></script>
+    <script src="js/index.js" type="text/javascript"></script>
+  </body>
+</html>
