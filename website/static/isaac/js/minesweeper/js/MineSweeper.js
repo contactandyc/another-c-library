@@ -2,6 +2,25 @@ import GameBoard from './GameBoard.js';
 
 export default class MineSweeper {
   constructor(size, numBombs, soundPlayer, winCb, loseCb) {
+    this.newGame(size, numBombs, soundPlayer, winCb, loseCb);
+
+    document.getElementById('flag-button').addEventListener('click', (e) => {
+      e.target.classList.toggle('grayed-out');
+      this.flagging = !this.flagging;
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.code === 'ShiftLeft') {
+        console.log('pressed');
+        this.flagging = !this.flagging;
+        document.getElementById('flag-button').classList.toggle('grayed-out');
+      }
+    });
+    // document.getElementById('num-bombs').innerText = this.numBombs;
+    // document.getElementById('size').innerText = `${this.size}x${this.size}`;
+  }
+
+  newGame(size, numBombs, soundPlayer, winCb, loseCb) {
     this.flagsRemaining = numBombs;
     this.size = size;
     this.numBombs = numBombs;
@@ -28,12 +47,8 @@ export default class MineSweeper {
       this.altClick(e.detail.pos);
     });
     document.getElementById('board').appendChild(this.gb);
+
     document.getElementById('num-flags').innerText = this.flagsRemaining;
-    document.getElementById('flag-select').addEventListener('change', (e) => {
-      this.flagging = e.detail.checked;
-    });
-    // document.getElementById('num-bombs').innerText = this.numBombs;
-    // document.getElementById('size').innerText = `${this.size}x${this.size}`;
   }
 
   win() {
@@ -117,6 +132,10 @@ export default class MineSweeper {
         this.doMove({ y: pos.y - 1, x: pos.x });
         this.doMove({ y: pos.y, x: pos.x + 1 });
         this.doMove({ y: pos.y, x: pos.x - 1 });
+        this.doMove({ y: pos.y + 1, x: pos.x + 1 });
+        this.doMove({ y: pos.y + 1, x: pos.x - 1 });
+        this.doMove({ y: pos.y - 1, x: pos.x - 1 });
+        this.doMove({ y: pos.y - 1, x: pos.x + 1 });
       }, 100);
     }
   }

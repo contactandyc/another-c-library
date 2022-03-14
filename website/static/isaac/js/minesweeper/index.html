@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <title>Minesweeper!</title>
+    <script language="Javascript"></script>
+    <link rel="stylesheet" href="./css/styles.css" />
+    <script src="./js/ToggleSwitch.js"></script>
+    <meta http-equiv="cache-control" content="max-age=0" />
+  </head>
+  <body>
+    <div id="container" class="container">
+      <div id="board"></div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="game-info">
+          <div class="info" id="time">1:30</div>
+          <div class="flag-select-container">
+            <div class="flag-button-wrapper">
+              <img
+                id="flag-button"
+                class="icon-image grayed-out"
+                src="./media/images/flag.png"
+              />
+            </div>
+            <div class="info" id="num-flags">35</div>
+            <img class="icon-image" src="./media/images/bomb.png" />
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="menu-button-container">
+          <div id="menu-button"></div>
+        </div>
+        <div class="menu-button-container">
+          <div id="mute-button" class="mute-button-muted icon-image"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="./js/GameManager.js"></script>
+    <script language="Javascript"></script>
+  </body>
+</html>

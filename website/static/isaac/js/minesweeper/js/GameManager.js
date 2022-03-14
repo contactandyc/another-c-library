@@ -5,11 +5,14 @@ import MusicPlayer from './MusicPlayer.js';
 class GameManager {
   constructor() {
     this.musicVol = 0.5;
-    this.soundVol = 1;
+    this.soundVol = 0.5;
+    this.muted = true;
     this.musicPlayer = new MusicPlayer();
     this.musicPlayer.volume = this.musicVol;
+    this.musicPlayer.muted = true;
     this.soundPlayer = new Audio();
     this.soundPlayer.volume = this.soundVol;
+    this.soundPlayer.muted = true;
     this.modal = null;
 
     this.time = { m: 0, s: 0 };
@@ -20,6 +23,14 @@ class GameManager {
       .getElementById('menu-button')
       .addEventListener('click', () => this.presentMenuModal());
     this.begin();
+
+    document.getElementById('mute-button').addEventListener('click', (e) => {
+      e.target.classList.toggle('mute-button-sound');
+      e.target.classList.toggle('mute-button-muted');
+      this.muted = !this.muted;
+      this.musicPlayer.muted = this.muted;
+      this.soundPlayer.muted = this.muted;
+    });
   }
 
   addClickAndLongClickListener(el, clickHandler, longClickHandler) {
@@ -41,7 +52,7 @@ class GameManager {
   updateTime() {
     if (this.game.state === 'playing') {
       this.time.s++;
-      if (this.time.s > 60) {
+      if (this.time.s >= 60) {
         this.time.s = 0;
         this.time.m++;
       }
@@ -80,23 +91,27 @@ class GameManager {
   }
 
   newGame() {
-    // console.log('size', this.size);
-    // console.log('num bombs', this.numBombs);
     if (this.modal) {
       this.modal.remove();
     }
-    if (this.game != undefined) {
+    if (this.game === undefined || this.game === null) {
+      this.game = new MineSweeper(
+        this.size,
+        this.numBombs,
+        this.soundPlayer,
+        () => this.win(),
+        () => this.lose()
+      );
+    } else {
       this.game.removeBoard();
+      this.game.newGame(
+        this.size,
+        this.numBombs,
+        this.soundPlayer,
+        () => this.win(),
+        () => this.lose()
+      );
     }
-    delete this.game;
-    this.game = new MineSweeper(
-      this.size,
-      this.numBombs,
-      this.soundPlayer,
-      () => this.win(),
-      () => this.lose()
-    );
-    document.getElementById('flag-select').checked = false;
     this.stopTimer();
     this.time = { m: 0, s: 0 };
     this.startTimer();
@@ -109,6 +124,45 @@ class GameManager {
     this.newGame();
   }
 
+  presentHelpModal() {
+    let options = document.createElement('div');
+    options.id = 'new-game-options';
+    let label = document.createElement('h2');
+    label.innerText = 'How to Play';
+    options.appendChild(label);
+
+    let helpContent = document.createElement('div');
+    helpContent.className = 'help-content';
+
+    let hc = `<h3>Clearing Land</h3>`;
+    hc += `<p>Clear land by clicking on a tile. If the tile contains a bomb, you lose, otherwise the number of bombs that are adjacent to the tile is revealed on the face of the tile. If there are no adjacent bombs, then the adjacent squares will also be revealed and the process will repeat until a square with adjacent bombs is reachd or the edge of the board.</p>`;
+    hc += `<img src="./media/images/help_clearing.jpg"/>`;
+
+    hc += `<h3>Flagging Bombs</h3>`;
+    hc += `<p>Mark a suspected bomb location with a flag by right clicking on a tile or by clicking on a tile while in flagging mode.</p>`;
+    hc += `<img src="./media/images/help_flagging.png"/>`;
+    hc += `<p>Toggle flagging mode by clicking the flag icon in the bottom bar.</p>`;
+    hc += `<img src="./media/images/help_flagging_mode.jpg"/>`;
+
+    hc += `<h3>Winning the Game</h3>`;
+    hc += `<p>Win the game by either revealing all non-bomb tiles or by flagging all the bombs!</p>`;
+    hc += `<img src="./media/images/help_winning.jpg"/>`;
+
+    helpContent.innerHTML = hc;
+    options.appendChild(helpContent);
+    let modal = new Modal(options);
+    modal.addButton(
+      'Exit',
+      (e) => {
+        modal.remove();
+      },
+      {
+        color: '#006416',
+        textColor: 'white',
+      }
+    );
+  }
+
   presentNewGameModal() {
     if (this.modal) {
       this.modal.remove();
@@ -119,26 +173,47 @@ class GameManager {
     label.innerText = "Let's play a game...";
     options.appendChild(label);
 
-    let sizeInput = document.createElement('input');
+    let difLabel = document.createElement('label');
+    difLabel.innerText = 'Difficulty';
+    options.appendChild(difLabel);
+    let difSetting = document.createElement('input');
+    difSetting.type = 'range';
+    difSetting.id = 'music-volume';
+    difSetting.min = 0;
+    difSetting.max = 4;
+    difSetting.defaultValue = 0;
+    difSetting.addEventListener('change', (e) => {
+      let difficulties = [[10, 10], [15, 30], [20, 40], [30, 60], [40, 100]];
+      let dif = difficulties[e.currentTarget.value];
+      sizeInput.value = dif[0];
+      bombsInput.value = dif[1];
+    });
+    options.appendChild(difSetting);
+
+    var sizeInput = document.createElement('input'); // var here so I can use the sizeInput in difSetting
     sizeInput.type = 'text';
     sizeInput.id = 'size-input';
     sizeInput.placeholder = 'Size';
-    sizeInput.defaultValue = 20;
-    if (this.size) sizeInput.value = this.size;
+    sizeInput.defaultValue = 10;
+    //if (this.size) sizeInput.value = this.size;
     options.appendChild(sizeInput);
 
-    let bombsInput = document.createElement('input');
+    var bombsInput = document.createElement('input'); // var here so I can use the bombsInput in difSetting
     bombsInput.type = 'text';
     bombsInput.id = 'bombs-input';
     bombsInput.placeholder = '# of Bombs';
-    bombsInput.defaultValue = 5;
-    if (this.numBombs) bombsInput.value = this.numBombs;
+    bombsInput.defaultValue = 10;
+    //if (this.numBombs) bombsInput.value = this.numBombs;
     options.appendChild(bombsInput);
 
     this.modal = new Modal(options);
     this.modal.addButton('New Game', (e) => this.closeNewGameModal(), {
       color: '#006416',
       textColor: 'white',
+    });
+    this.modal.addButton('Help', (e) => this.presentHelpModal(), {
+      color: 'white',
+      textColor: '#006416',
     });
   }
 
@@ -254,7 +329,7 @@ class GameManager {
       color: '#006416',
       textColor: 'white',
     });
-    this.modal.addButton('Walk of Shame', (e) => this.presentNewGameModal(), {
+    this.modal.addButton('New Game', (e) => this.presentNewGameModal(), {
       color: 'white',
       textColor: '#006416',
     });

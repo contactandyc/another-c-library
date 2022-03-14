@@ -30,7 +30,7 @@
   box-sizing: border-box;
   border-radius: 1%;
   background-color: #006416;
-  gap: 5px;
+  gap: calc(40px / var(--grid-rows));
   opacity: 85%;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -68,7 +68,7 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
-  border-radius: 5px;
+  border-radius: calc(40px / var(--grid-rows));
   color: white;
   font-size: var(--square-font-size);
   text-align: center;
