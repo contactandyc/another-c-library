@@ -173,20 +173,37 @@ class GameManager {
     label.innerText = "Let's play a game...";
     options.appendChild(label);
 
-    let sizeInput = document.createElement('input');
+    let difLabel = document.createElement('label');
+    difLabel.innerText = 'Difficulty';
+    options.appendChild(difLabel);
+    let difSetting = document.createElement('input');
+    difSetting.type = 'range';
+    difSetting.id = 'music-volume';
+    difSetting.min = 0;
+    difSetting.max = 4;
+    difSetting.defaultValue = 0;
+    difSetting.addEventListener('change', (e) => {
+      let difficulties = [[10, 10], [15, 30], [20, 40], [30, 60], [40, 100]];
+      let dif = difficulties[e.currentTarget.value];
+      sizeInput.value = dif[0];
+      bombsInput.value = dif[1];
+    });
+    options.appendChild(difSetting);
+
+    var sizeInput = document.createElement('input'); // var here so I can use the sizeInput in difSetting
     sizeInput.type = 'text';
     sizeInput.id = 'size-input';
     sizeInput.placeholder = 'Size';
-    sizeInput.defaultValue = 20;
-    if (this.size) sizeInput.value = this.size;
+    sizeInput.defaultValue = 10;
+    //if (this.size) sizeInput.value = this.size;
     options.appendChild(sizeInput);
 
-    let bombsInput = document.createElement('input');
+    var bombsInput = document.createElement('input'); // var here so I can use the bombsInput in difSetting
     bombsInput.type = 'text';
     bombsInput.id = 'bombs-input';
     bombsInput.placeholder = '# of Bombs';
-    bombsInput.defaultValue = 40;
-    if (this.numBombs) bombsInput.value = this.numBombs;
+    bombsInput.defaultValue = 10;
+    //if (this.numBombs) bombsInput.value = this.numBombs;
     options.appendChild(bombsInput);
 
     this.modal = new Modal(options);
