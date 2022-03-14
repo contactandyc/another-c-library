@@ -6,10 +6,13 @@ class GameManager {
   constructor() {
     this.musicVol = 0.5;
     this.soundVol = 1;
+    this.muted = true;
     this.musicPlayer = new MusicPlayer();
     this.musicPlayer.volume = this.musicVol;
+    this.musicPlayer.muted = true;
     this.soundPlayer = new Audio();
     this.soundPlayer.volume = this.soundVol;
+    this.soundPlayer.muted = true;
     this.modal = null;
 
     this.time = { m: 0, s: 0 };
@@ -41,7 +44,7 @@ class GameManager {
   updateTime() {
     if (this.game.state === 'playing') {
       this.time.s++;
-      if (this.time.s > 60) {
+      if (this.time.s >= 60) {
         this.time.s = 0;
         this.time.m++;
       }
@@ -96,7 +99,7 @@ class GameManager {
       () => this.win(),
       () => this.lose()
     );
-    document.getElementById('flag-select').checked = false;
+    //document.getElementById('flag-select').checked = false;
     this.stopTimer();
     this.time = { m: 0, s: 0 };
     this.startTimer();
@@ -131,7 +134,7 @@ class GameManager {
     bombsInput.type = 'text';
     bombsInput.id = 'bombs-input';
     bombsInput.placeholder = '# of Bombs';
-    bombsInput.defaultValue = 5;
+    bombsInput.defaultValue = 40;
     if (this.numBombs) bombsInput.value = this.numBombs;
     options.appendChild(bombsInput);
 
@@ -254,7 +257,7 @@ class GameManager {
       color: '#006416',
       textColor: 'white',
     });
-    this.modal.addButton('Walk of Shame', (e) => this.presentNewGameModal(), {
+    this.modal.addButton('New Game', (e) => this.presentNewGameModal(), {
       color: 'white',
       textColor: '#006416',
     });

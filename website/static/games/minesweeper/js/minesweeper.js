@@ -29,8 +29,17 @@ export default class MineSweeper {
     });
     document.getElementById('board').appendChild(this.gb);
     document.getElementById('num-flags').innerText = this.flagsRemaining;
-    document.getElementById('flag-select').addEventListener('change', (e) => {
-      this.flagging = e.detail.checked;
+
+    document.getElementById('flag-button').addEventListener('click', (e) => {
+      e.target.classList.toggle('grayed-out');
+      this.flagging = this.flagging ? false : true;
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.code === 'ShiftLeft') {
+        this.flagging = this.flagging ? false : true;
+        document.getElementById('flag-button').classList.toggle('grayed-out');
+      }
     });
     // document.getElementById('num-bombs').innerText = this.numBombs;
     // document.getElementById('size').innerText = `${this.size}x${this.size}`;
