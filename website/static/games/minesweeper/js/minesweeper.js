@@ -32,12 +32,12 @@ export default class MineSweeper {
 
     document.getElementById('flag-button').addEventListener('click', (e) => {
       e.target.classList.toggle('grayed-out');
-      this.flagging = this.flagging ? false : true;
+      this.flagging = !this.flagging;
     });
 
     document.addEventListener('keyup', (e) => {
       if (e.code === 'ShiftLeft') {
-        this.flagging = this.flagging ? false : true;
+        this.flagging = !this.flagging;
         document.getElementById('flag-button').classList.toggle('grayed-out');
       }
     });

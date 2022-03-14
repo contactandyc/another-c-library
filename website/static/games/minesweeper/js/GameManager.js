@@ -23,6 +23,14 @@ class GameManager {
       .getElementById('menu-button')
       .addEventListener('click', () => this.presentMenuModal());
     this.begin();
+
+    document.getElementById('mute-button').addEventListener('click', (e) => {
+      e.target.classList.toggle('mute-button-sound');
+      e.target.classList.toggle('mute-button-muted');
+      this.muted = !this.muted;
+      this.musicPlayer.muted = this.muted;
+      this.soundPlayer.muted = this.muted;
+    });
   }
 
   addClickAndLongClickListener(el, clickHandler, longClickHandler) {
