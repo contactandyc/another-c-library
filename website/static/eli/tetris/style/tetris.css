@@ -1,0 +1,65 @@
+body {
+    background-color: #101010;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.game-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    width: 500px;
+}
+.info-container {
+    display: flex;
+    width: 500px;
+    height: 150px;
+    justify-content: center;
+}
+.info {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-around;
+}
+#board {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-between;
+}
+#board div {
+    height: 30px;
+    width: 30px;
+    flex-grow: 1;
+    background-color: #303030;
+    border-width: 2px;
+    border-color: black;
+    border-style: solid;
+    background-position: center;
+    background-size: cover;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    align-items: center;
+    animation-duration: 0.5s;
+}
+.score {
+    color: white;
+    font-size: 150%;
+}
+.next-shape {
+    display: flex;
+    width: 100px;
+    height: 100px;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-content: center;
+}
+.next-shape div {
+    width: 20px;
+    height: 20px;
+}
+@keyframes clear {
+    to {
+        background-color: #303030;
+    }
+}

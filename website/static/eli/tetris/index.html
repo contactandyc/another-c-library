@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Tetris
+        </title>
+        <script type="module" src="js/tetris.js"></script>
+        <link rel="stylesheet" href="style/tetris.css"></link>
+        <link rel="stylesheet" href="style/pop_ups.css"></link>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <div class="game-container">
+            <div class="info-container">
+                <div class="info">
+                    <div class="score" id="score">
+                        Score: 0
+                    </div>
+                    <div class="next-shape" id="next-shape">
+                    </div>
+                </div>
+            </div>
+            <div id="board">
+            </div>
+        </div>
+        <div class="pop-ups">
+            <div class="pop-ups-end" id="pop-ups-end">
+                <h1>You died!</h1>
+                <p id="pop-ups-end-score">
+                    Score: 0
+                </p>
+                <div class="pop-ups-end-restart" id="pop-ups-end-restart">
+                </div>
+            </div>
+            <div class="pop-ups-intro" id="pop-ups-intro">
+                <h1>Tetris</h1>
+                <p>
+                    Your goal is to get the best score possible.
+                    When a row is full it disappears and it adds to your score.
+                    The more rows you clear at once the better your score.
+                    <br>
+                    But remember, if they pile to high up, you'll die.
+                </p>
+                <div class="pop-ups-intro-go" id="pop-ups-intro-go">
+                    Let's Go!
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
