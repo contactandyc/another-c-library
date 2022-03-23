@@ -7,11 +7,13 @@
         <script type="module" src="js/tetris.js"></script>
         <link rel="stylesheet" href="style/tetris.css"></link>
         <link rel="stylesheet" href="style/pop_ups.css"></link>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=0.9">
     </head>
     <body>
         <div class="game-container">
             <div class="info-container">
+                <div class="settings-button settings-visible" id="settings-visible">
+                </div>
                 <div class="info">
                     <div class="score" id="score">
                         Score: 0
@@ -19,12 +21,39 @@
                     <div class="next-shape" id="next-shape">
                     </div>
                 </div>
+                <div class="settings-button settings-restart" id="settings-restart">
+                </div>
             </div>
-            <div id="board">
+            <div class="board" id="board">
             </div>
         </div>
         <div class="pop-ups">
-            <div class="pop-ups-end" id="pop-ups-end">
+            <div class="pop-ups-base pop-ups-settings" id="pop-ups-settings">
+                <h2>
+                    Settings
+                </h2>
+                <div class="pop-ups-settings-container">
+                    Difficulty: 
+                    <div class="pop-ups-settings-difficulty">
+                        <div class="settings-button pop-ups-settings-slider" id="diff-down">
+                            &#60;
+                        </div>
+                        <p class="text" id="diff-text">Normal</p>
+                        <div class="settings-button pop-ups-settings-slider" id="diff-up">
+                            &#62;
+                        </div>
+                    </div>
+                </div>
+                <div class="pop-ups-button-container">
+                    <div class="pop-ups-button pop-ups-button-ok" id="pop-ups-button-ok">
+                        Ok
+                    </div>
+                    <div class="pop-ups-button pop-ups-button-cancel" id="pop-ups-button-cancel">
+                        Cancel
+                    </div>
+                </div>
+            </div>
+            <div class="pop-ups-base pop-ups-end" id="pop-ups-end">
                 <h1>You died!</h1>
                 <p id="pop-ups-end-score">
                     Score: 0
@@ -32,16 +61,16 @@
                 <div class="pop-ups-end-restart" id="pop-ups-end-restart">
                 </div>
             </div>
-            <div class="pop-ups-intro" id="pop-ups-intro">
+            <div class="pop-ups-base pop-ups-intro" id="pop-ups-intro">
                 <h1>Tetris</h1>
                 <p>
                     Your goal is to get the best score possible.
                     When a row is full it disappears and it adds to your score.
                     The more rows you clear at once the better your score.
                     <br>
-                    But remember, if they pile to high up, you'll die.
+                    But remember, if they pile too high up, it's <font color="red">Game Over.</font>
                 </p>
-                <div class="pop-ups-intro-go" id="pop-ups-intro-go">
+                <div class="pop-ups-button pop-ups-button-ok" id="pop-ups-intro-go">
                     Let's Go!
                 </div>
             </div>

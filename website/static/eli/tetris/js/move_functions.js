@@ -43,7 +43,7 @@ export default class MoveFunctions {
     }
     rotate(Render, turns) {
         let outshp=this.rotateShp(Render, Render.current_shape_rotation+turns);
-        if (this.outOfBounds(Render, outshp))
+        if (this.outOfBounds(Render, outshp)||this.outOfFloor(Render, outshp))
             return;
         Render.current_shape_rotation+=turns;
     }

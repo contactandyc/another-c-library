@@ -1,5 +1,6 @@
 import MoveFunctions from "./move_functions.js";
 import InfoFunctions from "./info_functions.js";
+import SettingFunctions from "./setting_functions.js";
 import Shapes from "./shapes.js";
 
 export default class RenderFunctions {
@@ -12,11 +13,15 @@ export default class RenderFunctions {
         color_map.set(4, "green");
         color_map.set(5, "purple");
         color_map.set(6, "red");
-        this.timer=1000;
+        color_map.set(7, "darkblue");
+        this.color_map=color_map;
+        this.speed_up=1, //measured in percent of percent
+        this.speed_cap=250,
         this.score=0;
         this.Move=new MoveFunctions();
         this.Info=new InfoFunctions();
-        this.color_map=color_map;
+        this.Setting=new SettingFunctions();
+        this.timer=1000;
         this.current_shape=Math.floor(Math.random()*Shapes.length);
         this.current_shape_rotation=0;
         this.next_shape=Math.floor(Math.random()*Shapes.length);
@@ -24,6 +29,7 @@ export default class RenderFunctions {
         this.boardRow=[];
         this.rows=rows;
         this.cols=cols;
+        this.pause=true;
         this.pos=[Math.floor(this.rows/2-2), 0];
         this.initBoard();
     }
@@ -108,7 +114,7 @@ export default class RenderFunctions {
                 if (!this.board[x][y])
                     break;
             }
-        this.score+=([0, 40, 100, 300, 1200])[mul];
+        this.score+=Math.floor(([0, 40, 100, 300, 1200])[mul]*this.Setting.diffData[this.Setting.difficulty][4]);
         return -1;
     }
     nextShape() {
@@ -124,14 +130,17 @@ export default class RenderFunctions {
         this.current_shape_rotation=0;
         this.pos=[Math.floor(this.rows/2-2), 0];
         this.current_shape_rotation=0;
-        if (this.Move.outOfFloor(this, this.getShape()))
-            this.Info.die(this);
+        if (!this.Move.outOfFloor(this, this.getShape()))
+            return;
+        this.Info.die(this);
+        this.pause=true;
     }
     update() {
         this.clearShape();
         this.board=this.applyShape();
         this.generateShapeColors();
         this.Info.update(this);
+        this.timer-=this.speed_cap>this.timer?0:this.speed_up;
     }
     restart() {
         this.board=[];
@@ -139,7 +148,11 @@ export default class RenderFunctions {
         document.getElementById("next-shape").innerHTML="";
         this.initBoard();
         this.generateBoard();
-        this.timer=1000;
+        this.current_shape=Math.floor(Math.random()*Shapes.length);
+        this.next_shape=Math.floor(Math.random()*Shapes.length);
+        this.timer=this.Setting.diffData[this.Setting.difficulty][3];
+        this.score=0;
+        this.pause=false;
         document.getElementById("pop-ups-end").style.display="none";
     }
 }

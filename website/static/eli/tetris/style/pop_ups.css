@@ -6,9 +6,8 @@
     align-items: center;
     justify-content: center;
 }
-.pop-ups-end {
-    width: 350px;
-    height: 350px;
+.pop-ups-base {
+    position: absolute;
     display: none;
     justify-content: center;
     align-items: center;
@@ -18,6 +17,10 @@
     border-style: solid;
     border-color: green;
     border-radius: 20px;
+}
+.pop-ups-end {
+    width: 350px;
+    height: 350px;
 }
 .pop-ups-end p {
     font-size: 120%;
@@ -31,40 +34,78 @@
     background-size: cover;
 }
 .pop-ups-intro {
-    width: 350px;
-    height: 300px;
+    width: 250px;
+    height: 400px;
     display: flex;
     text-align: center;
-    justify-content: center;
-    align-items: center;
     flex-flow: row wrap;
-    background-color: white;
-    border-width: 15px;
     padding: 0 30px 0 30px;
-    border-style: solid;
-    border-color: green;
-    border-radius: 20px;
 }
 .pop-ups-intro p {
     font-size: 120%;
     margin-top:1px;   
 }
-.pop-ups-intro-go {
+.pop-ups-button {
     display: flex;
     user-select: none;
     align-items: center;
     justify-content: center;
-    border-width: 4px;
+    border-width: 3px;
     border-style: solid;
     border-color: black;
     border-radius: 10px;
-    background-color: #00ff00;
-    width: 100px;
-    height: 50px;
+    width: 75px;
+    height: 30px;
 }
-.pop-ups-intro-go:hover {
+.pop-ups-button-ok {
+    background-color: #00ff00;
+}
+.pop-ups-button-ok:hover {
     background-color: #00aa00;
 }
-.pop-ups-intro-go:active {
+.pop-ups-button-ok:active {
     background-color: #005500;
+}
+.pop-ups-button-cancel {
+    background-color: #ff0000;
+}
+.pop-ups-button-cancel:hover {
+    background-color: #aa0000;
+}
+.pop-ups-button-cancel:active {
+    background-color: #550000;
+}
+.pop-ups-button-container {
+    width: 200px;
+    flex-flow: row nowrap;
+    display: flex;
+    justify-content: space-between;
+}
+.pop-ups-settings {
+    width: 280px;
+    height: 300px;
+    font-size: 125%;
+    z-index: 1;
+    display: none;
+    justify-content: space-around;
+}
+.pop-ups-settings-slider {
+    display: flex;
+    height: 20px;
+    width: 20px;
+    margin-left:5px;
+    margin-right:5px;
+    border-width: 1px;
+    color:white;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+.pop-ups-settings-container {
+    display: flex;
+    flex-flow: row nowrap;
+}
+.pop-ups-settings-difficulty {
+    display: flex;
+    flex-flow: row nowrap;
 }
