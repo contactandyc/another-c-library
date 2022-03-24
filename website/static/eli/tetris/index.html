@@ -7,7 +7,7 @@
         <script type="module" src="js/tetris.js"></script>
         <link rel="stylesheet" href="style/tetris.css"></link>
         <link rel="stylesheet" href="style/pop_ups.css"></link>
-        <meta name="viewport" content="width=device-width, initial-scale=0.9">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
         <div class="game-container">
@@ -26,6 +26,23 @@
             </div>
             <div class="board" id="board">
             </div>
+            <div class="move-buttons">
+                <div class="settings-button move-button move-left" id="move-left">
+                    &#60;
+                </div>
+                <div class="settings-button move-button rotate-left" id="rotate-left">
+                    R
+                </div>
+                <div class="settings-button move-button move-down" id="move-down">
+                    &#62;
+                </div>
+                <div class="settings-button move-button rotate-right" id="rotate-right">
+                    R
+                </div>
+                <div class="settings-button move-button move-right" id="move-right">
+                    &#62;
+                </div>
+            </div>
         </div>
         <div class="pop-ups">
             <div class="pop-ups-base pop-ups-settings" id="pop-ups-settings">
@@ -33,13 +50,44 @@
                     Settings
                 </h2>
                 <div class="pop-ups-settings-container">
-                    Difficulty: 
                     <div class="pop-ups-settings-difficulty">
+                        Difficulty: 
                         <div class="settings-button pop-ups-settings-slider" id="diff-down">
                             &#60;
                         </div>
                         <p class="text" id="diff-text">Normal</p>
                         <div class="settings-button pop-ups-settings-slider" id="diff-up">
+                            &#62;
+                        </div>
+                    </div>
+                    <br>
+                    <div class="pop-ups-settings-cols">
+                        Height: 
+                        <div class="settings-button pop-ups-settings-slider" id="cols-down">
+                            &#60;
+                        </div>
+                        <p class="text cols-text" id="cols-text">15</p>
+                        <div class="settings-button pop-ups-settings-slider" id="cols-up">
+                            &#62;
+                        </div>
+                    </div>
+                    <div class="pop-ups-settings-theme">
+                        Theme: 
+                        <div class="settings-button pop-ups-settings-slider" id="theme-down">
+                            &#60;
+                        </div>
+                        <p class="text" id="theme-text">Default</p>
+                        <div class="settings-button pop-ups-settings-slider" id="theme-up">
+                            &#62;
+                        </div>
+                    </div>
+                    <div class="pop-ups-settings-grid">
+                        Grid: 
+                        <div class="settings-button pop-ups-settings-slider" id="grid-down">
+                            &#60;
+                        </div>
+                        <p class="text" id="grid-text">On</p>
+                        <div class="settings-button pop-ups-settings-slider" id="grid-up">
                             &#62;
                         </div>
                     </div>

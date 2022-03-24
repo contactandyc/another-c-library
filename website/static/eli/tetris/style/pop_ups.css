@@ -7,7 +7,7 @@
     justify-content: center;
 }
 .pop-ups-base {
-    position: absolute;
+    position: fixed;
     display: none;
     justify-content: center;
     align-items: center;
@@ -24,7 +24,7 @@
 }
 .pop-ups-end p {
     font-size: 120%;
-    margin-top:1px;   
+    margin-top:1px;
 }
 .pop-ups-end-restart {
     margin-top: 100px;
@@ -83,7 +83,7 @@
 }
 .pop-ups-settings {
     width: 280px;
-    height: 300px;
+    height: 400px;
     font-size: 125%;
     z-index: 1;
     display: none;
@@ -103,9 +103,31 @@
 }
 .pop-ups-settings-container {
     display: flex;
-    flex-flow: row nowrap;
+    justify-content: center;
+    flex-flow: row wrap;
 }
 .pop-ups-settings-difficulty {
     display: flex;
     flex-flow: row nowrap;
+}
+.pop-ups-settings-cols {
+    margin-top: 25px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-self: center;
+}
+.cols-text {
+    width: 50px;
+}
+.pop-ups-settings-theme {
+    margin-top: 25px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-self: center;
+}
+.pop-ups-settings-grid {
+    margin-top: 25px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-self: center;
 }

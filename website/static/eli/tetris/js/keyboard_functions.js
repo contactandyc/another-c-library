@@ -6,10 +6,10 @@ export default class KeyboardFunctions {
             return;
         let Move=new MoveFunctions();
         switch (e.key.toLowerCase()) {
-            case "q":
+            case "arrowleft":
                 Move.rotate(Render, 1);
                 break;
-            case "e":
+            case "arrowright":
                 Move.rotate(Render, 3);
                 break;
             case "a":

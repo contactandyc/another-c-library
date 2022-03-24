@@ -2,7 +2,7 @@ import RenderFunctions from "./render_functions.js";
 import MoveFunctions from "./move_functions.js";
 import KeyboardFunctions from "./keyboard_functions.js";
 
-let Render=new RenderFunctions(10, 20),
+let Render=new RenderFunctions(),
     Move=new MoveFunctions(),
     Keyboard=new KeyboardFunctions();
 function loop() {

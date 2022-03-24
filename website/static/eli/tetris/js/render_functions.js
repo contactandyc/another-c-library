@@ -4,31 +4,25 @@ import SettingFunctions from "./setting_functions.js";
 import Shapes from "./shapes.js";
 
 export default class RenderFunctions {
-    constructor(rows, cols) {
-        let color_map=new Map();
-        color_map.set(0, "teal");
-        color_map.set(1, "blue");
-        color_map.set(2, "brown");
-        color_map.set(3, "yellow");
-        color_map.set(4, "green");
-        color_map.set(5, "purple");
-        color_map.set(6, "red");
-        color_map.set(7, "darkblue");
-        this.color_map=color_map;
+    constructor() {
         this.speed_up=1, //measured in percent of percent
         this.speed_cap=250,
         this.score=0;
         this.Move=new MoveFunctions();
         this.Info=new InfoFunctions();
         this.Setting=new SettingFunctions();
+        let color_map=new Map();
+        for (let i=-1; ++i<Shapes.length;color_map.set(i, 
+            this.Setting.themData[this.Setting.theme][i+1]));
+        this.color_map=color_map;
         this.timer=1000;
         this.current_shape=Math.floor(Math.random()*Shapes.length);
         this.current_shape_rotation=0;
         this.next_shape=Math.floor(Math.random()*Shapes.length);
         this.board=[];
         this.boardRow=[];
-        this.rows=rows;
-        this.cols=cols;
+        this.cols=this.Setting.cols;
+        this.rows=10;
         this.pause=true;
         this.pos=[Math.floor(this.rows/2-2), 0];
         this.initBoard();
@@ -43,12 +37,14 @@ export default class RenderFunctions {
     }
     generateBoard() {
         let brd=document.getElementById("board");
-        brd.style.width=`${this.rows*34}px`;
-        brd.style.height=`${this.cols*34}px`;
+        let box=30+(this.Setting.grid?4:0);
+        brd.style.width=`${this.rows*box}px`;
+        brd.style.height=`${this.cols*box}px`;
         for (let x=0; x<this.rows; x++) {
             for (let y=0; y<this.cols; y++) {
                 let d=document.createElement("div");
                 d.id=`b_${x}_${y}`;
+                d.style.borderWidth=`${this.Setting.grid?2:0}px`;
                 brd.appendChild(d);
             }
         }
@@ -128,7 +124,7 @@ export default class RenderFunctions {
         this.current_shape=this.next_shape;
         this.next_shape=Math.floor(Math.random()*Shapes.length);
         this.current_shape_rotation=0;
-        this.pos=[Math.floor(this.rows/2-2), 0];
+        this.pos=[5, 0];
         this.current_shape_rotation=0;
         if (!this.Move.outOfFloor(this, this.getShape()))
             return;
@@ -146,6 +142,11 @@ export default class RenderFunctions {
         this.board=[];
         document.getElementById("board").innerHTML="";
         document.getElementById("next-shape").innerHTML="";
+        this.cols=this.Setting.cols;
+        let color_map=new Map();
+        for (let i=-1; ++i<Shapes.length;color_map.set(i, 
+            this.Setting.themData[this.Setting.theme][i+1]));
+        this.color_map=color_map;
         this.initBoard();
         this.generateBoard();
         this.current_shape=Math.floor(Math.random()*Shapes.length);
