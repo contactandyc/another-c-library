@@ -137,9 +137,9 @@ export default class SettingFunctions {
         }
         this.Tvisible=this.visible;
         this.Tdifficulty=this.difficulty;
-        this.Tcols=cols;
-        this.Ttheme=theme;
-        this.Tgrid=grid;
+        this.Tcols=this.cols;
+        this.Ttheme=this.theme;
+        this.Tgrid=this.grid;
     }
     pushChanges(Render) {
         document.getElementById("pop-ups-settings").style.display=this.visible?"flex":"none";

@@ -111,21 +111,21 @@
     flex-flow: row nowrap;
 }
 .pop-ups-settings-cols {
+    margin-left: 24px;
     margin-top: 25px;
     display: flex;
     flex-flow: row nowrap;
     align-self: center;
 }
-.cols-text {
-    width: 50px;
-}
 .pop-ups-settings-theme {
+    margin-left: 23px;
     margin-top: 25px;
     display: flex;
     flex-flow: row nowrap;
     align-self: center;
 }
 .pop-ups-settings-grid {
+    margin-left: 43px;
     margin-top: 25px;
     display: flex;
     flex-flow: row nowrap;
