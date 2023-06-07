@@ -66,6 +66,12 @@ ac_pool_t *_ac_pool_init(size_t size, const char *caller);
 ac_pool_t *_ac_pool_init(size_t size);
 #endif
 
+/* ac_pool_pool_init creates a pool from another pool.  This can be useful for
+   having a repeated clearing mechanism inside a larger pool.  Ideally, this
+   pool should be sized right as the clear function can't free nodes. */
+ac_pool_t *ac_pool_pool_init(ac_pool_t *pool, size_t initial_size);
+
+
 /* ac_pool_clear will make all of the pool's memory reusable.  If the
   initial block was exceeded and additional blocks were added, those blocks
   will be freed. */
@@ -121,6 +127,37 @@ char **ac_pool_strdupa2(ac_pool_t *pool, char **a);
 char **ac_pool_tokenize(ac_pool_t *h, size_t *num_splits, const char *delim,
                         const char *p);
 
+/* split a string into N pieces using delimiter.
+ https://en.wikipedia.org/wiki/Comma-separated_values
+
+ RFC 4180 and MIME standards
+ The 2005 technical standard RFC 4180 formalizes the CSV file format
+ and defines the MIME type "text/csv" for the handling of text-based
+ fields. However, the interpretation of the text of each field is still
+ application-specific. Files that follow the RFC 4180 standard can
+ simplify CSV exchange and should be widely portable. Among its requirements:
+
+ 1. Any field may be quoted (with double quotes).
+ 2. Fields containing a line-break, double-quote or commas
+    should be quoted. (If they are not, the file will likely be
+    impossible to process correctly.)
+ 3. If double-quotes are used to enclose fields, then a
+    double-quote in a field must be represented by two
+    double-quote characters.
+ */
+char **ac_pool_split_csv(ac_pool_t *h, size_t *num_splits, char delim,
+                         const char *p);
+char **ac_pool_split_csvf(ac_pool_t *h, size_t *num_splits, char delim,
+                          const char *p, ...);
+
+char **ac_pool_split_csv2(ac_pool_t *h, size_t *num_splits, char delim,
+                          const char *p);
+char **ac_pool_split_csv2f(ac_pool_t *h, size_t *num_splits, char delim,
+                           const char *p, ...);
+
+char *ac_pool_csv_encode(ac_pool_t *h, char delim, const char *s);
+char *ac_pool_csv_encodef(ac_pool_t *h, char delim, const char *p, ...);
+
 /* split a string into N pieces using delimiter.  The array that is returned
    will always be valid with a NULL string at the end if p is NULL. num_splits
    can be NULL if the number of returning pieces is not desired. */
@@ -140,6 +177,19 @@ char **ac_pool_split2(ac_pool_t *h, size_t *num_splits, char delim,
 char **ac_pool_split2f(ac_pool_t *h, size_t *num_splits, char delim,
                        const char *p, ...);
 
+char **ac_pool_split_str(ac_pool_t *h, size_t *num_splits, const char *delim,
+                         const char *p);
+
+char **ac_pool_split_strf(ac_pool_t *h, size_t *num_splits, const char *delim,
+                      const char *p, ...);
+
+char **ac_pool_split_str2(ac_pool_t *h, size_t *num_splits, const char *delim,
+                      const char *p);
+
+char **ac_pool_split_str2f(ac_pool_t *h, size_t *num_splits, const char *delim,
+                       const char *p, ...);
+
+
 /* like ac_pool_strdup, limited to length (+1 for zero terminator) bytes */
 static inline char *ac_pool_strndup(ac_pool_t *h, const char *p, size_t length);
 
@@ -151,6 +201,9 @@ static inline void *ac_pool_udup(ac_pool_t *h, const void *data, size_t len);
 
 /* ac_pool_strdupf allocates a copy of the formatted string p. */
 static inline char *ac_pool_strdupf(ac_pool_t *h, const char *p, ...);
+
+/* strips <tag href="..." /> */
+char *ac_pool_strip_html(ac_pool_t *h, const char *s);
 
 /* ac_pool_strdupvf allocates a copy of the formatted string p. This is
   particularly useful if you wish to extend another object which uses pool as

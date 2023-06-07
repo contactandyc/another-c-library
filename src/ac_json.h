@@ -92,6 +92,9 @@ static inline ac_json_t *ac_json_binary(ac_pool_t *pool, char *s,
 static inline ac_json_t *ac_json_string(ac_pool_t *pool, const char *s,
                                         size_t length);
 static inline ac_json_t *ac_json_str(ac_pool_t *pool, const char *s);
+static inline ac_json_t *ac_json_encode_string(ac_pool_t *pool,
+                                               const char *s, size_t length);
+static inline ac_json_t *ac_json_encode_str(ac_pool_t *pool, const char *s);
 static inline ac_json_t *ac_json_true(ac_pool_t *pool);
 static inline ac_json_t *ac_json_false(ac_pool_t *pool);
 static inline ac_json_t *ac_json_null(ac_pool_t *pool);
@@ -158,6 +161,11 @@ static inline void ac_jsono_erase(ac_jsono_t *n);
 static inline ac_jsono_t *ac_jsono_insert(ac_json_t *j, const char *key,
                                           ac_json_t *item, bool copy_key);
 static inline ac_jsono_t *ac_jsono_find(ac_json_t *j, const char *key);
+
+#define AC_JSON_PARSE_STRING(j, resp, name) resp->name = (char *)ac_jsond(pool, ac_jsono_scan(j, #name)); if(!resp->name) { resp->name = (char *)""; }
+#define AC_JSON_PARSE_STRING_TEST(j, resp, name) resp->name = (char *)ac_jsond(pool, ac_jsono_scan(j, #name)); if(!resp->name) { return NULL; }
+#define AC_JSON_PARSE_UINT32(j, resp, name) resp->name = ac_uint32_t(ac_jsonv(ac_jsono_scan(j, #name)), 0)
+#define AC_JSON_PARSE_DOUBLE(j, resp, name) resp->name = ac_double(ac_jsonv(ac_jsono_scan(j, #name)), 0.0)
 
 #include "impl/ac_json.h"
 

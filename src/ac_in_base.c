@@ -165,8 +165,39 @@ static inline char *end_of_block(ac_in_base_t *h, int32_t *rlen, char *p,
   }
 }
 
-char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, char delim,
+/*
+https://en.wikipedia.org/wiki/Comma-separated_values
+
+RFC 4180 and MIME standards
+The 2005 technical standard RFC 4180 formalizes the CSV file format
+and defines the MIME type "text/csv" for the handling of text-based
+fields. However, the interpretation of the text of each field is still
+application-specific. Files that follow the RFC 4180 standard can
+simplify CSV exchange and should be widely portable. Among its requirements:
+
+1. MS-DOS-style lines that end with (CR/LF) characters
+   (optional for the last line).
+2. An optional header record (there is no sure way to detect
+   whether it is present, so care is required when importing).
+3. Each record should contain the same number of comma-separated
+   fields.
+4. Any field may be quoted (with double quotes).
+5. Fields containing a line-break, double-quote or commas
+   should be quoted. (If they are not, the file will likely be
+   impossible to process correctly.)
+6. If double-quotes are used to enclose fields, then a
+   double-quote in a field must be represented by two
+   double-quote characters.
+*/
+
+char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, int delim,
                                 bool required) {
+  bool csv = false;
+  if(delim >= 256) {
+    csv = true;
+    delim -= 256;
+  }
+
   cleanup_last_read(h);
 
   *rlen = 0;
@@ -178,7 +209,21 @@ char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, char delim,
   // 2. search for delimiter between pos/used
   char *ep = b->buffer + b->used;
   while (p < ep) {
-    if (*p != delim)
+    if (*p == '\"') {
+       if(csv) {
+          p++;
+        encoded_quote1:
+          while(p < ep && *p != '\"')
+            p++;
+          if(p+1 < ep && p[1] == '\"') {
+            p += 2;
+            goto encoded_quote1;
+          }
+      }
+      if(p < ep)
+        p++;
+    }
+    else if (*p != delim)
       p++;
     else {
       *rlen = (p - sp);
@@ -209,7 +254,21 @@ char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, char delim,
     fill_blocks(h, b);
     char *ep = sp + b->used;
     while (p < ep) {
-      if (*p != delim)
+      if (*p == '\"') {
+         if(csv) {
+            p++;
+          encoded_quote2:
+            while(p < ep && *p != '\"')
+              p++;
+            if(p+1 < ep && p[1] == '\"') {
+              p += 2;
+              goto encoded_quote2;
+            }
+        }
+        if(p < ep)
+          p++;
+      }
+      else if (*p != delim)
         p++;
       else {
         *rlen = (p - sp);
@@ -241,7 +300,21 @@ char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, char delim,
     sp = p;
     ep = p + b->used;
     while (p < ep) {
-      if (*p != delim)
+      if (*p == '\"') {
+         if(csv) {
+            p++;
+          encoded_quote3:
+            while(p < ep && *p != '\"')
+              p++;
+            if(p+1 < ep && p[1] == '\"') {
+              p += 2;
+              goto encoded_quote3;
+            }
+        }
+        if(p < ep)
+          p++;
+      }
+      else if (*p != delim)
         p++;
       else {
         size_t length = (p - sp);

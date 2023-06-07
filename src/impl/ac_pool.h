@@ -65,6 +65,9 @@ struct ac_pool_s {
 
   /* the total number of bytes allocated by the pool object */
   size_t used;
+
+  /* if set, memory is allocated from this pool */
+  ac_pool_t *pool;
 };
 
 static inline void *ac_pool_ualloc(ac_pool_t *h, size_t len) {
@@ -112,9 +115,10 @@ static inline void *ac_pool_min_max_alloc(ac_pool_t *h, size_t *rlen,
 }
 
 static inline void *ac_pool_alloc(ac_pool_t *h, size_t len) {
+  size_t to_add = ((sizeof(size_t) - ((size_t)(h->curp) & (sizeof(size_t) - 1))) &
+                                   (sizeof(size_t) - 1));
   char *r =
-      h->curp + ((sizeof(size_t) - ((size_t)(h->curp) & (sizeof(size_t) - 1))) &
-                 (sizeof(size_t) - 1));
+      h->curp + to_add;
   if (r + len < h->current->endp) {
     h->curp = r + len;
 #ifdef _AC_DEBUG_MEMORY_
@@ -208,7 +212,8 @@ static inline void ac_pool_reset(ac_pool_t *h, ac_pool_checkpoint_t *cp) {
   /* remove the extra blocks (the ones where prev != NULL) */
   ac_pool_node_t *prev = h->current->prev;
   while (prev != cp->prev) {
-    ac_free(h->current);
+    if(!h->pool)
+      ac_free(h->current);
     h->current = prev;
     prev = prev->prev;
   }

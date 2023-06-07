@@ -285,3 +285,58 @@ ac_cgi_t *ac_cgi_init(ac_pool_t *pool, const char *q) {
   }
   return h;
 }
+
+
+static void add_key_value_to_json(ac_pool_t *pool, ac_json_t *o, char *kv) {
+    if (*kv == 0)
+        return;
+    if (*kv == '=')
+        return;
+    char *p = kv;
+    while (*p && *p != '=')
+       p++;
+    char *value = NULL, *decoded = NULL;
+    if (*p == '=') {
+        *p = 0;
+        p++;
+        value = p;
+        decoded = ac_cgi_decode(pool, p);
+    }
+    char *encoded = ac_json_encode(pool, decoded, strlen(decoded));
+    ac_jsono_t *ko = ac_jsono_find(o, kv);
+    if(!ko) {
+        ac_jsono_insert(o, kv, ac_json_str(pool, encoded), true);
+}
+    else {
+        if(!ac_json_is_array(ko->value)) {
+            ac_json_t *a = ac_jsona(pool);
+            ac_jsona_append(a, ko->value);
+            ac_jsona_append(a, ac_json_str(pool, encoded));
+            ac_jsono_insert(o, kv, a, true);
+        }
+        else
+            ac_jsona_append(ko->value, ac_json_str(pool, encoded));
+    }
+}
+
+ac_json_t *ac_cgi_to_json(ac_pool_t *pool, const char *q) {
+    char *s = ac_pool_strdup(pool, q);
+    ac_json_t *o = ac_jsono(pool);
+    char *p = s;
+    char *p2 = strchr(p, '?');
+    if (p2)
+    p = p2 + 1;
+
+    while (*p) {
+        char *sp = p;
+        while (*p && *p != '&')
+            p++;
+        if (*p == '&') {
+            *p = 0;
+            p++;
+        }
+        add_key_value_to_json(pool, o, sp);
+    }
+    return o;
+}
+

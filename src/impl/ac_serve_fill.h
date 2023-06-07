@@ -2,6 +2,58 @@
 #define _ac_serve_fill_H
 
 #include <inttypes.h>
+/*
+< HTTP/2 200
+< content-type: application/json; charset=UTF-8
+< date: Fri, 03 Dec 2021 22:37:29 GMT
+< server: ESF
+*/
+
+static const char access_control_headers2_s[] =
+  "vary: X-Origin\r\n"
+  "vary: Referer\r\n"
+  "vary: Origin,Accept-Encoding\r\n"
+  "cache-control: private\r\n"
+  "x-xss-protection: 0\r\n"
+  "x-frame-options: SAMEORIGIN\r\n"
+  "x-content-type-options: nosniff\r\n"
+  "accept-ranges: none\r\n"
+  "XXX";
+
+static inline char *fill_default_access_control_headers2(char *p) {
+  uint64_t *sh = (uint64_t *)access_control_headers2_s;
+  uint64_t *wp = (uint64_t *)p;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh++;
+  *wp++ = *sh;
+  p = (char *)wp;
+  p -= 3;
+  return p;
+}
+
 
 static const char access_control_headers_s[] =
   "\nAccess-Control-Allow-Headers: Origin, X-Atmosphere-tracking-id, "
@@ -211,10 +263,13 @@ static char date_s[] =
 
 static inline char *fill_header(serve_request_t *sr, const char *status_line,
                                 uint64_t ts, const char *content_type,
-                                int keep_alive) {
+                                int keep_alive, bool old_style) {
   char *p = sr->header;
   p = fill_status_line(p, status_line, sr->request.service->date);
-  p = fill_default_access_control_headers(p);
+  if(old_style)
+    p = fill_default_access_control_headers(p);
+  else
+    p = fill_default_access_control_headers2(p);
   p = fill_anotherclibrary(p);
   p = fill_timing(p, ts);
   if (content_type)

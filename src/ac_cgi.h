@@ -18,6 +18,7 @@ limitations under the License.
 #define _ac_cgi_H
 
 #include "ac_pool.h"
+#include "ac_json.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +34,9 @@ typedef struct ac_cgi_s ac_cgi_t;
 
 /* initialize a cgi object using a pool (no destroy method exists) */
 ac_cgi_t *ac_cgi_init(ac_pool_t *pool, const char *q);
+
+/* initialize json object from cgi */
+ac_json_t *ac_cgi_to_json(ac_pool_t *pool, const char *q);
 
 /* get the original cgi query passed to init */
 const char *ac_cgi_query(ac_cgi_t *h);

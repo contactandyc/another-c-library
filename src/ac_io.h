@@ -27,6 +27,7 @@ limitations under the License.
 typedef int ac_io_format_t;
 
 ac_io_format_t ac_io_delimiter(int delim);
+ac_io_format_t ac_io_csv_delimiter(int delim);
 ac_io_format_t ac_io_fixed(int size);
 ac_io_format_t ac_io_prefix();
 

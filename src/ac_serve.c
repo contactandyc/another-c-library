@@ -137,7 +137,7 @@ static void after_write(uv_write_t *req, int status);
 
 void write_response_error(serve_request_t *sr, const char *error) {
   char *p = fill_header(sr, error, uv_now(&(sr->request.service->loop)) - sr->request_start_time,
-                        NULL, sr->request.http->keep_alive);
+                        NULL, sr->request.http->keep_alive, sr->request.service->old_style_cors);
   *p++ = '\r';
   *p++ = '\n';
 
@@ -158,7 +158,8 @@ void write_response(serve_request_t *sr) {
     content_type = "text/plain";
   char *p = fill_header(sr, HTTP_STATUS_200,
                         uv_now(&(sr->request.service->loop)) - sr->request_start_time,
-                        content_type, sr->request.http->keep_alive);
+                        content_type, sr->request.http->keep_alive,
+                        sr->request.service->old_style_cors);
   *p++ = '\r';
   *p++ = '\n';
   size_t num_bufs = 1;
@@ -400,6 +401,37 @@ void *run_loop(void *arg) {
   return NULL;
 }
 
+int json_on_url(ac_serve_request_t *r) {
+  r->status_string = NULL;
+  r->content_type = "application/json";
+
+  char *uri = (char *)ac_pool_alloc(r->pool, r->http->url.len+1);
+  memcpy(uri, r->http->url.base, r->http->url.len);
+  uri[r->http->url.len] = 0;
+
+  ac_json_t *json_request = NULL;
+  char *body = NULL;
+  if(r->http->body.len) {
+    body = (char *)ac_pool_alloc(r->pool, r->http->body.len+1);
+    memcpy(body, r->http->body.base, r->http->body.len);
+    body[r->http->body.len] = 0;
+    ac_json_t *j = ac_json_parse(r->pool, body, body+r->http->body.len);
+    if (!ac_json_is_error(j)) {
+      json_request = j;
+    }
+  }
+  ac_json_t *obj = r->service->on_json(r, uri, json_request);
+  ac_buffer_clear(r->bh);
+  if(obj)
+      ac_json_dump_to_buffer(r->bh, obj);
+  else
+      ac_buffer_sets(r->bh, "{}");
+
+  r->output.base = (char *)ac_buffer_data(r->bh);
+  r->output.len = ac_buffer_length(r->bh);
+  return 0;
+}
+
 int default_on_url(ac_serve_request_t *h) {
   static const char standard_headers[] =
       "Access-Control-Allow-Headers: Origin, X-Atmosphere-tracking-id, "
@@ -428,20 +460,34 @@ int default_on_chunk(ac_serve_request_t *h) {
   return 0;
 }
 
-ac_serve_t *ac_serve_init(int fd, ac_serve_cb _on_url, ac_serve_cb _on_chunk) {
+void ac_serve_new_cors(ac_serve_t *s) {
+  s->old_style_cors = false;
+}
+
+ac_serve_t *_ac_serve_init(int fd, ac_serve_cb _on_url, ac_serve_cb _on_chunk, ac_serve_json_cb _on_json) {
   ac_serve_t *w = (ac_serve_t *)ac_calloc(sizeof(*w));
   w->request_pool_size = 16384;
   w->backlog = 1000;
   w->fd = fd;
+  w->old_style_cors = true;
   w->num_threads = 1;
   w->thread_id = -1;
   w->on_url = _on_url ? _on_url : default_on_url;
+  w->on_json = _on_json;
   w->on_chunk = _on_chunk ? _on_chunk : default_on_chunk;
   w->create_thread_data = NULL;
   w->destroy_thread_data = NULL;
 
   strcpy(w->date, date_s);
   return w;
+}
+
+ac_serve_t *ac_serve_init(int fd, ac_serve_cb _on_url, ac_serve_cb _on_chunk) {
+    return _ac_serve_init(fd, _on_url, _on_chunk, NULL);
+}
+
+ac_serve_t *ac_serve_init_json(int fd, ac_serve_json_cb _on_json) {
+    return _ac_serve_init(fd, json_on_url, NULL, _on_json);
 }
 
 void ac_serve_thread_data(ac_serve_t *service,
@@ -483,12 +529,33 @@ ac_serve_t *ac_serve_port_init(int port, ac_serve_cb on_url, ac_serve_cb on_chun
   return s;
 }
 
+ac_serve_t *ac_serve_port_init_json(int port, ac_serve_json_cb on_url) {
+  int fd = get_port_fd(port, 1);
+  if (fd == -1)
+    return NULL;
+  ac_serve_t *s = ac_serve_init_json(fd, on_url);
+  s->socket_based = true;
+  s->base.port = port;
+  return s;
+}
+
+
 ac_serve_t *ac_serve_unix_domain_init(const char *path, ac_serve_cb on_url,
                                   ac_serve_cb on_chunk) {
   int fd = get_path_fd(path);
   if (fd == -1)
     return NULL;
   ac_serve_t *s = ac_serve_init(fd, on_url, on_chunk);
+  s->socket_based = false;
+  s->base.path = ac_strdup(path);
+  return s;
+}
+
+ac_serve_t *ac_serve_unix_domain_init_json(const char *path, ac_serve_json_cb on_url) {
+  int fd = get_path_fd(path);
+  if (fd == -1)
+    return NULL;
+  ac_serve_t *s = ac_serve_init_json(fd, on_url);
   s->socket_based = false;
   s->base.path = ac_strdup(path);
   return s;

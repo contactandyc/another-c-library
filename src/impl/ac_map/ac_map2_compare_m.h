@@ -118,7 +118,7 @@ limitations under the License.
       else                                                                     \
         return false;                                                          \
     }                                                                          \
-    *np = (ac_map_t *)node;                                                    \
+    *np = &node->mapname;                                                      \
     ac_map_fix_insert(*np, parent, root);                                      \
     return true;                                                               \
   }
@@ -144,7 +144,7 @@ limitations under the License.
           return false;                                                        \
       }                                                                        \
     }                                                                          \
-    *np = (ac_map_t *)node;                                                    \
+    *np = &node->mapname;                                                      \
     ac_map_fix_insert(*np, parent, root);                                      \
     return true;                                                               \
   }

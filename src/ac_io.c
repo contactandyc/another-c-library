@@ -47,6 +47,8 @@ size_t ac_io_hash_partition(const ac_io_record_t *r, size_t num_part,
 }
 
 bool ac_io_extension(const char *filename, const char *extension) {
+  if(!filename)
+    return false;
   const char *r = strrchr(filename, '/');
   if (r)
     filename = r + 1;
@@ -60,6 +62,11 @@ bool ac_io_extension(const char *filename, const char *extension) {
 
 ac_io_format_t ac_io_delimiter(int delim) {
   delim++;
+  return -delim;
+}
+
+ac_io_format_t ac_io_csv_delimiter(int delim) {
+  delim += 257;
   return -delim;
 }
 

@@ -50,6 +50,8 @@
 
 #include "impl/ac_in.h"
 
+typedef ac_in_t *(*ac_in_init_cb)( void * );
+
 typedef void (*ac_in_transform_cb)(ac_in_t *in, ac_out_t *out, void *arg);
 
 /* ac_in_options_t is declared in impl/ac_in.h and not opaque.  h is expected
@@ -128,6 +130,12 @@ void ac_in_options_reducer(ac_in_options_t *h, ac_io_compare_cb compare,
 */
 ac_in_t *ac_in_init(const char *filename, ac_in_options_t *options);
 
+/* This is just like ac_in_init, except that it sets the format and buffer_size
+   using parameters instead of requiring the ac_in_options_t structure.  It is
+   meant to be a helper function which reduces required code for this use case.
+*/
+ac_in_t *ac_in_quick_init(const char *filename, ac_io_format_t format, size_t buffer_size);
+
 /* Uses the file descriptor to create the input stream.  options dictate the
    compression state of input.  can_close should normally be true meaning that
    when the ac_in object is destroyed, the file should be closed.
@@ -148,6 +156,9 @@ ac_in_t *ac_in_records_init(ac_io_record_t *records, size_t num_records,
 /* Use this function to create an ac_in_t which allows multiple input streams */
 ac_in_t *ac_in_ext_init(ac_io_compare_cb compare, void *arg,
                         ac_in_options_t *options);
+
+/* Create an input which will open sequentially until cb returns NULL */
+ac_in_t *ac_in_init_from_cb(ac_in_init_cb cb, void *arg);
 
 /* Create an input which will open one file at a time in files */
 ac_in_t *ac_in_init_from_list(ac_io_file_info_t *files, size_t num_files,

@@ -26,6 +26,7 @@ limitations under the License.
 #include "ac_buffer.h"
 #include "ac_http_parser.h"
 #include "ac_pool.h"
+#include "ac_json.h"
 
 struct ac_serve_request_s;
 typedef struct ac_serve_request_s ac_serve_request_t;
@@ -37,11 +38,16 @@ typedef void *(*ac_serve_create_thread_data_cb)(void *gbl);
 typedef void (*ac_serve_destroy_thread_data_cb)(void *gbl, void *tdata);
 
 typedef int (*ac_serve_cb)(ac_serve_request_t *r);
+typedef ac_json_t * (*ac_serve_json_cb)(ac_serve_request_t *r, const char *uri, ac_json_t *json_request);
 
 ac_serve_t *ac_serve_init(int fd, ac_serve_cb on_url, ac_serve_cb on_chunk);
+ac_serve_t *ac_serve_init_json(int fd, ac_serve_json_cb on_json);
+void ac_serve_new_cors(ac_serve_t *s);
 ac_serve_t *ac_serve_port_init(int port, ac_serve_cb on_url, ac_serve_cb on_chunk);
+ac_serve_t *ac_serve_port_init_json(int port, ac_serve_json_cb on_json);
 ac_serve_t *ac_serve_unix_domain_init(const char *path, ac_serve_cb on_url,
                                   ac_serve_cb on_chunk);
+ac_serve_t *ac_serve_unix_domain_init_json(const char *path, ac_serve_json_cb on_url);
 
 /* specify a list of URIs (no host or port) and the number of times to repeat */
 ac_serve_t *ac_serve_hammer_init(ac_serve_cb on_url, ac_serve_cb on_chunk, char **urls, size_t num_urls, int repeat);
@@ -94,6 +100,7 @@ struct ac_serve_s {
   uv_timer_t timer;
 
   ac_serve_cb on_url;
+  ac_serve_json_cb on_json;
   ac_serve_cb on_chunk;
 
   ac_serve_create_thread_data_cb create_thread_data;
@@ -108,6 +115,8 @@ struct ac_serve_s {
   ac_serve_t *services;
   ac_serve_t *parent;
   bool shutting_down;
+
+  bool old_style_cors;
 
   /* Date: ... GMT\r\nThread-Id: 000001\r\n - 56 bytes */
   char date[64];

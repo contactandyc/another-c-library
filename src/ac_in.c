@@ -22,14 +22,45 @@ static const int AC_IN_NORMAL_TYPE = 0; // default (due to memset)
 static const int AC_IN_EXT_TYPE = 1;
 static const int AC_IN_RECORDS_TYPE = 2;
 static const int AC_IN_LIST_TYPE = 3;
+static const int AC_IN_CB_TYPE = 4;
 
 size_t ac_in_count(ac_in_t *h) {
+  if(!h)
+    return 0;
   size_t r = 0;
   while (ac_in_advance(h))
     r++;
   ac_in_destroy(h);
   return r;
 }
+
+struct ac_in_cb_s;
+typedef struct ac_in_cb_s ac_in_cb_t;
+
+struct ac_in_cb_s {
+  ac_in_options_t options;
+  int type;
+  ac_io_record_t rec;
+  ac_io_record_t *current;
+  size_t num_current;
+  ac_io_record_t *current_tmp;
+  size_t num_current_tmp;
+  ac_in_advance_cb advance;
+  ac_in_advance_cb advance_tmp;
+  ac_in_advance_unique_cb advance_unique;
+  ac_in_advance_unique_cb advance_unique_tmp;
+  ac_in_advance_cb count_advance;
+  size_t limit;
+  size_t record_num;
+  ac_out_t *out;
+  void (*destroy_out)(ac_out_t *out);
+  ac_buffer_t *group_bh;
+
+  ac_in_init_cb cb;
+  void *arg;
+  ac_in_t *cur_in;
+};
+
 
 struct ac_in_list_s;
 typedef struct ac_in_list_s ac_in_list_t;
@@ -84,7 +115,7 @@ struct ac_in_s {
 
   ac_in_base_t *base;
 
-  char delimiter;
+  int delimiter;
   uint32_t fixed;
 
   ac_lz4_t *lz4;
@@ -248,7 +279,7 @@ ac_io_record_t *empty_record_unique(ac_in_t *h, size_t *len) {
   return NULL;
 }
 
-static inline ac_io_record_t *_advance_delimited_(ac_in_t *h, char delimiter,
+static inline ac_io_record_t *_advance_delimited_(ac_in_t *h, int delimiter,
                                                   bool full_record_required) {
   int32_t len = 0;
   char *p =
@@ -271,7 +302,7 @@ ac_io_record_t *_advance_delimited(ac_in_t *h) {
 
 char *ac_in_lz4_read(ac_in_t *h, uint32_t len);
 char *ac_in_lz4_readz(ac_in_t *h, int32_t *rlen, uint32_t len);
-char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, char delim,
+char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, int delim,
                                bool required);
 
 ac_io_record_t *_advance_prefix_lz4(ac_in_t *h) {
@@ -318,7 +349,7 @@ ac_io_record_t *_advance_fixed_lz4(ac_in_t *h) {
 }
 
 static inline ac_io_record_t *
-_advance_delimited_lz4_(ac_in_t *h, char delimiter, bool full_record_required) {
+_advance_delimited_lz4_(ac_in_t *h, int delimiter, bool full_record_required) {
   int32_t len = 0;
   char *p = ac_in_lz4_read_delimited(h, &len, delimiter, full_record_required);
   if (!p) {
@@ -372,6 +403,7 @@ void ac_in_reset(ac_in_t *h) {
 void ac_in_ext_destroy(ac_in_t *h);
 void ac_in_records_destroy(ac_in_t *hp);
 void ac_in_destroy_from_list(ac_in_t *hp);
+void ac_in_destroy_from_cb(ac_in_t *hp);
 
 void ac_in_destroy(ac_in_t *h) {
   if (!h)
@@ -382,6 +414,8 @@ void ac_in_destroy(ac_in_t *h) {
     ac_in_records_destroy(h);
   else if (h->type == AC_IN_LIST_TYPE)
     ac_in_destroy_from_list(h);
+  else if (h->type == AC_IN_CB_TYPE)
+    ac_in_destroy_from_cb(h);
   else {
     if (h->base)
       ac_in_base_destroy(h->base);
@@ -464,6 +498,14 @@ ac_in_t *ac_in_empty() {
 }
 
 ac_io_record_t *advance_reduced(ac_in_t *h);
+
+ac_in_t *ac_in_quick_init(const char *filename, ac_io_format_t format, size_t buffer_size) {
+  ac_in_options_t opts;
+  ac_in_options_init(&opts);
+  ac_in_options_format(&opts, format);
+  ac_in_options_buffer_size(&opts, buffer_size);
+  return ac_in_init(filename, &opts);
+}
 
 ac_in_t *_ac_in_init(const char *filename, int fd, bool can_close, void *buf,
                      size_t buf_len, bool can_free, ac_in_options_t *options) {
@@ -688,6 +730,67 @@ void ac_in_destroy_from_list(ac_in_t *hp) {
   ac_free(h);
 }
 
+ac_io_record_t *advance_cb(ac_in_t *hp) {
+  ac_in_cb_t *h = (ac_in_cb_t *)hp;
+  if (!h)
+    return NULL;
+
+  h->num_current = 0;
+  ac_io_record_t *r = h->cur_in->advance(h->cur_in);
+  if (!r) {
+    ac_in_destroy(h->cur_in);
+    h->cur_in = h->cb(h->arg);
+    if (!h->cur_in) {
+      _ac_in_empty(hp);
+      return NULL;
+    }
+    r = h->cur_in->advance(h->cur_in);
+  }
+  h->current = r;
+  h->num_current = 1;
+  return r;
+}
+
+ac_io_record_t *advance_unique_cb(ac_in_t *hp, size_t *num_r) {
+  if (!hp) {
+    *num_r = 0;
+    return NULL;
+  }
+  ac_in_cb_t *h = (ac_in_cb_t *)hp;
+  ac_io_record_t *r = h->advance(hp);
+  *num_r = h->num_current;
+  return r;
+}
+
+ac_in_t *ac_in_init_from_cb(ac_in_init_cb cb, void *arg) {
+  ac_in_t *cur = cb(arg);
+  if(!cur)
+    return NULL;
+
+  ac_in_cb_t *h = (ac_in_cb_t *)ac_calloc(
+      sizeof(ac_in_cb_t));
+  h->cb = cb;
+  h->arg = arg;
+  h->type = AC_IN_CB_TYPE;
+  h->cur_in = cur;
+
+  h->advance = advance_cb;
+  h->advance_unique = advance_unique_cb;
+  h->advance_unique_tmp = h->advance_unique;
+  h->advance_tmp = h->advance;
+  return (ac_in_t *)h;
+}
+
+void ac_in_destroy_from_cb(ac_in_t *hp) {
+  ac_in_cb_t *h = (ac_in_cb_t *)hp;
+  if (!h)
+    return;
+  if (h->cur_in)
+    ac_in_destroy(h->cur_in);
+  ac_free(h);
+}
+
+
 static ac_io_record_t *count_and_advance(ac_in_t *h) {
   h->record_num++;
   if (h->record_num <= h->limit)
@@ -801,8 +904,14 @@ static inline void cleanup_last_read(ac_in_t *h) {
   }
 }
 
-char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, char delim,
+char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, int delim,
                                bool required) {
+  bool csv = false;
+  if(delim >= 256) {
+    csv = true;
+    delim -= 256;
+  }
+
   cleanup_last_read(h);
   *rlen = 0;
 
@@ -813,7 +922,21 @@ char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, char delim,
   // 2. search for delimiter between pos/used
   char *ep = b->buffer + b->used;
   while (p < ep) {
-    if (*p != delim)
+    if (*p == '\"') {
+       if(csv) {
+          p++;
+        encoded_quote1:
+          while(p < ep && *p != '\"')
+            p++;
+          if(p+1 < ep && p[1] == '\"') {
+            p += 2;
+            goto encoded_quote1;
+          }
+      }
+      if(p < ep)
+        p++;
+    }
+    else if (*p != delim)
       p++;
     else {
       *rlen = (p - sp);
@@ -841,7 +964,21 @@ char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, char delim,
     fill_blocks(h, b);
     char *ep = sp + b->used;
     while (p < ep) {
-      if (*p != delim)
+      if (*p == '\"') {
+         if(csv) {
+            p++;
+          encoded_quote2:
+            while(p < ep && *p != '\"')
+              p++;
+            if(p+1 < ep && p[1] == '\"') {
+              p += 2;
+              goto encoded_quote2;
+            }
+        }
+        if(p < ep)
+          p++;
+      }
+      else if (*p != delim)
         p++;
       else {
         *rlen = (p - sp);
@@ -870,7 +1007,21 @@ char *ac_in_lz4_read_delimited(ac_in_t *h, int32_t *rlen, char delim,
     sp = p;
     ep = p + b->used;
     while (p < ep) {
-      if (*p != delim)
+      if (*p == '\"') {
+         if(csv) {
+            p++;
+          encoded_quote3:
+            while(p < ep && *p != '\"')
+              p++;
+            if(p+1 < ep && p[1] == '\"') {
+              p += 2;
+              goto encoded_quote3;
+            }
+        }
+        if(p < ep)
+          p++;
+      }
+      else if (*p != delim)
         p++;
       else {
         size_t length = (p - sp);

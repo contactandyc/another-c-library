@@ -25,7 +25,7 @@ ac_in_base_t *ac_in_base_reinit(ac_in_base_t *base, size_t buffer_size);
 
 const char *ac_in_base_filename(ac_in_base_t *h);
 
-char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, char delim,
+char *ac_in_base_read_delimited(ac_in_base_t *h, int32_t *rlen, int delim,
                                 bool required);
 
 /*

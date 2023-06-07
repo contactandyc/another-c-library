@@ -87,6 +87,35 @@ static inline ac_json_t *ac_json_str(ac_pool_t *pool, const char *s) {
   return j;
 }
 
+static inline ac_json_t *ac_json_encode_string(ac_pool_t *pool, const char *s, size_t length) {
+  if (!s)
+    return NULL;
+
+  char *v = ac_json_encode(pool, (char *)s, length);
+
+  ac_json_t *j = (ac_json_t *)ac_pool_alloc(pool, sizeof(ac_json_t));
+  j->parent = NULL;
+  j->type = AC_JSON_STRING;
+  j->value = (char *)v;
+  j->length = strlen(v);
+  return j;
+}
+
+static inline ac_json_t *ac_json_encode_str(ac_pool_t *pool, const char *s) {
+  if (!s)
+    return NULL;
+
+  char *v = ac_json_encode(pool, (char *)s, strlen(s));
+
+  ac_json_t *j = (ac_json_t *)ac_pool_alloc(pool, sizeof(ac_json_t));
+  j->parent = NULL;
+  j->type = AC_JSON_STRING;
+  j->value = (char *)v;
+  j->length = strlen(v);
+  return j;
+}
+
+
 static inline ac_json_t *ac_json_true(ac_pool_t *pool) {
   ac_json_t *j = (ac_json_t *)ac_pool_alloc(pool, sizeof(ac_json_t));
   j->parent = NULL;
@@ -340,16 +369,19 @@ static inline void ac_jsona_append(ac_json_t *j, ac_json_t *item) {
 }
 
 static inline int ac_jsona_count(ac_json_t *j) {
+  if(!j) return 0;
   _ac_jsona_t *arr = (_ac_jsona_t *)j;
   return arr->num_entries;
 }
 
 static inline ac_jsona_t *ac_jsona_first(ac_json_t *j) {
+  if(!j) return NULL;
   _ac_jsona_t *arr = (_ac_jsona_t *)j;
   return arr->head;
 }
 
 static inline ac_jsona_t *ac_jsona_last(ac_json_t *j) {
+  if(!j) return NULL;
   _ac_jsona_t *arr = (_ac_jsona_t *)j;
   return arr->tail;
 }
@@ -384,16 +416,22 @@ static inline void ac_jsona_erase(ac_jsona_t *n) {
 }
 
 static inline int ac_jsono_count(ac_json_t *j) {
+  if(!j)
+    return 0;
   _ac_jsono_t *o = (_ac_jsono_t *)j;
   return o->num_entries;
 }
 
 static inline ac_jsono_t *ac_jsono_first(ac_json_t *j) {
+  if(!j)
+    return NULL;
   _ac_jsono_t *o = (_ac_jsono_t *)j;
   return o->head;
 }
 
 static inline ac_jsono_t *ac_jsono_last(ac_json_t *j) {
+  if(!j)
+    return NULL;
   _ac_jsono_t *o = (_ac_jsono_t *)j;
   return o->tail;
 }
@@ -520,7 +558,7 @@ static inline ac_jsono_t *ac_jsono_insert(ac_json_t *j, const char *key,
   } else {
     ac_jsono_append(j, key, item, copy_key);
     _ac_jsono_t *o = (_ac_jsono_t *)j;
-    __ac_json_insert(res, &(o->root));
+    __ac_json_insert(o->tail, &(o->root));
   }
   return res;
 }

@@ -610,8 +610,14 @@ get_end_of_key:;
     p++;
   if (p < ep) {
     if (p[-1] == '\\') {
-      p++;
-      goto get_end_of_key;
+        // if odd number of \, then skip "
+        char *backtrack = p-1;
+        while(*backtrack == '\\')
+            backtrack--;
+        if(((p-backtrack) & 1) == 0) {
+            p++;
+            goto get_end_of_key;
+        }
     }
     *p = 0;
   }
@@ -655,8 +661,8 @@ start_key_object:;
     if (ch >= '1' && ch <= '9') {
       AC_JSON_KEYED_NEXT_DIGIT;
     } else if (ch == '0') {
+      ch = *p;
       if (p + 1 < ep) {
-        ch = *p;
         if (ch != '.') {
           stringp = (char *)"0";
           data_type = AC_JSON_ZERO;
@@ -676,8 +682,8 @@ start_key_object:;
     AC_JSON_BAD_CHARACTER;
   case '0':
     stringp = p - 1;
+    ch = *p;
     if (p + 1 < ep) {
-      ch = *p;
       if (ch != '.') {
         stringp = (char *)"0";
         data_type = AC_JSON_ZERO;
@@ -786,8 +792,14 @@ keyed_start_string:;
     AC_JSON_BAD_CHARACTER;
   }
   if (p[-1] == '\\') {
-    p++;
-    goto keyed_start_string;
+    // if odd number of \, then skip "
+    char *backtrack = p-1;
+    while(*backtrack == '\\')
+        backtrack--;
+    if(((p-backtrack) & 1) == 0) {
+        p++;
+        goto keyed_start_string;
+    }
   }
   *p = 0;
   string_length = p - stringp;
@@ -953,8 +965,8 @@ start_value:;
     if (ch >= '1' && ch <= '9') {
       AC_JSON_NEXT_DIGIT;
     } else if (ch == '0') {
+      ch = *p;
       if (p + 1 < ep) {
-        ch = *p;
         if (ch != '.') {
           stringp = (char *)"0";
           data_type = AC_JSON_ZERO;
@@ -968,15 +980,14 @@ start_value:;
         stringp = (char *)"0";
         data_type = AC_JSON_ZERO;
         string_length = 1;
-        ch = *p;
         AC_JSON_ADD_STRING;
       }
     }
     AC_JSON_BAD_CHARACTER;
   case '0':
     stringp = p - 1;
+    ch = *p;
     if (p + 1 < ep) {
-      ch = *p;
       if (ch != '.') {
         stringp = (char *)"0";
         data_type = AC_JSON_ZERO;
@@ -990,7 +1001,6 @@ start_value:;
       stringp = (char *)"0";
       data_type = AC_JSON_ZERO;
       string_length = 1;
-      ch = *p;
       AC_JSON_ADD_STRING;
     }
   case AC_JSON_NATURAL_NUMBER_CASE:
@@ -1082,8 +1092,14 @@ start_string:;
     AC_JSON_BAD_CHARACTER;
   }
   if (p[-1] == '\\') {
-    p++;
-    goto start_string;
+    // if odd number of \, then skip "
+    char *backtrack = p-1;
+    while(*backtrack == '\\')
+        backtrack--;
+    if(((p-backtrack) & 1) == 0) {
+        p++;
+        goto start_string;
+    }
   }
   *p = 0;
   string_length = p - stringp;

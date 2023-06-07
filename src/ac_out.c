@@ -648,6 +648,8 @@ ac_out_t *_ac_out_init_(const char *filename, int fd, bool fd_owner,
   if (h) {
     if (options->format < 0) {
       int delim = (-options->format) - 1;
+      if(delim >= 256) // for output, csv format is expected to be done before write_record
+        delim -= 256;
       h->delimiter = delim;
       h->write_record = _ac_out_write_delimiter;
     } else if (options->format > 0) {
@@ -1017,8 +1019,8 @@ typedef struct {
 
 const int EXTRA_IN = 0;
 const int EXTRA_FILENAME = 1;
-const int EXTRA_FILE_TO_REMOVE = 1;
-const int EXTRA_ACK_FILE = 3;
+const int EXTRA_FILE_TO_REMOVE = EXTRA_FILENAME;
+const int EXTRA_ACK_FILE = EXTRA_FILENAME | 2;
 
 typedef struct extra_s {
   int type;
@@ -1340,6 +1342,8 @@ ac_in_t *ac_out_in(ac_out_t *hp) {
     in = _ac_out_sorted_in(hp);
     if (in)
       ac_in_destroy_out(in, hp, NULL);
+    else
+      ac_out_destroy(hp);
   } else if (hp->type == AC_OUT_PARTITIONED_TYPE)
     in = ac_out_partitioned_in(hp);
   else if (hp->type == AC_OUT_NORMAL_TYPE)
