@@ -7,7 +7,9 @@
 
 struct ac_cursor_s;
 typedef struct ac_cursor_s ac_cursor_t;
-
+/*
+    Callback function for custom cursors.  This function is called for each token.
+*/
 typedef ac_cursor_t *(*ac_cursor_custom_cb)(ac_pool_t *pool, ac_token_t *token, void *arg);
 
 /* The ac_token object has a ac_token_parse_expression function which parses a query
@@ -15,6 +17,9 @@ typedef ac_cursor_t *(*ac_cursor_custom_cb)(ac_pool_t *pool, ac_token_t *token, 
    to get each id which matches the given query. */
 ac_cursor_t *ac_cursor_open(ac_pool_t *pool, ac_cursor_custom_cb cb, ac_token_t *t, void *arg);
 
+/*
+    Create a cursor which will return all ids in the range [start, end)
+*/
 ac_cursor_t *ac_cursor_range(ac_pool_t *pool, uint32_t start, uint32_t end);
 
 uint32_t ac_cursor_first(ac_pool_t *pool, ac_cursor_custom_cb cb, ac_token_t *t, void *arg);

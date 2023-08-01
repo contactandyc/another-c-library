@@ -51,6 +51,7 @@ ac_serve_t *ac_serve_unix_domain_init_json(const char *path, ac_serve_json_cb on
 
 /* specify a list of URIs (no host or port) and the number of times to repeat */
 ac_serve_t *ac_serve_hammer_init(ac_serve_cb on_url, ac_serve_cb on_chunk, char **urls, size_t num_urls, int repeat);
+ac_serve_t *ac_serve_hammer_init_json(ac_serve_json_cb on_json, char **urls, size_t num_urls, int repeat);
 
 void ac_serve_thread_data(ac_serve_t *service,
                         ac_serve_create_thread_data_cb create,
@@ -61,6 +62,11 @@ void ac_serve_backlog(ac_serve_t *w, int backlog);
 void ac_serve_threads(ac_serve_t *w, int num_threads);
 
 void ac_serve_run(ac_serve_t *w);
+
+void ac_serve_begin_chunking(ac_serve_request_t *r);
+void ac_serve_chunk(ac_serve_request_t *r, const void *d, size_t len);
+void ac_serve_end_chunking(ac_serve_request_t *r);
+
 
 void ac_serve_destroy(ac_serve_t *w);
 
@@ -108,6 +114,7 @@ struct ac_serve_s {
 
   int fd;
   int thread_id;
+  int chunk_id;
   int num_threads;
   int backlog;
   size_t request_pool_size;

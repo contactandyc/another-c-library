@@ -21,7 +21,7 @@ typedef struct {
 
   on_http_cb on_chunk_encoding;
   on_http_cb on_chunk;
-  on_http_cb on_chunks_complete;
+  on_http_cb on_chunk_complete;
   on_http_cb on_url;
 
   uv_buf_t status;
@@ -211,7 +211,7 @@ static int on_chunk_header(llhttp_t *parser) {
   ac_pool_reset(lh->http.pool, &lh->checkpoint);
 
   if (parser->content_length == 0) {
-    lh->on_chunks_complete((ac_http_parser_t *)lh);
+    lh->on_chunk_complete((ac_http_parser_t *)lh);
     return 0;
   }
   return 0;
@@ -231,14 +231,14 @@ static int on_message_complete(llhttp_t *h) {
     if (!lh->http.chunked)
       lh->on_url((ac_http_parser_t *)lh);
     else if (lh->http.chunked)
-      lh->on_chunks_complete((ac_http_parser_t *)lh);
+      lh->on_chunk_complete((ac_http_parser_t *)lh);
     if (ch)
       *ch = c;
   } else {
     if (!lh->http.chunked)
       lh->on_url((ac_http_parser_t *)lh);
     else if (lh->http.chunked)
-      lh->on_chunks_complete((ac_http_parser_t *)lh);
+      lh->on_chunk_complete((ac_http_parser_t *)lh);
   }
   return 0;
 }
@@ -273,7 +273,7 @@ static ac_http_parser_t *ac_http_parser_init(size_t pool_size, bool client,
   h->on_url = _on_url ? _on_url : on_http;
   h->on_chunk_encoding = on_http;
   h->on_chunk = on_http;
-  h->on_chunks_complete = on_http;
+  h->on_chunk_complete = on_http;
   h->status.len = 0;
   h->status.base = NULL;
   h->header_key.len = 0;
@@ -340,11 +340,11 @@ bool ac_http_parser_data(ac_http_parser_t *h, const void *d, size_t len) {
 }
 
 void ac_http_parser_chunk(ac_http_parser_t *h, on_http_cb on_chunk,
-                   on_http_cb on_chunk_encoding, on_http_cb on_chunks_complete) {
+                   on_http_cb on_chunk_encoding, on_http_cb on_chunk_complete) {
   ac_llhttp_ext_t *hp = (ac_llhttp_ext_t *)h;
   hp->on_chunk_encoding = on_chunk_encoding ? on_chunk_encoding : on_http;
   hp->on_chunk = on_chunk ? on_chunk : on_http;
-  hp->on_chunks_complete = on_chunks_complete ? on_chunks_complete : on_http;
+  hp->on_chunk_complete = on_chunk_complete ? on_chunk_complete : on_http;
 }
 
 void ac_http_parser_destroy(ac_http_parser_t *h) {
