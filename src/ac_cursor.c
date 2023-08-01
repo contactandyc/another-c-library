@@ -143,18 +143,33 @@ uint32_t advance_or_to(or_cursor_t *c, uint32_t id) {
     if (id <= c->cursor.current)
         return c->cursor.current;
 
+    bool pushed = false;
     for( uint32_t i=0; i<c->num_active; i++ ) {
-        if(c->active[i]->advance_to(c->active[i], id))
+        if(c->active[i]->advance_to(c->active[i], id)) {
             or_push(c, c->active[i]);
+            pushed = true;
+        }
     }
-    if(!c->num_heap)
-        return ac_cursor_empty(&c->cursor);
+    ac_cursor_t *p;
+    if(!pushed) {
+        if(!c->num_heap)
+            return ac_cursor_empty(&c->cursor);
 
-    c->active[0] = or_pop(c);
+        ac_cursor_t *p = or_pop(c);
+        while(!p->advance_to(p, id)) {
+            if(!c->num_heap)
+                return ac_cursor_empty(&c->cursor);
+            p = or_pop(c);
+        }
+    }
+    else
+        p = or_pop(c);
+
+    c->active[0] = p;
     c->num_active = 1;
 
     ac_cursor_t **heap = c->heap;
-    uint32_t current = c->active[0]->current;
+    uint32_t current = p->current;
     while(c->num_heap && heap[1]->current == current) {
         c->active[c->num_active] = or_pop(c);
         c->num_active++;

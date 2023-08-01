@@ -1,8 +1,9 @@
+UV=1
 ROOT=..
 include $(ROOT)/src/Makefile.include
 
-FLAGS += -D_AC_DEBUG_MEMORY_=NULL
-PROGRAMS=uvdemo1 tcpdemo webserver
+FLAGS += -g -D_AC_DEBUG_MEMORY_=NULL
+PROGRAMS=json_service uv_client uvdemo1
 
 all: $(PROGRAMS) examples
 

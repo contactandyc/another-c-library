@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "ac_serve.h"
 #include "ac_timer.h"
+#include <pthread.h>
 
 struct serve_request_s;
 typedef struct serve_request_s serve_request_t;
@@ -24,14 +25,22 @@ typedef struct serve_request_s serve_request_t;
 #define AC_SERVE_CLOSING 1
 #define AC_SERVE_CLOSED 2
 
+#define AC_SERVE_CHUNKING 1
+
 struct serve_request_s {
   ac_serve_request_t request;
+
+  ac_buffer_t *alt_bh;
+
   uv_buf_t buf;
   uv_tcp_t stream;
   uv_shutdown_t shutdown;
   uv_write_t writer;
   char header[1024];
   int request_state;
+  int chunk_state;
+  bool chunk_ended;
+  pthread_mutex_t chunk_mutex;
 
   uint64_t request_start_time;
   bool message_ended;
@@ -42,6 +51,110 @@ struct serve_request_s {
 #include "impl/ac_serve_fill.h"
 
 void write_response(serve_request_t *sr);
+
+static void after_chunking(uv_write_t *req, int status);
+static void close_connection(serve_request_t *sr);
+
+static void swap_buffers_and_write(ac_serve_request_t *r) {
+    serve_request_t *sr = (serve_request_t *)r;
+
+    ac_buffer_t *tmp = r->bh;
+    r->bh = sr->alt_bh;
+    sr->alt_bh = tmp;
+    ac_buffer_clear(r->bh);
+    sr->chunk_state = AC_SERVE_CHUNKING;
+    size_t num_bufs = 1;
+    uv_buf_t *bufs = &sr->bufs[0];
+    bufs[0].base = ac_buffer_data(sr->alt_bh);
+    bufs[0].len = ac_buffer_length(sr->alt_bh);
+    sr->num_bufs = num_bufs;
+    if (!sr->request.service->hammer) {
+      uv_stream_t *stream = (uv_stream_t *)&sr->stream;
+      if (uv_is_writable(stream))
+        printf( "%s\n", bufs[0].base );
+        uv_write(&sr->writer, stream, bufs, num_bufs, after_chunking);
+    }
+}
+
+static void after_begin_chunking(uv_write_t *req, int status) {
+  serve_request_t *sr = (serve_request_t *)req->data;
+  pthread_mutex_lock(&sr->chunk_mutex);
+  if(ac_buffer_length(sr->request.bh) > 0)
+      swap_buffers_and_write(&sr->request);
+  else
+      sr->chunk_state = AC_SERVE_OPEN;
+   pthread_mutex_unlock(&sr->chunk_mutex);
+}
+
+static void after_chunking(uv_write_t *req, int status) {
+  serve_request_t *sr = (serve_request_t *)req->data;
+  pthread_mutex_lock(&sr->chunk_mutex);
+  if(ac_buffer_length(sr->request.bh) > 0) {
+      swap_buffers_and_write(&sr->request);
+      pthread_mutex_unlock(&sr->chunk_mutex);
+  }
+  else {
+      pthread_mutex_unlock(&sr->chunk_mutex);
+      sr->chunk_state = AC_SERVE_OPEN;
+      if(sr->chunk_ended) {
+          ac_buffer_destroy(sr->alt_bh);
+          pthread_mutex_destroy(&sr->chunk_mutex);
+          close_connection(sr);
+      }
+  }
+}
+
+void ac_serve_begin_chunking(ac_serve_request_t *r) {
+    serve_request_t *sr = (serve_request_t *)r;
+    sr->alt_bh = ac_buffer_init(4096);
+    ac_buffer_sets(sr->alt_bh, "HTTP/1.1 200 OK\r\n" );
+    ac_buffer_appends(sr->alt_bh, r->service->date );
+    ac_buffer_appendf(sr->alt_bh, "Chunk: %d\r\n", r->service->chunk_id);
+    r->service->chunk_id++;
+    ac_buffer_appends(sr->alt_bh, "Content-Type: text/plain\r\nConnection: Keep-Alive\r\nTransfer-Encoding: chunked\r\n\r\n");
+    size_t num_bufs = 1;
+    uv_buf_t *bufs = &sr->bufs[0];
+    bufs[0].base = ac_buffer_data(sr->alt_bh);
+    bufs[0].len = ac_buffer_length(sr->alt_bh);
+    sr->num_bufs = num_bufs;
+    sr->chunk_state = AC_SERVE_OPEN;
+    sr->chunk_ended = false;
+    pthread_mutex_init(&sr->chunk_mutex, NULL);
+    if (!sr->request.service->hammer) {
+      uv_stream_t *stream = (uv_stream_t *)&sr->stream;
+      if (uv_is_writable(stream))
+        sr->chunk_state = AC_SERVE_CHUNKING;
+        printf( "%s\n", bufs[0].base );
+        uv_write(&sr->writer, stream, bufs, num_bufs, after_begin_chunking);
+    }
+}
+
+void ac_serve_chunk(ac_serve_request_t *r, const void *d, size_t len) {
+    if(!len)
+        return;
+
+    serve_request_t *sr = (serve_request_t *)r;
+    pthread_mutex_lock(&sr->chunk_mutex);
+    ac_buffer_appendf(r->bh, "%x\r\n", len);
+    ac_buffer_append(r->bh, d, len);
+    ac_buffer_append(r->bh, "\r\n", 2);
+
+    if(sr->chunk_state == AC_SERVE_OPEN)
+        swap_buffers_and_write(r);
+
+    pthread_mutex_unlock(&sr->chunk_mutex);
+}
+
+
+void ac_serve_end_chunking(ac_serve_request_t *r) {
+    serve_request_t *sr = (serve_request_t *)r;
+    pthread_mutex_lock(&sr->chunk_mutex);
+    ac_buffer_append(r->bh, "0\r\n", 3);
+    sr->chunk_ended = true;
+    if(sr->chunk_state == AC_SERVE_OPEN)
+        swap_buffers_and_write(r);
+    pthread_mutex_unlock(&sr->chunk_mutex);
+}
 
 void serve_request_on_url(ac_http_parser_t *h) {
   serve_request_t *sr = (serve_request_t *)h->data;
@@ -509,6 +622,18 @@ void ac_serve_clone(ac_serve_t *dest, ac_serve_t *src, int thread_id) {
 
 ac_serve_t *ac_serve_hammer_init(ac_serve_cb on_url, ac_serve_cb on_chunk, char **urls, size_t num_urls, int repeat) {
   ac_serve_t *s = ac_serve_init(0, on_url, on_chunk);
+  s->socket_based = false;
+  s->base.port = 0;
+  s->num_times_to_repeat_hammering_url = repeat;
+  s->hammer_urls = urls;
+  s->hammer_urls_curp = urls;
+  s->hammer_urls_ep = urls + num_urls;
+  s->hammer = true;
+  return s;
+}
+
+ac_serve_t *ac_serve_hammer_init_json(ac_serve_json_cb on_json, char **urls, size_t num_urls, int repeat) {
+  ac_serve_t *s = ac_serve_init_json(0, on_json);
   s->socket_based = false;
   s->base.port = 0;
   s->num_times_to_repeat_hammering_url = repeat;

@@ -67,7 +67,7 @@ ac_http_parser_t *ac_http_parser_client_init(on_http_cb on_body, size_t pool_siz
 /* set functions to handle chunk encoding.  on_chunk is typically the only
    function required.  Specify NULL if no callback is specified. */
 void ac_http_parser_chunk(ac_http_parser_t *h, on_http_cb on_chunk,
-                   on_http_cb on_chunk_encoding, on_http_cb on_chunks_complete);
+                   on_http_cb on_chunk_encoding, on_http_cb on_chunk_complete);
 
 /* make the http parser reusable */
 void ac_http_parser_clear(ac_http_parser_t *h);
