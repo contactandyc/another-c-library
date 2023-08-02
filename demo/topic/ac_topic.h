@@ -35,12 +35,20 @@ typedef struct ac_topic_s ac_topic_t;
 */
 ac_topic_parsed_message_t *ac_topic_parse_message(ac_pool_t *pool, ac_json_t *json);
 
+/*
+    Creates a parsed message from the given key and value.
+*/
+ac_topic_parsed_message_t *ac_topic_parse_message_from_key_value(ac_pool_t *pool, const char *key, const char *value);
+
 // Dump (print) the contents of a parsed message for debugging purposes.
 void ac_topic_parsed_message_dump(ac_topic_parsed_message_t *message);
 
 // Initialize a new topic with the given name, number of partitions and replicas,
 // and size of the memory pool for the topic.
 ac_topic_t *ac_topic_init(const char *name, int num_partitions, int num_replicas, int pool_size);
+
+// Dump (print) the contents of a topic for debugging purposes.
+void ac_topic_dump(ac_topic_t *topic);
 
 // Add a parsed message to a topic. Returns the offset (message id)
 // at which the message was added.
