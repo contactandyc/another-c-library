@@ -23,8 +23,8 @@ limitations under the License.
 #define AC_JSON_OBJECT 1
 #define AC_JSON_ARRAY 2
 #define AC_JSON_BINARY 3
-#define AC_JSON_STRING 4
-#define AC_JSON_NULL 5
+#define AC_JSON_NULL 4
+#define AC_JSON_STRING 5
 #define AC_JSON_FALSE 6
 #define AC_JSON_ZERO 7
 #define AC_JSON_NUMBER 8

@@ -56,8 +56,8 @@ typedef enum {
   object = 1,
   array = 2,
   binary = 3,
-  string = 4,
-  null = 5,
+  null = 4,
+  string = 5,
   bool_false = 6,
   zero = 7,
   number = 8,
@@ -75,6 +75,10 @@ void ac_json_dump_to_buffer(ac_buffer_t *bh, ac_json_t *a);
 
 /* Decode encoded json text */
 char *ac_json_decode(ac_pool_t *pool, char *s, size_t length);
+
+/* Decode encoded json text and return the length of the decoded string.  This
+   allows for binary data to be encoded. */
+char *ac_json_decode2(size_t *rlen, ac_pool_t *pool, char *s, size_t length);
 
 /* Encode json text */
 char *ac_json_encode(ac_pool_t *pool, char *s, size_t length);
