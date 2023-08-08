@@ -526,6 +526,208 @@ static inline ac_json_t *ac_jsono_scan(ac_json_t *j, const char *key) {
   return NULL;
 }
 
+static inline int parse_int(const char *str, int default_value) {
+    if (!str) return default_value;
+
+    int num = 0;
+    int ch = *str;
+    if(ch == '-') {
+        str++;
+        ch = *str;
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+
+            /*
+            if (*str < '0' || *str > '9') {
+                // Not a valid digit
+                return default_value;
+            }
+            // Shift the current number by 10 (to make space for the new digit)
+            // and add the new digit to the number
+            num = num * 10 + (*str - '0');
+            str++;
+            */
+        }
+        num = -num;
+    }
+    else {
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+            /*
+            if (*str < '0' || *str > '9') {
+                // Not a valid digit
+                return default_value;
+            }
+            // Shift the current number by 10 (to make space for the new digit)
+            // and add the new digit to the number
+            num = num * 10 + (*str - '0');
+            str++;
+            */
+        }
+    }
+    return num;
+}
+
+
+static inline int ac_jsono_scan_int(ac_json_t *j, const char *key, int default_value) {
+    return parse_int(ac_jsonv(ac_jsono_scan(j, key)), default_value);
+}
+
+static inline int32_t parse_int32(const char *str, int32_t default_value) {
+    if (!str) return default_value;
+
+    int32_t num = 0;
+
+    int ch = *str;
+    if(*str == '-') {
+        str++;
+        ch = *str;
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+        }
+        num = -num;
+    }
+    else {
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+        }
+    }
+    return num;
+}
+
+static inline int32_t ac_jsono_scan_int32(ac_json_t *j, const char *key, int32_t default_value) {
+    return parse_int32(ac_jsonv(ac_jsono_scan(j, key)), default_value);
+}
+
+static inline uint32_t parse_uint32(const char *str, uint32_t default_value) {
+    if (!str) return default_value;
+
+    uint32_t num = 0;
+
+    int ch = *str;
+    while (ch) {
+        if (ch >= '0' && ch <= '9') {
+            num = num * 10 + (ch - '0');
+            str++;
+            ch = *str;
+            continue;
+        }
+        // Not a valid digit
+        return default_value;
+    }
+
+    return num;
+}
+
+
+static inline uint32_t ac_jsono_scan_uint32(ac_json_t *j, const char *key, uint32_t default_value) {
+    return parse_uint32(ac_jsonv(ac_jsono_scan(j, key)), default_value);
+}
+
+static inline int64_t parse_int64(const char *str, int64_t default_value) {
+    if (!str) return default_value;
+
+    int64_t num = 0;
+    int ch = *str;
+    if(ch == '-') {
+        str++;
+        ch = *str;
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+        }
+        num = -num;
+    }
+    else {
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+        }
+    }
+    return num;
+}
+
+static inline int64_t ac_jsono_scan_int64(ac_json_t *j, const char *key, int64_t default_value) {
+    return parse_int64(ac_jsonv(ac_jsono_scan(j, key)), default_value);
+}
+
+static inline uint64_t parse_uint64(const char *str, uint64_t default_value) {
+    if (!str) return default_value;
+
+    uint64_t num = 0;
+
+    int ch = *str;
+    while (ch) {
+        if (ch >= '0' && ch <= '9') {
+            num = num * 10 + (ch - '0');
+            str++;
+            ch = *str;
+            continue;
+        }
+        // Not a valid digit
+        return default_value;
+    }
+
+    return num;
+}
+
+static inline uint64_t ac_jsono_scan_uint64(ac_json_t *j, const char *key, uint64_t default_value) {
+    return parse_uint64(ac_jsonv(ac_jsono_scan(j, key)), default_value);
+}
+
+static inline char *ac_jsono_scan_str(ac_json_t *j, const char *key, const char *default_value) {
+    char *value = ac_jsonv(ac_jsono_scan(j, key));
+    return value ? value : (char *)default_value;
+}
+
+static inline char *ac_jsono_scan_strd(ac_pool_t *pool, ac_json_t *j,
+                                             const char *key,
+                                             const char *default_value) {
+    char *value = ac_jsond(pool, ac_jsono_scan(j, key));
+    return value ? value : (char *)default_value;
+}
+
+
 static inline void _ac_jsono_fill_tree(_ac_jsono_t *o) {
   ac_jsono_t *r = o->head;
   o->root = NULL;

@@ -150,6 +150,16 @@ static inline void ac_jsono_append(ac_json_t *j, const char *key,
 static inline ac_json_t *ac_jsono_scan(ac_json_t *j, const char *key);
 static inline ac_json_t *ac_jsono_scanr(ac_json_t *j, const char *key);
 
+static inline int ac_jsono_scan_int(ac_json_t *j, const char *key, int default_value);
+static inline int32_t ac_jsono_scan_int32(ac_json_t *j, const char *key, int32_t default_value);
+static inline uint32_t ac_jsono_scan_uint32(ac_json_t *j, const char *key, uint32_t default_value);
+static inline int64_t ac_jsono_scan_int64(ac_json_t *j, const char *key, int64_t default_value);
+static inline uint64_t ac_jsono_scan_uint64(ac_json_t *j, const char *key, uint64_t default_value);
+static inline char *ac_jsono_scan_str(ac_json_t *j, const char *key, const char *default_value);
+static inline char *ac_jsono_scan_strd(ac_pool_t *pool, ac_json_t *j,
+                                       const char *key,
+                                       const char *default_value);
+
 /* use _get if json is meant to be read only and _find if not.
   The ac_jsono_get method is faster than the ac_jsono_find
   method as it creates a sorted array vs a red black tree (or map).  The

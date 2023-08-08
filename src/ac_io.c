@@ -298,6 +298,19 @@ ac_pool_io_list(ac_pool_t *pool, const char *path, size_t *num_files,
   return __ac_io_list(pool, path, num_files, file_valid, arg);
 }
 
+static inline
+int compare_ac_io_file_info(const ac_io_file_info_t *a, const ac_io_file_info_t *b) {
+    if(a->last_modified != b->last_modified)
+        return (a->last_modified < b->last_modified) ? -1 : 1;
+    return 0;
+}
+
+static ac_sort_m(_sort_ac_io_file_info, ac_io_file_info_t, compare_ac_io_file_info);
+
+void ac_io_sort_file_info_by_last_modified(ac_io_file_info_t *files, size_t num_files) {
+    _sort_ac_io_file_info(files, num_files);
+}
+
 #ifdef _AC_DEBUG_MEMORY_
 char *_ac_io_read_file(size_t *len, const char *filename, const char *caller) {
 #else
