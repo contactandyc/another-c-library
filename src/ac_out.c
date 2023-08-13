@@ -777,32 +777,35 @@ void ac_out_destroy(ac_out_t *h) {
 }
 
 /** ac_out_ext functionality **/
-static void suffix_filename_with_id(char *dest, const char *filename, size_t id,
+static void suffix_filename_with_id(char *dest, size_t dest_len, const char *filename, size_t id,
                                     const char *extra, bool use_lz4) {
   strcpy(dest, filename);
+  dest_len -= strlen(dest);
+  dest += strlen(dest);
+
   if (ac_io_extension(filename, "lz4"))
-    sprintf(dest + strlen(dest) - 4, "%s%s_%lu.lz4", extra ? "_" : "",
+    snprintf(dest - 4, dest_len + 4, "%s%s_%lu.lz4", extra ? "_" : "",
             extra ? extra : "", id);
   else if (ac_io_extension(filename, "gz")) {
     if (use_lz4)
-      sprintf(dest + strlen(dest) - 3, "%s%s_%lu.lz4", extra ? "_" : "",
+      snprintf(dest - 3, dest_len + 3, "%s%s_%lu.lz4", extra ? "_" : "",
               extra ? extra : "", id);
     else
-      sprintf(dest + strlen(dest) - 3, "%s%s_%lu.gz", extra ? "_" : "",
+      snprintf(dest - 3, dest_len + 3, "%s%s_%lu.gz", extra ? "_" : "",
               extra ? extra : "", id);
   } else {
     if (use_lz4)
-      sprintf(dest + strlen(dest), "%s%s_%lu.lz4", extra ? "_" : "",
+      snprintf(dest, dest_len, "%s%s_%lu.lz4", extra ? "_" : "",
               extra ? extra : "", id);
     else
-      sprintf(dest + strlen(dest), "%s%s_%lu", extra ? "_" : "",
-              extra ? extra : "", id);
+      snprintf(dest, dest_len, "%s%s_%lu", extra ? "_" : "",
+               extra ? extra : "", id);
   }
 }
 
 /* used to create a partitioned filename */
 void ac_out_partition_filename(char *dest, const char *filename, size_t id) {
-  suffix_filename_with_id(dest, filename, id, NULL, false);
+  suffix_filename_with_id(dest, strlen(filename) + 20, filename, id, NULL, false);
 }
 
 /** ac_out_partitioned_t **/
@@ -860,10 +863,11 @@ ac_out_t *ac_out_partitioned_init(const char *filename,
     if (!filename)
       abort();
     // give suffix to filename
-    char *tmp_name = (char *)ac_malloc(strlen(filename) + 20);
+    size_t tmp_name_len = strlen(filename) + 40;
+    char *tmp_name = (char *)ac_malloc(tmp_name_len);
     ac_io_partition_cb partition = ext_options->partition;
     ext_options->partition = NULL;
-    suffix_filename_with_id(tmp_name, filename, 0, NULL, false);
+    suffix_filename_with_id(tmp_name, tmp_name_len, filename, 0, NULL, false);
     ac_out_t *r = ac_out_ext_init(tmp_name, options, ext_options);
     ext_options->partition = partition;
     ac_free(tmp_name);
@@ -895,15 +899,16 @@ ac_out_t *ac_out_partitioned_init(const char *filename,
       h->part_options.write_ack_file = false;
     }
 
-    char *tmp_name = (char *)ac_malloc(strlen(filename) + 40);
+    size_t tmp_name_len = strlen(filename) + 40;
+    char *tmp_name = (char *)ac_malloc(tmp_name_len);
     for (size_t i = 0; i < h->num_partitions; i++) {
       // printf("%s\n", tmp_name);
       if (h->ext_options.sort_while_partitioning || !h->ext_options.compare) {
-        suffix_filename_with_id(tmp_name, filename, i, NULL, false);
+        suffix_filename_with_id(tmp_name, tmp_name_len, filename, i, NULL, false);
         h->partitions[i] = ac_out_ext_init(tmp_name, &(h->part_options),
                                            &(h->ext_part_options));
       } else {
-        suffix_filename_with_id(tmp_name, filename, i, "unsorted",
+        suffix_filename_with_id(tmp_name, tmp_name_len, filename, i, "unsorted",
                                 h->ext_options.lz4_tmp);
         h->partitions[i] = ac_out_init(tmp_name, &(h->part_options));
       }
@@ -918,7 +923,8 @@ ac_out_t *ac_out_partitioned_init(const char *filename,
 void *sort_partitions(void *arg) {
   ac_out_partitioned_t *h = (ac_out_partitioned_t *)arg;
   char *filename = h->filename;
-  char *tmp_name = (char *)ac_malloc(strlen(h->filename) + 40);
+  size_t tmp_name_len = strlen(filename) + 40;
+  char *tmp_name = (char *)ac_malloc(tmp_name_len);
 
   while (true) {
     pthread_mutex_lock(&h->mutex);
@@ -928,10 +934,10 @@ void *sort_partitions(void *arg) {
     if (tp >= h->taskep)
       break;
 
-    suffix_filename_with_id(tmp_name, filename, *tp, "unsorted",
+    suffix_filename_with_id(tmp_name, tmp_name_len, filename, *tp, "unsorted",
                             h->ext_options.lz4_tmp);
     ac_in_t *in = ac_in_init(tmp_name, &(h->in_options));
-    suffix_filename_with_id(tmp_name, filename, *tp, NULL, false);
+    suffix_filename_with_id(tmp_name, tmp_name_len, filename, *tp, NULL, false);
     ac_out_t *out =
         ac_out_ext_init(tmp_name, &(h->part_options), &(h->ext_part_options));
     ac_io_record_t *r;
@@ -985,9 +991,10 @@ void _ac_out_partitioned_destroy(ac_out_t *hp) {
     ac_free(h->tasks);
     ac_free(threads);
     char *filename = h->filename;
-    char *tmp_name = (char *)ac_malloc(strlen(h->filename) + 40);
+    size_t tmp_name_len = strlen(h->filename) + 40;
+    char *tmp_name = (char *)ac_malloc(tmp_name_len);
     for (size_t i = 0; i < h->num_partitions; i++) {
-      suffix_filename_with_id(tmp_name, filename, i, "unsorted",
+      suffix_filename_with_id(tmp_name, tmp_name_len, filename, i, "unsorted",
                               h->ext_options.lz4_tmp);
       remove(tmp_name);
     }
@@ -1090,12 +1097,12 @@ void ac_out_sorted_add_ack_file(ac_out_t *hp, const char *filename) {
 
 static void tmp_filename(char *dest, const char *filename, uint32_t n,
                          const char *suffix) {
-  sprintf(dest, "%s_%u_tmp%s", filename, n, suffix);
+  snprintf(dest, strlen(filename) + 24 + strlen(suffix), "%s_%u_tmp%s", filename, n, suffix);
 }
 
 static void group_tmp_filename(char *dest, const char *filename, uint32_t n,
                                const char *suffix) {
-  sprintf(dest, "%s_%u_gtmp%s", filename, n, suffix);
+  snprintf(dest, strlen(filename) + strlen(suffix) + 30, "%s_%u_gtmp%s", filename, n, suffix);
 }
 
 static inline void clear_buffer(ac_out_buffer_t *b) {
@@ -1481,7 +1488,10 @@ void ac_out_sorted_destroy(ac_out_t *hp) {
   ac_out_sorted_t *h = (ac_out_sorted_t *)hp;
   ac_in_t *in = _ac_out_sorted_in(hp);
   if (in) {
-    sprintf(h->tmp_filename, "%s%s", h->filename, h->suffix ? h->suffix : "");
+    size_t tmp_len = strlen(h->filename);
+    if(h->suffix)
+        tmp_len += strlen(h->suffix);
+    snprintf(h->tmp_filename, tmp_len + 1, "%s%s", h->filename, h->suffix ? h->suffix : "");
     ac_out_t *out = ac_out_ext_init(h->tmp_filename, &(h->options),
                                     &(h->partition_options));
     ac_io_record_t *r;

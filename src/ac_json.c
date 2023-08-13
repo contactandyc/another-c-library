@@ -452,8 +452,15 @@ char *_ac_json_encode(ac_pool_t *pool, char *s, char *p, size_t length) {
 char *ac_json_encode(ac_pool_t *pool, char *s, size_t length) {
   char *p = s;
   char *ep = p + length;
+  if(*ep != 0) {
+    s = ac_pool_dup(pool, s, length+1);
+    s[length] = 0;
+    p = s;
+    ep = p + length;
+  }
   while (p < ep) {
     switch (*p) {
+    case '\0':
     case '\"':
     case '\\':
     case '/':

@@ -157,7 +157,7 @@ static inline ac_json_t *ac_json_number(ac_pool_t *pool, ssize_t n) {
   j->parent = NULL;
   j->value = (char *)(j + 1);
   j->type = AC_JSON_NUMBER;
-  sprintf(j->value, "%ld", n);
+  snprintf(j->value, 22, "%ld", n);
   j->length = strlen(j->value);
   return j;
 }

@@ -622,7 +622,7 @@ void ac_serve_clone(ac_serve_t *dest, ac_serve_t *src, int thread_id) {
   dest->parent = src;
   if (dest->hammer_urls_curp)
     dest->hammer_urls_curp = dest->hammer_urls + thread_id;
-  sprintf(dest->date + 48, "%06d\r\n", thread_id);
+  snprintf(dest->date + 48, 10, "%06d\r\n", thread_id);
 }
 
 ac_serve_t *ac_serve_hammer_init(ac_serve_cb on_url, ac_serve_cb on_chunk, char **urls, size_t num_urls, int repeat) {

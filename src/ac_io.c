@@ -79,8 +79,9 @@ bool ac_io_make_directory(const char *path) {
   if (d)
     closedir(d);
   else {
-    char *cmd = (char *)ac_malloc(11 + strlen(path));
-    sprintf(cmd, "mkdir -p %s", path);
+    size_t cmd_len = 11 + strlen(path);
+    char *cmd = (char *)ac_malloc(cmd_len);
+    snprintf(cmd, cmd_len, "mkdir -p %s", path);
     if (system(cmd) != 0) {
       ac_free(cmd);
       return false;
@@ -217,7 +218,7 @@ void _ac_io_list(ac_io_file_info_root_t *root, const char *path,
   while ((entry = readdir(dp)) != NULL) {
     if (entry->d_name[0] == '.')
       continue;
-    sprintf(filename, "%s/%s", path, entry->d_name);
+    snprintf(filename, 8192, "%s/%s", path, entry->d_name);
     ac_io_file_info_t fi;
     fi.filename = filename;
     if (!ac_io_file_info(&fi)) {

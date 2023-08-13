@@ -25,6 +25,7 @@ static ac_out_t *open_sorted(char *filename, ac_io_compare_cb compare, size_t bu
 struct ac_search_builder_s {
     char *filename;
     char *base_filename;
+    size_t filename_len;
     size_t buffer_size;
     ac_buffer_t *bh;
     ac_pool_t *tmp_pool;
@@ -70,10 +71,12 @@ ac_search_builder_t *ac_search_builder_init(const char *filename, size_t buffer_
     ac_search_builder_t *h = (ac_search_builder_t *)ac_calloc(sizeof(*h) + (strlen(filename)*2) + 50);
     h->base_filename = (char *)(h+1);
     strcpy(h->base_filename, filename);
-    h->filename = h->base_filename + strlen(filename) + 1;
-    sprintf(h->filename, "%s_data", filename );
+    h->filename_len = strlen(filename);
+    h->filename = h->base_filename + h->filename_len + 1;
+
+    snprintf(h->filename, h->filename_len+40, "%s_data", filename );
     h->term_data = open_sorted(h->filename, compare_term_data, buffer_size);
-    sprintf(h->filename, "%s_gbl", filename );
+    snprintf(h->filename, h->filename_len+40, "%s_gbl", filename );
     h->global_data = open_sorted(h->filename, compare_global_data, buffer_size/10);
     h->buffer_size = buffer_size;
     h->bh = ac_buffer_init(256);
@@ -144,9 +147,9 @@ void ac_search_builder_destroy(ac_search_builder_t *h) {
     FILE *out_idx, *out_data;
     size_t offs;
 
-    sprintf(h->filename, "%s_gbl_idx", h->base_filename);
+    snprintf(h->filename, h->filename_len+40, "%s_gbl_idx", h->base_filename);
     out_idx = fopen(h->filename, "wb");
-    sprintf(h->filename, "%s_gbl", h->base_filename);
+    snprintf(h->filename, h->filename_len+40, "%s_gbl", h->base_filename);
     out_data = fopen(h->filename, "wb");
     offs = 4;
     uint32_t last_id = 0;
@@ -171,9 +174,9 @@ void ac_search_builder_destroy(ac_search_builder_t *h) {
     fclose(out_data);
     ac_in_destroy(in);
 
-    sprintf(h->filename, "%s_term_idx", h->base_filename);
+    snprintf(h->filename, h->filename_len+40, "%s_term_idx", h->base_filename);
     out_idx = fopen(h->filename, "wb");
-    sprintf(h->filename, "%s_term_data", h->base_filename);
+    snprintf(h->filename, h->filename_len+40, "%s_term_data", h->base_filename);
     out_data = fopen(h->filename, "wb");
 
     offs = 4;
@@ -377,18 +380,19 @@ const void * ac_search_builder_image_global(ac_search_builder_image_t *h, uint32
 
 ac_search_builder_image_t *ac_search_builder_image_init(const char *base) {
     char *p, *ep, **wp;
-    char *filename = (char *)ac_malloc(strlen(base)+50);
+    size_t filename_len = strlen(base)+50;
+    char *filename = (char *)ac_malloc(filename_len);
     ac_search_builder_image_t *h = (ac_search_builder_image_t *)ac_calloc(sizeof(*h));
 
     size_t len = 0;
-    sprintf(filename, "%s_gbl_idx", base );
+    snprintf(filename, filename_len, "%s_gbl_idx", base );
     size_t *gbl_idx = (size_t *)ac_io_read_file(&len, filename);
     len /= sizeof(size_t);
 
     h->gbls = (void **)ac_calloc(sizeof(void *) * len);
     h->num_gbls = len;
 
-    sprintf(filename, "%s_gbl", base );
+    snprintf(filename, filename_len, "%s_gbl", base );
     h->gbl_data = (char *)ac_io_read_file(&h->gbl_data_len, filename);
     for( size_t i=0; i<len; i++ ) {
         if(gbl_idx[i] > 0)
@@ -396,7 +400,7 @@ ac_search_builder_image_t *ac_search_builder_image_init(const char *base) {
     }
     ac_free(gbl_idx);
 
-    sprintf(filename, "%s_term_idx", base );
+    snprintf(filename, filename_len, "%s_term_idx", base );
     h->term_idx = (char *)ac_io_read_file(&h->term_idx_len, filename);
     h->num_terms = 0;
     p = h->term_idx;
@@ -417,7 +421,7 @@ ac_search_builder_image_t *ac_search_builder_image_init(const char *base) {
         p += sizeof(size_t) + sizeof(uint32_t);
     }
 
-    sprintf(filename, "%s_term_data", base );
+    snprintf(filename, filename_len, "%s_term_data", base );
     h->term_data = (char *)ac_io_read_file(&h->term_data_len, filename);
     ac_free(filename);
     return h;

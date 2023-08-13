@@ -35,15 +35,15 @@ uint64_t ac_md5_str(const char *s) {
 char *ac_date_time(char *dest, time_t ts) {
   struct tm t;
   gmtime_r(&ts, &t);
-  sprintf(dest, "%04d-%02d-%02d %02d:%02d:%02d", t.tm_year + 1900, t.tm_mon + 1,
-          t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
+  snprintf(dest, 20, "%04d-%02d-%02d %02d:%02d:%02d", t.tm_year + 1900, t.tm_mon + 1,
+           t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
   return dest;
 }
 
 char *ac_date(char *dest, time_t ts) {
   struct tm t;
   gmtime_r(&ts, &t);
-  sprintf(dest, "%04d-%02d-%02d", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday);
+  snprintf(dest, 11, "%04d-%02d-%02d", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday);
   return dest;
 }
 
