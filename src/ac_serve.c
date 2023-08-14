@@ -28,10 +28,9 @@ typedef struct serve_request_s serve_request_t;
 struct serve_request_s {
   ac_serve_request_t request;
 
-  uv_buf_t buf;
+  uv_buf_t read_buf;
   uv_tcp_t stream;
   uv_shutdown_t shutdown;
-  uv_write_t writer;
   char header[1024];
   int request_state;
 
@@ -39,12 +38,12 @@ struct serve_request_s {
   ac_serve_cb on_url;
   ac_serve_cb on_chunk;
 
-  char chunk_header[24];
-
   uint64_t request_start_time;
   bool request_completed;
-  uv_buf_t bufs[3];
-  size_t num_bufs;
+
+  uv_write_t writer;
+  char chunk_header[24];
+  uv_buf_t bufs[4];
 };
 
 #include "impl/ac_serve_fill.h"
@@ -52,7 +51,13 @@ struct serve_request_s {
 static void after_chunking(uv_write_t *req, int status);
 static void close_connection(serve_request_t *sr);
 
+#define FUNC_TRACE() {}
+
+#define FUNC_TRACEX() printf( "%s\n", __func__ )
+
 void serve_request_on_url(ac_http_parser_t *h) {
+  FUNC_TRACE();
+
   serve_request_t *sr = (serve_request_t *)h->data;
   sr->request_start_time = uv_now(&(sr->request.service->loop));
   // construct header and content to respond with
@@ -92,11 +97,11 @@ ac_serve_request_t *ac_serve_request_init(ac_serve_t *s) {
   }
 
   serve_request_t *sr = (serve_request_t *)ac_calloc(sizeof(*sr) + 8192);
-  sr->buf.base = (char *)(sr + 1);
-  sr->buf.len = 8192;
+  sr->read_buf.base = (char *)(sr + 1);
+  sr->read_buf.len = 8192;
   sr->stream.data = sr;
   sr->shutdown.data = sr;
-  sr->writer.data = sr;
+  sr->writer.data = sr; // only used for chunks
   sr->request_completed = true;
   sr->request_state = AC_SERVE_OPEN;
   ac_serve_request_t *request = (ac_serve_request_t *)sr;
@@ -148,7 +153,8 @@ static void after_write(uv_write_t *req, int status);
 static void after_last_write(uv_write_t *req, int status);
 
 void write_response_error(serve_request_t *sr, const char *error) {
-  char *p = (char *)ac_pool_alloc(sr->request.pool, 1024);
+  ac_pool_t *pool = sr->request.pool;
+  char *p = (char *)ac_pool_alloc(pool, 1024);
   char *sp = p;
 
   p = fill_header(p, error, sr->request.service->date, 0,
@@ -157,14 +163,17 @@ void write_response_error(serve_request_t *sr, const char *error) {
   *p++ = '\r';
   *p++ = '\n';
 
-  uv_buf_t *bufs = &sr->bufs[0];
+  uv_buf_t *bufs = (uv_buf_t *)ac_pool_alloc(pool, sizeof(uv_buf_t));
   bufs[0].base = sp;
   bufs[0].len = p - sp;
-  sr->num_bufs = 1;
+
+  uv_write_t *writer = (uv_write_t*)ac_pool_calloc(pool, sizeof(*writer));
+  writer->data = sr;
+
   if (!sr->request.service->hammer) {
     uv_stream_t *stream = (uv_stream_t *)&sr->stream;
     if (uv_is_writable(stream))
-      uv_write(&sr->writer, stream, bufs, 1, after_last_write);
+      uv_write(writer, stream, bufs, 1, after_last_write);
   }
 }
 
@@ -200,15 +209,16 @@ void ac_serve_start_chunk_encoding(ac_serve_request_t *r,
                   r->service->old_style_cors);
   *p++ = '\r';
   *p++ = '\n';
-  uv_buf_t *bufs = &sr->bufs[0];
+
+  uv_buf_t *bufs = sr->bufs;
   bufs[0].base = sp;
   bufs[0].len = p - sp;
-  sr->num_bufs = 1;
+
   sr->after_write = cb;
   if (!sr->request.service->hammer) {
     uv_stream_t *stream = (uv_stream_t *)&sr->stream;
     if (uv_is_writable(stream))
-      uv_write(&sr->writer, stream, bufs, sr->num_bufs, after_write);
+      uv_write(&(sr->writer), stream, bufs, 1, after_write);
   }
 }
 
@@ -217,44 +227,79 @@ void ac_serve_chunk(ac_serve_request_t *r,
                     ac_serve_cb cb) {
   if(!r) return;
 
+  /* for chunks, use bufs on serve_request because allocating memory
+     will result in memory growth with each chunk.
+  */
+
   serve_request_t *sr = (serve_request_t*)r;
   snprintf(sr->chunk_header, sizeof(sr->chunk_header), "%x\r\n", body_length);
-  uv_buf_t *bufs = &sr->bufs[0];
+
+  uv_buf_t *bufs = sr->bufs;
   bufs[0].base = sr->chunk_header;
   bufs[0].len = strlen(sr->chunk_header);
   bufs[1].base = body;
   bufs[1].len = body_length;
   bufs[2].base = "\r\n";
   bufs[2].len = 2;
-  sr->num_bufs = 3;
   sr->after_write = cb;
   if (!sr->request.service->hammer) {
     uv_stream_t *stream = (uv_stream_t *)&sr->stream;
     if (uv_is_writable(stream))
-      uv_write(&sr->writer, stream, bufs, sr->num_bufs, after_write);
+      uv_write(&(sr->writer), stream, bufs, 3, after_write);
   }
 }
+
+void ac_serve_chunk2(ac_serve_request_t *r,
+                     void *body, uint32_t body_length,
+                     void *body2, uint32_t body2_length,
+                     ac_serve_cb cb) {
+  if(!r) return;
+
+  /* for chunks, use bufs on serve_request because allocating memory
+     will result in memory growth with each chunk.
+  */
+
+  serve_request_t *sr = (serve_request_t*)r;
+  snprintf(sr->chunk_header, sizeof(sr->chunk_header), "%x\r\n", body_length+body2_length);
+
+  uv_buf_t *bufs = sr->bufs;
+  bufs[0].base = sr->chunk_header;
+  bufs[0].len = strlen(sr->chunk_header);
+  bufs[1].base = body;
+  bufs[1].len = body_length;
+  bufs[2].base = body2;
+  bufs[2].len = body2_length;
+  bufs[3].base = "\r\n";
+  bufs[3].len = 2;
+  sr->after_write = cb;
+  if (!sr->request.service->hammer) {
+    uv_stream_t *stream = (uv_stream_t *)&sr->stream;
+    if (uv_is_writable(stream))
+      uv_write(&(sr->writer), stream, bufs, 4, after_write);
+  }
+}
+
 
 void ac_serve_finish_chunk_encoding(ac_serve_request_t *r, ac_serve_cb cb) {
   if(!r) return;
   serve_request_t *sr = (serve_request_t*)r;
-  uv_buf_t *bufs = &sr->bufs[0];
+  uv_buf_t *bufs = sr->bufs;
   bufs[0].base = "0\r\n";
   bufs[0].len = 3;
-  sr->num_bufs = 1;
   if(cb)
     sr->request.on_request_complete = cb;
   if (!sr->request.service->hammer) {
     uv_stream_t *stream = (uv_stream_t *)&sr->stream;
     if (uv_is_writable(stream))
-      uv_write(&sr->writer, stream, bufs, sr->num_bufs, after_last_write);
+      uv_write(&(sr->writer), stream, bufs, 1, after_last_write);
   }
 }
 
 void ac_serve_http_200(ac_serve_request_t *r,
-                       ac_pool_t *pool,
                        const char *content_type,
                        void *body, uint64_t body_length) {
+  FUNC_TRACE();
+  ac_pool_t *pool = r->pool;
   char *p = (char *)ac_pool_alloc(pool, 1024);
   char *sp = p;
   if (!content_type)
@@ -267,24 +312,31 @@ void ac_serve_http_200(ac_serve_request_t *r,
                   r->service->old_style_cors);
   *p++ = '\r';
   *p++ = '\n';
-  uv_buf_t *bufs = &sr->bufs[0];
+
+  uv_buf_t *bufs = (uv_buf_t *)ac_pool_alloc(pool, sizeof(uv_buf_t)*2);
   bufs[0].base = sp;
   bufs[0].len = p - sp;
-  sr->num_bufs = 1;
+  size_t num_bufs = 1;
   if(body_length > 0) {
     bufs[1].base = body;
     bufs[1].len = body_length;
-    sr->num_bufs = 2;
+    num_bufs = 2;
   }
+
+  uv_write_t *writer = (uv_write_t*)ac_pool_calloc(pool, sizeof(*writer));
+  writer->data = sr;
+
   if (!sr->request.service->hammer) {
     uv_stream_t *stream = (uv_stream_t *)&sr->stream;
     if (uv_is_writable(stream))
-      uv_write(&sr->writer, stream, bufs, sr->num_bufs, after_last_write);
+      uv_write(writer, stream, bufs, num_bufs, after_last_write);
   }
 }
 
 static void close_connection(serve_request_t *sr) {
   if (sr->request_state == AC_SERVE_OPEN) {
+    FUNC_TRACE();
+
     if(sr->request.on_request_complete)
       sr->request.on_request_complete((ac_serve_request_t*)sr);
 
@@ -295,18 +347,24 @@ static void close_connection(serve_request_t *sr) {
 
 static void after_write(uv_write_t *req, int status) {
   serve_request_t *sr = (serve_request_t *)req->data;
+  FUNC_TRACE();
   if(sr->after_write)
     sr->after_write((ac_serve_request_t*)sr);
 }
 
 static void after_last_write(uv_write_t *req, int status) {
   serve_request_t *sr = (serve_request_t *)req->data;
+  FUNC_TRACE();
   // callback?
   if(sr->request.http->keep_alive && sr->request.on_request_complete)
     sr->request.on_request_complete((ac_serve_request_t*)sr);
   sr->request_completed = true;
   if (!sr->request.http->keep_alive) {
     close_connection(sr);
+  }
+  else {
+    // is there more requests to complete?
+
   }
 }
 
@@ -326,20 +384,23 @@ static void handle_request_error(serve_request_t *sr, const char *error) {
 
 static void on_alloc(uv_handle_t *client, size_t suggested_size,
                      uv_buf_t *buf) {
+  FUNC_TRACE();
   // printf("on_alloc\n");
   serve_request_t *sr = (serve_request_t *)client->data;
   if (sr->request_completed)
     serve_request_clear(sr);
-  *buf = sr->buf;
+  *buf = sr->read_buf;
 }
 
 void on_shutdown(uv_shutdown_t *req, int status) {
+  FUNC_TRACE();
   serve_request_t *sr = (serve_request_t *)req->data;
   if (sr->request_state == AC_SERVE_OPEN)
     close_connection(sr);
 }
 
 static void on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf) {
+  FUNC_TRACE();
   // printf("on_read\n");
   serve_request_t *sr = (serve_request_t *)stream->data;
   if (nread > 0) {
@@ -359,6 +420,7 @@ static void on_read(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf) {
 }
 
 void on_accept(uv_poll_t *server, int status, int events) {
+  FUNC_TRACE();
     // printf("on_accept\n");
   ac_serve_t *service = (ac_serve_t *)server->data;
   struct sockaddr_in clientaddr;
@@ -373,6 +435,7 @@ void on_accept(uv_poll_t *server, int status, int events) {
     uv_tcp_init(&service->loop, &request->stream);
     uv_tcp_open((uv_tcp_t *)&request->stream, fd);
     request->stream.data = request;
+    request->request.fd = fd;
     uv_tcp_keepalive((uv_tcp_t *)&request->stream, 1, 60);
     uv_read_start((uv_stream_t *)&request->stream, on_alloc, on_read);
   }
@@ -539,11 +602,6 @@ ac_json_t *ac_serve_parse_body_as_json(ac_serve_request_t *r, ac_pool_t *pool) {
     }
   }
   return json_request;
-}
-
-
-void ac_serve_http_200_json(ac_serve_request_t *r, ac_pool_t *pool, void *body, uint64_t body_length ) {
-       ac_serve_http_200(r, pool, "application/json", body, body_length);
 }
 
 int default_on_url(ac_serve_request_t *h) {

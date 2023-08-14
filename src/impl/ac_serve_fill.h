@@ -219,7 +219,7 @@ static inline char *fill_status_line(char *p, const char *status_line,
   return p;
 }
 
-static const char content_length_s[] = "Content-length: ";
+static const char content_length_s[] = "Content-Length: ";
 
 static inline char *fill_content_length(char *p, uint64_t len) {
   uint64_t *sh = (uint64_t *)content_length_s;

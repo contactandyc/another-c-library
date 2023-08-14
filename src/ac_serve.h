@@ -63,11 +63,9 @@ void ac_serve_destroy(ac_serve_t *w);
 char *ac_serve_uri(ac_serve_request_t *r, ac_pool_t *pool);
 ac_json_t *ac_serve_parse_body_as_json(ac_serve_request_t *r, ac_pool_t *pool);
 
-void ac_serve_http_200(ac_serve_request_t *r, ac_pool_t *pool,
+void ac_serve_http_200(ac_serve_request_t *r,
                        const char *content_type,
                        void *body, uint64_t body_length);
-
-void ac_serve_http_200_json(ac_serve_request_t *r, ac_pool_t *pool, void *body, uint64_t body_length );
 
 void ac_serve_start_chunk_encoding(ac_serve_request_t *r,
                                    ac_pool_t *pool,
@@ -77,6 +75,11 @@ void ac_serve_start_chunk_encoding(ac_serve_request_t *r,
 void ac_serve_chunk(ac_serve_request_t *r,
                     void *body, uint32_t body_length,
                     ac_serve_cb cb);
+
+void ac_serve_chunk2(ac_serve_request_t *r,
+                     void *body, uint32_t body_length,
+                     void *body2, uint32_t body2_length,
+                     ac_serve_cb cb);
 
 /* if cb is NULL, default on_request_complete will be called */
 void ac_serve_finish_chunk_encoding(ac_serve_request_t *r, ac_serve_cb cb);
@@ -101,6 +104,8 @@ struct ac_serve_request_s {
          SIZE_EXCEEDED = 1,
          BAD_REQUEST = 2,
          INTERNAL_ERROR = 3 } state;
+
+  int fd; // only to be used for reference
 
   ac_serve_t *service;
   ac_serve_request_t *next;

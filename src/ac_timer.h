@@ -26,6 +26,9 @@ extern "C" {
 struct ac_timer_s;
 typedef struct ac_timer_s ac_timer_t;
 
+/* returns the time with ms precision */
+long ac_timer_current();
+
 /*
    Initialize the timer.  repeat is necessary to indicate how many times the
    test was repeated so that the final result represents that.  If a thing is
