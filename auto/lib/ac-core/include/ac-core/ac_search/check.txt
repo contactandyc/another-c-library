@@ -1,0 +1,166 @@
+17,18c17,19
+< #define ac_search_def(name, keytype, datatype)                                 \
+<   datatype *name(const keytype *p, const datatype *base, size_t num_elements);
+---
+> #define ac_search_compare_def(name, keytype, datatype)                         \
+>   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+>                  int compare(const keytype *key, const datatype *value));
+20,22c21,23
+< #define ac_search_m(name, keytype, datatype, compare)                          \
+<   datatype *name(const keytype *p, const datatype *base,                       \
+<                  size_t num_elements) {                                        \
+---
+> #define ac_search_compare_m(name, keytype, datatype)                           \
+>   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+>                  int compare(const keytype *key, const datatype *value)) {     \
+39,41c40,42
+< #define ac_search_least_m(name, keytype, datatype, compare)                    \
+<   datatype *name(const keytype *p, const datatype *base,                       \
+<                  size_t num_elements) {                                        \
+---
+> #define ac_search_least_compare_m(name, keytype, datatype)                     \
+>   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+>                  int compare(const keytype *key, const datatype *value)) {     \
+60,62c61,63
+< #define ac_search_greatest_m(name, keytype, datatype, compare)                 \
+<   datatype *name(const keytype *p, const datatype *base,                       \
+<                  size_t num_elements) {                                        \
+---
+> #define ac_search_greatest_compare_m(name, keytype, datatype)                  \
+>   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+>                  int compare(const keytype *key, const datatype *value)) {     \
+84,86c85,87
+< #define ac_search_lower_bound_m(name, keytype, datatype, compare)              \
+<   datatype *name(const keytype *p, const datatype *base,                       \
+<                  size_t num_elements) {                                        \
+---
+> #define ac_search_lower_bound_compare_m(name, keytype, datatype)               \
+>   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+>                  int compare(const keytype *key, const datatype *value)) {     \
+101,103c102,104
+< #define ac_search_upper_bound_m(name, keytype, datatype, compare)              \
+<   datatype *name(const keytype *p, const datatype *base,                       \
+<                  size_t num_elements) {                                        \
+---
+> #define ac_search_upper_bound_compare_m(name, keytype, datatype)               \
+>   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+>                  int compare(const keytype *key, const datatype *value)) {     \
+17,19c17,21
+< #define ac_search_arg_def(name, keytype, datatype, compare)                    \
+<   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+<                  void *arg);
+---
+> #define ac_search_compare_arg_def(name, keytype, datatype)                     \
+>   datatype *name(                                                              \
+>       const keytype *p, const datatype *base, size_t num_elements,             \
+>       int compare(const keytype *key, const datatype *value, void *arg),       \
+>       void *arg);
+21,23c23,27
+< #define ac_search_arg_m(name, keytype, datatype, compare)                      \
+<   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+<                  void *arg) {                                                  \
+---
+> #define ac_search_compare_arg_m(name, keytype, datatype)                       \
+>   datatype *name(                                                              \
+>       const keytype *p, const datatype *base, size_t num_elements,             \
+>       int compare(const keytype *key, const datatype *value, void *arg),       \
+>       void *arg) {                                                             \
+40,42c44,48
+< #define ac_search_least_arg_m(name, keytype, datatype, compare)                \
+<   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+<                  void *arg) {                                                  \
+---
+> #define ac_search_least_compare_arg_m(name, keytype, datatype)                 \
+>   datatype *name(                                                              \
+>       const keytype *p, const datatype *base, size_t num_elements,             \
+>       int compare(const keytype *key, const datatype *value, void *arg),       \
+>       void *arg) {                                                             \
+61,63c67,71
+< #define ac_search_greatest_arg_m(name, keytype, datatype, compare)             \
+<   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+<                  void *arg) {                                                  \
+---
+> #define ac_search_greatest_compare_arg_m(name, keytype, datatype)              \
+>   datatype *name(                                                              \
+>       const keytype *p, const datatype *base, size_t num_elements,             \
+>       int compare(const keytype *key, const datatype *value, void *arg),       \
+>       void *arg) {                                                             \
+85,87c93,97
+< #define ac_search_lower_bound_arg_m(name, keytype, datatype, compare)          \
+<   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+<                  void *arg) {                                                  \
+---
+> #define ac_search_lower_bound_compare_arg_m(name, keytype, datatype)           \
+>   datatype *name(                                                              \
+>       const keytype *p, const datatype *base, size_t num_elements,             \
+>       int compare(const keytype *key, const datatype *value, void *arg),       \
+>       void *arg) {                                                             \
+102,104c112,116
+< #define ac_search_upper_bound_arg_m(name, keytype, datatype, compare)          \
+<   datatype *name(const keytype *p, const datatype *base, size_t num_elements,  \
+<                  void *arg) {                                                  \
+---
+> #define ac_search_upper_bound_compare_arg_m(name, keytype, datatype)           \
+>   datatype *name(                                                              \
+>       const keytype *p, const datatype *base, size_t num_elements,             \
+>       int compare(const keytype *key, const datatype *value, void *arg),       \
+>       void *arg) {                                                             \
+17,21c17,18
+< #define ac_search_compare_arg_def(name, keytype, datatype)                     \
+<   datatype *name(                                                              \
+<       const keytype *p, const datatype *base, size_t num_elements,             \
+<       int compare(const keytype *key, const datatype *value, void *arg),       \
+<       void *arg);
+---
+> #define ac_search_def(name, keytype, datatype)                                 \
+>   datatype *name(const keytype *p, const datatype *base, size_t num_elements);
+23,27c20,22
+< #define ac_search_compare_arg_m(name, keytype, datatype)                       \
+<   datatype *name(                                                              \
+<       const keytype *p, const datatype *base, size_t num_elements,             \
+<       int compare(const keytype *key, const datatype *value, void *arg),       \
+<       void *arg) {                                                             \
+---
+> #define ac_search_m(name, keytype, datatype, compare)                          \
+>   datatype *name(const keytype *p, const datatype *base,                       \
+>                  size_t num_elements) {                                        \
+44,48c39,41
+< #define ac_search_least_compare_arg_m(name, keytype, datatype)                 \
+<   datatype *name(                                                              \
+<       const keytype *p, const datatype *base, size_t num_elements,             \
+<       int compare(const keytype *key, const datatype *value, void *arg),       \
+<       void *arg) {                                                             \
+---
+> #define ac_search_least_m(name, keytype, datatype, compare)                    \
+>   datatype *name(const keytype *p, const datatype *base,                       \
+>                  size_t num_elements) {                                        \
+67,71c60,62
+< #define ac_search_greatest_compare_arg_m(name, keytype, datatype)              \
+<   datatype *name(                                                              \
+<       const keytype *p, const datatype *base, size_t num_elements,             \
+<       int compare(const keytype *key, const datatype *value, void *arg),       \
+<       void *arg) {                                                             \
+---
+> #define ac_search_greatest_m(name, keytype, datatype, compare)                 \
+>   datatype *name(const keytype *p, const datatype *base,                       \
+>                  size_t num_elements) {                                        \
+93,97c84,86
+< #define ac_search_lower_bound_compare_arg_m(name, keytype, datatype)           \
+<   datatype *name(                                                              \
+<       const keytype *p, const datatype *base, size_t num_elements,             \
+<       int compare(const keytype *key, const datatype *value, void *arg),       \
+<       void *arg) {                                                             \
+---
+> #define ac_search_lower_bound_m(name, keytype, datatype, compare)              \
+>   datatype *name(const keytype *p, const datatype *base,                       \
+>                  size_t num_elements) {                                        \
+112,116c101,103
+< #define ac_search_upper_bound_compare_arg_m(name, keytype, datatype)           \
+<   datatype *name(                                                              \
+<       const keytype *p, const datatype *base, size_t num_elements,             \
+<       int compare(const keytype *key, const datatype *value, void *arg),       \
+<       void *arg) {                                                             \
+---
+> #define ac_search_upper_bound_m(name, keytype, datatype, compare)              \
+>   datatype *name(const keytype *p, const datatype *base,                       \
+>                  size_t num_elements) {                                        \
