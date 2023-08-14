@@ -56,6 +56,12 @@ void ac_timer_add(ac_timer_t *t, ac_timer_t *add) {
   t->base += (add->time_spent + add->base);
 }
 
+long ac_timer_current() {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return (tv.tv_sec * 1000000) + tv.tv_usec;
+}
+
 void ac_timer_start(ac_timer_t *t) {
   struct timeval tv;
   gettimeofday(&tv, NULL);

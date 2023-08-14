@@ -1693,7 +1693,7 @@ void default_transform(ac_in_t *in, ac_out_t *out, void *arg) {
     ac_out_write_record(out, r->record, r->length);
 }
 
-static void get_tmp_name(char *dest, const char *fmt) {
+static void get_tmp_name(char *dest, size_t dest_len, const char *fmt) {
   static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   static int id = 0;
   int _id;
@@ -1701,7 +1701,7 @@ static void get_tmp_name(char *dest, const char *fmt) {
   _id = id;
   id++;
   pthread_mutex_unlock(&mutex);
-  sprintf(dest, fmt, _id);
+  snprintf(dest, dest_len, fmt, _id);
 }
 
 ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,
@@ -1719,7 +1719,7 @@ ac_in_t *ac_in_transform(ac_in_t *in, ac_io_format_t format, size_t buffer_size,
   if (reducer)
     ac_out_ext_options_reducer(&ext_opts, reducer, reducer_arg);
   char *name = (char *)ac_malloc(100);
-  get_tmp_name(name, "transform_%d.lz4");
+  get_tmp_name(name, 100, "transform_%d.lz4");
   ac_out_t *out = ac_out_ext_init(name, &opts, &ext_opts);
   ac_free(name);
 

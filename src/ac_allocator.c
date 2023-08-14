@@ -94,13 +94,13 @@ void save_old_log(ac_allocator_t *a, size_t saves, char *tmp) {
     char *p = tmp;
     char *old_name = p;
     if (num) {
-      sprintf(old_name, "%s.%d", a->logfile, num);
+      snprintf(old_name, strlen(a->logfile)+20, "%s.%d", a->logfile, num);
       p += strlen(old_name) + 1;
     } else
       old_name = (char *)a->logfile;
 
     char *new_name = p;
-    sprintf(new_name, "%s.%d", a->logfile, num + 1);
+    snprintf(new_name, strlen(a->logfile)+20, "%s.%d", a->logfile, num + 1);
     // printf("rename: %s => %s\n", old_name, new_name);
     rename(old_name, new_name);
   }

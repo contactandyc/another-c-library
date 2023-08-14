@@ -38,15 +38,20 @@ typedef void *(*ac_serve_create_thread_data_cb)(void *gbl);
 typedef void (*ac_serve_destroy_thread_data_cb)(void *gbl, void *tdata);
 
 typedef int (*ac_serve_cb)(ac_serve_request_t *r);
+typedef ac_json_t * (*ac_serve_json_cb)(ac_serve_request_t *r, const char *uri, ac_json_t *json_request);
 
 ac_serve_t *ac_serve_init(int fd, ac_serve_cb on_url, ac_serve_cb on_chunk);
+ac_serve_t *ac_serve_init_json(int fd, ac_serve_json_cb on_json);
 void ac_serve_new_cors(ac_serve_t *s);
 ac_serve_t *ac_serve_port_init(int port, ac_serve_cb on_url, ac_serve_cb on_chunk);
+ac_serve_t *ac_serve_port_init_json(int port, ac_serve_json_cb on_json);
 ac_serve_t *ac_serve_unix_domain_init(const char *path, ac_serve_cb on_url,
                                   ac_serve_cb on_chunk);
+ac_serve_t *ac_serve_unix_domain_init_json(const char *path, ac_serve_json_cb on_url);
 
 /* specify a list of URIs (no host or port) and the number of times to repeat */
 ac_serve_t *ac_serve_hammer_init(ac_serve_cb on_url, ac_serve_cb on_chunk, char **urls, size_t num_urls, int repeat);
+ac_serve_t *ac_serve_hammer_init_json(ac_serve_json_cb on_json, char **urls, size_t num_urls, int repeat);
 
 void ac_serve_thread_data(ac_serve_t *service,
                         ac_serve_create_thread_data_cb create,
@@ -58,54 +63,38 @@ void ac_serve_threads(ac_serve_t *w, int num_threads);
 
 void ac_serve_run(ac_serve_t *w);
 
+void ac_serve_begin_chunking(ac_serve_request_t *r);
+void ac_serve_chunk(ac_serve_request_t *r, const void *d, size_t len);
+void ac_serve_end_chunking(ac_serve_request_t *r);
+
+
 void ac_serve_destroy(ac_serve_t *w);
-
-char *ac_serve_uri(ac_serve_request_t *r, ac_pool_t *pool);
-ac_json_t *ac_serve_parse_body_as_json(ac_serve_request_t *r, ac_pool_t *pool);
-
-void ac_serve_http_200(ac_serve_request_t *r,
-                       const char *content_type,
-                       void *body, uint64_t body_length);
-
-void ac_serve_start_chunk_encoding(ac_serve_request_t *r,
-                                   ac_pool_t *pool,
-                                   const char *content_type,
-                                   ac_serve_cb cb);
-
-void ac_serve_chunk(ac_serve_request_t *r,
-                    void *body, uint32_t body_length,
-                    ac_serve_cb cb);
-
-void ac_serve_chunk2(ac_serve_request_t *r,
-                     void *body, uint32_t body_length,
-                     void *body2, uint32_t body2_length,
-                     ac_serve_cb cb);
-
-/* if cb is NULL, default on_request_complete will be called */
-void ac_serve_finish_chunk_encoding(ac_serve_request_t *r, ac_serve_cb cb);
-
 
 struct ac_serve_request_s {
   ac_http_parser_t *http;
 
   ac_pool_t *pool;
- // ac_buffer_t *bh;
+  ac_buffer_t *bh;
   void *thread_data;
-  void *data;
 
-  ac_serve_cb on_request_complete;
+  ac_serve_cb on_url;
+  ac_serve_cb on_chunk;
 
   /* output parameters
     - status_string = NULL defaults to 200 OK
     - content_type = NULL defaults to text/plain
     - output = NULL, len output content
+    - chunk_encoded = false, true if chunked output
   */
+  char *status_string;
+  char *content_type;
+  uv_buf_t output;
+  bool chunk_encoded;
+
   enum { OK = 0,
          SIZE_EXCEEDED = 1,
          BAD_REQUEST = 2,
          INTERNAL_ERROR = 3 } state;
-
-  int fd; // only to be used for reference
 
   ac_serve_t *service;
   ac_serve_request_t *next;
@@ -117,8 +106,8 @@ struct ac_serve_s {
   uv_timer_t timer;
 
   ac_serve_cb on_url;
+  ac_serve_json_cb on_json;
   ac_serve_cb on_chunk;
-  ac_serve_cb on_request_complete;
 
   ac_serve_create_thread_data_cb create_thread_data;
   ac_serve_destroy_thread_data_cb destroy_thread_data;

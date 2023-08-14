@@ -219,7 +219,7 @@ static inline char *fill_status_line(char *p, const char *status_line,
   return p;
 }
 
-static const char content_length_s[] = "Content-length: ";
+static const char content_length_s[] = "Content-Length: ";
 
 static inline char *fill_content_length(char *p, uint64_t len) {
   uint64_t *sh = (uint64_t *)content_length_s;
@@ -261,11 +261,11 @@ static inline char *fill_keep_alive(char *p) {
 static char date_s[] =
     "Date: Fri, 26 Aug 2011 00:31:53 GMT\r\nThread-ID: 000001\r\n";
 
-static inline char *fill_header(serve_request_t *sr, const char *status_line,
+static inline char *fill_header(char *p, const char *status_line,
+                                const char *date, uint64_t body_length,
                                 uint64_t ts, const char *content_type,
                                 int keep_alive, bool old_style) {
-  char *p = sr->header;
-  p = fill_status_line(p, status_line, sr->request.service->date);
+  p = fill_status_line(p, status_line, date);
   if(old_style)
     p = fill_default_access_control_headers(p);
   else
@@ -277,13 +277,33 @@ static inline char *fill_header(serve_request_t *sr, const char *status_line,
   if (keep_alive)
     p = fill_keep_alive(p);
 
-  if (sr->request.chunk_encoded)
-    p = fill_chunk_encoded(p);
-  else
-    p = fill_content_length(p, sr->request.output.len);
+  p = fill_content_length(p, body_length);
 
   *p = 0;
   return p;
 }
+
+static inline char *fill_chunk_encoded_header(char *p, const char *status_line,
+                                              const char *date,
+                                              uint64_t ts, const char *content_type,
+                                              int keep_alive, bool old_style) {
+  p = fill_status_line(p, status_line, date);
+  if(old_style)
+    p = fill_default_access_control_headers(p);
+  else
+    p = fill_default_access_control_headers2(p);
+  p = fill_anotherclibrary(p);
+  p = fill_timing(p, ts);
+  if (content_type)
+    p = fill_content_type(p, content_type);
+  if (keep_alive)
+    p = fill_keep_alive(p);
+
+  p = fill_chunk_encoded(p);
+
+  *p = 0;
+  return p;
+}
+
 
 #endif

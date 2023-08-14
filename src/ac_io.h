@@ -85,6 +85,8 @@ ac_io_file_info_t *ac_io_select_file_info(ac_pool_t *pool, size_t *num_res,
                                           size_t num_inputs, size_t partition,
                                           size_t num_partitions);
 
+void ac_io_sort_file_info_by_last_modified(ac_io_file_info_t *files, size_t num_files);
+
 bool ac_io_file_exists(const char *filename);
 
 size_t ac_io_file_size(const char *filename);

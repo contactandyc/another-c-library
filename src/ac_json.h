@@ -56,8 +56,8 @@ typedef enum {
   object = 1,
   array = 2,
   binary = 3,
-  string = 4,
-  null = 5,
+  null = 4,
+  string = 5,
   bool_false = 6,
   zero = 7,
   number = 8,
@@ -75,6 +75,10 @@ void ac_json_dump_to_buffer(ac_buffer_t *bh, ac_json_t *a);
 
 /* Decode encoded json text */
 char *ac_json_decode(ac_pool_t *pool, char *s, size_t length);
+
+/* Decode encoded json text and return the length of the decoded string.  This
+   allows for binary data to be encoded. */
+char *ac_json_decode2(size_t *rlen, ac_pool_t *pool, char *s, size_t length);
 
 /* Encode json text */
 char *ac_json_encode(ac_pool_t *pool, char *s, size_t length);
@@ -145,6 +149,16 @@ static inline void ac_jsono_append(ac_json_t *j, const char *key,
 
 static inline ac_json_t *ac_jsono_scan(ac_json_t *j, const char *key);
 static inline ac_json_t *ac_jsono_scanr(ac_json_t *j, const char *key);
+
+static inline int ac_jsono_scan_int(ac_json_t *j, const char *key, int default_value);
+static inline int32_t ac_jsono_scan_int32(ac_json_t *j, const char *key, int32_t default_value);
+static inline uint32_t ac_jsono_scan_uint32(ac_json_t *j, const char *key, uint32_t default_value);
+static inline int64_t ac_jsono_scan_int64(ac_json_t *j, const char *key, int64_t default_value);
+static inline uint64_t ac_jsono_scan_uint64(ac_json_t *j, const char *key, uint64_t default_value);
+static inline char *ac_jsono_scan_str(ac_json_t *j, const char *key, const char *default_value);
+static inline char *ac_jsono_scan_strd(ac_pool_t *pool, ac_json_t *j,
+                                       const char *key,
+                                       const char *default_value);
 
 /* use _get if json is meant to be read only and _find if not.
   The ac_jsono_get method is faster than the ac_jsono_find

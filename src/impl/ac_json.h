@@ -23,8 +23,8 @@ limitations under the License.
 #define AC_JSON_OBJECT 1
 #define AC_JSON_ARRAY 2
 #define AC_JSON_BINARY 3
-#define AC_JSON_STRING 4
-#define AC_JSON_NULL 5
+#define AC_JSON_NULL 4
+#define AC_JSON_STRING 5
 #define AC_JSON_FALSE 6
 #define AC_JSON_ZERO 7
 #define AC_JSON_NUMBER 8
@@ -157,7 +157,7 @@ static inline ac_json_t *ac_json_number(ac_pool_t *pool, ssize_t n) {
   j->parent = NULL;
   j->value = (char *)(j + 1);
   j->type = AC_JSON_NUMBER;
-  sprintf(j->value, "%ld", n);
+  snprintf(j->value, 22, "%ld", n);
   j->length = strlen(j->value);
   return j;
 }
@@ -525,6 +525,208 @@ static inline ac_json_t *ac_jsono_scan(ac_json_t *j, const char *key) {
   }
   return NULL;
 }
+
+static inline int parse_int(const char *str, int default_value) {
+    if (!str) return default_value;
+
+    int num = 0;
+    int ch = *str;
+    if(ch == '-') {
+        str++;
+        ch = *str;
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+
+            /*
+            if (*str < '0' || *str > '9') {
+                // Not a valid digit
+                return default_value;
+            }
+            // Shift the current number by 10 (to make space for the new digit)
+            // and add the new digit to the number
+            num = num * 10 + (*str - '0');
+            str++;
+            */
+        }
+        num = -num;
+    }
+    else {
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+            /*
+            if (*str < '0' || *str > '9') {
+                // Not a valid digit
+                return default_value;
+            }
+            // Shift the current number by 10 (to make space for the new digit)
+            // and add the new digit to the number
+            num = num * 10 + (*str - '0');
+            str++;
+            */
+        }
+    }
+    return num;
+}
+
+
+static inline int ac_jsono_scan_int(ac_json_t *j, const char *key, int default_value) {
+    return parse_int(ac_jsonv(ac_jsono_scan(j, key)), default_value);
+}
+
+static inline int32_t parse_int32(const char *str, int32_t default_value) {
+    if (!str) return default_value;
+
+    int32_t num = 0;
+
+    int ch = *str;
+    if(*str == '-') {
+        str++;
+        ch = *str;
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+        }
+        num = -num;
+    }
+    else {
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+        }
+    }
+    return num;
+}
+
+static inline int32_t ac_jsono_scan_int32(ac_json_t *j, const char *key, int32_t default_value) {
+    return parse_int32(ac_jsonv(ac_jsono_scan(j, key)), default_value);
+}
+
+static inline uint32_t parse_uint32(const char *str, uint32_t default_value) {
+    if (!str) return default_value;
+
+    uint32_t num = 0;
+
+    int ch = *str;
+    while (ch) {
+        if (ch >= '0' && ch <= '9') {
+            num = num * 10 + (ch - '0');
+            str++;
+            ch = *str;
+            continue;
+        }
+        // Not a valid digit
+        return default_value;
+    }
+
+    return num;
+}
+
+
+static inline uint32_t ac_jsono_scan_uint32(ac_json_t *j, const char *key, uint32_t default_value) {
+    return parse_uint32(ac_jsonv(ac_jsono_scan(j, key)), default_value);
+}
+
+static inline int64_t parse_int64(const char *str, int64_t default_value) {
+    if (!str) return default_value;
+
+    int64_t num = 0;
+    int ch = *str;
+    if(ch == '-') {
+        str++;
+        ch = *str;
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+        }
+        num = -num;
+    }
+    else {
+        while (ch) {
+            if (ch >= '0' && ch <= '9') {
+                num = num * 10 + (ch - '0');
+                str++;
+                ch = *str;
+                continue;
+            }
+            // Not a valid digit
+            return default_value;
+        }
+    }
+    return num;
+}
+
+static inline int64_t ac_jsono_scan_int64(ac_json_t *j, const char *key, int64_t default_value) {
+    return parse_int64(ac_jsonv(ac_jsono_scan(j, key)), default_value);
+}
+
+static inline uint64_t parse_uint64(const char *str, uint64_t default_value) {
+    if (!str) return default_value;
+
+    uint64_t num = 0;
+
+    int ch = *str;
+    while (ch) {
+        if (ch >= '0' && ch <= '9') {
+            num = num * 10 + (ch - '0');
+            str++;
+            ch = *str;
+            continue;
+        }
+        // Not a valid digit
+        return default_value;
+    }
+
+    return num;
+}
+
+static inline uint64_t ac_jsono_scan_uint64(ac_json_t *j, const char *key, uint64_t default_value) {
+    return parse_uint64(ac_jsonv(ac_jsono_scan(j, key)), default_value);
+}
+
+static inline char *ac_jsono_scan_str(ac_json_t *j, const char *key, const char *default_value) {
+    char *value = ac_jsonv(ac_jsono_scan(j, key));
+    return value ? value : (char *)default_value;
+}
+
+static inline char *ac_jsono_scan_strd(ac_pool_t *pool, ac_json_t *j,
+                                             const char *key,
+                                             const char *default_value) {
+    char *value = ac_jsond(pool, ac_jsono_scan(j, key));
+    return value ? value : (char *)default_value;
+}
+
 
 static inline void _ac_jsono_fill_tree(_ac_jsono_t *o) {
   ac_jsono_t *r = o->head;

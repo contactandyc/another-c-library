@@ -331,7 +331,7 @@ static int unicode_to_utf8(char *dest, char **src) {
   return 0;
 }
 
-static inline char *_ac_json_decode(ac_pool_t *pool, char *s, char *p,
+static inline char *_ac_json_decode(ac_pool_t *pool, char **eptr, char *s, char *p,
                                     size_t length) {
   char *sp;
   char *res = (char *)ac_pool_alloc(pool, length + 1);
@@ -388,6 +388,7 @@ static inline char *_ac_json_decode(ac_pool_t *pool, char *s, char *p,
     }
   }
   *rp = 0;
+  *eptr = rp;
   return res;
 }
 
@@ -451,8 +452,15 @@ char *_ac_json_encode(ac_pool_t *pool, char *s, char *p, size_t length) {
 char *ac_json_encode(ac_pool_t *pool, char *s, size_t length) {
   char *p = s;
   char *ep = p + length;
+  if(*ep != 0) {
+    s = ac_pool_dup(pool, s, length+1);
+    s[length] = 0;
+    p = s;
+    ep = p + length;
+  }
   while (p < ep) {
     switch (*p) {
+    case '\0':
     case '\"':
     case '\\':
     case '/':
@@ -479,8 +487,28 @@ char *ac_json_decode(ac_pool_t *pool, char *s, size_t length) {
       break;
     p++;
   }
-  return _ac_json_decode(pool, s, p, length);
+  char *eptr = NULL;
+  return _ac_json_decode(pool, &eptr, s, p, length);
 }
+
+char *ac_json_decode2(size_t *rlen, ac_pool_t *pool, char *s, size_t length) {
+  char *p = s;
+  char *ep = p + length;
+  for (;;) {
+    if (p == ep) {
+      *rlen = length;
+      return s;
+    }
+    else if (*p == '\\')
+      break;
+    p++;
+  }
+  char *eptr = NULL;
+  char *r = _ac_json_decode(pool, &eptr, s, p, length);
+  *rlen = eptr - r;
+  return r;
+}
+
 
 void ac_json_dump_error_to_buffer(ac_buffer_t *bh, ac_json_t *j) {
   ac_json_error_t *err = (ac_json_error_t *)j;
