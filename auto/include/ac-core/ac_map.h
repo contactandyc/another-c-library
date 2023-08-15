@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ac_map/ac_map2_arg_m.h"
-#include "ac_map/ac_map2_compare_arg_m.h"
-#include "ac_map/ac_map2_compare_m.h"
-#include "ac_map/ac_map2_m.h"
-#include "ac_map/ac_map_arg_m.h"
-#include "ac_map/ac_map_compare_arg_m.h"
-#include "ac_map/ac_map_compare_m.h"
-#include "ac_map/ac_map_m.h"
+#include "ac-core/ac_map/ac_map2_arg_m.h"
+#include "ac-core/ac_map/ac_map2_compare_arg_m.h"
+#include "ac-core/ac_map/ac_map2_compare_m.h"
+#include "ac-core/ac_map/ac_map2_m.h"
+#include "ac-core/ac_map/ac_map_arg_m.h"
+#include "ac-core/ac_map/ac_map_compare_arg_m.h"
+#include "ac-core/ac_map/ac_map_compare_m.h"
+#include "ac-core/ac_map/ac_map_m.h"

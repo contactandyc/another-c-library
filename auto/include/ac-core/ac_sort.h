@@ -17,7 +17,7 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "ac_sort/ac_sort_aux.h"
+#include "ac-core/ac_sort/ac_sort_aux.h"
 
 #define sort_swap(a, b)                                                        \
   tmp = *(a);                                                                  \

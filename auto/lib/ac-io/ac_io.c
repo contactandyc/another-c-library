@@ -29,7 +29,7 @@ limitations under the License.
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "lz4/xxhash.h"
+#include "ac_lz4.h"
 
 ac_sort_compare_arg_m(ac_io_sort_records, ac_io_record_t);
 
@@ -42,7 +42,7 @@ bool ac_io_keep_first(ac_io_record_t *res, const ac_io_record_t *r,
 size_t ac_io_hash_partition(const ac_io_record_t *r, size_t num_part,
                             void *arg) {
   size_t offs = arg ? (*(size_t *)arg) : 0;
-  XXH64_hash_t hash = XXH64(r->record + offs, (r->length - offs) + 1, 0);
+  uint64_t hash = ac_lz4_hash64(r->record + offs, (r->length - offs) + 1);
   return hash % num_part;
 }
 
@@ -114,7 +114,7 @@ bool ac_io_file_info(ac_io_file_info_t *fi) {
     return false;
   fi->last_modified = sb.st_mtime;
   fi->size = sb.st_size;
-  fi->hash = (uint64_t)XXH64(fi->filename, strlen(fi->filename), 0);
+  fi->hash = ac_lz4_hash64(fi->filename, strlen(fi->filename));
   return true;
 }
 

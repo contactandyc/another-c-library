@@ -13,7 +13,7 @@
    This should not be documented for the website usage.
 */
 
-#include "impl/ac_in_base.h"
+#include "ac-io/ac_in_base.h"
 
 ac_in_base_t *ac_in_base_init_gz(const char *filename, int fd, bool can_close,
                                  size_t buffer_size);

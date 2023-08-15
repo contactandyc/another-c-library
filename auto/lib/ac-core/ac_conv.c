@@ -17,6 +17,7 @@ limitations under the License.
 #include "ac_conv.h"
 
 #include <stdio.h>
+#include <string.h>
 
 char *ac_date_time(char *dest, time_t ts) {
   struct tm t;

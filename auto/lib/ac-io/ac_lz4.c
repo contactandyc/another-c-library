@@ -16,9 +16,9 @@ limitations under the License.
 
 #include "ac_lz4.h"
 
-#include "../lz4/lz4.h"
-#include "../lz4/lz4hc.h"
-#include "../lz4/xxhash.h"
+#include "lz4/lz4.h"
+#include "lz4/lz4hc.h"
+#include "lz4/xxhash.h"
 
 #include "ac_allocator.h"
 
@@ -30,6 +30,11 @@ limitations under the License.
 uint64_t ac_lz4_hash64(const void *s, size_t len) {
   return (uint64_t)XXH64(s, len, 0);
 }
+
+int ac_lz4_compress_bound(int inputSize) {
+    return LZ4_compressBound(inputSize);
+}
+
 
 static uint8_t _64kb[7] = {0x04, 0x22, 0x4d, 0x18, 0x60, 0x40, 0x82};
 static uint8_t c_64kb[7] = {0x04, 0x22, 0x4d, 0x18, 0x64, 0x40, 0xa7};

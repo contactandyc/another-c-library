@@ -1,5 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I m4
+
 SUBDIRS = lib examples
 
 .PHONY: new-change bump-version

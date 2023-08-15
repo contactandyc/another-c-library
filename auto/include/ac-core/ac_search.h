@@ -18,7 +18,7 @@ limitations under the License.
 
 #include <stdio.h>
 
-#include "ac_search/ac_search_arg_m.h"
-#include "ac_search/ac_search_compare_arg_m.h"
-#include "ac_search/ac_search_compare_m.h"
-#include "ac_search/ac_search_m.h"
+#include "ac-core/ac_search/ac_search_arg_m.h"
+#include "ac-core/ac_search/ac_search_compare_arg_m.h"
+#include "ac-core/ac_search/ac_search_compare_m.h"
+#include "ac-core/ac_search/ac_search_m.h"

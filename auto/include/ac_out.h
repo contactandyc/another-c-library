@@ -23,7 +23,7 @@ limitations under the License.
 
 #include "ac_in.h"
 
-#include "impl/ac_out.h"
+#include "ac-io/ac_out.h"
 
 /* open a file for writing with a given filename */
 ac_out_t *ac_out_init(const char *filename, ac_out_options_t *options);
@@ -52,7 +52,7 @@ bool ac_out_write_prefix(ac_out_t *h, const void *d, size_t len);
 bool ac_out_write_delimiter(ac_out_t *h, const void *d, size_t len,
                             char delimiter);
 
-/* ac_out_options_t is declared in impl/ac_out.h.  h is expected to point to a
+/* ac_out_options_t is declared in ac-io/ac_out.h.  h is expected to point to a
    structure of this type (and not NULL). */
 void ac_out_options_init(ac_out_options_t *h);
 

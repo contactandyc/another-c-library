@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "../ac_map.h"
-#include "../ac_search.h"
-#include "../ac_sort.h"
+#include "ac_map.h"
+#include "ac_search.h"
+#include "ac_sort.h"
 
 #define AC_JSON_ERROR 0
 #define AC_JSON_VALID 1

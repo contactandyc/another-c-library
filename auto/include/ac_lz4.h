@@ -24,6 +24,8 @@ limitations under the License.
 
 uint64_t ac_lz4_hash64(const void *s, size_t len);
 
+int ac_lz4_compress_bound(int inputSize);
+
 size_t ac_lz4_compress_appending_to_buffer(ac_buffer_t *dest, void *src, int src_size);
 bool ac_lz4_decompress_into_fixed_buffer(void *dest, int dest_size, void *src, int src_size);
 

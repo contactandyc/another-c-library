@@ -18,7 +18,7 @@ limitations under the License.
 
 #include "ac_allocator.h"
 #include "ac_lz4.h"
-#include "lz4/lz4.h"
+// #include "lz4/lz4.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -121,7 +121,7 @@ start:;
   if (len) {
     char *wp = h->buffer2 + h->buffer_pos2;
     char *ep = h->buffer2 + h->buffer_size2;
-    char *mp = wp + LZ4_compressBound(len) + 8;
+    char *mp = wp + ac_lz4_compress_bound(len) + 8;
     written = false;
     if (mp <= ep) {
       uint32_t n = ac_lz4_compress_block(h->lz4, p, len, wp, mp - wp);

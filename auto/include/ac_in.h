@@ -48,13 +48,13 @@
 
 #include <sys/types.h>
 
-#include "impl/ac_in.h"
+#include "ac-io/ac_in.h"
 
 typedef ac_in_t *(*ac_in_init_cb)( void * );
 
 typedef void (*ac_in_transform_cb)(ac_in_t *in, ac_out_t *out, void *arg);
 
-/* ac_in_options_t is declared in impl/ac_in.h and not opaque.  h is expected
+/* ac_in_options_t is declared in ac-io/ac_in.h and not opaque.  h is expected
    to point to a structure of this type (and not NULL). */
 void ac_in_options_init(ac_in_options_t *h);
 
