@@ -21,3 +21,4 @@ libtool
 .deps
 *.o
 .dirstamp
+*.Po
