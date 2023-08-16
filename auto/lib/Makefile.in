@@ -146,7 +146,9 @@ am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libac_connect_a_AR = $(AR) $(ARFLAGS)
-libac_connect_a_LIBADD =
+am__DEPENDENCIES_1 =
+libac_connect_a_DEPENDENCIES = libac-core.a libac-json.a libac-io.a \
+	$(am__DEPENDENCIES_1)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libac_connect_a_OBJECTS = ac-connect/ac_cgi.$(OBJEXT) \
 	ac-connect/ac_client.$(OBJEXT) \
@@ -162,7 +164,7 @@ am_libac_core_a_OBJECTS = ac-core/ac_allocator.$(OBJEXT) \
 	ac-core/ac_timer.$(OBJEXT)
 libac_core_a_OBJECTS = $(am_libac_core_a_OBJECTS)
 libac_io_a_AR = $(AR) $(ARFLAGS)
-libac_io_a_LIBADD =
+libac_io_a_DEPENDENCIES = libac-core.a libac-json.a
 am_libac_io_a_OBJECTS = ac-io/ac_in.$(OBJEXT) \
 	ac-io/ac_in_base.$(OBJEXT) ac-io/ac_io.$(OBJEXT) \
 	ac-io/ac_out.$(OBJEXT) ac-io/ac_lz4.$(OBJEXT) \
@@ -171,11 +173,11 @@ am_libac_io_a_OBJECTS = ac-io/ac_in.$(OBJEXT) \
 	ac-io/md5/md5.$(OBJEXT)
 libac_io_a_OBJECTS = $(am_libac_io_a_OBJECTS)
 libac_json_a_AR = $(AR) $(ARFLAGS)
-libac_json_a_LIBADD =
+libac_json_a_DEPENDENCIES = libac-core.a
 am_libac_json_a_OBJECTS = ac-json/ac_json.$(OBJEXT)
 libac_json_a_OBJECTS = $(am_libac_json_a_OBJECTS)
 libac_utils_a_AR = $(AR) $(ARFLAGS)
-libac_utils_a_LIBADD =
+libac_utils_a_DEPENDENCIES = libac-core.a libac-json.a libac-io.a
 am_libac_utils_a_OBJECTS = ac-utils/ac_file_sync.$(OBJEXT)
 libac_utils_a_OBJECTS = $(am_libac_utils_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -304,6 +306,8 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIBUV_CFLAGS = @LIBUV_CFLAGS@
+LIBUV_LIBS = @LIBUV_LIBS@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
@@ -326,6 +330,9 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -386,7 +393,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LIBRARIES = libac-core.a libac-json.a libac-io.a libac-connect.a libac-utils.a
-AM_CFLAGS = $(am__append_1) $(am__append_2)
+AM_CFLAGS = $(LIBUV_CFLAGS) $(am__append_1) $(am__append_2)
+LDADD = $(LIBUV_LIBS)
 
 # libac-core
 libac_core_a_SOURCES = ac-core/ac_allocator.c\
@@ -439,6 +447,7 @@ sort_HEADERS = ../include/ac-core/ac_sort/ac_sort_arg_m.h\
 
 # libac-json
 libac_json_a_SOURCES = ac-json/ac_json.c
+libac_json_a_LIBADD = libac-core.a
 json_headers = ../include/ac_json.h
 jsondir = $(includedir)/ac-json
 json_HEADERS = ../include/ac-json/ac_json.h
@@ -455,6 +464,7 @@ libac_io_a_SOURCES = ac-io/ac_in.c\
     ac-io/ac_md5.c\
     ac-io/md5/md5.c
 
+libac_io_a_LIBADD = libac-core.a libac-json.a -lz
 io_headers = ../include/ac_in.h\
     ../include/ac_in_base.h\
     ../include/ac_io.h\
@@ -475,6 +485,7 @@ libac_connect_a_SOURCES = ac-connect/ac_cgi.c\
     ac-connect/ac_serve.c\
     ac-connect/llhttp/llhttp.c
 
+libac_connect_a_LIBADD = libac-core.a libac-json.a libac-io.a -lz $(LIBUV_LIBS)
 connect_headers = ../include/ac_cgi.h\
     ../include/ac_client.h\
     ../include/ac_http_parser.h\
@@ -485,6 +496,7 @@ connect_HEADERS = ../include/ac-connect/llhttp.h
 
 # libac-utils
 libac_utils_a_SOURCES = ac-utils/ac_file_sync.c
+libac_utils_a_LIBADD = libac-core.a libac-json.a libac-io.a
 utils_headers = ../include/ac_file_sync.h
 
 # headers for top level directory

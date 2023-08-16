@@ -17,9 +17,15 @@ AM_PROG_AR
 AC_PROG_CC
 LT_INIT
 
+
+AC_PATH_PROG(PKG_CONFIG, pkg-config)
+PKG_PROG_PKG_CONFIG([0.29])
+PKG_CHECK_MODULES(LIBUV, libuv >= 1.35)
+
 # Check for necessary libraries, functions, etc.
-# AC_CHECK_LIB([m], [sqrt])
-# AC_CHECK_FUNCS([memset])
+AC_CHECK_LIB([z], [gzread], [], [
+  AC_MSG_ERROR([zlib library not found])
+])
 
 # Check for Address Sanitizer
 AC_ARG_ENABLE([address-sanitizer],
@@ -42,5 +48,5 @@ AC_SUBST([MEMORY_CHECK_FILE])
 AM_CONDITIONAL([WITH_MEMORY_CHECK_FILE], [test "x$MEMORY_CHECK_FILE" != "xno"])
 
 # Generate the output files
-AC_CONFIG_FILES([Makefile lib/Makefile examples/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile examples/Makefile examples/ac-io/Makefile examples/ac-io/read-line-by-line/Makefile])
 AC_OUTPUT
