@@ -53,4 +53,6 @@ Line 5: This is the fifth record.
 
 # Summary
 
-This code provides a simple command-line utility that reads a file specified by the user and prints its contents to the standard output. The I/O handling is managed through functions presumably defined in "ac_io.h", and proper memory management is ensured by freeing the buffer after use.  ac_io_read_file does not decompress gz or lz4 files.
+This code provides a simple command-line utility that reads a file specified by the user and prints its contents to the standard output. 
+
+NOTE: ac_io_read_file does not decompress gz or lz4 files.
