@@ -29,6 +29,7 @@ if(MEMORY_CHECK_FILE)
 endif()
 
 add_subdirectory(lib)
+add_subdirectory(examples)
 
 # Install README, AUTHORS, etc.
 install(FILES README.md AUTHORS NEWS.md CHANGELOG.md LICENSE DESTINATION ${CMAKE_INSTALL_DOCDIR})
