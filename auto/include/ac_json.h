@@ -22,6 +22,10 @@ limitations under the License.
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //#define AC_JSON_DEBUG
 //#define AC_JSON_FILL_TEST
 //#define AC_JSON_SORT_TEST
@@ -182,5 +186,9 @@ static inline ac_jsono_t *ac_jsono_find(ac_json_t *j, const char *key);
 #define AC_JSON_PARSE_DOUBLE(j, resp, name) resp->name = ac_double(ac_jsonv(ac_jsono_scan(j, #name)), 0.0)
 
 #include "ac-json/ac_json.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

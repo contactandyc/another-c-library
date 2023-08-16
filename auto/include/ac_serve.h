@@ -28,6 +28,10 @@ limitations under the License.
 #include "ac_pool.h"
 #include "ac_json.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct ac_serve_request_s;
 typedef struct ac_serve_request_s ac_serve_request_t;
 
@@ -157,5 +161,9 @@ struct ac_serve_s {
   int num_times_to_repeat_hammering_url;
   double time_spent_hammering;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

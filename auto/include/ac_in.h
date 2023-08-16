@@ -48,6 +48,10 @@
 
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "ac-io/ac_in.h"
 
 typedef ac_in_t *(*ac_in_init_cb)( void * );
@@ -257,5 +261,9 @@ void ac_in_out_group(ac_in_t *in, ac_out_t *out, ac_io_compare_cb compare,
 void ac_in_out_group2(ac_in_t *in, ac_out_t *out, ac_out_t *out2,
                       ac_io_compare_cb compare, void *compare_arg,
                       ac_in_out_group2_cb group, void *arg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

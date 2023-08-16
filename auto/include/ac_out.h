@@ -23,6 +23,10 @@ limitations under the License.
 
 #include "ac_in.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "ac-io/ac_out.h"
 
 /* open a file for writing with a given filename */
@@ -165,5 +169,9 @@ void ac_out_ext_options_dont_compress_tmp(ac_out_ext_options_t *h);
 
 /* used to create a partitioned filename */
 void ac_out_partition_filename(char *dest, const char *filename, size_t id);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

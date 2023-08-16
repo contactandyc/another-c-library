@@ -28,6 +28,10 @@ limitations under the License.
 #include "ac_pool.h"
 #include "ac_json.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct ac_client_request_s;
 typedef struct ac_client_request_s ac_client_request_t;
 
@@ -72,5 +76,9 @@ void ac_client_make_request(ac_client_request_t* r, const char *request, size_t 
 
 /* close the connection */
 void ac_client_close(ac_client_request_t *r);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -22,6 +22,10 @@ limitations under the License.
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 uint64_t ac_lz4_hash64(const void *s, size_t len);
 
 int ac_lz4_compress_bound(int inputSize);
@@ -106,5 +110,10 @@ uint32_t ac_lz4_compress_block(ac_lz4_t *l, const void *src, uint32_t src_len,
 int ac_lz4_finish(ac_lz4_t *l, void *dest);
 
 void ac_lz4_destroy(ac_lz4_t *r);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

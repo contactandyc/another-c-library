@@ -24,6 +24,10 @@ limitations under the License.
 #include "ac_pool.h"
 #include "ac-connect/llhttp.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct ac_http_parser_header_s {
   uv_buf_t key;
   uv_buf_t value;
@@ -77,5 +81,9 @@ bool ac_http_parser_data(ac_http_parser_t *h, const void *d, size_t len);
 
 /* destroy the http parser */
 void ac_http_parser_destroy(ac_http_parser_t *h);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

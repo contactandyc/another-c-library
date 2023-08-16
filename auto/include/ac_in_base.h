@@ -12,6 +12,9 @@
 
    This should not be documented for the website usage.
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "ac-io/ac_in_base.h"
 
@@ -39,5 +42,10 @@ char *ac_in_base_read(ac_in_base_t *h, int32_t len);
 char *ac_in_base_readz(ac_in_base_t *h, int32_t *rlen, int32_t len);
 
 void ac_in_base_destroy(ac_in_base_t *h);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

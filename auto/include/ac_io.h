@@ -24,6 +24,10 @@ limitations under the License.
 #include <inttypes.h>
 #include <time.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef int ac_io_format_t;
 
 ac_io_format_t ac_io_delimiter(int delim);
@@ -174,5 +178,9 @@ static inline size_t ac_io_split_by_uint32_t_2(const ac_io_record_t *r,
   uint32_t np = num_part;
   return (a[1]) % np;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

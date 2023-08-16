@@ -4,6 +4,10 @@
 #include "ac_pool.h"
 #include "ac_in.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Used to synchronize files from a local and remote source where all files are line delimited
    and are keyed by an id,...
 
@@ -70,5 +74,9 @@ void ac_file_sync_append(ac_pool_t *pool, ac_file_sync_t *h, const char *type,
 
 /* update checkpoint to match local for given type */
 void ac_file_sync_checkpoint(ac_pool_t *pool, ac_file_sync_t *h, const char *type);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

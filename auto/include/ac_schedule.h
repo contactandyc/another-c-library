@@ -11,6 +11,10 @@
 
 #include <time.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct ac_schedule_s;
 typedef struct ac_schedule_s ac_schedule_t;
 
@@ -407,5 +411,9 @@ Other helper functions
 
 /* Debugging - print the internals */
 void ac_schedule_print(ac_schedule_t *h);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

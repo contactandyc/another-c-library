@@ -68,7 +68,14 @@ limitations under the License.
                                         void *arg),
                             void *arg);
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "ac-core/ac_search.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
