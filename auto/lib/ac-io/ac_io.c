@@ -312,7 +312,7 @@ void ac_io_sort_file_info_by_last_modified(ac_io_file_info_t *files, size_t num_
     _sort_ac_io_file_info(files, num_files);
 }
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 char *_ac_io_read_file(size_t *len, const char *filename, const char *caller) {
 #else
 char *_ac_io_read_file(size_t *len, const char *filename) {
@@ -327,7 +327,7 @@ char *_ac_io_read_file(size_t *len, const char *filename) {
 
   size_t length = ac_io_file_size(filename);
   if (length) {
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
     char *buf = (char *)_ac_malloc_d(NULL, caller, length + 1, false);
 #else
     char *buf = (char *)ac_malloc(length + 1);

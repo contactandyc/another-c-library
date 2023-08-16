@@ -36,7 +36,7 @@ limitations under the License.
 extern "C" {
 #endif
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 #define ac_malloc(len) _ac_malloc_d(NULL, __AC_FILE_LINE__, len, false)
 #define ac_calloc(len) _ac_calloc_d(NULL, __AC_FILE_LINE__, len, false)
 #define ac_realloc(p, len) _ac_realloc_d(NULL, __AC_FILE_LINE__, p, len, false)

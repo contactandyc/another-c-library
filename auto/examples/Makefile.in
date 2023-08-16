@@ -88,8 +88,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@WITH_MEMORY_CHECK_TRUE@am__append_1 = -D_AC_DEBUG_MEMORY_=NULL
-@WITH_MEMORY_CHECK_FILE_TRUE@am__append_2 = -D_AC_DEBUG_MEMORY_='"${MEMORY_CHECK_FILE}"'
+@WITH_MEMORY_CHECK_TRUE@am__append_1 = -D_AC_MEMORY_CHECK_=NULL
+@WITH_MEMORY_CHECK_FILE_TRUE@am__append_2 = -D_AC_MEMORY_CHECK_='"${MEMORY_CHECK_FILE}"'
 bin_PROGRAMS = test_pool$(EXEEXT)
 subdir = examples
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4

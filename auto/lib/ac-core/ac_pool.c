@@ -30,7 +30,7 @@ void ac_pool_set_minimum_growth_size(ac_pool_t *h, size_t size) {
   h->minimum_growth_size = size;
 }
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 static void dump_pool(FILE *out, const char *caller, void *p, size_t length) {
   ac_pool_t *pool = (ac_pool_t *)p;
   fprintf(out, "%s size: %lu, max_size: %lu, initial_size: %lu used: %lu ",
@@ -61,7 +61,7 @@ ac_pool_t *_ac_pool_init(size_t initial_size) {
     block_size -= (sizeof(ac_pool_t) + sizeof(ac_pool_node_t));
 
   ac_pool_t *h;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   h = (ac_pool_t *)_ac_malloc_d(
       NULL, caller, block_size + sizeof(ac_pool_t) + sizeof(ac_pool_node_t),
       true);
@@ -131,7 +131,7 @@ void ac_pool_clear(ac_pool_t *h) {
 
   /* reset size and used */
   h->size = 0;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   h->cur_size = 0;
 #endif
   h->used =
@@ -166,7 +166,7 @@ void *_ac_pool_alloc_grow(ac_pool_t *h, size_t len) {
   char *r = (char *)(block + 1);
   block->endp = r + block_size;
   h->curp = r + len;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   h->cur_size += len;
   if (h->cur_size > h->max_size)
     h->max_size = h->cur_size;
@@ -185,7 +185,7 @@ char *ac_pool_strdupvf(ac_pool_t *pool, const char *fmt, va_list args) {
   va_end(args_copy);
   if (n < leftover) {
     pool->curp += n + 1;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
     pool->cur_size += (n + 1);
     if (pool->cur_size > pool->max_size)
       pool->max_size = pool->cur_size;

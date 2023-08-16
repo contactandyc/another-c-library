@@ -89,8 +89,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@WITH_MEMORY_CHECK_TRUE@am__append_1 = -D_AC_DEBUG_MEMORY_=NULL
-@WITH_MEMORY_CHECK_FILE_TRUE@am__append_2 = -D_AC_DEBUG_MEMORY_='"${MEMORY_CHECK_FILE}"'
+@WITH_MEMORY_CHECK_TRUE@am__append_1 = -D_AC_MEMORY_CHECK_=NULL
+@WITH_MEMORY_CHECK_FILE_TRUE@am__append_2 = -D_AC_MEMORY_CHECK_='"${MEMORY_CHECK_FILE}"'
 subdir = lib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -99,9 +99,10 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-DIST_COMMON = $(srcdir)/Makefile.am $(core_HEADERS) $(include_HEADERS) \
-	$(io_HEADERS) $(json_HEADERS) $(map_HEADERS) $(search_HEADERS) \
-	$(sort_HEADERS) $(am__DIST_COMMON)
+DIST_COMMON = $(srcdir)/Makefile.am $(connect_HEADERS) $(core_HEADERS) \
+	$(include_HEADERS) $(io_HEADERS) $(json_HEADERS) \
+	$(map_HEADERS) $(search_HEADERS) $(sort_HEADERS) \
+	$(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
@@ -133,22 +134,32 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(coredir)" \
-	"$(DESTDIR)$(includedir)" "$(DESTDIR)$(iodir)" \
-	"$(DESTDIR)$(jsondir)" "$(DESTDIR)$(mapdir)" \
-	"$(DESTDIR)$(searchdir)" "$(DESTDIR)$(sortdir)"
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(connectdir)" \
+	"$(DESTDIR)$(coredir)" "$(DESTDIR)$(includedir)" \
+	"$(DESTDIR)$(iodir)" "$(DESTDIR)$(jsondir)" \
+	"$(DESTDIR)$(mapdir)" "$(DESTDIR)$(searchdir)" \
+	"$(DESTDIR)$(sortdir)"
 LIBRARIES = $(lib_LIBRARIES)
 ARFLAGS = cru
 AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
+libac_connect_a_AR = $(AR) $(ARFLAGS)
+libac_connect_a_LIBADD =
+am__dirstamp = $(am__leading_dot)dirstamp
+am_libac_connect_a_OBJECTS = ac-connect/ac_cgi.$(OBJEXT) \
+	ac-connect/ac_client.$(OBJEXT) \
+	ac-connect/ac_http_parser.$(OBJEXT) \
+	ac-connect/ac_serve.$(OBJEXT) \
+	ac-connect/llhttp/llhttp.$(OBJEXT)
+libac_connect_a_OBJECTS = $(am_libac_connect_a_OBJECTS)
 libac_core_a_AR = $(AR) $(ARFLAGS)
 libac_core_a_LIBADD =
-am__dirstamp = $(am__leading_dot)dirstamp
 am_libac_core_a_OBJECTS = ac-core/ac_allocator.$(OBJEXT) \
 	ac-core/ac_buffer.$(OBJEXT) ac-core/ac_conv.$(OBJEXT) \
-	ac-core/ac_map.$(OBJEXT) ac-core/ac_pool.$(OBJEXT)
+	ac-core/ac_map.$(OBJEXT) ac-core/ac_pool.$(OBJEXT) \
+	ac-core/ac_timer.$(OBJEXT)
 libac_core_a_OBJECTS = $(am_libac_core_a_OBJECTS)
 libac_io_a_AR = $(AR) $(ARFLAGS)
 libac_io_a_LIBADD =
@@ -165,7 +176,7 @@ am_libac_json_a_OBJECTS = ac-json/ac_json.$(OBJEXT)
 libac_json_a_OBJECTS = $(am_libac_json_a_OBJECTS)
 libac_utils_a_AR = $(AR) $(ARFLAGS)
 libac_utils_a_LIBADD =
-am_libac_utils_a_OBJECTS = ac-utils/ac_timer.$(OBJEXT)
+am_libac_utils_a_OBJECTS = ac-utils/ac_file_sync.$(OBJEXT)
 libac_utils_a_OBJECTS = $(am_libac_utils_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -182,15 +193,21 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ac-core/$(DEPDIR)/ac_allocator.Po \
+am__depfiles_remade = ac-connect/$(DEPDIR)/ac_cgi.Po \
+	ac-connect/$(DEPDIR)/ac_client.Po \
+	ac-connect/$(DEPDIR)/ac_http_parser.Po \
+	ac-connect/$(DEPDIR)/ac_serve.Po \
+	ac-connect/llhttp/$(DEPDIR)/llhttp.Po \
+	ac-core/$(DEPDIR)/ac_allocator.Po \
 	ac-core/$(DEPDIR)/ac_buffer.Po ac-core/$(DEPDIR)/ac_conv.Po \
 	ac-core/$(DEPDIR)/ac_map.Po ac-core/$(DEPDIR)/ac_pool.Po \
-	ac-io/$(DEPDIR)/ac_in.Po ac-io/$(DEPDIR)/ac_in_base.Po \
-	ac-io/$(DEPDIR)/ac_io.Po ac-io/$(DEPDIR)/ac_lz4.Po \
-	ac-io/$(DEPDIR)/ac_md5.Po ac-io/$(DEPDIR)/ac_out.Po \
-	ac-io/lz4/$(DEPDIR)/lz4.Po ac-io/lz4/$(DEPDIR)/lz4hc.Po \
-	ac-io/lz4/$(DEPDIR)/xxhash.Po ac-io/md5/$(DEPDIR)/md5.Po \
-	ac-json/$(DEPDIR)/ac_json.Po ac-utils/$(DEPDIR)/ac_timer.Po
+	ac-core/$(DEPDIR)/ac_timer.Po ac-io/$(DEPDIR)/ac_in.Po \
+	ac-io/$(DEPDIR)/ac_in_base.Po ac-io/$(DEPDIR)/ac_io.Po \
+	ac-io/$(DEPDIR)/ac_lz4.Po ac-io/$(DEPDIR)/ac_md5.Po \
+	ac-io/$(DEPDIR)/ac_out.Po ac-io/lz4/$(DEPDIR)/lz4.Po \
+	ac-io/lz4/$(DEPDIR)/lz4hc.Po ac-io/lz4/$(DEPDIR)/xxhash.Po \
+	ac-io/md5/$(DEPDIR)/md5.Po ac-json/$(DEPDIR)/ac_json.Po \
+	ac-utils/$(DEPDIR)/ac_file_sync.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -214,17 +231,19 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libac_core_a_SOURCES) $(libac_io_a_SOURCES) \
-	$(libac_json_a_SOURCES) $(libac_utils_a_SOURCES)
-DIST_SOURCES = $(libac_core_a_SOURCES) $(libac_io_a_SOURCES) \
-	$(libac_json_a_SOURCES) $(libac_utils_a_SOURCES)
+SOURCES = $(libac_connect_a_SOURCES) $(libac_core_a_SOURCES) \
+	$(libac_io_a_SOURCES) $(libac_json_a_SOURCES) \
+	$(libac_utils_a_SOURCES)
+DIST_SOURCES = $(libac_connect_a_SOURCES) $(libac_core_a_SOURCES) \
+	$(libac_io_a_SOURCES) $(libac_json_a_SOURCES) \
+	$(libac_utils_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-HEADERS = $(core_HEADERS) $(include_HEADERS) $(io_HEADERS) \
-	$(json_HEADERS) $(map_HEADERS) $(search_HEADERS) \
+HEADERS = $(connect_HEADERS) $(core_HEADERS) $(include_HEADERS) \
+	$(io_HEADERS) $(json_HEADERS) $(map_HEADERS) $(search_HEADERS) \
 	$(sort_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
@@ -366,42 +385,16 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-lib_LIBRARIES = libac-core.a libac-io.a libac-json.a libac-utils.a
+lib_LIBRARIES = libac-core.a libac-json.a libac-io.a libac-connect.a libac-utils.a
 AM_CFLAGS = $(am__append_1) $(am__append_2)
-libac_io_a_SOURCES = ac-io/ac_in.c\
-    ac-io/ac_in_base.c\
-    ac-io/ac_io.c\
-    ac-io/ac_out.c\
-    ac-io/ac_lz4.c\
-    ac-io/lz4/lz4.c\
-    ac-io/lz4/lz4hc.c\
-    ac-io/lz4/xxhash.c\
-    ac-io/ac_md5.c\
-    ac-io/md5/md5.c
 
-io_headers = ../include/ac_in.h\
-    ../include/ac_in_base.h\
-    ../include/ac_io.h\
-    ../include/ac_out.h\
-    ../include/ac_lz4.h\
-    ../include/ac_md5.h
-
-iodir = $(includedir)/ac-io
-io_HEADERS = ../include/ac-io/ac_in.h\
-    ../include/ac-io/ac_in_base.h\
-    ../include/ac-io/ac_out.h
-
-libac_json_a_SOURCES = ac-json/ac_json.c
-json_headers = ../include/ac_json.h
-jsondir = $(includedir)/ac-json
-json_HEADERS = ../include/ac-json/ac_json.h
-libac_utils_a_SOURCES = ac-utils/ac_timer.c
-utils_headers = ../include/ac_timer.h
+# libac-core
 libac_core_a_SOURCES = ac-core/ac_allocator.c\
     ac-core/ac_buffer.c\
     ac-core/ac_conv.c\
     ac-core/ac_map.c\
-    ac-core/ac_pool.c
+    ac-core/ac_pool.c\
+    ac-core/ac_timer.c
 
 core_headers = ../include/ac_allocator.h\
     ../include/ac_buffer.h\
@@ -410,9 +403,9 @@ core_headers = ../include/ac_allocator.h\
     ../include/ac_map.h\
     ../include/ac_pool.h\
     ../include/ac_search.h\
-    ../include/ac_sort.h
+    ../include/ac_sort.h\
+    ../include/ac_timer.h
 
-include_HEADERS = ${core_headers} ${io_headers} ${json_headers} ${utils_headers}
 coredir = $(includedir)/ac-core
 core_HEADERS = ../include/ac-core/ac_buffer.h\
     ../include/ac-core/ac_map.h\
@@ -443,6 +436,59 @@ sort_HEADERS = ../include/ac-core/ac_sort/ac_sort_arg_m.h\
     ../include/ac-core/ac_sort/ac_sort_compare_m.h\
     ../include/ac-core/ac_sort/ac_sort_m.h
 
+
+# libac-json
+libac_json_a_SOURCES = ac-json/ac_json.c
+json_headers = ../include/ac_json.h
+jsondir = $(includedir)/ac-json
+json_HEADERS = ../include/ac-json/ac_json.h
+
+# libac-io
+libac_io_a_SOURCES = ac-io/ac_in.c\
+    ac-io/ac_in_base.c\
+    ac-io/ac_io.c\
+    ac-io/ac_out.c\
+    ac-io/ac_lz4.c\
+    ac-io/lz4/lz4.c\
+    ac-io/lz4/lz4hc.c\
+    ac-io/lz4/xxhash.c\
+    ac-io/ac_md5.c\
+    ac-io/md5/md5.c
+
+io_headers = ../include/ac_in.h\
+    ../include/ac_in_base.h\
+    ../include/ac_io.h\
+    ../include/ac_out.h\
+    ../include/ac_lz4.h\
+    ../include/ac_md5.h
+
+iodir = $(includedir)/ac-io
+io_HEADERS = ../include/ac-io/ac_in.h\
+    ../include/ac-io/ac_in_base.h\
+    ../include/ac-io/ac_out.h
+
+
+# libac-connect
+libac_connect_a_SOURCES = ac-connect/ac_cgi.c\
+    ac-connect/ac_client.c\
+    ac-connect/ac_http_parser.c\
+    ac-connect/ac_serve.c\
+    ac-connect/llhttp/llhttp.c
+
+connect_headers = ../include/ac_cgi.h\
+    ../include/ac_client.h\
+    ../include/ac_http_parser.h\
+    ../include/ac_serve.h
+
+connectdir = $(includedir)/ac-connect
+connect_HEADERS = ../include/ac-connect/llhttp.h
+
+# libac-utils
+libac_utils_a_SOURCES = ac-utils/ac_file_sync.c
+utils_headers = ../include/ac_file_sync.h
+
+# headers for top level directory
+include_HEADERS = ${core_headers} ${io_headers} ${json_headers} ${utils_headers} ${connect_headers}
 all: all-am
 
 .SUFFIXES:
@@ -508,6 +554,33 @@ uninstall-libLIBRARIES:
 
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
+ac-connect/$(am__dirstamp):
+	@$(MKDIR_P) ac-connect
+	@: > ac-connect/$(am__dirstamp)
+ac-connect/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ac-connect/$(DEPDIR)
+	@: > ac-connect/$(DEPDIR)/$(am__dirstamp)
+ac-connect/ac_cgi.$(OBJEXT): ac-connect/$(am__dirstamp) \
+	ac-connect/$(DEPDIR)/$(am__dirstamp)
+ac-connect/ac_client.$(OBJEXT): ac-connect/$(am__dirstamp) \
+	ac-connect/$(DEPDIR)/$(am__dirstamp)
+ac-connect/ac_http_parser.$(OBJEXT): ac-connect/$(am__dirstamp) \
+	ac-connect/$(DEPDIR)/$(am__dirstamp)
+ac-connect/ac_serve.$(OBJEXT): ac-connect/$(am__dirstamp) \
+	ac-connect/$(DEPDIR)/$(am__dirstamp)
+ac-connect/llhttp/$(am__dirstamp):
+	@$(MKDIR_P) ac-connect/llhttp
+	@: > ac-connect/llhttp/$(am__dirstamp)
+ac-connect/llhttp/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ac-connect/llhttp/$(DEPDIR)
+	@: > ac-connect/llhttp/$(DEPDIR)/$(am__dirstamp)
+ac-connect/llhttp/llhttp.$(OBJEXT): ac-connect/llhttp/$(am__dirstamp) \
+	ac-connect/llhttp/$(DEPDIR)/$(am__dirstamp)
+
+libac-connect.a: $(libac_connect_a_OBJECTS) $(libac_connect_a_DEPENDENCIES) $(EXTRA_libac_connect_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libac-connect.a
+	$(AM_V_AR)$(libac_connect_a_AR) libac-connect.a $(libac_connect_a_OBJECTS) $(libac_connect_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libac-connect.a
 ac-core/$(am__dirstamp):
 	@$(MKDIR_P) ac-core
 	@: > ac-core/$(am__dirstamp)
@@ -523,6 +596,8 @@ ac-core/ac_conv.$(OBJEXT): ac-core/$(am__dirstamp) \
 ac-core/ac_map.$(OBJEXT): ac-core/$(am__dirstamp) \
 	ac-core/$(DEPDIR)/$(am__dirstamp)
 ac-core/ac_pool.$(OBJEXT): ac-core/$(am__dirstamp) \
+	ac-core/$(DEPDIR)/$(am__dirstamp)
+ac-core/ac_timer.$(OBJEXT): ac-core/$(am__dirstamp) \
 	ac-core/$(DEPDIR)/$(am__dirstamp)
 
 libac-core.a: $(libac_core_a_OBJECTS) $(libac_core_a_DEPENDENCIES) $(EXTRA_libac_core_a_DEPENDENCIES) 
@@ -591,7 +666,7 @@ ac-utils/$(am__dirstamp):
 ac-utils/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) ac-utils/$(DEPDIR)
 	@: > ac-utils/$(DEPDIR)/$(am__dirstamp)
-ac-utils/ac_timer.$(OBJEXT): ac-utils/$(am__dirstamp) \
+ac-utils/ac_file_sync.$(OBJEXT): ac-utils/$(am__dirstamp) \
 	ac-utils/$(DEPDIR)/$(am__dirstamp)
 
 libac-utils.a: $(libac_utils_a_OBJECTS) $(libac_utils_a_DEPENDENCIES) $(EXTRA_libac_utils_a_DEPENDENCIES) 
@@ -601,6 +676,8 @@ libac-utils.a: $(libac_utils_a_OBJECTS) $(libac_utils_a_DEPENDENCIES) $(EXTRA_li
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ac-connect/*.$(OBJEXT)
+	-rm -f ac-connect/llhttp/*.$(OBJEXT)
 	-rm -f ac-core/*.$(OBJEXT)
 	-rm -f ac-io/*.$(OBJEXT)
 	-rm -f ac-io/lz4/*.$(OBJEXT)
@@ -611,11 +688,17 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@ac-connect/$(DEPDIR)/ac_cgi.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ac-connect/$(DEPDIR)/ac_client.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ac-connect/$(DEPDIR)/ac_http_parser.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ac-connect/$(DEPDIR)/ac_serve.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ac-connect/llhttp/$(DEPDIR)/llhttp.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ac-core/$(DEPDIR)/ac_allocator.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ac-core/$(DEPDIR)/ac_buffer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ac-core/$(DEPDIR)/ac_conv.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ac-core/$(DEPDIR)/ac_map.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ac-core/$(DEPDIR)/ac_pool.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ac-core/$(DEPDIR)/ac_timer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ac-io/$(DEPDIR)/ac_in.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ac-io/$(DEPDIR)/ac_in_base.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ac-io/$(DEPDIR)/ac_io.Po@am__quote@ # am--include-marker
@@ -627,7 +710,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@ac-io/lz4/$(DEPDIR)/xxhash.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ac-io/md5/$(DEPDIR)/md5.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ac-json/$(DEPDIR)/ac_json.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@ac-utils/$(DEPDIR)/ac_timer.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ac-utils/$(DEPDIR)/ac_file_sync.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -664,6 +747,27 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-connectHEADERS: $(connect_HEADERS)
+	@$(NORMAL_INSTALL)
+	@list='$(connect_HEADERS)'; test -n "$(connectdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(connectdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(connectdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(connectdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(connectdir)" || exit $$?; \
+	done
+
+uninstall-connectHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(connect_HEADERS)'; test -n "$(connectdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(connectdir)'; $(am__uninstall_files_from_dir)
 install-coreHEADERS: $(core_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(core_HEADERS)'; test -n "$(coredir)" || list=; \
@@ -900,7 +1004,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(LIBRARIES) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(coredir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(iodir)" "$(DESTDIR)$(jsondir)" "$(DESTDIR)$(mapdir)" "$(DESTDIR)$(searchdir)" "$(DESTDIR)$(sortdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(connectdir)" "$(DESTDIR)$(coredir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(iodir)" "$(DESTDIR)$(jsondir)" "$(DESTDIR)$(mapdir)" "$(DESTDIR)$(searchdir)" "$(DESTDIR)$(sortdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -929,6 +1033,10 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ac-connect/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ac-connect/$(am__dirstamp)
+	-rm -f ac-connect/llhttp/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ac-connect/llhttp/$(am__dirstamp)
 	-rm -f ac-core/$(DEPDIR)/$(am__dirstamp)
 	-rm -f ac-core/$(am__dirstamp)
 	-rm -f ac-io/$(DEPDIR)/$(am__dirstamp)
@@ -951,11 +1059,17 @@ clean-am: clean-generic clean-libLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ac-core/$(DEPDIR)/ac_allocator.Po
+		-rm -f ac-connect/$(DEPDIR)/ac_cgi.Po
+	-rm -f ac-connect/$(DEPDIR)/ac_client.Po
+	-rm -f ac-connect/$(DEPDIR)/ac_http_parser.Po
+	-rm -f ac-connect/$(DEPDIR)/ac_serve.Po
+	-rm -f ac-connect/llhttp/$(DEPDIR)/llhttp.Po
+	-rm -f ac-core/$(DEPDIR)/ac_allocator.Po
 	-rm -f ac-core/$(DEPDIR)/ac_buffer.Po
 	-rm -f ac-core/$(DEPDIR)/ac_conv.Po
 	-rm -f ac-core/$(DEPDIR)/ac_map.Po
 	-rm -f ac-core/$(DEPDIR)/ac_pool.Po
+	-rm -f ac-core/$(DEPDIR)/ac_timer.Po
 	-rm -f ac-io/$(DEPDIR)/ac_in.Po
 	-rm -f ac-io/$(DEPDIR)/ac_in_base.Po
 	-rm -f ac-io/$(DEPDIR)/ac_io.Po
@@ -967,7 +1081,7 @@ distclean: distclean-am
 	-rm -f ac-io/lz4/$(DEPDIR)/xxhash.Po
 	-rm -f ac-io/md5/$(DEPDIR)/md5.Po
 	-rm -f ac-json/$(DEPDIR)/ac_json.Po
-	-rm -f ac-utils/$(DEPDIR)/ac_timer.Po
+	-rm -f ac-utils/$(DEPDIR)/ac_file_sync.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -984,9 +1098,9 @@ info: info-am
 
 info-am:
 
-install-data-am: install-coreHEADERS install-includeHEADERS \
-	install-ioHEADERS install-jsonHEADERS install-mapHEADERS \
-	install-searchHEADERS install-sortHEADERS
+install-data-am: install-connectHEADERS install-coreHEADERS \
+	install-includeHEADERS install-ioHEADERS install-jsonHEADERS \
+	install-mapHEADERS install-searchHEADERS install-sortHEADERS
 
 install-dvi: install-dvi-am
 
@@ -1015,11 +1129,17 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ac-core/$(DEPDIR)/ac_allocator.Po
+		-rm -f ac-connect/$(DEPDIR)/ac_cgi.Po
+	-rm -f ac-connect/$(DEPDIR)/ac_client.Po
+	-rm -f ac-connect/$(DEPDIR)/ac_http_parser.Po
+	-rm -f ac-connect/$(DEPDIR)/ac_serve.Po
+	-rm -f ac-connect/llhttp/$(DEPDIR)/llhttp.Po
+	-rm -f ac-core/$(DEPDIR)/ac_allocator.Po
 	-rm -f ac-core/$(DEPDIR)/ac_buffer.Po
 	-rm -f ac-core/$(DEPDIR)/ac_conv.Po
 	-rm -f ac-core/$(DEPDIR)/ac_map.Po
 	-rm -f ac-core/$(DEPDIR)/ac_pool.Po
+	-rm -f ac-core/$(DEPDIR)/ac_timer.Po
 	-rm -f ac-io/$(DEPDIR)/ac_in.Po
 	-rm -f ac-io/$(DEPDIR)/ac_in_base.Po
 	-rm -f ac-io/$(DEPDIR)/ac_io.Po
@@ -1031,7 +1151,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ac-io/lz4/$(DEPDIR)/xxhash.Po
 	-rm -f ac-io/md5/$(DEPDIR)/md5.Po
 	-rm -f ac-json/$(DEPDIR)/ac_json.Po
-	-rm -f ac-utils/$(DEPDIR)/ac_timer.Po
+	-rm -f ac-utils/$(DEPDIR)/ac_file_sync.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -1048,10 +1168,11 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-coreHEADERS uninstall-includeHEADERS \
-	uninstall-ioHEADERS uninstall-jsonHEADERS \
-	uninstall-libLIBRARIES uninstall-mapHEADERS \
-	uninstall-searchHEADERS uninstall-sortHEADERS
+uninstall-am: uninstall-connectHEADERS uninstall-coreHEADERS \
+	uninstall-includeHEADERS uninstall-ioHEADERS \
+	uninstall-jsonHEADERS uninstall-libLIBRARIES \
+	uninstall-mapHEADERS uninstall-searchHEADERS \
+	uninstall-sortHEADERS
 
 .MAKE: install-am install-strip
 
@@ -1059,18 +1180,19 @@ uninstall-am: uninstall-coreHEADERS uninstall-includeHEADERS \
 	clean-generic clean-libLIBRARIES clean-libtool cscopelist-am \
 	ctags ctags-am distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-coreHEADERS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-includeHEADERS install-info install-info-am \
-	install-ioHEADERS install-jsonHEADERS install-libLIBRARIES \
-	install-man install-mapHEADERS install-pdf install-pdf-am \
-	install-ps install-ps-am install-searchHEADERS \
-	install-sortHEADERS install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-coreHEADERS uninstall-includeHEADERS \
+	html-am info info-am install install-am install-connectHEADERS \
+	install-coreHEADERS install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-includeHEADERS install-info \
+	install-info-am install-ioHEADERS install-jsonHEADERS \
+	install-libLIBRARIES install-man install-mapHEADERS \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-searchHEADERS install-sortHEADERS install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am uninstall-connectHEADERS \
+	uninstall-coreHEADERS uninstall-includeHEADERS \
 	uninstall-ioHEADERS uninstall-jsonHEADERS \
 	uninstall-libLIBRARIES uninstall-mapHEADERS \
 	uninstall-searchHEADERS uninstall-sortHEADERS

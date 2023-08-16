@@ -17,7 +17,7 @@ limitations under the License.
 #include <stdlib.h>
 
 struct ac_buffer_s {
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   ac_allocator_dump_t dump;
   size_t initial_size;
   size_t max_length;
@@ -76,7 +76,7 @@ static inline void *ac_buffer_resize(ac_buffer_t *h, size_t length) {
     _ac_buffer_grow(h, length);
   h->length = length;
   h->data[h->length] = 0;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   if (length > h->max_length)
     h->max_length = length;
 #endif
@@ -98,7 +98,7 @@ static inline void *ac_buffer_append_alloc(ac_buffer_t *h, size_t length) {
   char *r = h->data + h->length;
   h->length += length;
   r[length] = 0;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   if (h->length > h->max_length)
     h->max_length = h->length;
 #endif
@@ -111,7 +111,7 @@ static inline void *ac_buffer_append_ualloc(ac_buffer_t *h, size_t length) {
   char *r = h->data + h->length;
   h->length += length;
   r[length] = 0;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   if (h->length > h->max_length)
     h->max_length = h->length;
 #endif
@@ -137,7 +137,7 @@ static inline void ac_buffer_appendc(ac_buffer_t *h, char ch) {
   *d++ = ch;
   *d = 0;
   h->length++;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   if (h->length > h->max_length)
     h->max_length = h->length;
 #endif
@@ -155,7 +155,7 @@ static inline void ac_buffer_appendn(ac_buffer_t *h, char ch, ssize_t n) {
   d += n;
   *d = 0;
   h->length += n;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   if (h->length > h->max_length)
     h->max_length = h->length;
 #endif
@@ -176,7 +176,7 @@ static inline void *ac_buffer_alloc(ac_buffer_t *h, size_t length) {
   if (length > h->size)
     _ac_buffer_alloc(h, length);
   h->length = length;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   if (length > h->max_length)
     h->max_length = length;
 #endif
@@ -190,7 +190,7 @@ static inline void _ac_buffer_set(ac_buffer_t *h, const void *data,
     _ac_buffer_alloc(h, length);
   memcpy(h->data, data, length);
   h->length = length;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   if (length > h->max_length)
     h->max_length = length;
 #endif

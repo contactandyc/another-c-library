@@ -19,7 +19,7 @@ limitations under the License.
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 static void dump_buffer(FILE *out, const char *caller, void *p, size_t length) {
   ac_buffer_t *bh = (ac_buffer_t *)p;
   fprintf(out, "%s size: %lu, max_length: %lu, initial_size: %lu ", caller,
@@ -59,7 +59,7 @@ void _ac_buffer_append(ac_buffer_t *h, const void *data, size_t length) {
   memcpy(h->data + h->length, data, length);
   h->length += length;
   h->data[h->length] = 0;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   if (length > h->max_length)
     h->max_length = length;
 #endif
@@ -86,7 +86,7 @@ void ac_buffer_appendvf(ac_buffer_t *h, const char *fmt, va_list args) {
     va_end(args_copy);
     h->length += n;
   }
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   if (h->length > h->max_length)
     h->max_length = h->length;
 #endif

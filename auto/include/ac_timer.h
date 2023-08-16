@@ -18,6 +18,7 @@ limitations under the License.
 #define _ac_timer_H
 
 #include "ac_common.h"
+#include "ac_pool.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +35,7 @@ long ac_timer_current();
    test was repeated so that the final result represents that.  If a thing is
    only being timed with a single repetition, then use a value of 1.
 */
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 #define ac_timer_init(repeat)                                                  \
   _ac_timer_init(repeat, AC_FILE_LINE_MACRO("ac_timer"))
 ac_timer_t *_ac_timer_init(int repeat, const char *caller);
@@ -42,6 +43,8 @@ ac_timer_t *_ac_timer_init(int repeat, const char *caller);
 #define ac_timer_init(repeat) _ac_timer_init(repeat)
 ac_timer_t *_ac_timer_init(int repeat);
 #endif
+
+ac_timer_t *ac_timer_pool_init(ac_pool_t *pool, int repeat);
 
 /* destroy the timer */
 void ac_timer_destroy(ac_timer_t *t);

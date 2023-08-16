@@ -128,7 +128,7 @@ void *dump_global_allocations_thread(void *arg) {
       done = 1;
     else {
       clock_gettime(CLOCK_REALTIME, &ts);
-      ts.tv_sec += _AC_DEBUG_MEMORY_SPEED_;
+      ts.tv_sec += _AC_MEMORY_CHECK_SPEED_;
       pthread_cond_timedwait(&a->cond, &a->mutex, &ts);
     }
     pthread_mutex_unlock(&a->mutex);
@@ -179,8 +179,8 @@ void myStartupFun(void) __attribute__((constructor));
 void myCleanupFun(void) __attribute__((destructor));
 
 void myStartupFun(void) {
-#ifdef _AC_DEBUG_MEMORY_
-  global_allocator = ac_allocator_init(_AC_DEBUG_MEMORY_, true);
+#ifdef _AC_MEMORY_CHECK_
+  global_allocator = ac_allocator_init(_AC_MEMORY_CHECK_, true);
 #else
   global_allocator = ac_allocator_init(NULL, true);
 #endif

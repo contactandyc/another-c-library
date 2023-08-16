@@ -60,7 +60,7 @@ bool ac_lz4_check_header(ac_lz4_header_t *r, void *header,
   ac_lz4_t *ac_lz4_init_decompress(void *header, uint32_t header_size);
 */
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 #define ac_lz4_init(level, size, block_checksum, content_checksum)             \
   _ac_lz4_init(level, size, block_checksum, content_checksum,                  \
                AC_FILE_LINE_MACRO("ac_lz4"))
@@ -73,7 +73,7 @@ ac_lz4_t *_ac_lz4_init(int level, ac_lz4_block_size_t size, bool block_checksum,
                        bool content_checksum);
 #endif
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 #define ac_lz4_init_decompress(header, header_size)                            \
   _ac_lz4_init_decompress(header, header_size,                                 \
                           AC_FILE_LINE_MACRO("ac_lz4_decompress"))

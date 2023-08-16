@@ -58,7 +58,7 @@ struct ac_pool_s;
 typedef struct ac_pool_s ac_pool_t;
 
 /* ac_pool_init will create a working space of size bytes */
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 #define ac_pool_init(size) _ac_pool_init(size, AC_FILE_LINE_MACRO("ac_pool"))
 ac_pool_t *_ac_pool_init(size_t size, const char *caller);
 #else

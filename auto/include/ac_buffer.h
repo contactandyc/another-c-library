@@ -50,7 +50,7 @@ typedef struct ac_buffer_s ac_buffer_t;
 
    ac_buffer_t *ac_buffer_init(size_t size);
 */
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 #define ac_buffer_init(size)                                                   \
   _ac_buffer_init(size, AC_FILE_LINE_MACRO("ac_buffer"));
 ac_buffer_t *_ac_buffer_init(size_t size, const char *caller);

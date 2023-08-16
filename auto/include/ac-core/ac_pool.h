@@ -35,7 +35,7 @@ typedef struct ac_pool_node_s {
 } ac_pool_node_t;
 
 struct ac_pool_s {
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   ac_allocator_dump_t dump;
   /* The size of the initial block requires a second variable to be
      thread-safe. */
@@ -74,7 +74,7 @@ static inline void *ac_pool_ualloc(ac_pool_t *h, size_t len) {
   char *r = h->curp;
   if (r + len < h->current->endp) {
     h->curp = r + len;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
     h->cur_size += len;
     if (h->cur_size > h->max_size)
       h->max_size = h->cur_size;
@@ -91,7 +91,7 @@ static inline void *ac_pool_min_max_alloc(ac_pool_t *h, size_t *rlen,
                  (sizeof(size_t) - 1));
   if (r + len < h->current->endp) {
     h->curp = r + len;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
     h->cur_size += len;
     if (h->cur_size > h->max_size)
       h->max_size = h->cur_size;
@@ -102,7 +102,7 @@ static inline void *ac_pool_min_max_alloc(ac_pool_t *h, size_t *rlen,
   if (r + min_len < h->current->endp) {
     len = (h->current->endp - r) - 1;
     h->curp = r + len;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
     h->cur_size += len;
     if (h->cur_size > h->max_size)
       h->max_size = h->cur_size;
@@ -121,7 +121,7 @@ static inline void *ac_pool_alloc(ac_pool_t *h, size_t len) {
       h->curp + to_add;
   if (r + len < h->current->endp) {
     h->curp = r + len;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
     h->cur_size += len;
     if (h->cur_size > h->max_size)
       h->max_size = h->cur_size;
@@ -193,7 +193,7 @@ struct ac_pool_checkpoint_s {
   char *curp;
   size_t size;
   size_t used;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   size_t cur_size;
 #endif
 };
@@ -203,7 +203,7 @@ static inline void ac_pool_checkpoint(ac_pool_t *h, ac_pool_checkpoint_t *cp) {
   cp->curp = h->curp;
   cp->size = h->size;
   cp->used = h->used;
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   cp->cur_size = h->cur_size;
 #endif
 }
@@ -222,7 +222,7 @@ static inline void ac_pool_reset(ac_pool_t *h, ac_pool_checkpoint_t *cp) {
   h->curp = cp->curp;
   h->size = cp->size;
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   h->cur_size = cp->cur_size;
 #endif
   h->used = cp->used;

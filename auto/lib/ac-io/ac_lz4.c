@@ -318,7 +318,7 @@ bool ac_lz4_check_header(ac_lz4_header_t *r, void *header,
   return true;
 }
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 ac_lz4_t *_ac_lz4_init_decompress(void *header, uint32_t header_size,
                                   const char *caller) {
 #else
@@ -328,7 +328,7 @@ ac_lz4_t *_ac_lz4_init_decompress(void *header, uint32_t header_size) {
   if (!ac_lz4_check_header(&h, header, header_size))
     return NULL;
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   ac_lz4_t *r = (ac_lz4_t *)_ac_malloc_d(NULL, caller, sizeof(ac_lz4_t), false);
 #else
   ac_lz4_t *r = (ac_lz4_t *)ac_malloc(sizeof(ac_lz4_t));
@@ -348,7 +348,7 @@ ac_lz4_t *_ac_lz4_init_decompress(void *header, uint32_t header_size) {
   return r;
 }
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 ac_lz4_t *_ac_lz4_init(int level, ac_lz4_block_size_t size, bool block_checksum,
                        bool content_checksum, const char *caller) {
 #else
@@ -388,7 +388,7 @@ ac_lz4_t *_ac_lz4_init(int level, ac_lz4_block_size_t size, bool block_checksum,
 
   uint32_t compressed_size = LZ4_compressBound(block_size);
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
   ac_lz4_t *r = (ac_lz4_t *)_ac_malloc_d(NULL, caller,
                                          sizeof(ac_lz4_t) + ctx_size, false);
 #else

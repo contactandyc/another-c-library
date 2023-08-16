@@ -101,7 +101,7 @@ bool ac_io_file(const char *filename);
 
   char *ac_io_read_file(size_t *len, const char *filename); */
 
-#ifdef _AC_DEBUG_MEMORY_
+#ifdef _AC_MEMORY_CHECK_
 #define ac_io_read_file(len, filename)                                         \
   _ac_io_read_file(len, filename, AC_FILE_LINE_MACRO("ac_io_read_file"))
 char *_ac_io_read_file(size_t *len, const char *filename, const char *caller);

@@ -34,21 +34,21 @@ extern "C" {
 #define XXH_INLINE_ALL
 
 /*
-Defining _AC_DEBUG_MEMORY_ will check that memory is properly
+Defining _AC_MEMORY_CHECK_ will check that memory is properly
 freed (and try some rudimentary double free checks).  If memory
 doesn't seem to be previously allocated, there is a scan to find
-the closest block.  _AC_DEBUG_MEMORY_ can be defined as NULL or
+the closest block.  _AC_MEMORY_CHECK_ can be defined as NULL or
 a valid string.  If it is defined as a string, then a file will be
-written with the given name every _AC_DEBUG_MEMORY_SPEED_ seconds.
+written with the given name every _AC_MEMORY_CHECK_SPEED_ seconds.
 Snapshots are saved in increasing intervals.
 */
-// #define _AC_DEBUG_MEMORY_ "memory.log"
+// #define _AC_MEMORY_CHECK_ "memory.log"
 
 /* How often should the memory be checked? It is always checked in the
-   beginning and every _AC_DEBUG_MEMORY_SPEED_ seconds assuming
-   _AC_DEBUG_MEMORY_ is defined as a string (and not NULL). */
-#ifndef _AC_DEBUG_MEMORY_SPEED_
-#define _AC_DEBUG_MEMORY_SPEED_ 60
+   beginning and every _AC_MEMORY_CHECK_SPEED_ seconds assuming
+   _AC_MEMORY_CHECK_ is defined as a string (and not NULL). */
+#ifndef _AC_MEMORY_CHECK_SPEED_
+#define _AC_MEMORY_CHECK_SPEED_ 60
 #endif
 /*
   Given an address of a member of a structure, the base object type, and the

@@ -26,9 +26,19 @@ struct ac_timer_s {
   int repeat;
   long time_spent;
   long start_time;
+  bool owned;
 };
 
-#ifdef _AC_DEBUG_MEMORY_
+ac_timer_t *ac_timer_pool_init(ac_pool_t *pool, int repeat) {
+  ac_timer_t *t = (ac_timer_t *)ac_pool_alloc(pool, sizeof(ac_timer_t));
+  t->repeat = repeat;
+  t->base = t->time_spent = t->start_time = 0;
+  t->owned = false;
+  return t;
+}
+
+
+#ifdef _AC_MEMORY_CHECK_
 ac_timer_t *_ac_timer_init(int repeat, const char *caller) {
   ac_timer_t *t =
       (ac_timer_t *)_ac_malloc_d(NULL, caller, sizeof(ac_timer_t), false);
@@ -38,10 +48,11 @@ ac_timer_t *_ac_timer_init(int repeat) {
 #endif
   t->repeat = repeat;
   t->base = t->time_spent = t->start_time = 0;
+  t->owned = true;
   return t;
 }
 
-void ac_timer_destroy(ac_timer_t *t) { ac_free(t); }
+void ac_timer_destroy(ac_timer_t *t) { if(t->owned) ac_free(t); }
 
 /* get the number of times a task is meant to repeat */
 int ac_timer_get_repeat(ac_timer_t *t) { return t->repeat; }
