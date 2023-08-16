@@ -54,7 +54,7 @@ sort_HEADERS = ../include/ac-core/ac_sort/ac_sort_arg_m.h\
 
 # libac-json
 libac_json_a_SOURCES = ac-json/ac_json.c
-libac_json_a_LIBADD = libac-core.a
+# libac_json_a_LIBADD = libac-core.a
 
 json_headers = ../include/ac_json.h
 
@@ -73,7 +73,7 @@ libac_io_a_SOURCES = ac-io/ac_in.c\
     ac-io/ac_md5.c\
     ac-io/md5/md5.c
 
-libac_io_a_LIBADD = libac-core.a libac-json.a -lz
+# libac_io_a_LIBADD = libac-core.a libac-json.a
 
 io_headers = ../include/ac_in.h\
     ../include/ac_in_base.h\
@@ -96,7 +96,7 @@ libac_connect_a_SOURCES = ac-connect/ac_cgi.c\
     ac-connect/ac_http_parser.c\
     ac-connect/ac_serve.c\
     ac-connect/llhttp/llhttp.c
-libac_connect_a_LIBADD = libac-core.a libac-json.a libac-io.a -lz $(LIBUV_LIBS)
+# libac_connect_a_LIBADD = libac-core.a libac-json.a libac-io.a
 
 connect_headers = ../include/ac_cgi.h\
     ../include/ac_client.h\
@@ -109,11 +109,9 @@ connect_HEADERS = ../include/ac-connect/llhttp.h
 # libac-utils
 
 libac_utils_a_SOURCES = ac-utils/ac_file_sync.c
-libac_utils_a_LIBADD = libac-core.a libac-json.a libac-io.a
+# libac_utils_a_LIBADD = libac-core.a libac-json.a libac-io.a
 
 utils_headers = ../include/ac_file_sync.h
-
-
 
 # headers for top level directory
 

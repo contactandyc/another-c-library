@@ -48,5 +48,11 @@ AC_SUBST([MEMORY_CHECK_FILE])
 AM_CONDITIONAL([WITH_MEMORY_CHECK_FILE], [test "x$MEMORY_CHECK_FILE" != "xno"])
 
 # Generate the output files
-AC_CONFIG_FILES([Makefile lib/Makefile examples/Makefile examples/ac-io/Makefile examples/ac-io/read-line-by-line/Makefile])
+AC_CONFIG_FILES([Makefile
+    lib/Makefile
+    examples/Makefile
+    examples/ac-io/Makefile
+    examples/ac-io/read-file-into-buffer/Makefile
+    examples/ac-io/read-line-by-line/Makefile
+])
 AC_OUTPUT

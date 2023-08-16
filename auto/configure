@@ -14059,7 +14059,7 @@ fi
 
 
 # Generate the output files
-ac_config_files="$ac_config_files Makefile lib/Makefile examples/Makefile examples/ac-io/Makefile examples/ac-io/read-line-by-line/Makefile"
+ac_config_files="$ac_config_files Makefile lib/Makefile examples/Makefile examples/ac-io/Makefile examples/ac-io/read-file-into-buffer/Makefile examples/ac-io/read-line-by-line/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -15085,6 +15085,7 @@ do
     "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
     "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
     "examples/ac-io/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ac-io/Makefile" ;;
+    "examples/ac-io/read-file-into-buffer/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ac-io/read-file-into-buffer/Makefile" ;;
     "examples/ac-io/read-line-by-line/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ac-io/read-line-by-line/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
