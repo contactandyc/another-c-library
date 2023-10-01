@@ -1,4 +1,4 @@
-# anotherclibrary v1.0
+# anotherclibrary (Currently being reworked)
 
 `anotherclibrary` is a C library that provides various functionalities. This document provides a guide on how to build and use the library.
 
