@@ -1,13 +1,13 @@
+build
+build2
 config.guess
 autom4te.cache
 aclocal.m4
 config.sub
-configure
 depcomp
 install-sh
 missing
 ltmain.sh
-Makefile.in
 config.status
 config.log
 compile
@@ -18,3 +18,7 @@ node_modules
 libtool
 *.tar.gz
 *.dSYM
+*.Po
+.deps
+*.o
+.dirstamp

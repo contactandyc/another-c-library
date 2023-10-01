@@ -1,3 +1,0 @@
-curl -s "https://en.wikipedia.org/wiki/List_of_women_writers" | grep "</li>" | grep "</a> ([0-9]*.[0-9]*)" | sed 's/.* title="//g' | sed 's#".*</a> (#,#g' | grep "), " | sed 's/), /,/g' | grep "</li>" | sed 's#</li>##g' | grep -v "<i>" | sed "s/<ul>//g" | sed "s#</ul>##g"  > names.txt
-curl -s "https://en.wikipedia.org/wiki/List_of_female_poets" | grep "</li>" | grep "</a> ([0-9]*.[0-9]*)" | sed 's/.* title="//g' | sed 's#".*</a> (#,#g' | grep "), " | sed 's/), /,/g' | grep "</li>" | sed 's#</li>##g' | grep -v "<i>" | sed "s/<ul>//g" | sed "s#</ul>##g"  >> names.txt
-sort names.txt | grep -v "&#" | uniq > names
