@@ -1,7 +1,7 @@
-#include "ac_token.h"
-#include "ac_buffer.h"
-#include "ac_in.h"
-#include "ac_map.h"
+#include "another-c-library/ac_token.h"
+#include "another-c-library/ac_buffer.h"
+#include "another-c-library/ac_in.h"
+#include "another-c-library/ac_map.h"
 
 #include <string.h>
 #include <stdio.h>

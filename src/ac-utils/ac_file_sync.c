@@ -1,9 +1,9 @@
-#include "ac_file_sync.h"
-#include "ac_sort.h"
-#include "ac_io.h"
-#include "ac_json.h"
-#include "ac_allocator.h"
-#include "ac_in.h"
+#include "another-c-library/ac_file_sync.h"
+#include "another-c-library/ac_sort.h"
+#include "another-c-library/ac_io.h"
+#include "another-c-library/ac_json.h"
+#include "another-c-library/ac_allocator.h"
+#include "another-c-library/ac_in.h"
 
 #include <stdio.h>
 #include <string.h>

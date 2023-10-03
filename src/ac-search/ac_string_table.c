@@ -1,7 +1,7 @@
-#include "ac_string_table.h"
-#include "ac_map.h"
-#include "ac_search.h"
-#include "ac_io.h"
+#include "another-c-library/ac_string_table.h"
+#include "another-c-library/ac_map.h"
+#include "another-c-library/ac_search.h"
+#include "another-c-library/ac_io.h"
 #include <string.h>
 #include <inttypes.h>
 

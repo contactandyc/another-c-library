@@ -1,8 +1,8 @@
-#include "ac_schedule.h"
+#include "another-c-library/ac_schedule.h"
 
-#include "ac_allocator.h"
-#include "ac_io.h"
-#include "ac_map.h"
+#include "another-c-library/ac_allocator.h"
+#include "another-c-library/ac_io.h"
+#include "another-c-library/ac_map.h"
 
 #include <math.h>
 #include <pthread.h>

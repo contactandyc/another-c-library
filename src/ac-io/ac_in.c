@@ -1,10 +1,10 @@
-#include "ac_in.h"
+#include "another-c-library/ac_in.h"
 
-#include "ac_buffer.h"
-#include "ac_common.h"
-#include "ac_io.h"
-#include "ac_lz4.h"
-#include "ac_out.h"
+#include "another-c-library/ac_buffer.h"
+#include "another-c-library/ac_common.h"
+#include "another-c-library/ac_io.h"
+#include "another-c-library/ac_lz4.h"
+#include "another-c-library/ac_out.h"
 
 #include <errno.h>
 #include <fcntl.h>

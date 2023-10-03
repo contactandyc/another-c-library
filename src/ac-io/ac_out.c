@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ac_out.h"
+#include "another-c-library/ac_out.h"
 
-#include "ac_allocator.h"
-#include "ac_lz4.h"
+#include "another-c-library/ac_allocator.h"
+#include "another-c-library/ac_lz4.h"
 // #include "lz4/lz4.h"
 
 #include <errno.h>

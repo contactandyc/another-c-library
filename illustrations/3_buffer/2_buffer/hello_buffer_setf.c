@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ac_buffer.h"
+#include "another-c-library/ac_buffer.h"
 
 int main( int argc, char *argv[] ) {
   ac_buffer_t *bh = ac_buffer_init(10);

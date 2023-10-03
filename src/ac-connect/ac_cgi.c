@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ac_cgi.h"
+#include "another-c-library/ac_cgi.h"
 
-#include "ac_conv.h"
-#include "ac_map.h"
+#include "another-c-library/ac_conv.h"
+#include "another-c-library/ac_map.h"
 
 #include <stdio.h>
 #include <string.h>

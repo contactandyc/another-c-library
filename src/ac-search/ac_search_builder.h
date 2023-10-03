@@ -3,10 +3,10 @@
 
 #include <inttypes.h>
 #include <stddef.h>
-#include "ac_pool.h"
-#include "ac_s.h"
-#include "ac_cursor.h"
-#include "ac_number_range.h"
+#include "another-c-library/ac_pool.h"
+#include "another-c-library/ac_s.h"
+#include "another-c-library/ac_cursor.h"
+#include "another-c-library/ac_number_range.h"
 
 struct ac_search_builder_s;
 typedef struct ac_search_builder_s ac_search_builder_t;

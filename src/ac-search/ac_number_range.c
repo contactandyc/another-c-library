@@ -1,6 +1,6 @@
-#include "ac_number_range.h"
+#include "another-c-library/ac_number_range.h"
 
-#include "ac_search.h"
+#include "another-c-library/ac_search.h"
 #include <stdio.h>
 #include <string.h>
 

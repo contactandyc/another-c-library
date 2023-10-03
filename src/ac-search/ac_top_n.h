@@ -1,7 +1,7 @@
 #ifndef _ac_top_n_h
 #define _ac_top_n_h
 
-#include "ac_pool.h"
+#include "another-c-library/ac_pool.h"
 
 typedef struct {
     uint32_t id;

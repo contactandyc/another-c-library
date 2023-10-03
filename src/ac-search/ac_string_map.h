@@ -1,8 +1,8 @@
 #ifndef _ac_string_map_h
 #define _ac_string_map_h
 
-#include "ac_pool.h"
-#include "ac_buffer.h"
+#include "another-c-library/ac_pool.h"
+#include "another-c-library/ac_buffer.h"
 
 struct ac_string_map_s;
 typedef struct ac_string_map_s ac_string_map_t;

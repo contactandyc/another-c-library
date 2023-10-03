@@ -1,5 +1,5 @@
-#include "ac_string_map.h"
-#include "ac_map.h"
+#include "another-c-library/ac_string_map.h"
+#include "another-c-library/ac_map.h"
 
 struct ac_string_map_s {
     ac_pool_t *pool;

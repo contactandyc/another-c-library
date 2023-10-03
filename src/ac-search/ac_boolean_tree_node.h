@@ -1,7 +1,7 @@
 #ifndef _ac_boolean_tree_node_h
 #define _ac_boolean_tree_node_h
 
-#include "ac_pool.h"
+#include "another-c-library/ac_pool.h"
 
 struct ac_boolean_tree_node_s;
 typedef struct ac_boolean_tree_node_s ac_boolean_tree_node_t;

@@ -1,7 +1,7 @@
-#include "ac_s.h"
-#include "ac_allocator.h"
-#include "ac_pool.h"
-#include "ac_map.h"
+#include "another-c-library/ac_s.h"
+#include "another-c-library/ac_allocator.h"
+#include "another-c-library/ac_pool.h"
+#include "another-c-library/ac_map.h"
 
 #include <stdlib.h>
 #include <string.h>

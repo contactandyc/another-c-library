@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ac_json.h"
+#include "another-c-library/ac_json.h"
 
-#include "ac_allocator.h"
-#include "ac_pool.h"
-#include "ac_sort.h"
+#include "another-c-library/ac_allocator.h"
+#include "another-c-library/ac_pool.h"
+#include "another-c-library/ac_sort.h"
 
 #include <stdbool.h>
 #include <stdio.h>

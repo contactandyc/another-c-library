@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ac-connect/llhttp.h"
+#include "another-c-library/ac-connect/llhttp.h"
 
 typedef int (*llhttp__internal__span_cb)(llhttp__internal_t *, const char *,
                                          const char *);
@@ -5914,7 +5914,7 @@ int llhttp__internal_execute(llhttp__internal_t *state, const char *p,
 #include <stdlib.h>
 #include <string.h>
 
-#include "ac-connect/llhttp.h"
+#include "another-c-library/ac-connect/llhttp.h"
 
 #define CALLBACK_MAYBE(PARSER, NAME, ...)                                      \
   do {                                                                         \
@@ -6119,7 +6119,7 @@ void llhttp__debug(llhttp_t *s, const char *p, const char *endp,
 }
 #include <stdio.h>
 #ifndef LLHTTP__TEST
-#include "ac-connect/llhttp.h"
+#include "another-c-library/ac-connect/llhttp.h"
 #else
 #define llhttp_t llparse_t
 #endif /* */

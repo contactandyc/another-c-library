@@ -1,7 +1,7 @@
 #ifndef _ac_token_h
 #define _ac_token_h
 
-#include "ac_pool.h"
+#include "another-c-library/ac_pool.h"
 
 struct ac_token_s;
 typedef struct ac_token_s ac_token_t;

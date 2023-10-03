@@ -1,10 +1,10 @@
-#include "ac_search_builder.h"
+#include "another-c-library/ac_search_builder.h"
 
 #include <inttypes.h>
 
-#include "ac_out.h"
-#include "ac_buffer.h"
-#include "ac_search.h"
+#include "another-c-library/ac_out.h"
+#include "another-c-library/ac_buffer.h"
+#include "another-c-library/ac_search.h"
 
 static ac_out_t *open_sorted(char *filename, ac_io_compare_cb compare, size_t buffer_size) {
   ac_out_options_t options;

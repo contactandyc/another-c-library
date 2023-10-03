@@ -2,8 +2,8 @@
 #define _ac_s_H
 
 #include <inttypes.h>
-#include "ac_pool.h"
-#include "ac_token.h"
+#include "another-c-library/ac_pool.h"
+#include "another-c-library/ac_token.h"
 
 struct ac_s_s;
 typedef struct ac_s_s ac_s_t;

@@ -1,7 +1,7 @@
-#include "ac_in_base.h"
+#include "another-c-library/ac_in_base.h"
 
-#include "ac_allocator.h"
-#include "ac_buffer.h"
+#include "another-c-library/ac_allocator.h"
+#include "another-c-library/ac_buffer.h"
 
 #include <errno.h>
 #include <fcntl.h>

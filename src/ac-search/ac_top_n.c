@@ -1,5 +1,5 @@
-#include "ac_top_n.h"
-#include "ac_sort.h"
+#include "another-c-library/ac_top_n.h"
+#include "another-c-library/ac_sort.h"
 
 static inline int compare_ac_top_n_item(const ac_top_n_item_t *a, const ac_top_n_item_t *b) {
   if(a->weight != b->weight)

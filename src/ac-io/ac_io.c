@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ac_io.h"
+#include "another-c-library/ac_io.h"
 
-#include "ac_allocator.h"
+#include "another-c-library/ac_allocator.h"
 
 #include <dirent.h>
 #include <errno.h>
@@ -29,7 +29,7 @@ limitations under the License.
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "ac_lz4.h"
+#include "another-c-library/ac_lz4.h"
 
 ac_sort_compare_arg_m(ac_io_sort_records, ac_io_record_t);
 
