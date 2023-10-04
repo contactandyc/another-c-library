@@ -17,7 +17,7 @@ limitations under the License.
 #ifndef _ac_object_pipe_H
 #define _ac_object_pipe_H
 
-#include "ac_common.h"
+#include "another-c-library/ac_common.h"
 
 #include <uv.h>
 

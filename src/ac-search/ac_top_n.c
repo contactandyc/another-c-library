@@ -1,14 +1,14 @@
-#include "ac_top_n.h"
-#include "ac_sort.h"
+#include "another-c-library/ac-search/ac_top_n.h"
 
-static inline int compare_ac_top_n_item(const ac_top_n_item_t *a, const ac_top_n_item_t *b) {
+#include "the-macro-library/macro_sort.h"
+
+static inline bool compare_ac_top_n_item(const ac_top_n_item_t *a, const ac_top_n_item_t *b) {
   if(a->weight != b->weight)
     return (a->weight < b->weight) ? 1 : -1; // descending
-  if(a->id != b->id)
-    return (a->id < b->id) ? -1 : 1;
-  return 0;
+  return a->id < b->id;
 }
-static inline ac_sort_m(sort_ac_top_n_item, ac_top_n_item_t, compare_ac_top_n_item);
+
+static inline macro_sort(sort_ac_top_n_item, ac_top_n_item_t, compare_ac_top_n_item);
 
 struct ac_top_n_s {
     ac_top_n_item_t *iw;

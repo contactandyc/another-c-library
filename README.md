@@ -1,5 +1,7 @@
 # anotherclibrary (Currently being reworked)
 
+* Updating to use https://github/contactandyc/the-macro-library for most of the macros.
+
 `anotherclibrary` is a C library that provides various functionalities. This document provides a guide on how to build and use the library.
 
 ## Dependencies

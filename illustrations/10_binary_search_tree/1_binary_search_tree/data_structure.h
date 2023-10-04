@@ -17,8 +17,8 @@ limitations under the License.
 #ifndef _data_structure_H
 #define _data_structure_H
 
-#include "ac_pool.h"
-#include "ac_common.h"
+#include "another-c-library/ac_pool.h"
+#include "another-c-library/ac_common.h"
 
 struct node_s;
 typedef struct node_s node_t;

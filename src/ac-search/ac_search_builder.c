@@ -1,10 +1,10 @@
-#include "ac_search_builder.h"
+#include "another-c-library/ac-search/ac_search_builder.h"
 
 #include <inttypes.h>
 
-#include "ac_out.h"
-#include "ac_buffer.h"
-#include "ac_search.h"
+#include "another-c-library/ac_out.h"
+#include "another-c-library/ac_buffer.h"
+#include "the-macro-library/macro_bsearch.h"
 
 static ac_out_t *open_sorted(char *filename, ac_io_compare_cb compare, size_t buffer_size) {
   ac_out_options_t options;
@@ -431,7 +431,7 @@ static inline int compare_strings(const char *key, const char **v) {
     return strcmp(key, *v);
 }
 
-static inline ac_search_m(search_strings, char, char *, compare_strings);
+static inline macro_bsearch_kv(search_strings, char, char *, compare_strings);
 
 static inline void advance_group(ac_search_builder_image_term_t *t)
 {

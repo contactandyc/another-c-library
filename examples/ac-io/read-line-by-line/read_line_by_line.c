@@ -1,5 +1,5 @@
-#include "ac_in.h"
-#include "ac_out.h"
+#include "another-c-library/ac_in.h"
+#include "another-c-library/ac_out.h"
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {

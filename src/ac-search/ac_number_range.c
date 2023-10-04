@@ -1,6 +1,6 @@
-#include "ac_number_range.h"
+#include "another-c-library/ac-search/ac_number_range.h"
 
-#include "ac_search.h"
+#include "the-macro-library/macro_bsearch.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -48,8 +48,7 @@ static inline int compare_number_range(const int *k, const ac_number_range_t *v)
         return (*k < v->end) ? -1 : 1;
     return 0;
 }
-
-static inline ac_search_upper_bound_m(search_number_ranges, int, ac_number_range_t, compare_number_range);
+static inline _macro_bsearch_kv(search_number_ranges, upper_bound, cmp_no_arg, int, ac_number_range_t, compare_number_range);
 
 static inline bool _match_number_ranges(int ts, ac_number_range_t *nr, size_t num_nr) {
     ac_number_range_t *t = search_number_ranges(&ts, nr, num_nr);

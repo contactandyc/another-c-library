@@ -1,7 +1,7 @@
 #ifndef _data_structure_H
 #define _data_structure_H
 
-#include "ac_pool.h"
+#include "another-c-library/ac_pool.h"
 #include <stdbool.h>
 
 

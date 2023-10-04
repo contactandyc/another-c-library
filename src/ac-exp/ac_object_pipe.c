@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ac_object_pipe.h"
+#include "another-c-library/ac_object_pipe.h"
 
-#include "ac_allocator.h"
+#include "another-c-library/ac_allocator.h"
 
 #include <fcntl.h>
 #include <pthread.h>

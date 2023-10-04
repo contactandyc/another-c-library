@@ -1,8 +1,8 @@
 # Explanation of code
 
 ```c
-#include "ac_in.h"
-#include "ac_out.h"
+#include "another-c-library/ac_in.h"
+#include "another-c-library/ac_out.h"
 ```
 Include ac_in and ac_out for input and output
 

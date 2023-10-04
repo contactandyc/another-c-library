@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ac_cgi.h"
+#include "another-c-library/ac_cgi.h"
 
-#include "ac_conv.h"
-#include "ac_map.h"
+#include "another-c-library/ac_conv.h"
+#include "the-macro-library/macro_map.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -97,13 +97,13 @@ typedef struct value_s {
 } value_t;
 
 typedef struct {
-  ac_map_t map;
+  macro_map_t map;
   value_t *head, *tail;
 } cgi_node_t;
 
 struct ac_cgi_s {
   ac_pool_t *pool;
-  ac_map_t *root;
+  macro_map_t *root;
 };
 
 static inline const char *get_key(const cgi_node_t *el) {
@@ -119,13 +119,13 @@ static inline int compare_key_for_find(const char *key,
   return strcasecmp(key, get_key(value));
 }
 
-ac_map_find_m(cgi_find, char, cgi_node_t, compare_key_for_find);
-ac_map_insert_m(cgi_insert, cgi_node_t, compare_key);
+macro_map_find_kv(cgi_find, char, cgi_node_t, compare_key_for_find);
+macro_map_insert(cgi_insert, cgi_node_t, compare_key);
 
 const char *ac_cgi_query(ac_cgi_t *h) { return (char *)(h + 1); }
 
 char **ac_cgi_strs(ac_cgi_t *h, const char *key) {
-  cgi_node_t *n = cgi_find(key, h->root);
+  cgi_node_t *n = cgi_find(h->root, key);
   if (!n || !n->head)
     return NULL;
 
@@ -149,7 +149,7 @@ char **ac_cgi_strs(ac_cgi_t *h, const char *key) {
 
 const char *ac_cgi_str(ac_cgi_t *h, const char *key,
                          const char *default_value) {
-  cgi_node_t *n = cgi_find(key, h->root);
+  cgi_node_t *n = cgi_find(h->root, key);
   if (!n || !n->head)
     return default_value;
 
@@ -157,7 +157,7 @@ const char *ac_cgi_str(ac_cgi_t *h, const char *key,
 }
 
 bool ac_cgi_bool(ac_cgi_t *h, const char *key, bool default_value) {
-  cgi_node_t *n = cgi_find(key, h->root);
+  cgi_node_t *n = cgi_find(h->root, key);
   if (!n || !n->head)
     return default_value;
 
@@ -165,7 +165,7 @@ bool ac_cgi_bool(ac_cgi_t *h, const char *key, bool default_value) {
 }
 
 int ac_cgi_int(ac_cgi_t *h, const char *key, int default_value) {
-  cgi_node_t *n = cgi_find(key, h->root);
+  cgi_node_t *n = cgi_find(h->root, key);
   if (!n || !n->head)
     return default_value;
 
@@ -173,7 +173,7 @@ int ac_cgi_int(ac_cgi_t *h, const char *key, int default_value) {
 }
 
 long ac_cgi_long(ac_cgi_t *h, const char *key, long default_value) {
-  cgi_node_t *n = cgi_find(key, h->root);
+  cgi_node_t *n = cgi_find(h->root, key);
   if (!n || !n->head)
     return default_value;
 
@@ -181,7 +181,7 @@ long ac_cgi_long(ac_cgi_t *h, const char *key, long default_value) {
 }
 
 double ac_cgi_double(ac_cgi_t *h, const char *key, double default_value) {
-  cgi_node_t *n = cgi_find(key, h->root);
+  cgi_node_t *n = cgi_find(h->root, key);
   if (!n || !n->head)
     return default_value;
 
@@ -190,7 +190,7 @@ double ac_cgi_double(ac_cgi_t *h, const char *key, double default_value) {
 
 int32_t ac_cgi_int32_t(ac_cgi_t *h, const char *key,
                          int32_t default_value) {
-  cgi_node_t *n = cgi_find(key, h->root);
+  cgi_node_t *n = cgi_find(h->root, key);
   if (!n || !n->head)
     return default_value;
 
@@ -199,7 +199,7 @@ int32_t ac_cgi_int32_t(ac_cgi_t *h, const char *key,
 
 uint32_t ac_cgi_uint32_t(ac_cgi_t *h, const char *key,
                            uint32_t default_value) {
-  cgi_node_t *n = cgi_find(key, h->root);
+  cgi_node_t *n = cgi_find(h->root, key);
   if (!n || !n->head)
     return default_value;
 
@@ -208,7 +208,7 @@ uint32_t ac_cgi_uint32_t(ac_cgi_t *h, const char *key,
 
 int64_t ac_cgi_int64_t(ac_cgi_t *h, const char *key,
                          int64_t default_value) {
-  cgi_node_t *n = cgi_find(key, h->root);
+  cgi_node_t *n = cgi_find(h->root, key);
   if (!n || !n->head)
     return default_value;
 
@@ -217,7 +217,7 @@ int64_t ac_cgi_int64_t(ac_cgi_t *h, const char *key,
 
 uint64_t ac_cgi_uint64_t(ac_cgi_t *h, const char *key,
                            uint64_t default_value) {
-  cgi_node_t *n = cgi_find(key, h->root);
+  cgi_node_t *n = cgi_find(h->root, key);
   if (!n || !n->head)
     return default_value;
 
@@ -239,13 +239,13 @@ static void add_key_value(ac_cgi_t *h, char *kv) {
     value = p;
     decoded = ac_cgi_decode(h->pool, p);
   }
-  cgi_node_t *n = cgi_find(kv, h->root);
+  cgi_node_t *n = cgi_find(h->root, kv);
   if (!n) {
     n = (cgi_node_t *)ac_pool_alloc(h->pool,
                                       sizeof(cgi_node_t) + strlen(kv) + 1);
     strcpy((char *)(n + 1), kv);
     n->head = n->tail = NULL;
-    cgi_insert(n, &h->root);
+    cgi_insert(&h->root, n);
   }
   if (value) {
     value_t *v = (value_t *)ac_pool_alloc(h->pool, sizeof(value_t));

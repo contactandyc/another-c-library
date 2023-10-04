@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ac_allocator.h"
-#include "ac_pool.h"
+#include "another-c-library/ac_allocator.h"
+#include "another-c-library/ac_pool.h"
 #include <stdlib.h>
 
 size_t ac_pool_size(ac_pool_t *h) {

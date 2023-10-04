@@ -14,11 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ac_json.h"
+#include "another-c-library/ac_json.h"
 
-#include "ac_allocator.h"
-#include "ac_pool.h"
-#include "ac_sort.h"
+#include "another-c-library/ac_allocator.h"
+#include "another-c-library/ac_pool.h"
+
+#include "the-macro-library/macro_sort.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -1239,14 +1240,14 @@ bad_character:;
   return (ac_json_t *)err;
 }
 
-static inline int ac_json_compare(const ac_jsono_t **a, const ac_jsono_t **b) {
-  return strcmp((*a)->key, (*b)->key);
+static inline bool ac_json_compare(const ac_jsono_t **a, const ac_jsono_t **b) {
+  return strcmp((*a)->key, (*b)->key) < 0;
 }
 
-ac_sort_m(__ac_json_sort, ac_jsono_t *, ac_json_compare);
+macro_sort(__ac_json_sort, ac_jsono_t *, ac_json_compare);
 
 void _ac_jsono_fill(_ac_jsono_t *o) {
-  o->root = (ac_map_t *)ac_pool_alloc(
+  o->root = (macro_map_t *)ac_pool_alloc(
       o->pool, (sizeof(ac_jsono_t *) * (o->num_entries + 1)));
   ac_jsono_t **base = (ac_jsono_t **)o->root;
   ac_jsono_t **awp = base;

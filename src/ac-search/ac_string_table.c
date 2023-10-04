@@ -1,20 +1,22 @@
-#include "ac_string_table.h"
-#include "ac_map.h"
-#include "ac_search.h"
-#include "ac_io.h"
+#include "another-c-library/ac-search/ac_string_table.h"
+
+#include "another-c-library/ac_io.h"
+
+#include "the-macro-library/macro_map.h"
+#include "the-macro-library/macro_bsearch.h"
 #include <string.h>
 #include <inttypes.h>
 
-static inline int compare_string_node(const ac_map_t *a, const ac_map_t *b) {
+static inline int compare_string_node(const macro_map_t *a, const macro_map_t *b) {
   return strcmp((char *)(a+1), (char *)(b+1));
 }
 
-static inline int compare_string_node_for_find(const char *a, const ac_map_t *b) {
+static inline int compare_string_node_for_find(const char *a, const macro_map_t *b) {
   return strcmp(a, (char *)(b+1));
 }
 
-static inline ac_map_insert_m(string_node_insert, ac_map_t, compare_string_node);
-static inline ac_map_find_m(string_node_find, char, ac_map_t, compare_string_node_for_find);
+static inline macro_map_insert(string_node_insert, macro_map_t, compare_string_node);
+static inline macro_map_find_kv(string_node_find, char, macro_map_t, compare_string_node_for_find);
 
 struct ac_string_table_s {
     char *all_strings;
@@ -23,7 +25,7 @@ struct ac_string_table_s {
 
     // only needed for id rewrite
     ac_pool_t *pool;
-    ac_map_t *root;
+    macro_map_t *root;
 
     uint32_t map_size;
 };
@@ -35,7 +37,7 @@ static inline int compare_strings(const char *key, const uint32_t *v, const void
     return strcmp(key, value);
 }
 
-static inline ac_search_arg_m(search_strings, char, uint32_t, compare_strings);
+static inline _macro_bsearch_kv(search_strings, core, cmp_arg, char, uint32_t, compare_strings);
 
 uint32_t ac_string_table_find(ac_string_table_t *h, const char *s) {
     if(!s) return 0;
@@ -61,12 +63,12 @@ void ac_string_table_add(ac_string_table_t *h, const char *s) {
         return;
 
     uint32_t *res = search_strings(s, h->offsets, h->num_strings, h->all_strings);
-    if(!res && !string_node_find(s, h->root)) {
+    if(!res && !string_node_find(h->root, s)) {
         // printf( "adding %s\n", s );
-        ac_map_t *n =
-            (ac_map_t *)ac_pool_calloc(h->pool, sizeof(ac_map_t) + strlen(s)+1);
+        macro_map_t *n =
+            (macro_map_t *)ac_pool_calloc(h->pool, sizeof(macro_map_t) + strlen(s)+1);
         strcpy((char *)(n+1), s);
-        string_node_insert(n, &h->root);
+        string_node_insert(&h->root, n);
         h->map_size++;
     }
 }
@@ -118,7 +120,7 @@ uint32_t *ac_string_table_save(ac_string_table_t *h, const char *filename) {
     uint32_t *sp = h->offsets;
     uint32_t *p = sp;
     uint32_t *ep = p+h->num_strings;
-    ac_map_t *n = ac_map_first(h->root);
+    macro_map_t *n = macro_map_first(h->root);
     uint32_t cur_offs = 0;
     char *s;
     // merge old and new
@@ -134,7 +136,7 @@ uint32_t *ac_string_table_save(ac_string_table_t *h, const char *filename) {
             }
             else {
                 s = v2;
-                n = ac_map_next(n);
+                n = macro_map_next(n);
             }
             *op++ = cur_offs;
             cur_offs += strlen(s) + 1;
@@ -153,7 +155,7 @@ uint32_t *ac_string_table_save(ac_string_table_t *h, const char *filename) {
     // finish new
     while(n) {
         s = (char *)(n+1);
-        n = ac_map_next(n);
+        n = macro_map_next(n);
         *op++ = cur_offs;
         cur_offs += strlen(s) + 1;
     }
@@ -167,7 +169,7 @@ uint32_t *ac_string_table_save(ac_string_table_t *h, const char *filename) {
     ac_free(offs);
 
     p = sp;
-    n = ac_map_first(h->root);
+    n = macro_map_first(h->root);
     while(p < ep && n) {
         char *v1 = h->all_strings + *p;
         char *v2 = (char *)(n+1);
@@ -179,7 +181,7 @@ uint32_t *ac_string_table_save(ac_string_table_t *h, const char *filename) {
             }
             else {
                 s = v2;
-                n = ac_map_next(n);
+                n = macro_map_next(n);
             }
             fwrite(s, strlen(s)+1, 1, out);
         }
@@ -195,7 +197,7 @@ uint32_t *ac_string_table_save(ac_string_table_t *h, const char *filename) {
     // finish new
     while(n) {
         s = (char *)(n+1);
-        n = ac_map_next(n);
+        n = macro_map_next(n);
         fwrite(s, strlen(s)+1, 1, out);
     }
     fclose(out);
