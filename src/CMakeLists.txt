@@ -63,6 +63,10 @@ else()
     target_link_libraries(ac-connect PRIVATE ZLIB::ZLIB)
 endif()
 
-set(libac_utils_a_SOURCES ac-utils/ac_file_sync.c)
+set(libac_utils_a_SOURCES
+    ac-utils/ac_csv.c
+    ac-utils/ac_file_sync.c
+    ac-utils/ac_split.c
+    ac-utils/ac_strip_html.c)
 add_library(ac-utils STATIC ${libac_utils_a_SOURCES})
 target_link_libraries(ac-utils PRIVATE ZLIB::ZLIB)

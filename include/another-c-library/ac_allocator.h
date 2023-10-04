@@ -47,10 +47,6 @@ extern "C" {
 #define ac_strdupan(p, n) _ac_strdupan_d(NULL, __AC_FILE_LINE__, p, n)
 #define ac_strdupa2(p) _ac_strdupa2_d(NULL, __AC_FILE_LINE__, p)
 #define ac_memdup(p, len) _ac_memdup_d(NULL, __AC_FILE_LINE__, p, len)
-#define ac_split(num_splits, delim, s)                                         \
-  _ac_split_d(NULL, __AC_FILE_LINE__, num_splits, delim, s)
-#define ac_split2(num_splits, delim, s)                                        \
-  _ac_split2_d(NULL, __AC_FILE_LINE__, num_splits, delim, s)
 #define ac_free(p) _ac_free_d(NULL, __AC_FILE_LINE__, p)
 #else
 #define ac_malloc(len) malloc(len)
@@ -63,10 +59,6 @@ extern "C" {
 #define ac_strdupan(p, n) _ac_strdupan(p, n)
 #define ac_strdupa2(p) _ac_strdupa2(p)
 #define ac_memdup(p, len) _ac_memdup(p, len)
-#define ac_split(num_splits, delim, s)                                         \
-  _ac_split_d(NULL, NULL, num_splits, delim, s)
-#define ac_split2(num_splits, delim, s)                                        \
-  _ac_split2_d(NULL, NULL, num_splits, delim, s)
 #define ac_free(p) free(p)
 #endif
 
@@ -112,12 +104,6 @@ void *_ac_realloc_d(ac_allocator_t *a, const char *caller, void *p, size_t len,
 char *_ac_strdup_d(ac_allocator_t *a, const char *caller, const char *p);
 
 void _ac_free_d(ac_allocator_t *a, const char *caller, void *p);
-
-char **_ac_split_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
-                   char delim, const char *s);
-
-char **_ac_split2_d(ac_allocator_t *a, const char *caller, size_t *num_splits,
-                    char delim, const char *s);
 
 static inline void *_ac_memdup_d(ac_allocator_t *a, const char *caller,
                                  const void *p, size_t len) {

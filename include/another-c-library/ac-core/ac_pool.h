@@ -227,3 +227,5 @@ static inline void ac_pool_reset(ac_pool_t *h, ac_pool_checkpoint_t *cp) {
 #endif
   h->used = cp->used;
 }
+
+char **_ac_pool_split(ac_pool_t *h, size_t *num_splits, char delim, char *s);
