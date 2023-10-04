@@ -2,7 +2,7 @@
 
 #include "another-c-library/ac_allocator.h"
 #include "another-c-library/ac_io.h"
-#include "another-c-library/ac_map.h"
+#include "the-macro-library/macro_map.h"
 
 #include <math.h>
 #include <pthread.h>
@@ -78,7 +78,7 @@ typedef struct {
 } parsed_args_t;
 
 struct ac_schedule_s {
-  ac_map_t *task_root;
+  macro_map_t *task_root;
   ac_pool_t *pool;
   ac_pool_t *tmp_pool;
 
@@ -146,7 +146,7 @@ struct ac_transform_s {
 };
 
 struct ac_task_s {
-  ac_map_t node;
+  macro_map_t node;
 
   char *task_name;
   size_t num_partitions;
@@ -441,11 +441,11 @@ int compare_task_for_insert(const ac_task_t *a, const ac_task_t *b) {
   return strcmp(a->task_name, b->task_name);
 }
 
-static ac_map_find_m(_task_find, char, ac_task_t, compare_task_for_find);
-static ac_map_insert_m(_task_insert, ac_task_t, compare_task_for_insert);
+static macro_map_find_kv(_task_find, char, ac_task_t, compare_task_for_find);
+static macro_map_insert(_task_insert, ac_task_t, compare_task_for_insert);
 
 static ac_task_t *find_task(ac_schedule_t *h, const char *task_name) {
-  return _task_find(task_name, h->task_root);
+  return _task_find(h->task_root, task_name);
 }
 
 static ac_task_state_link_t *available_tasks(ac_schedule_t *h,
@@ -2500,7 +2500,7 @@ ac_task_t *ac_schedule_task(ac_schedule_t *h, const char *task_name,
     node->num_partitions = num_partitions;
     node->task_name = (char *)(node->state_linkage + num_partitions);
     strcpy(node->task_name, task_name);
-    _task_insert(node, &(h->task_root));
+    _task_insert(&(h->task_root), node);
     for (size_t i = 0; i < num_partitions; i++) {
       node->state_linkage[i].task = node;
       node->state_linkage[i].waiting_on_others = false;

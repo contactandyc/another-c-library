@@ -5,7 +5,6 @@ set(libac_core_a_SOURCES
     ac-core/ac_allocator.c
     ac-core/ac_buffer.c
     ac-core/ac_conv.c
-    ac-core/ac_map.c
     ac-core/ac_pool.c
     ac-core/ac_timer.c
 )

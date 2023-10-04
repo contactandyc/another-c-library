@@ -4,7 +4,7 @@
 
 #include "another-c-library/ac_out.h"
 #include "another-c-library/ac_buffer.h"
-#include "another-c-library/ac_search.h"
+#include "the-macro-library/macro_bsearch.h"
 
 static ac_out_t *open_sorted(char *filename, ac_io_compare_cb compare, size_t buffer_size) {
   ac_out_options_t options;
