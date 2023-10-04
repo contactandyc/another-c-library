@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "another-c-library/ac_map.h"
-#include "another-c-library/ac_search.h"
-#include "another-c-library/ac_sort.h"
+#include "the-macro-library/macro_map.h"
+#include "the-macro-library/macro_bsearch.h"
 
 #define AC_JSON_ERROR 0
 #define AC_JSON_VALID 1
@@ -49,7 +48,7 @@ struct ac_jsona_s {
 };
 
 struct ac_jsono_s {
-  ac_map_t map;
+  macro_map_t map;
   char *key;
   ac_json_t *value;
   ac_jsono_t *next;
@@ -225,14 +224,15 @@ static inline int ac_jsono_insert_compare(const ac_jsono_t *a,
   return strcmp(a->key, b->key);
 }
 
-static inline ac_map_find_m(__ac_json_find, char, ac_jsono_t,
-                            ac_jsono_compare2);
+static inline
+macro_map_find_kv(__ac_json_find, char, ac_jsono_t,
+                  ac_jsono_compare2);
 
-static inline ac_map_insert_m(__ac_json_insert, ac_jsono_t,
-                              ac_jsono_insert_compare);
+static inline macro_map_insert(__ac_json_insert, ac_jsono_t,
+                                  ac_jsono_insert_compare);
 
-static inline ac_search_least_m(__ac_json_search, char, ac_jsono_t *,
-                                ac_jsono_compare);
+static inline macro_bsearch_first_kv(__ac_json_search, char, ac_jsono_t *,
+                                  ac_jsono_compare);
 
 struct ac_json_error_s;
 typedef struct ac_json_error_s ac_json_error_t;
@@ -265,7 +265,7 @@ struct _ac_jsono_s {
   uint32_t type;
   uint32_t num_entries;
   ac_json_t *parent;
-  ac_map_t *root;
+  macro_map_t *root;
   size_t num_sorted_entries;
   ac_jsono_t *head;
   ac_jsono_t *tail;
@@ -450,7 +450,7 @@ static inline void ac_jsono_erase(ac_jsono_t *n) {
       o->root = NULL;
       o->num_sorted_entries = 0;
     } else
-      ac_map_erase((ac_map_t *)n, &o->root);
+      macro_map_erase(&o->root, (macro_map_t *)n);
   }
   if (n->previous) {
     n->previous->next = n->next;
@@ -733,7 +733,7 @@ static inline void _ac_jsono_fill_tree(_ac_jsono_t *o) {
   o->root = NULL;
   o->num_sorted_entries = 0;
   while (r) {
-    __ac_json_insert(r, &(o->root));
+    __ac_json_insert(&(o->root), r);
     r = r->next;
   }
 }
@@ -746,7 +746,7 @@ static inline ac_jsono_t *ac_jsono_find(ac_json_t *j, const char *key) {
     else
       return NULL;
   }
-  return __ac_json_find(key, o->root);
+  return __ac_json_find(o->root, key);
 }
 
 static inline ac_jsono_t *ac_jsono_insert(ac_json_t *j, const char *key,
@@ -760,7 +760,7 @@ static inline ac_jsono_t *ac_jsono_insert(ac_json_t *j, const char *key,
   } else {
     ac_jsono_append(j, key, item, copy_key);
     _ac_jsono_t *o = (_ac_jsono_t *)j;
-    __ac_json_insert(o->tail, &(o->root));
+    __ac_json_insert(&(o->root), o->tail);
   }
   return res;
 }

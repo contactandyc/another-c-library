@@ -19,7 +19,7 @@ limitations under the License.
 
 #include "another-c-library/ac_buffer.h"
 #include "another-c-library/ac_common.h"
-#include "another-c-library/ac_sort.h"
+#include "the-macro-library/macro_sort.h"
 
 #include <inttypes.h>
 #include <time.h>
@@ -49,7 +49,7 @@ typedef struct ac_io_file_info_s {
   int32_t tag;
 } ac_io_file_info_t;
 
-ac_sort_compare_arg_def(ac_io_sort_records, ac_io_record_t);
+_macro_sort_compare_h(ac_io_sort_records, cmp_arg, ac_io_record_t);
 
 typedef bool (*ac_io_reducer_cb)(ac_io_record_t *res, const ac_io_record_t *r,
                                 size_t num_r, ac_buffer_t *bh, void *tag);

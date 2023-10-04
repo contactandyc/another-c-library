@@ -31,7 +31,7 @@ limitations under the License.
 
 #include "another-c-library/ac_lz4.h"
 
-ac_sort_compare_arg_m(ac_io_sort_records, ac_io_record_t);
+_macro_sort_compare(ac_io_sort_records, cmp_arg, ac_io_record_t);
 
 bool ac_io_keep_first(ac_io_record_t *res, const ac_io_record_t *r,
                       size_t num_r, ac_buffer_t *bh, void *tag) {
@@ -300,13 +300,11 @@ ac_pool_io_list(ac_pool_t *pool, const char *path, size_t *num_files,
 }
 
 static inline
-int compare_ac_io_file_info(const ac_io_file_info_t *a, const ac_io_file_info_t *b) {
-    if(a->last_modified != b->last_modified)
-        return (a->last_modified < b->last_modified) ? -1 : 1;
-    return 0;
+bool compare_ac_io_file_info(const ac_io_file_info_t *a, const ac_io_file_info_t *b) {
+    return a->last_modified < b->last_modified;
 }
 
-static ac_sort_m(_sort_ac_io_file_info, ac_io_file_info_t, compare_ac_io_file_info);
+static macro_sort(_sort_ac_io_file_info, ac_io_file_info_t, compare_ac_io_file_info);
 
 void ac_io_sort_file_info_by_last_modified(ac_io_file_info_t *files, size_t num_files) {
     _sort_ac_io_file_info(files, num_files);

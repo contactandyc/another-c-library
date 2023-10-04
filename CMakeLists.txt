@@ -30,6 +30,14 @@ endif()
 
 include_directories("/usr/local/include")
 
+# include(CheckIncludeFile)
+# check_include_file("the-macro-library/macro_sort.h" HAVE_MACRO_SORT)
+
+find_path(MACRO_SORT_HEADER NAMES "macro_sort.h" PATHS "/usr/local/include/the-macro-library")
+if(NOT MACRO_SORT_HEADER)
+    message(FATAL_ERROR "The Macro Library found at https://github.com/contactandyc/the-macro-library is not installed")
+endif()
+
 add_subdirectory(src)
 add_subdirectory(examples)
 

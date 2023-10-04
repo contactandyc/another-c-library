@@ -1,23 +1,22 @@
 #include "another-c-library/ac_file_sync.h"
-#include "another-c-library/ac_sort.h"
 #include "another-c-library/ac_io.h"
 #include "another-c-library/ac_json.h"
 #include "another-c-library/ac_allocator.h"
 #include "another-c-library/ac_in.h"
 
+#include "the-macro-library/macro_sort.h"
+
 #include <stdio.h>
 #include <string.h>
 
-static inline int compare_ac_file_sync_entry(const ac_file_sync_entry_t *a, const ac_file_sync_entry_t *b) {
+static inline bool compare_ac_file_sync_entry(const ac_file_sync_entry_t *a, const ac_file_sync_entry_t *b) {
     int n=strcmp(a->type, b->type);
     if(n)
-        return n;
-    if(a->index != b->index)
-        return (a->index < b->index) ? -1 : 1;
-    return 0;
+        return n < 0;
+    return a->index < b->index;
 }
 
-static inline ac_sort_m(sort_ac_file_sync_entry, ac_file_sync_entry_t, compare_ac_file_sync_entry);
+static inline macro_sort(sort_ac_file_sync_entry, ac_file_sync_entry_t, compare_ac_file_sync_entry);
 
 void ac_file_sync_destroy(ac_file_sync_t *h) {
     ac_pool_t *pool = h->pool;
@@ -40,13 +39,11 @@ static bool check_file(const char *filename, void *arg) {
         return len > 5 && !strcmp(filename+len-5, ".json");
 }
 
-static inline int compare_uint32_t(const uint32_t *a, const uint32_t *b) {
-    if(*a != *b)
-        return (*a < *b) ? -1 : 1;
-    return 0;
+static inline bool compare_uint32_t(const uint32_t *a, const uint32_t *b) {
+    return *a < *b;
 }
 
-static inline ac_sort_m(sort_uint32_t, uint32_t, compare_uint32_t);
+static inline macro_sort(sort_uint32_t, uint32_t, compare_uint32_t);
 
 typedef struct {
     uint32_t *files;
