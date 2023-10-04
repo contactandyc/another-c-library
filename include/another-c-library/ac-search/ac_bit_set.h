@@ -1,8 +1,8 @@
 #ifndef _ac_bit_set_h
 #define _ac_bit_set_h
 
-#include "another-c-library/ac_cursor.h"
 #include "another-c-library/ac_pool.h"
+#include "another-c-library/ac-search/ac_cursor.h"
 
 struct ac_bit_set_s;
 typedef struct ac_bit_set_s ac_bit_set_t;

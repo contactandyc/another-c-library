@@ -1,7 +1,10 @@
-#include "another-c-library/ac_token.h"
+#include "another-c-library/ac-search/ac_token.h"
+
 #include "another-c-library/ac_buffer.h"
+
 #include "another-c-library/ac_in.h"
-#include "another-c-library/ac_map.h"
+
+#include "the-macro-library/macro_map.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -940,11 +943,11 @@ ac_token_t *ac_token_parse_expression(ac_pool_t *pool, const char *s,
 
 struct ac_token_dict_s {
     ac_pool_t *pool;
-    ac_map_t *root;    
+    macro_map_t *root;
 };
 
 struct ac_token_node_s {
-    ac_map_t node;
+    macro_map_t node;
     ac_token_t *token;
 };
 
@@ -960,13 +963,13 @@ int compare_token_node_for_insert(const ac_token_node_t *a, const ac_token_node_
     return strcmp((const char *)(a+1), (const char *)(b+1));
 }
 
-static ac_map_find_m(_token_node_find, char, ac_token_node_t, compare_token_node_for_find);
-static ac_map_insert_m(_token_node_insert, ac_token_node_t, compare_token_node_for_insert);
+static macro_map_find_kv(_token_node_find, char, ac_token_node_t, compare_token_node_for_find);
+static macro_map_insert(_token_node_insert, ac_token_node_t, compare_token_node_for_insert);
 
 
 ac_token_cb_t ac_token_dict_cb(void *arg, ac_token_cb_data_t *d) {
     ac_token_dict_t *h = (ac_token_dict_t *)arg;
-    ac_token_node_t *n = _token_node_find(d->param, h->root);
+    ac_token_node_t *n = _token_node_find(h->root, d->param);
     if(!n) {
         if(d->param[0] == '@')
             return NUMBER;
@@ -1081,11 +1084,11 @@ bool ac_token_dict_add(ac_token_dict_t *h, const char *config_line) {
     t->attr_type = cb_type;
     t->no_params = no_params;
 
-    ac_token_node_t *n = _token_node_find(name, h->root);
+    ac_token_node_t *n = _token_node_find(h->root, name);
     if(!n) {
         n = (ac_token_node_t *)ac_pool_calloc(h->pool, sizeof(*n) + strlen(name) + 1);
         strcpy((char *)(n+1), name);
-        _token_node_insert(n, &h->root);
+        _token_node_insert(&h->root, n);
         // printf( "inserting %s (%s) %s\n", name, type, p );
     }
     n->token = t;
@@ -1095,7 +1098,7 @@ bool ac_token_dict_add(ac_token_dict_t *h, const char *config_line) {
 
 char **ac_token_dict_values(ac_token_dict_t *h, uint32_t *num_values, const char *param) {
     *num_values = 0;
-    ac_token_node_t *n = _token_node_find(param, h->root);
+    ac_token_node_t *n = _token_node_find(h->root, param);
     if(!n) return NULL;
 
     if(n->token) {

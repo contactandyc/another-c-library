@@ -45,4 +45,4 @@ add_subdirectory(examples)
 install(FILES README.md AUTHORS NEWS.md CHANGELOG.md LICENSE DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
 # Install header files
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/another-c-library DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/another-c-library)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/another-c-library DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

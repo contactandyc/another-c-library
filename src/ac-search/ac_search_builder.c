@@ -1,4 +1,4 @@
-#include "another-c-library/ac_search_builder.h"
+#include "another-c-library/ac-search/ac_search_builder.h"
 
 #include <inttypes.h>
 
@@ -431,7 +431,7 @@ static inline int compare_strings(const char *key, const char **v) {
     return strcmp(key, *v);
 }
 
-static inline ac_search_m(search_strings, char, char *, compare_strings);
+static inline macro_bsearch_kv(search_strings, char, char *, compare_strings);
 
 static inline void advance_group(ac_search_builder_image_term_t *t)
 {

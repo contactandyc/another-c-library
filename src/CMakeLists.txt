@@ -29,6 +29,20 @@ set(libac_io_a_SOURCES
 add_library(ac-io STATIC ${libac_io_a_SOURCES})
 target_link_libraries(ac-io PRIVATE ZLIB::ZLIB)
 
+set(libac_search_a_SOURCES
+    ac-search/ac_bit_set.c
+    ac-search/ac_boolean_tree_node.c
+    ac-search/ac_cursor.c
+    ac-search/ac_number_range.c
+    ac-search/ac_s.c
+    ac-search/ac_string_map.c
+    ac-search/ac_search_builder.c
+    ac-search/ac_string_table.c
+    ac-search/ac_token.c
+    ac-search/ac_top_n.c)
+add_library(ac-search STATIC ${libac_search_a_SOURCES})
+target_link_libraries(ac-search PRIVATE ZLIB::ZLIB)
+
 find_library(LIBUV_LIBRARY NAMES uv)
 
 if(LIBUV_LIBRARY)

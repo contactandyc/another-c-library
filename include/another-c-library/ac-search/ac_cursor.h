@@ -3,7 +3,7 @@
 
 #include <inttypes.h>
 #include "another-c-library/ac_pool.h"
-#include "another-c-library/ac_token.h"
+#include "another-c-library/ac-search/ac_token.h"
 
 struct ac_cursor_s;
 typedef struct ac_cursor_s ac_cursor_t;

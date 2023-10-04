@@ -1,7 +1,10 @@
-#include "another-c-library/ac_s.h"
+#include "another-c-library/ac-search/ac_s.h"
+
 #include "another-c-library/ac_allocator.h"
 #include "another-c-library/ac_pool.h"
-#include "another-c-library/ac_map.h"
+#include "another-c-library/ac_buffer.h"
+
+#include "the-macro-library/macro_map.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -312,7 +315,7 @@ struct ac_s_term_s;
 typedef struct ac_s_term_s ac_s_term_t;
 
 struct ac_s_term_s {
-    ac_map_t node;
+    macro_map_t node;
     ac_block_t *groups;
     uint32_t num_groups;
     uint32_t num_ids;
@@ -332,13 +335,13 @@ int compare_term_for_insert(const ac_s_term_t *a, const ac_s_term_t *b) {
     return strcmp((const char *)(a+1), (const char *)(b+1));
 }
 
-static ac_map_lower_bound_m(_term_upper, char, ac_s_term_t, compare_term_for_find);
-static ac_map_find_m(_term_find, char, ac_s_term_t, compare_term_for_find);
-static ac_map_insert_m(_term_insert, ac_s_term_t, compare_term_for_insert);
+static _macro_map_kv(_term_upper, lower_bound, macro_map_default(), char, ac_s_term_t, compare_term_for_find);
+static macro_map_find_kv(_term_find, char, ac_s_term_t, compare_term_for_find);
+static macro_map_insert(_term_insert, ac_s_term_t, compare_term_for_insert);
 
 struct ac_s_idx_s {
     ac_pool_t *pool;
-    ac_map_t *root;    
+    macro_map_t *root;
 };
 
 struct ac_s_s
@@ -872,7 +875,7 @@ void ac_s_erase(ac_s_t *h, const char *term, uint32_t id) {
     uint8_t key = term[0];
     if(key >= 'A' && key <= 'Z')
         key = key - 'A' + 'a';
-    ac_s_term_t *t = _term_find(term, h->idx[key].root);
+    ac_s_term_t *t = _term_find(h->idx[key].root, term);
     if(!t)
         return;
     t->groups = _ac_s_remove(h, t, t->groups, &t->num_groups, id);
@@ -883,7 +886,7 @@ uint8_t *ac_s_find(ac_s_t *h, uint32_t *len, const char *term, uint32_t id) {
     uint8_t key = term[0];
     if(key >= 'A' && key <= 'Z')
         key = key - 'A' + 'a';
-    ac_s_term_t *t = _term_find(term, h->idx[key].root);
+    ac_s_term_t *t = _term_find(h->idx[key].root, term);
     if(!t)
         return NULL;
     uint8_t *next = NULL;
@@ -899,11 +902,11 @@ void ac_s_insert(ac_s_t *h, const char *term, uint32_t id, const void *data, uin
     uint8_t key = term[0];
     if(key >= 'A' && key <= 'Z')
         key = key - 'A' + 'a';
-    ac_s_term_t *t = _term_find(term, h->idx[key].root);
+    ac_s_term_t *t = _term_find(h->idx[key].root, term);
     if(!t) {
         t = ac_pool_calloc(h->idx[key].pool, sizeof(*t) + strlen(term) + 1);
         strcpy((char *)(t+1), term);
-        _term_insert(t, &h->idx[key].root);    
+        _term_insert(&h->idx[key].root, t);
     }
     t->groups = _ac_s_add(h, t, t->groups, &t->num_groups, id, data, len);
 }
@@ -1891,20 +1894,20 @@ ac_s_cursor_t *ac_s_init_wild_cursor(ac_pool_t *pool, ac_s_t *h, const char *ter
     uint8_t key = term[0];
     if(key >= 'A' && key <= 'Z')
         key = key - 'A' + 'a';
-    ac_s_term_t *t = _term_upper(term, h->idx[key].root);
+    ac_s_term_t *t = _term_upper(h->idx[key].root, term);
     if(!t || strncmp((char *)(t+1), term, strlen(term))) {
         return ac_s_init_empty_cursor(pool);
     }
 
     ac_s_cursor_t *r = ac_s_init_or_term_cursor(pool);
-    ac_map_t *iter = &t->node;
+    macro_map_t *iter = &t->node;
     do {
         t = (ac_s_term_t *)iter;
         if(strncmp((char *)(t+1), term, strlen(term)))
             break;
         r->add_to_cursor(r, _init_term_cursor(pool, t));
     }
-    while((iter = ac_map_next(iter)));
+    while((iter = macro_map_next(iter)));
 
     or_cursor_t *oc = (or_cursor_t *)r;
     if(oc->num_cursors == 1)
@@ -1929,7 +1932,7 @@ ac_s_cursor_t *ac_s_init_term_cursor(ac_pool_t *pool, ac_s_t *h, ac_token_t *tok
     uint8_t key = term[0];
     if(key >= 'A' && key <= 'Z')
         key = key - 'A' + 'a';
-    ac_s_term_t *t = _term_find(term, h->idx[key].root);
+    ac_s_term_t *t = _term_find(h->idx[key].root, term);
     if(!t) {
         // empty cursor or NULL?
         return ac_s_init_empty_cursor(pool);
