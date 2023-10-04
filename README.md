@@ -19,13 +19,13 @@ To build `anotherclibrary`, follow these steps:
 ```bash
 mkdir build
 cd build
-./configure
+cmake ..
 make 
 make install
 ```
 
 
-## Configure Options
+## Configure Options (moving to cmake)
 
 * `--enable-debug`<br/>
   This will enable debug mode and should be used when specifying enable-address-sanitizer and the memory check options.
@@ -35,14 +35,6 @@ make install
   AnotherCLibrary can check memory that has been allocated / freed with ac_alloc and ac_free functions.  It can find memory leaks, invalid free(s), and double free(s) without sacrificing performance.  This option will report errors to the terminal.
 * `--with-memory-check-file=filename`<br/>
   Similar to the prior option, except that instead of reporting to the terminal, the memory information is stored in the file (based upon filename).  The with-memory-check option only reports on memory leaks at the end of the program.  This option will output memory usage every 2 minutes.  It saves previous versions by rotating the log.
-
-
-## Development
-
-4. **Generate the Configuration Script**: Run the following command to generate the configuration script:
-   ```bash
-   autoreconf --install
-   ```
 
 
 ## Contact
