@@ -1,0 +1,139 @@
+body {
+    background-color: #101010;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    touch-action: manipulation
+}
+.game-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    width: 500px;
+}
+.info-container {
+    display: flex;
+    width: 350px;
+    height: 150px;
+    align-items: center;
+    justify-content: space-between;
+}
+.info {
+    display: flex;
+    flex-grow: 0;
+    flex-flow: column nowrap;
+    justify-content: space-around;
+}
+.settings-button {
+    height: 30px;
+    width: 30px;
+    z-index: 1;
+    display: flex;
+    background-position: center;
+    background-size: cover;
+    border-radius: 20px;
+    background-color: #000099;
+    border-style: solid;
+    border-width: 3px;
+    border-color: black;
+}
+.settings-button:hover {
+    background-color: #000080;
+}
+.settings-button:active {
+    background-color: #000055;
+}
+.settings-visible {
+    background-image: url('../images/settings.png');
+}
+.settings-restart {
+    background-image: url('../images/restart.png');
+    background-size: 100%;
+}
+.board {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-between;
+}
+.board div {
+    height: 30px;
+    width: 30px;
+    flex-grow: 1;
+    background-color: #303030;
+    border-width: 2px;
+    border-color: black;
+    border-style: solid;
+    background-position: center;
+    background-size: cover;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    align-items: center;
+    animation-duration: 0.5s;
+}
+.score {
+    color: white;
+    font-size: 150%;
+}
+.next-shape {
+    display: flex;
+    width: 100px;
+    height: 100px;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-content: center;
+}
+.next-shape div {
+    width: 20px;
+    height: 20px;
+}
+.text {
+    display: flex;
+    width: 115px;
+    height: 30px;
+    margin: 0;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+.move-buttons {
+    position: fixed;
+    z-index: 2;
+    width: 350px;
+    bottom: 20px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+}
+.move-button {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    border-radius: 30px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    color: red;
+    user-select: none;
+    font-size: 300%;
+    font-weight: bolder
+}
+.move-left {
+    order: 0;
+}
+.rotate-left {
+    order: 1;
+    font-size: 210%;
+}
+.move-down {
+    order: 2;
+    transform: rotate(90deg);
+}
+.rotate-right {
+    order: 3;
+    font-size: 210%;
+    transform: scaleX(-1);
+}
+.move-right {
+    order: 4;
+}
